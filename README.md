@@ -29,10 +29,10 @@ async fn main() -> WaapiResult<()> {
 ### Making Simple Calls
 
 ```rust
-use waapi_client::api::ak;
+use waapi_client::waapi_function_api::ak;
 
 // Call without arguments
-let response = client.call(ak::wwise::core::GET_INFO, None, None).await?;
+let response = client.call(ak::wwise::core::getInfo, None, None).await?;
 response.print();
 ```
 
@@ -78,8 +78,8 @@ let options = WaapiOptions::with_return(&[
 use std::collections::HashMap;
 use waapi_client::{
     WaapiClient, WaapiArgs, WaapiOptions, WaapiValue, ReturnType,
-    api::ak,
 };
+use waapi_client::waapi_function_api::ak;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -105,7 +105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Make the call
     let response = client
-        .call(ak::wwise::core::object::GET, Some(args), Some(options))
+        .call(ak::wwise::core::object::get, Some(args), Some(options))
         .await?;
 
     // Extract values (type-safe)
@@ -156,20 +156,25 @@ if let Some(id_value) = response.get_return_value(ReturnType::Id) {
 
 ## API Endpoints
 
-Predefined API endpoints are available in the `api::ak` module:
+All WAAPI endpoints are available in the `waapi_function_api::ak` module as constants:
 
 ```rust
-use waapi_client::api::ak;
+use waapi_client::waapi_function_api::ak;
 
 // Core API
-ak::wwise::core::GET_INFO
-ak::wwise::core::object::GET
+ak::wwise::core::getInfo
+ak::wwise::core::object::get
+
+// Sound Engine
+ak::soundengine::postEvent
+ak::soundengine::setRTPCValue
 
 // UI API
-ak::wwise::ui::GET_SELECTED_OBJECTS
+ak::wwise::ui::getSelectedObjects
+ak::wwise::ui::bringToForeground
 ```
 
-More endpoints will be added over time, or you can use string literals for any WAAPI endpoint.
+All 170+ WAAPI endpoints are available. See [src/api.rs](src/api.rs) for the complete list organized by module.
 
 ## Return Types
 
