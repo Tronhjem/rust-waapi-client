@@ -2,6 +2,13 @@
 name = "waapi-client"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+authors = ["waapi-client contributors"]
+description = "A Rust client library for the Wwise Authoring API (WAAPI)"
+repository = "https://github.com/Tronhjem/rust-waapi-client"
+
+keywords = ["wwise", "waapi", "audio", "audiokinetic", "game-audio"]
+categories = ["api-bindings", "multimedia::audio"]
 
 [dependencies]
 wampire = { path = "src/wamp" }
