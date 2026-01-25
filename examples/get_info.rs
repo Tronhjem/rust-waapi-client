@@ -1,15 +1,28 @@
 use std::collections::HashMap;
 
+use log::{debug, error, info};
 use waapi_client::waapi_function_api::ak;
 use waapi_client::{ReturnType, WaapiArgs, WaapiClient, WaapiOptions, WaapiValue};
 
 #[tokio::main]
 async fn main() {
+    WaapiClient::initialize_logger(Some("info"));
+
     let test_address: &str = "127.0.0.1:8080";
+    info!("Connecting to WAAPI at {}", test_address);
+
     let waapi_client = WaapiClient::new(Some(test_address));
 
     if let Ok(mut client) = waapi_client {
-        // let response = client.call(ak::wwise::core::GET_INFO, None, None).await;
+        info!("Successfully connected to WAAPI");
+
+        debug!("Calling getInfo endpoint");
+        let info_response = client
+            .call(ak::wwise::core::getInfo, None, None)
+            .await
+            .unwrap();
+
+        info_response.print();
 
         let sel_options = WaapiOptions::with_return(&[ReturnType::Id]);
         let selected = client
@@ -33,6 +46,7 @@ async fn main() {
             ReturnType::Notes,
         ]);
 
+        info!("Getting object details for selected item");
         let get_respons = client
             .call(ak::wwise::core::object::get, Some(args), Some(options))
             .await
@@ -40,6 +54,9 @@ async fn main() {
 
         get_respons.print();
 
-        client.shutdown().await.expect("Shutdown failed");
+        info!("Shutting down WAAPI client");
+        client.shutdown().await.unwrap();
+    } else {
+        error!("Failed to connect to WAAPI at {}", test_address);
     }
 }

@@ -55,12 +55,10 @@ impl WaapiResponse {
         }
     }
 
-    /// Get a value from kwargs by key
     pub fn get(&self, key: &str) -> Option<&WaapiValue> {
         self.kwargs.get(key)
     }
 
-    /// Get the first object from the "return" list (common pattern in WAAPI)
     pub fn get_return_object(&self) -> Option<&HashMap<String, WaapiValue>> {
         if let Some(WaapiValue::List(list)) = self.kwargs.get("return") {
             if let Some(WaapiValue::Dict(dict)) = list.first() {
@@ -74,7 +72,6 @@ impl WaapiResponse {
         None
     }
 
-    /// Get all objects from the "return" list
     pub fn get_return_objects(&self) -> Vec<&HashMap<String, WaapiValue>> {
         if let Some(WaapiValue::List(list)) = self.kwargs.get("return") {
             return list
@@ -125,17 +122,42 @@ pub struct WaapiClient {
 }
 
 impl WaapiClient {
+    /// Initialize the logger for wampire debug output.
+    ///
+    /// Call this before creating a WaapiClient to see internal wampire logs.
+    ///
+    /// # Arguments
+    /// * `level` - Optional log level filter. Defaults to "error" if None.
+    ///             Valid values: "trace", "debug", "info", "warn", "error"
+    ///
+    /// # Example
+    /// ```no_run
+    /// use waapi_client::WaapiClient;
+    ///
+    /// // Show all logs
+    /// WaapiClient::initialize_logger(Some("debug"));
+    ///
+    /// // Only show errors (default)
+    /// WaapiClient::initialize_logger(None);
+    /// ```
+    pub fn initialize_logger(level: Option<&str>) {
+        let log_level = level.unwrap_or("error");
+        env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level))
+            .init();
+    }
+
     pub fn new(url: Option<&str>) -> WaapiResult<WaapiClient> {
         let connection_url = make_url(url.unwrap_or("127.0.0.1:8080"));
         let connection = Connection::new(&connection_url, "waapi_client");
-        let client = connection
-            .connect()
-            .map_err(|e| WaapiError::ConnectionFailed(format!("{:?}", e)))?;
+        let connected_client = connection.connect();
 
-        Ok(Self {
-            wamp_client: client,
-            shutdown_called: false,
-        })
+        match connected_client {
+            Ok(client) => Ok(Self {
+                wamp_client: client,
+                shutdown_called: false,
+            }),
+            Err(e) => Err(WaapiError::ConnectionFailed(format!("{:?}", e))),
+        }
     }
 
     pub async fn call(
@@ -148,14 +170,14 @@ impl WaapiClient {
         let wamp_kwargs: Option<HashMap<String, wampire::Value>> = args.map(|a| {
             a.into_hashmap()
                 .into_iter()
-                .map(|(k, v)| (k, v.into()))
+                .map(|(key, value)| (key, value.into()))
                 .collect()
         });
 
         let wamp_options: Option<HashMap<String, wampire::Value>> = options.map(|opts| {
             opts.to_hashmap()
                 .into_iter()
-                .map(|(k, v)| (k, v.into()))
+                .map(|(key, value)| (key, value.into()))
                 .collect()
         });
 
@@ -171,8 +193,11 @@ impl WaapiClient {
 
         match result {
             Ok((args, kwargs)) => Ok(WaapiResponse {
-                args: args.into_iter().map(|v| v.into()).collect(),
-                kwargs: kwargs.into_iter().map(|(k, v)| (k, v.into())).collect(),
+                args: args.into_iter().map(|value| value.into()).collect(),
+                kwargs: kwargs
+                    .into_iter()
+                    .map(|(key, value)| (key, value.into()))
+                    .collect(),
             }),
             Err(e) => Err(WaapiError::CallFailed(format!("{:?}", e.get_reason()))),
         }
