@@ -1,14 +1,14 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+pub mod api;
+mod types;
+pub mod waapi_client;
+
+pub use types::{ReturnType, WaapiArgs, WaapiOptions, WaapiValue};
+pub use waapi_client::{WaapiClient, WaapiError, WaapiResponse, WaapiResult};
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+        assert_eq!(2 + 2, 4);
     }
 }
