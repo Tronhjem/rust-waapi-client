@@ -15,7 +15,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-# Rust keywords that need to be escaped with r#
 RUST_KEYWORDS = {'move', 'type', 'mod', 'use', 'fn', 'let', 'if', 'else', 'for', 
                  'while', 'loop', 'match', 'return', 'break', 'continue', 'const',
                  'static', 'struct', 'enum', 'trait', 'impl', 'self', 'super',
@@ -33,7 +32,6 @@ def parse_function_path(func: str) -> Tuple[List[str], str]:
 
 
 def escape_if_keyword(name: str) -> str:
-    """Add r# prefix if the name is a Rust keyword"""
     return f'r#{name}' if name in RUST_KEYWORDS else name
 
 
@@ -82,35 +80,28 @@ def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
     
     # Get all items from tree
     items = [(k, v) for k, v in tree.items() if k != '__functions']
-    items.sort(key=lambda x: x[0])  # Sort alphabetically
+    items.sort(key=lambda x: x[0]) 
     
-    # Get functions at this level
     functions = tree.get('__functions', [])
-    functions.sort(key=lambda x: x[0])  # Sort alphabetically
+    functions.sort(key=lambda x: x[0])
     
-    # Generate const declarations for functions at this level
     for func_name, full_path in functions:
         escaped_name = escape_if_keyword(func_name)
         
-        # Check if the line will be too long (> 100 chars is typical Rust convention)
         const_line = f'{indent}pub const {escaped_name}: &str = "{full_path}";'
         
         if len(const_line) > 100:
-            # Split into multiple lines
             lines.append(f'{indent}pub const {escaped_name}: &str =')
             lines.append(f'{indent}    "{full_path}";')
         else:
             lines.append(const_line)
     
-    # Generate submodules
     for module_name, subtree in items:
-        # Add blank line before submodule if we already have content
         if functions and not lines[-1] == '':
             lines.append('')
         
         lines.append(f'{indent}pub mod {module_name} {{')
         
-        # Recursively generate submodule content
         submodule_lines = generate_module_code(subtree, indent_level + 1)
         lines.extend(submodule_lines)
         
@@ -130,18 +121,14 @@ def generate_api_file(functions: List[str], output_path: Path):
     # Build the module tree
     tree = build_module_tree(functions)
     
-    # Start with file header
     lines = [
         '/// Wwise Authoring API endpoints',
         '#[allow(non_upper_case_globals)]',
         '#[allow(non_snake_case)]',
     ]
     
-    # Generate the module code
     module_lines = generate_module_code(tree, 0)
     lines.extend(module_lines)
-    
-    # Write to file
     content = '\n'.join(lines) + '\n'
     output_path.write_text(content, encoding='utf-8')
     
@@ -153,13 +140,11 @@ def generate_from_text(file_name, out_file_name, waapi_type):
     functions_file = script_dir / file_name
     output_file = script_dir.parent / 'src' / out_file_name
     
-    # Check if functions.txt exists
     if not functions_file.exists():
         print(f"Error: {functions_file} not found!")
         print("Run get_waapi_functions.py first to generate functions.txt")
         return 1
     
-    # Load functions from JSON file
     with open(functions_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
@@ -169,15 +154,9 @@ def generate_from_text(file_name, out_file_name, waapi_type):
         print("Error: No functions found in functions.txt")
         return 1
     
-    # Generate the api.rs file
     generate_api_file(functions, output_file)
-
-def main():
-    result = generate_from_text("waapi_functions.txt","waapi_function_api.rs", 'functions')
-    result = generate_from_text("waapi_topics.txt", "waapi_topics_api.rs", 'topics')
-    
-    return 0
 
 
 if __name__ == '__main__':
-    exit(main())
+    generate_from_text("waapi_functions.txt","waapi_function_api.rs", 'functions')
+    generate_from_text("waapi_topics.txt", "waapi_topics_api.rs", 'topics')
