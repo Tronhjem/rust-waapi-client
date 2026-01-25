@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use waapi_client::api::ak;
+use waapi_client::waapi_function_api::ak;
 use waapi_client::{ReturnType, WaapiArgs, WaapiClient, WaapiOptions, WaapiValue};
 
 #[tokio::main]
@@ -13,7 +13,7 @@ async fn main() {
 
         let sel_options = WaapiOptions::with_return(&[ReturnType::Id]);
         let selected = client
-            .call(ak::wwise::ui::GET_SELECTED_OBJECTS, None, Some(sel_options))
+            .call(ak::wwise::ui::getSelectedObjects, None, Some(sel_options))
             .await
             .unwrap();
 
@@ -34,7 +34,7 @@ async fn main() {
         ]);
 
         let get_respons = client
-            .call(ak::wwise::core::object::GET, Some(args), Some(options))
+            .call(ak::wwise::core::object::get, Some(args), Some(options))
             .await
             .unwrap();
 
