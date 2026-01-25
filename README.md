@@ -1,6 +1,7 @@
 # waapi-client
 
 A Rust client library for the Wwise Authoring API (WAAPI), providing a clean, type-safe interface for interacting with Audiokinetic Wwise.
+More information about WAAPI can be found here: https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
 For now it's using a forked version of wampire for working with wamp. 
 https://github.com/Tronhjem/wamp-for-rust
