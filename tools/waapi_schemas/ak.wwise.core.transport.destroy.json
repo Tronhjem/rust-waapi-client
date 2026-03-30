@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "transport": {
+        "description": "The transport object ID to be used with all other ak.wwise.core.transport functions.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "transport"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Destroys the given transport object.",
+      "title": "Destroying a transport object",
+      "args": {
+        "transport": 1234
+      }
+    }
+  ]
+}

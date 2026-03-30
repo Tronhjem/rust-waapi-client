@@ -1,0 +1,44 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "listeners": {
+        "type": "array",
+        "description": "Array of listener game object IDs. Game objects must have been previously registered.",
+        "maxItems": 4294967295,
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/gameObject"
+        }
+      }
+    },
+    "required": [
+      "listeners"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets \"listeners\" as the list of default listeners.",
+      "title": "Setting the list of default listeners",
+      "args": {
+        "listeners": [
+          2233445,
+          5566778,
+          123456,
+          11222648
+        ]
+      }
+    }
+  ]
+}

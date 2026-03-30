@@ -1,0 +1,100 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "description": "A value to pass to the command. Some commands can take a value as an argument. Refer to the commands for more information.",
+        "$ref": "common_definitions.json#/definitions/propertyValue"
+      },
+      "platforms": {
+        "type": "array",
+        "description": "An array of platform. Each platform is an ID (GUID) or a unique name. Some commands can take platforms as arguments. Refer to the commands for more information.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/platformArg"
+        }
+      },
+      "command": {
+        "type": "string",
+        "description": "The ID of the command to execute. Refer to \\ref globalcommandsids for the lists of commands."
+      },
+      "objects": {
+        "type": "array",
+        "description": "An array of objects. Each object is an ID (GUID), name, or path of the object. Some commands can take objects as arguments. Refer to the commands for more information.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/objectArg"
+        }
+      }
+    },
+    "required": [
+      "command"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Finds the specified objects in the Project Explorer view (Selection Channel 1), and selects them.",
+      "title": "Finding and selecting objects in Project Explorer",
+      "args": {
+        "command": "FindInProjectExplorerSyncGroup1",
+        "objects": [
+          "{83D27335-6B94-4939-A01F-F00BEEB36E24}",
+          "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Executes \"ConvertCurrentPlatform\" on objects defined by \"objects\" GUID's.",
+      "title": "Executing a command requiring the object's parameter",
+      "args": {
+        "command": "ConvertCurrentPlatform",
+        "objects": [
+          "{83D27335-6B94-4939-A01F-F00BEEB36E24}",
+          "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Executes the \"ResetAllMutes\" command.",
+      "title": "Executing a command not requiring the object's parameter",
+      "args": {
+        "command": "ResetAllMutes"
+      }
+    },
+    {
+      "result": {},
+      "description": "Executes the \"Mute\" command and specify the mute state.",
+      "title": "Muting the specified object",
+      "args": {
+        "value": true,
+        "command": "Mute",
+        "objects": [
+          "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound"
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Executes the \"Mute\" command without specifying a value to toggle the current state.",
+      "title": "Toggling the Mute state on the specified object",
+      "args": {
+        "command": "Mute",
+        "objects": [
+          "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound"
+        ]
+      }
+    }
+  ]
+}

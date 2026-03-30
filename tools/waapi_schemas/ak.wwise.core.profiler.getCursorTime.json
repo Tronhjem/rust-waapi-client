@@ -1,0 +1,33 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "cursor": {
+        "description": "Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/profilerCursor"
+      }
+    },
+    "required": [
+      "cursor"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "integer",
+        "description": "The current position of the specified Time Cursor, in ms."
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "description": "Single file or array of files to revert. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "description": "Array of log entries generated during the request.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfLogCentralItem"
+      }
+    },
+    "required": [
+      "log"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "log": []
+      },
+      "description": "The modification is canceled and the contents of the file return to what was before the checkout.",
+      "title": "Reverting a file modification in the source control.",
+      "args": {
+        "files": [
+          "//projet-file//Originals/SFX/existingFile.wav"
+        ]
+      }
+    }
+  ]
+}

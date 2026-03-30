@@ -1,0 +1,72 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "The unique ID of the game object. ",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "event": {
+        "description": "Either the ID (GUID), name, or Short ID of the Event.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "event"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "The playing ID of the Event launched, or \\c AK_INVALID_PLAYING_ID if posting the event failed.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": 8
+      },
+      "description": "Posts an Event to the sound engine using the Event's name.",
+      "title": "Posting an Event by name",
+      "args": {
+        "gameObject": 1122334,
+        "event": "Play_Music"
+      }
+    },
+    {
+      "result": {
+        "return": 8
+      },
+      "description": "Posts an Event to the sound engine using the Event's Short ID.",
+      "title": "Posting an Event by Short ID",
+      "args": {
+        "gameObject": 1122334,
+        "event": 2932040671
+      }
+    },
+    {
+      "result": {
+        "return": 8
+      },
+      "description": "Posts an Event to the sound engine using the Event's GUID.",
+      "title": "Posting an Event by object GUID",
+      "args": {
+        "gameObject": 1122334,
+        "event": "{FF59687C-48CF-4385-B1C5-CE84B0A63880}"
+      }
+    }
+  ]
+}

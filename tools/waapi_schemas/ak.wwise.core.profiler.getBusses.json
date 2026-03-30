@@ -1,0 +1,70 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for busses, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      },
+      "busPipelineID": {
+        "description": "The pipeline ID of a single bus instance to get.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Members to return for each bus. Defaults to Pipeline ID, Game Object ID, and Object GUID.",
+        "$ref": "waapi_definitions.json#/definitions/busReturnOptions"
+      }
+    },
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of busses.",
+        "items": {
+          "description": "Bus item.",
+          "$ref": "waapi_definitions.json#/definitions/busReturn"
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "objectName": "Master Audio Bus"
+          },
+          {
+            "objectName": "My Aux Bus"
+          }
+        ]
+      },
+      "description": "Queries the bus in the current capture session at 30 secs (30,000 milliseconds).",
+      "title": "Querying the bus names at a point in time",
+      "args": {
+        "time": 30000
+      },
+      "options": {
+        "return": [
+          "objectName"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Unsolo all soloed objects in Wwise.",
+      "title": "Unsolo all objects",
+      "args": {}
+    }
+  ]
+}

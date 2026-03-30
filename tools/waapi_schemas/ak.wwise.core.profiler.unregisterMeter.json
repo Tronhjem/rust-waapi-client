@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to receive meter data. This object must be a bus, an aux bus or a device.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Unregisters a specific bus for metering.",
+      "title": "Unregistering a bus for metering",
+      "args": {
+        "object": "Bus:MusicBus"
+      }
+    }
+  ]
+}

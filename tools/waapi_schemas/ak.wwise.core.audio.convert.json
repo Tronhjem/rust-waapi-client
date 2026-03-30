@@ -1,0 +1,85 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "platforms": {
+        "type": "array",
+        "description": "An array of platforms. Each platform is an ID (GUID) or a unique name.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/platformArg"
+        }
+      },
+      "languages": {
+        "type": "array",
+        "description": "An array of languages. Each language is a unique name.",
+        "items": {
+          "description": "A language is a unique name.",
+          "$ref": "waapi_definitions.json#/definitions/languageArg"
+        }
+      },
+      "objects": {
+        "type": "array",
+        "description": "An array of objects. Each object is an ID (GUID), name, or object path. ",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/objectArg"
+        }
+      }
+    },
+    "required": [
+      "objects",
+      "platforms",
+      "languages"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "errors": {
+        "type": "array",
+        "description": "List of logged entries with associated messages and severities.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "severity": {
+              "description": "Severity of the logged message.",
+              "$ref": "waapi_definitions.json#/definitions/logCentralSeverity"
+            },
+            "message": {
+              "type": "string",
+              "description": "Message logged by the system (Error or warning)."
+            }
+          },
+          "description": "Logged entry with severity and message.",
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "errors": []
+      },
+      "description": "Converts the audio file of the specified object onto specified platforms and languages.",
+      "title": "Convert a WwiseObject",
+      "args": {
+        "platforms": [
+          "Windows"
+        ],
+        "languages": [
+          "SFX"
+        ],
+        "objects": [
+          "\\Actor-Mixer Hierarchy\\Default Work Unit\\Hello"
+        ]
+      }
+    }
+  ]
+}

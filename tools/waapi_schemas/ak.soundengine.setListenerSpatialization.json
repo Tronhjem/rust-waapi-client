@@ -1,0 +1,61 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "channelConfig": {
+        "description": "Channel configuration associated with volumeOffsets. Use <tt>AK::AkChannelConfig::Serialize</tt> to serialize the value.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "listener": {
+        "description": "Listener game object ID.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "spatialized": {
+        "type": "boolean",
+        "description": "Spatialization toggle (true: enable spatialization, false: disable spatialization)."
+      },
+      "volumeOffsets": {
+        "type": "array",
+        "description": "Array of per-speaker volume offsets, in dB. See AkSpeakerVolumes.h for how to manipulate this array.",
+        "maxItems": 4294967295,
+        "items": {
+          "type": "number",
+          "description": "Per-speaker volume offset."
+        }
+      }
+    },
+    "required": [
+      "listener",
+      "spatialized",
+      "channelConfig",
+      "volumeOffsets"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the spatialization for \"listener\" using \"volumeOffsets\" to pan to the left.",
+      "title": "Setting the listener spatialization",
+      "args": {
+        "channelConfig": 12546,
+        "listener": 555,
+        "spatialized": false,
+        "volumeOffsets": [
+          0,
+          -96.3
+        ]
+      }
+    }
+  ]
+}

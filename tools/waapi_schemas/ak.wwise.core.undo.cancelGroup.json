@@ -1,0 +1,31 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "undo": {
+        "type": "boolean",
+        "description": "Specify if the operations are undone. False when not specified."
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Cancels an undo group.",
+      "title": "Canceling an undo group",
+      "args": {}
+    }
+  ]
+}

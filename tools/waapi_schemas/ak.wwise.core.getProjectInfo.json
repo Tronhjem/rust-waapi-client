@@ -1,0 +1,316 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "Project id.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The Project name. Note that the Project name can differ from the WPROJ file name, if the file was renamed after Project creation."
+      },
+      "path": {
+        "type": "string",
+        "description": "The absolute path to the WPROJ file."
+      },
+      "platforms": {
+        "type": "array",
+        "description": "Array of the Platforms defined in the project.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Platform unique id.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "name": {
+              "type": "string",
+              "description": "Platform name defined in the Project."
+            },
+            "baseName": {
+              "type": "string",
+              "description": "The name of the deployment platform used in file system."
+            },
+            "baseDisplayName": {
+              "type": "string",
+              "description": "The official name of the deployment platform. The name could contain special characters."
+            },
+            "soundBankPath": {
+              "type": "string",
+              "description": "The path on which the SoundBank files are generated for this Platform."
+            },
+            "copiedMediaPath": {
+              "type": "string",
+              "description": "The path on which the SoundBank media files are copied for this Platform."
+            }
+          },
+          "description": "Platform defined in the project.",
+          "required": [
+            "id",
+            "name",
+            "baseName",
+            "baseDisplayName",
+            "soundBankPath",
+            "copiedMediaPath"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "languages": {
+        "type": "array",
+        "description": "Array of the Languages defined in the project.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "Language unique id.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "shortId": {
+              "description": "The short ID (32-bit) of the language.",
+              "$ref": "common_definitions.json#/definitions/uint32"
+            },
+            "name": {
+              "type": "string",
+              "description": "Language name."
+            }
+          },
+          "description": "Language defined in the project.",
+          "required": [
+            "id",
+            "name",
+            "shortId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "directories": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "string",
+            "description": "The root directory of the project. Refer to \\ref defining_custom_properties for more information."
+          },
+          "commands": {
+            "type": "string",
+            "description": "The Commands directory of the project. Refer to \\ref defining_custom_commands for more information."
+          },
+          "cache": {
+            "type": "string",
+            "description": "The .cache directory of the project, as specified in the Project Settings. The .cache directory contains converted media files (WEM files)."
+          },
+          "root": {
+            "type": "string",
+            "description": "The root directory of the project, where is located the wproj file."
+          },
+          "originals": {
+            "type": "string",
+            "description": "The Originals directory of the project, as specified in the Project Settings. The Originals directory contains the project's WAV files, separated by languages."
+          },
+          "soundBankOutputRoot": {
+            "type": "string",
+            "description": "The SoundBank output root directory of the project, as specified in the Project Settings. This directory contains the Project's SoundBank C++ header, XML and JSON files. Refer to the 'platforms' section for Platform specific directories."
+          }
+        },
+        "description": "Collection of directories used by Wwise.",
+        "required": [
+          "root",
+          "cache",
+          "originals",
+          "soundBankOutputRoot",
+          "commands",
+          "properties"
+        ],
+        "additionalProperties": false
+      },
+      "displayTitle": {
+        "type": "string",
+        "description": "The complete text from the Wwise titlebar."
+      },
+      "isDirty": {
+        "type": "boolean",
+        "description": "True if the Project or any of the Work Units have unsaved changes."
+      },
+      "currentLanguageId": {
+        "description": "The current Language set in the user interface.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "referenceLanguageId": {
+        "description": "The reference Language set in the Language settings.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "currentPlatformId": {
+        "description": "The current Platform set in the user interface.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "defaultConversion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Conversion Settings unique id.",
+            "$ref": "common_definitions.json#/definitions/guid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Conversion Settings object name."
+          }
+        },
+        "description": "The default Conversion Settings object used in the Project.",
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "name",
+      "displayTitle",
+      "path",
+      "id",
+      "isDirty",
+      "currentLanguageId",
+      "referenceLanguageId",
+      "languages",
+      "currentPlatformId",
+      "platforms",
+      "defaultConversion",
+      "directories"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "id": "{4DA5940A-0C59-43B3-A8FD-8AFFC0DA0711}",
+        "name": "IntegrationDemo",
+        "path": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\IntegrationDemo.wproj",
+        "platforms": [
+          {
+            "id": "{A2D401DE-B8B6-4FEB-8142-137C34D507CB}",
+            "name": "Android",
+            "baseName": "Android",
+            "baseDisplayName": "Android™",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\Android\\assets\\GeneratedSoundBanks\\Android\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\Android\\assets\\GeneratedSoundBanks\\Android\\Media"
+          },
+          {
+            "id": "{ECE03DB4-F948-462D-B2BB-A9173012B1F9}",
+            "name": "iOS",
+            "baseName": "iOS",
+            "baseDisplayName": "iOS",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\iOS\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\iOS\\Media"
+          },
+          {
+            "id": "{BD0BDF13-3125-454F-8BFD-319537169F82}",
+            "name": "Linux",
+            "baseName": "Linux",
+            "baseDisplayName": "Linux",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Linux\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Linux\\Media"
+          },
+          {
+            "id": "{9C6217D5-DD11-4795-87C1-6CE02853C541}",
+            "name": "Mac",
+            "baseName": "Mac",
+            "baseDisplayName": "Mac®",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Mac\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Mac\\Media"
+          },
+          {
+            "id": "{3AF9B9B6-6EF1-47E9-B5FE-E30C9E602C78}",
+            "name": "PS4",
+            "baseName": "PS4",
+            "baseDisplayName": "PlayStation®4",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\PS4\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\PS4\\Media"
+          },
+          {
+            "id": "{D5ED7120-5431-4D09-9798-39BE0ABD51F0}",
+            "name": "PS5",
+            "baseName": "PS5",
+            "baseDisplayName": "PlayStation®5",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\PS5\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\PS5\\Media"
+          },
+          {
+            "id": "{EE08C214-8E87-44DD-9F19-D8EEA37D5D30}",
+            "name": "Switch",
+            "baseName": "Switch",
+            "baseDisplayName": "Switch™",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Switch\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Switch\\Media"
+          },
+          {
+            "id": "{6E0CB257-C6C8-4C5C-8366-2740DFC441EC}",
+            "name": "Windows",
+            "baseName": "Windows",
+            "baseDisplayName": "Windows®",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Windows\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\Windows\\Media"
+          },
+          {
+            "id": "{B131584B-9961-4BB5-9C58-A3E9ABFFBBF7}",
+            "name": "XboxOne",
+            "baseName": "XboxOne",
+            "baseDisplayName": "Xbox One™",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\XboxOne\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\XboxOne\\Media"
+          },
+          {
+            "id": "{DCABC33B-39F8-4D63-ACD6-FA1EE58E58AA}",
+            "name": "XboxSeriesX",
+            "baseName": "XboxSeriesX",
+            "baseDisplayName": "Xbox Series X™",
+            "soundBankPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\XboxSeriesX\\",
+            "copiedMediaPath": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\XboxSeriesX\\Media"
+          }
+        ],
+        "languages": [
+          {
+            "id": "{C7DD1F00-ECD1-4598-B60F-EAE32C06EC46}",
+            "shortId": 684519430,
+            "name": "English(US)"
+          },
+          {
+            "id": "{87AD0603-CBEB-4D18-89B0-EBA48B97FA28}",
+            "shortId": 1024389618,
+            "name": "French(Canada)"
+          }
+        ],
+        "directories": {
+          "properties": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\Add-ons\\Properties",
+          "commands": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\Add-ons\\Commands",
+          "cache": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\.cache\\",
+          "root": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\",
+          "originals": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\Originals\\",
+          "soundBankOutputRoot": "C:\\Wwise\\SDK\\samples\\IntegrationDemo\\WwiseProject\\GeneratedSoundBanks\\"
+        },
+        "displayTitle": "IntegrationDemo - Wwise 2022.1.0",
+        "isDirty": false,
+        "currentLanguageId": "{C7DD1F00-ECD1-4598-B60F-EAE32C06EC46}",
+        "referenceLanguageId": "{C7DD1F00-ECD1-4598-B60F-EAE32C06EC46}",
+        "currentPlatformId": "{A2D401DE-B8B6-4FEB-8142-137C34D507CB}",
+        "defaultConversion": {
+          "id": "{3A429FCB-87D8-458B-B315-DBE8023064B3}",
+          "name": "SFX"
+        }
+      },
+      "description": "Gets information about the current opened project.",
+      "title": "Getting the information about the current Project",
+      "args": {}
+    }
+  ]
+}

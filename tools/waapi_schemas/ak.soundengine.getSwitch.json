@@ -1,0 +1,42 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "The unique ID of the game object. ",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "switchGroup": {
+        "description": "Either the ID (GUID), unique qualified name, or path of the Switch Group.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "switchGroup"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "description": "Specifies the return options for every object returned.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturnOptions"
+  },
+  "resultSchema": {
+    "description": "The Switch Group and any options. Default returns id and name.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturn",
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {
+        "id": "{44339A11-DC69-4A1B-9771-66244391C6ED}",
+        "name": "Dirt"
+      },
+      "description": "Gets the state of the Surface Switch Group for Game Object Footstep.",
+      "title": "Get the state of a switch for a Game Object.",
+      "args": {
+        "gameObject": 400530090,
+        "switchGroup": "{EAB62AA7-5069-491B-BC8F-495B01CA7501}"
+      }
+    }
+  ]
+}

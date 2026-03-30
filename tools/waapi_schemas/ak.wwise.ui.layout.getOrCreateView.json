@@ -1,0 +1,52 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The unique identifier, as a string, of the view type to get or create."
+      },
+      "posX": {
+        "type": "integer",
+        "description": "Initial position of the created view on the horizontal axis. Defaults to -1."
+      },
+      "posY": {
+        "type": "integer",
+        "description": "Initial position of the created view on the vertical axis. Defaults to -1."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The unique ID of the view",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "id": "{39949670-A96A-47C5-8EEF-F8AD26BD6B34}"
+      },
+      "description": "Gets a view, if it exists in the current layout, or creates a new one.",
+      "title": "Retrieving or creating a new view",
+      "args": {
+        "name": "Game Object 3D Viewer",
+        "posX": 100,
+        "posY": 100
+      }
+    }
+  ]
+}

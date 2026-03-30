@@ -1,0 +1,63 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to watch.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "property": {
+        "type": "string",
+        "description": "The property of the watched object to watch.",
+        "$ref": "waapi_definitions.json#/definitions/propertyName"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every change on \"property\" of \"object\". Refer to \\ref wobjects_index for more information on the properties available.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "required": [
+      "object",
+      "property"
+    ],
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The watched object.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "property": {
+        "type": "string",
+        "description": "The watched property of the watched object.",
+        "$ref": "waapi_definitions.json#/definitions/propertyName"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform for which the change occurred.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "old": {
+        "description": "The previous value.",
+        "$ref": "common_definitions.json#/definitions/propertyValue"
+      },
+      "new": {
+        "description": "The new value.",
+        "$ref": "common_definitions.json#/definitions/propertyValue"
+      }
+    },
+    "required": [
+      "object",
+      "property",
+      "old",
+      "new",
+      "platform"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "The path to the project WPROJ file. For using WAAPI on Mac, please refer to \\ref waapi_path_on_mac .",
+        "pattern": "\\.wproj$"
+      },
+      "onUpgrade": {
+        "type": "string",
+        "description": "(DEPRECATED) The action to be executed when opening a project that needs to be upgraded. Note, this is deprecated. Please use onMigrationRequired instead.",
+        "enum": [
+          "migrate",
+          "fail"
+        ]
+      },
+      "onMigrationRequired": {
+        "type": "string",
+        "description": "The action to be executed when opening a project that needs to be migrated.",
+        "enum": [
+          "migrate",
+          "fail"
+        ]
+      },
+      "bypassSave": {
+        "type": "boolean",
+        "description": "Indicates if the user should not be prompted to save the current project. Defaults to true."
+      },
+      "autoCheckOutToSourceControl": {
+        "type": "boolean",
+        "description": "Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true."
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Opens the .wproj project specified by path.",
+      "title": "Opening a project",
+      "args": {
+        "path": "C:\\projects\\myWwiseProject.wproj",
+        "bypassSave": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the layout to register."
+      },
+      "layout": {
+        "description": "The layout description in JSON format.",
+        "$ref": "waapi_ui_definitions.json#/definitions/LayoutEntity"
+      }
+    },
+    "required": [
+      "name",
+      "layout"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Registers a new layout from a JSON format",
+      "title": "Register a new temporary layout",
+      "args": {
+        "name": "TemporaryLayout",
+        "layout": {
+          "Layout": {
+            "Name": "TemporaryLayout"
+          }
+        }
+      }
+    }
+  ]
+}

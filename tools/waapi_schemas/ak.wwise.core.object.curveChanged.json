@@ -1,0 +1,39 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every curve change.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "owner": {
+        "description": "The owner object.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "notification": {
+        "type": "string",
+        "description": "The type of change applied to the curve."
+      },
+      "curve": {
+        "description": "The curve object that was modified.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "notification",
+      "curve",
+      "owner"
+    ],
+    "additionalProperties": false
+  }
+}

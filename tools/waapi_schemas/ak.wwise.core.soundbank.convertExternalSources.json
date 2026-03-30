@@ -1,0 +1,86 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "sources": {
+        "type": "array",
+        "description": "An array of external sources files and corrisponding arguments.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "platform": {
+              "description": "The platform to convert external sources for.",
+              "$ref": "waapi_definitions.json#/definitions/platformArg"
+            },
+            "input": {
+              "type": "string",
+              "description": "The path to the wsources file."
+            },
+            "output": {
+              "type": "string",
+              "description": "Optional argument for the path of the output folder to be generated.The default path is WwiseProject/.cache/ExternalSources/Platform."
+            }
+          },
+          "description": "An external sources file and its arguments.",
+          "required": [
+            "input",
+            "platform"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "sources"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Convert External Sources for Linux at the default output path.",
+      "title": "Convert External Sources for a platform",
+      "args": {
+        "sources": [
+          {
+            "platform": "Linux",
+            "input": "C:\\My-Wsources\\sources1.wsources"
+          }
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Convert External Sources for several platforms given a variety of wsources files, with optional and default output paths.",
+      "title": "Convert External Sources for several platforms and output paths",
+      "args": {
+        "sources": [
+          {
+            "platform": "Windows",
+            "input": "C:\\My-Wsources\\sources1.wsources"
+          },
+          {
+            "platform": "{6E0CB257-C6C8-4C5C-8366-2740DFC441EC}",
+            "input": "C:\\My-Wsources\\sources2.wsources",
+            "output": "C:\\ExternalSources-Alternate\\Windows"
+          },
+          {
+            "platform": "Linux",
+            "input": "C:\\My-Wsources\\sources1.wsources",
+            "output": "C:\\ExternalSources-Alternate\\Linux"
+          }
+        ]
+      }
+    }
+  ]
+}

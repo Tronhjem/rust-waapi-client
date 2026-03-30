@@ -1,0 +1,24 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "logs": {
+        "type": "array",
+        "description": "The SoundBank generation log. The log is empty when used in WwiseConsole.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/logCentralItem"
+        }
+      },
+      "error": {
+        "type": "string",
+        "description": "(DEPRECATED) The error message if an error occurred. Only present if an error occurred. You should check logs instead now."
+      }
+    },
+    "additionalProperties": false
+  }
+}

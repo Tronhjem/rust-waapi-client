@@ -1,0 +1,29 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "viewID": {
+        "type": "string",
+        "description": "The ID of the view."
+      }
+    },
+    "required": [
+      "viewID"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "array",
+    "items": {
+      "description": "The ID of the view handle.",
+      "$ref": "common_definitions.json#/definitions/guid"
+    },
+    "additionalProperties": false
+  },
+  "examples": []
+}

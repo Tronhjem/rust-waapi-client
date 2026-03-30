@@ -1,4 +1,5 @@
-mod types;
+pub mod api;
+pub mod types;
 pub mod waapi_client;
 pub mod waapi_function_api;
 pub mod waapi_topics_api;

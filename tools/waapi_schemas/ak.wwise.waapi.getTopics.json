@@ -1,0 +1,27 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "topics": {
+        "type": "array",
+        "description": "Array of topic URIs.",
+        "items": {
+          "type": "string",
+          "description": "Topic URIs retrieved from the Wwise Authoring API schema."
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": []
+}

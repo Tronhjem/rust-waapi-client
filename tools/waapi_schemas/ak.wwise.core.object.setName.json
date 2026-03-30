@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to rename.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "value": {
+        "type": "string",
+        "description": "The new name of the object."
+      }
+    },
+    "required": [
+      "object",
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Renames the object specified by \"object\" to \"value\".",
+      "title": "Renaming a WwiseObject",
+      "args": {
+        "object": "{24979032-B170-43E3-A2E4-469E0193E2C3}",
+        "value": "new name"
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Associated game object ID. Its default value is the transport game object.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "switchGroup": {
+        "description": "Either the ID (GUID), name, or short ID of the Switch Group.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      },
+      "switchState": {
+        "description": "Either the ID (GUID), name, or Short ID of the Switch State.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "switchGroup",
+      "switchState"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets \"switchGroup\" to the \"switchState\" for \"gameObject\".",
+      "title": "Setting the Switch Group to another State using names",
+      "args": {
+        "gameObject": 1122334,
+        "switchGroup": "Ground",
+        "switchState": "Gravel"
+      }
+    },
+    {
+      "return": {},
+      "description": "Sets \"switchGroup\" to the \"switchState\" for \"gameObject\".",
+      "title": "Setting the Switch Group to another State using Short IDs",
+      "args": {
+        "gameObject": 1122334,
+        "switchGroup": 1270826848,
+        "switchState": 1208172755
+      }
+    }
+  ]
+}

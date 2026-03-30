@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name of the game object (for monitoring purpose)."
+      },
+      "gameObject": {
+        "description": "ID of the game object to be registered. Valid range is [0, 0xFFFFFFFFFFFFFFDF].",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      }
+    },
+    "required": [
+      "gameObject",
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Registers the \"MyGameObjectName\" game object.",
+      "title": "Registering a game object",
+      "args": {
+        "name": "MyGameObjectName",
+        "gameObject": 1122334
+      }
+    }
+  ]
+}

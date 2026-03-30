@@ -1,0 +1,34 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to control via the transport object.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "description": "Prepare the object and it dependencies for playback and use with the transport object.",
+      "title": "Preparing An Event",
+      "args": {
+        "object": "{B9DAD74D-400A-4CDC-B051-17C229BDD779}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The current layout name, an empty string means no layout."
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "name": "Designer"
+      },
+      "description": "Returns the current layout's name as a string.",
+      "title": "Retrieving the current layout's name",
+      "args": {}
+    }
+  ]
+}

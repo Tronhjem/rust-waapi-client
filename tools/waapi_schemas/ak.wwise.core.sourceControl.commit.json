@@ -1,0 +1,53 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "description": "Array of files to commit. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      },
+      "message": {
+        "type": "string",
+        "description": "Description message for the commit."
+      }
+    },
+    "required": [
+      "files",
+      "message"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "description": "Array of log entries generated during the request.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfLogCentralItem"
+      }
+    },
+    "required": [
+      "log"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "log": []
+      },
+      "description": "The modification and the message on it is sent to the source file.",
+      "title": "Commiting a file modification in the source control.",
+      "args": {
+        "files": [
+          "//projet-file//Originals/SFX/existingFile.wav"
+        ],
+        "message": "some comments about this commit"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every attenuation curve change.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "curveType": {
+        "type": "string",
+        "description": "The curve type that changed.",
+        "enum": [
+          "VolumeDryUsage",
+          "VolumeWetGameUsage",
+          "VolumeWetUserUsage",
+          "LowPassFilterUsage",
+          "HighPassFilterUsage",
+          "SpreadUsage",
+          "FocusUsage"
+        ]
+      },
+      "attenuation": {
+        "description": "The attenuation object owning the curve.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "attenuation",
+      "curveType"
+    ],
+    "additionalProperties": false
+  }
+}

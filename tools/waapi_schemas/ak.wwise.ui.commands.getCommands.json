@@ -1,0 +1,27 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "commands": {
+        "type": "array",
+        "description": "An array of command ids.",
+        "items": {
+          "type": "string",
+          "description": "Command ids which can be used with ak.wwise.ui.commands.execute."
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": []
+}

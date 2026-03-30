@@ -1,0 +1,53 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "listener": {
+        "description": "Listener game object ID",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "emitter": {
+        "description": "Emitter game object ID.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "obstructionLevel": {
+        "type": "number",
+        "description": "ObstructionLevel: [0.0f..1.0f]."
+      },
+      "occlusionLevel": {
+        "type": "number",
+        "description": "OcclusionLevel: [0.0f..1.0f]."
+      }
+    },
+    "required": [
+      "emitter",
+      "listener",
+      "obstructionLevel",
+      "occlusionLevel"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the \"emitter\"'s \"obstructionLevel\" and \"occlusionLevel\" for the \"listener\".",
+      "title": "Setting the obstruction and occlusion level of a game object",
+      "args": {
+        "listener": 4455667,
+        "emitter": 1122334,
+        "obstructionLevel": 0.3,
+        "occlusionLevel": 0.3
+      }
+    }
+  ]
+}

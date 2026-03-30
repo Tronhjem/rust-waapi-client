@@ -1,0 +1,50 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The ID of the splitter to move."
+      },
+      "delta": {
+        "type": "integer",
+        "description": "The delta, in pixels, to add to the splitter position."
+      }
+    },
+    "required": [
+      "id",
+      "delta"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Moves a splitter to the right or the bottom, by a delta given in pixels.",
+      "title": "Moving a layout splitter forward",
+      "args": {
+        "id": "{6609D1BA-0E47-48F4-B3B6-3DA1C345B66E}",
+        "delta": 100
+      }
+    },
+    {
+      "result": {},
+      "description": "Moves a splitter to the left or the top, by a delta given in pixels.",
+      "title": "Moving a layout splitter backward",
+      "args": {
+        "id": "{6609D1BA-0E47-48F4-B3B6-3DA1C345B66E}",
+        "delta": -100
+      }
+    }
+  ]
+}

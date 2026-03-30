@@ -1,0 +1,47 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "transport": {
+        "description": "The ID of the watched transport.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "transport"
+    ],
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID) of the object controlled by the transport object.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "gameObject": {
+        "description": "The game object used by the transport object.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "transport": {
+        "description": "The ID of the watched transport.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "state": {
+        "type": "string",
+        "description": "The state of the transport object.",
+        "enum": [
+          "playing",
+          "stopped",
+          "paused"
+        ]
+      }
+    },
+    "required": [
+      "transport",
+      "state",
+      "object"
+    ],
+    "additionalProperties": false
+  }
+}

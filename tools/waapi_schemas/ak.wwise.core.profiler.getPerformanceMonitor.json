@@ -1,0 +1,101 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for Performance Monitor data, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of Performance Monitor counters.",
+        "items": {
+          "description": "Performance Monitor counter.",
+          "$ref": "#/definitions/performanceMonitorCounter"
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+      "performanceMonitorCounter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "unique Id of the counter."
+          },
+          "name": {
+            "type": "string",
+            "description": "name of the counter as shown in Wwise Authoring."
+          },
+          "value": {
+            "type": "number",
+            "description": "value of counter at given time."
+          }
+        },
+        "description": "Performance Monitor counter values.",
+        "required": [
+          "name",
+          "id",
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "id": "CpuTotal",
+            "name": "cpuTotal",
+            "value": 2.21
+          },
+          {
+            "id": "VoicesPhysical",
+            "name": "voicesPhysical",
+            "value": 1
+          },
+          {
+            "id": "VoicesTotal",
+            "name": "voicesTotal",
+            "value": 2
+          },
+          {
+            "id": "ActiveTransitions",
+            "name": "Number of Transitions/Interpolations",
+            "value": 1
+          },
+          {
+            "id": "OutputPeak",
+            "name": "outputPeak",
+            "value": -37.5
+          }
+        ]
+      },
+      "description": "Queries the Performance Monitor Counters in the current capture session at the latest capture time. For the purposes of this example only a subset of the returned counters are displayed.",
+      "title": "Querying the Performance Monitor at a point in time.",
+      "args": {
+        "time": "capture"
+      }
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "platforms": {
+        "type": "array",
+        "description": "List of platforms to generate. If you don't specify any platforms, all the platforms will be generated",
+        "items": {
+          "type": "string",
+          "description": "The ID (GUID) or the name of the platforms"
+        }
+      },
+      "languages": {
+        "type": "array",
+        "description": "List of languages to generate. If you don't specify any languages, all the languages will be generated.",
+        "items": {
+          "description": "The ID (GUID) or name of the language.",
+          "$ref": "waapi_definitions.json#/definitions/languageArg"
+        }
+      },
+      "soundbanks": {
+        "type": "array",
+        "description": "List of user-defined SoundBanks to generate. If the array is empty then all user-defined SoundBanks are generated. Note that auto-defined SoundBanks cannot be specified, and all auto-defined SoundBanks are generated regardless of this parameter.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the user-defined SoundBank to generate. A temporary SoundBank will be created if the SoundBank doesn't exist. Auto-defined SoundBanks cannot be specified."
+            },
+            "inclusions": {
+              "type": "array",
+              "description": "List of inclusion type to use for this SoundBank. Not required if the bank already exists.",
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "event",
+                  "structure",
+                  "media"
+                ]
+              }
+            },
+            "events": {
+              "type": "array",
+              "description": "List of events to include in this SoundBank. Not required if the bank already exists.",
+              "items": {
+                "description": "The ID (GUID), name, or path of the event to include in the SoundBank.",
+                "$ref": "waapi_definitions.json#/definitions/objectArg"
+              }
+            },
+            "auxBusses": {
+              "type": "array",
+              "description": "List of AuxBus to include in this SoundBank.",
+              "items": {
+                "description": "The ID (GUID), name, or path of the Auxiliary Bus to include in the SoundBank.",
+                "$ref": "waapi_definitions.json#/definitions/objectArg"
+              }
+            },
+            "rebuild": {
+              "type": "boolean",
+              "description": "Force rebuild of this particuliar SoundBank. Default value: false"
+            }
+          },
+          "description": "SoundBank Info.",
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "skipLanguages": {
+        "type": "boolean",
+        "description": "By default, if you don't specify any languages all languages will be generated. If you set this parameter to true, no localized SoundBank will be generated."
+      },
+      "rebuildInitBank": {
+        "type": "boolean",
+        "description": "If you don't use rebuildSoundBanks, use this option to force a rebuild of the Init bank for each specified platform."
+      },
+      "rebuildSoundBanks": {
+        "type": "boolean",
+        "description": "Will rebuild all SoundBanks if true. If you want to clear the converted media as well, use clearAudioFileCache parameter. Default value: false"
+      },
+      "clearAudioFileCache": {
+        "type": "boolean",
+        "description": "Deletes the content of the Wwise audio file cache folder prior to converting source files and generating SoundBanks, which ensures that all source files are reconverted. Note that the whole cache is cleared, for all platforms, regardless of the platforms arguments. Default value: false"
+      },
+      "writeToDisk": {
+        "type": "boolean",
+        "description": "Use the normal SoundBank generation process and write the sound bank and info file to disk. Default value: false"
+      }
+    },
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "logs": {
+        "type": "array",
+        "description": "The SoundBank generation log. The log is empty when used in WwiseConsole.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/logCentralItem"
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Generating SoundBanks already in project and have the bank data streamed via WAAPI. Refer to \\ref ak_wwise_core_soundbank_generated to learn how to retrieve the SoundBank data.",
+      "title": "Generating several existing SoundBanks without writing them to disk",
+      "args": {
+        "platforms": [
+          "Windows",
+          "Linux"
+        ],
+        "languages": [
+          "English(US)"
+        ],
+        "soundbanks": [
+          {
+            "name": "SampleBank"
+          },
+          {
+            "name": "AnotherBank"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Sample call that import a new SoundBank and then generate it, the SoundBank will not be saved in the project. Refer to \\ref ak_wwise_core_soundbank_generated to learn how to retrieve the SoundBank data.",
+      "title": "Generating a new SoundBank by specifying inclusions",
+      "args": {
+        "platforms": [
+          "Windows",
+          "Linux"
+        ],
+        "soundbanks": [
+          {
+            "name": "SampleBank",
+            "inclusions": [
+              "event",
+              "structure",
+              "media"
+            ],
+            "events": [
+              "Event:Play_Footsteps",
+              "Event:Play_Music"
+            ],
+            "auxBusses": [
+              "AuxBus:Cavern"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "description": "Import a new SoundBank, generate it and then write it to disk in the SoundBank generation folder.",
+      "title": "Generating a new SoundBank on disk by specifying inclusions",
+      "args": {
+        "platforms": [
+          "Windows",
+          "Linux"
+        ],
+        "soundbanks": [
+          {
+            "name": "SampleBank",
+            "inclusions": [
+              "event",
+              "structure",
+              "media"
+            ],
+            "events": [
+              "Event:Play_Footsteps",
+              "Event:Play_Music"
+            ],
+            "auxBusses": [
+              "AuxBus:Cavern"
+            ],
+            "rebuild": true
+          }
+        ],
+        "clearAudioFileCache": true,
+        "writeToDisk": true
+      }
+    }
+  ]
+}

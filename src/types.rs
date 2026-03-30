@@ -117,6 +117,8 @@ pub enum ReturnType {
     BlendTracks,
     SupportsStates,
     SupportsRandomizer,
+    ActiveSource,
+    ClassIdLower,
     SwitchGroupGameParameter,
     HasEmptySwitchStateAssignment,
     ExtractEvents,
@@ -195,7 +197,9 @@ impl ReturnType {
             ReturnType::OriginalState => "originalState",
             ReturnType::BlendTracks => "blendTracks",
             ReturnType::SupportsStates => "supportsStates",
-            ReturnType::SupportsRandomizer => "suppportsRandomizer",
+            ReturnType::SupportsRandomizer => "supportsRandomizer",
+            ReturnType::ActiveSource => "activeSource",
+            ReturnType::ClassIdLower => "classid",
             ReturnType::SwitchGroupGameParameter => "switchGroupGameParameter",
             ReturnType::HasEmptySwitchStateAssignment => "hasEmptySwitchStateAssignment",
             ReturnType::ExtractEvents => "extractEvents",
@@ -209,16 +213,24 @@ impl ReturnType {
 #[derive(Debug, Clone)]
 pub struct WaapiOptions {
     return_types: Vec<ReturnType>,
+    language: Option<String>,
+    platform: Option<String>,
 }
 
 impl WaapiOptions {
     pub fn new(return_types: Vec<ReturnType>) -> Self {
-        Self { return_types }
+        Self {
+            return_types,
+            language: None,
+            platform: None,
+        }
     }
 
     pub fn with_return(return_types: &[ReturnType]) -> Self {
         Self {
             return_types: return_types.to_vec(),
+            language: None,
+            platform: None,
         }
     }
 
@@ -230,7 +242,26 @@ impl WaapiOptions {
             .map(|rt| WaapiValue::String(rt.as_str().to_string()))
             .collect();
         map.insert("return".to_string(), WaapiValue::List(return_values));
+
+        if let Some(plat) = &self.platform {
+            map.insert("platform".to_string(), WaapiValue::String(plat.clone()));
+        }
+
+        if let Some(lan) = &self.language {
+            map.insert("language".to_string(), WaapiValue::String(lan.clone()));
+        }
+
         map
+    }
+
+    pub fn set_language(mut self, language: impl Into<String>) -> Self {
+        self.language = Some(language.into());
+        self
+    }
+
+    pub fn set_platform(mut self, platform: impl Into<String>) -> Self {
+        self.platform = Some(platform.into());
+        self
     }
 }
 

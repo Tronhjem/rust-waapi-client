@@ -1,0 +1,51 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the layout from which to undock the view"
+      },
+      "viewID": {
+        "description": "The unique id of the view to undock.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "posX": {
+        "type": "integer",
+        "description": "Position of the undocked view on the horizontal axis. Defaults to 0."
+      },
+      "posY": {
+        "type": "integer",
+        "description": "Position of the undocked view on the vertical axis. Defaults to 0."
+      }
+    },
+    "required": [
+      "name",
+      "viewID"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Creates a floating view, at the given position, from a docked view in a layout.",
+      "title": "Undock a view from a layout",
+      "args": {
+        "name": "Designer",
+        "viewID": "{6609D1BA-0E47-48F4-B3B6-3DA1C345B66E}",
+        "posX": 200,
+        "posY": 100
+      }
+    }
+  ]
+}

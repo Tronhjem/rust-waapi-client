@@ -1,0 +1,94 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for media, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of Loaded Media.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "mediaId": {
+              "type": "integer",
+              "description": "The short ID of the media file"
+            },
+            "fileName": {
+              "type": "string",
+              "description": "The name of the media file."
+            },
+            "format": {
+              "type": "string",
+              "description": "The audio format of the media file."
+            },
+            "size": {
+              "type": "integer",
+              "description": "The size (in bytes) of the media file."
+            },
+            "soundBank": {
+              "type": "string",
+              "description": "The name of the SoundBank that contains the media file."
+            }
+          },
+          "description": "Information about a media file loaded into memory as a result of the PrepareEvent() and PrepareGameSyncs() functions.",
+          "required": [
+            "mediaId",
+            "fileName",
+            "format",
+            "size",
+            "soundBank"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "mediaId": 34223551,
+            "fileName": "mySound1.wav",
+            "format": "ptADPCM",
+            "size": 1745238,
+            "soundBank": "mySoundBank1"
+          },
+          {
+            "mediaId": 66326472,
+            "fileName": "mySound2.wav",
+            "format": "VORBIS",
+            "size": 36522,
+            "soundBank": "mySoundBank2"
+          }
+        ]
+      },
+      "description": "Queries the active Loaded Media in the current capture session at the latest capture time.",
+      "title": "Querying the Loaded Media at a point in time.",
+      "args": {
+        "time": "capture"
+      }
+    }
+  ]
+}

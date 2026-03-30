@@ -1,0 +1,49 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for every imported object.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "array",
+        "description": "The list of imported original files.",
+        "items": {
+          "type": "string",
+          "description": "Absolute path to the original file."
+        }
+      },
+      "operation": {
+        "type": "string",
+        "description": "The operation applied for this import call.",
+        "enum": [
+          "CreateNewObject",
+          "ReplaceFile",
+          "Localize",
+          "ReplaceObject"
+        ]
+      },
+      "objects": {
+        "type": "array",
+        "description": "The list of objects that have been created as part of the same import operation.",
+        "items": {
+          "description": "Object created during the import operation. Default return is id and name.",
+          "$ref": "waapi_definitions.json#/definitions/objectReturn"
+        }
+      }
+    },
+    "required": [
+      "objects",
+      "files",
+      "operation"
+    ],
+    "additionalProperties": false
+  }
+}

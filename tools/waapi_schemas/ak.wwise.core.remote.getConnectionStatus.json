@@ -1,0 +1,81 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "description": "The current connection status in text."
+      },
+      "isConnected": {
+        "type": "boolean",
+        "description": "Indicates if the Wwise Authoring application is connected to a Wwise Sound Engine process."
+      },
+      "console": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the remote console as returned by the executable."
+          },
+          "host": {
+            "type": "string",
+            "description": "The IPv4 of the connected host. This can also be a file path if Wwise is connected to a local file (profiler session)."
+          },
+          "platform": {
+            "type": "string",
+            "description": "Platform of the remote console as returned by the executable."
+          },
+          "appName": {
+            "type": "string",
+            "description": "The name of the connected application as returned by the executable."
+          },
+          "customPlatform": {
+            "type": "string",
+            "description": "Platform, as defined in the project platforms of the remote console, as returned by the executable."
+          }
+        },
+        "description": "Describe the remote process.",
+        "required": [
+          "name",
+          "platform",
+          "customPlatform",
+          "host",
+          "appName"
+        ]
+      }
+    },
+    "required": [
+      "isConnected",
+      "status"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "status": "Connected to PC-USERNAME (Windows - Local host) Integration Demo",
+        "isConnected": true,
+        "console": {
+          "name": "PC-USERNAME",
+          "host": "127.0.0.1",
+          "platform": "Windows",
+          "appName": "Integration Demo",
+          "customPlatform": "Windows"
+        }
+      },
+      "description": "Retrieves the current connection status. In this example, Wwise is connected to the Integration Demo.",
+      "title": "Getting the connection status",
+      "args": {}
+    }
+  ]
+}

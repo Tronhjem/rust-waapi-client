@@ -1,0 +1,29 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every object prior to its deletion.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The object to be deleted.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  }
+}

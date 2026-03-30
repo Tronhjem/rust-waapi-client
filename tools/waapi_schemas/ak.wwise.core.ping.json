@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "isAvailable": {
+        "type": "boolean",
+        "description": "Indicates if WAAPI is available. Note that WAAPI is not available when a modal dialog is shown."
+      }
+    },
+    "required": [
+      "isAvailable"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "isAvailable": true
+      },
+      "description": "Make sure that WAAPI can be used before making a call to it.",
+      "title": "Verify the status of WAAPI",
+      "args": {}
+    }
+  ]
+}

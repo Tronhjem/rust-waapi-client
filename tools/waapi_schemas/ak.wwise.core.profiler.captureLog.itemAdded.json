@@ -1,0 +1,96 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "types": {
+        "type": "array",
+        "description": "Defines which types of capture log items to receive. This filter can help to reduce the amount of data serialized. When no types are specified, all types are being sent.",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Notification",
+            "InteractiveMusic",
+            "Midi",
+            "ExternalSource",
+            "Marker",
+            "State",
+            "Switch",
+            "SetParameter",
+            "ParameterChanged",
+            "Bank",
+            "Prepare",
+            "Event",
+            "DialogueEventResolved",
+            "ActionTriggered",
+            "ActionDelayed",
+            "Message",
+            "APICall",
+            "GameObjectRegistration"
+          ]
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string",
+        "description": "The entry type. Equivalent to the Type column in the Capture Log."
+      },
+      "severity": {
+        "type": "string",
+        "description": "Normal: normal execution. \nMessage: Shown in yellow in the capture log. \nError: Shown in red in the capture log.",
+        "enum": [
+          "Normal",
+          "Message",
+          "Error"
+        ]
+      },
+      "objectName": {
+        "type": "string",
+        "description": "The name of the object for the entry."
+      },
+      "time": {
+        "description": "The time at which the event occurred. This is the elapsed time in milliseconds since the initialization of the sound engine.",
+        "$ref": "common_definitions.json#/definitions/int32"
+      },
+      "gameObjectId": {
+        "description": "The game object ID for the entry.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "gameObjectName": {
+        "type": "string",
+        "description": "The game object name for the entry."
+      },
+      "playingId": {
+        "description": "The playing ID for the entry.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "description": {
+        "type": "string",
+        "description": "The description for the entry. Equivalent to the Description column in the Capture Log."
+      },
+      "objectId": {
+        "description": "The ID (GUID) of the object for the entry.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "objectShortId": {
+        "description": "The short ID (32-bit) of the object for the entry.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "errorCodeName": {
+        "type": "string",
+        "description": "The error code name for the entry."
+      }
+    },
+    "required": [
+      "time",
+      "type",
+      "description",
+      "severity"
+    ],
+    "additionalProperties": false
+  }
+}

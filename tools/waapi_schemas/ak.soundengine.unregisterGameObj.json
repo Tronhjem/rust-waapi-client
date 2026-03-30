@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "ID of the game object to be unregistered. Valid range is [0, 0xFFFFFFFFFFFFFFDF]. Use \\c AK_INVALID_GAME_OBJECT to unregister all game objects.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      }
+    },
+    "required": [
+      "gameObject"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Unregisters \"gameObject\".",
+      "title": "Unregistering a game object",
+      "args": {
+        "gameObject": 1122334
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The platform to which the settings apply. A platform is an ID (GUID) or a unique name.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "plugin": {
+        "type": "string",
+        "description": "Name of the plug-in to use for future conversions"
+      },
+      "conversion": {
+        "description": "The object used for conversion. An object is an ID (GUID).",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "conversion",
+      "platform",
+      "plugin"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Changes an object's or project's conversion plug-in to the one specified (Vorbis).",
+      "title": "Set conversion plugin.",
+      "args": {
+        "platform": "Windows",
+        "plugin": "Vorbis",
+        "conversion": "{6D1B890C-9826-4384-BF07-C15223E9FB56}"
+      }
+    }
+  ]
+}

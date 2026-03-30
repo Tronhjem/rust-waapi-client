@@ -1,0 +1,45 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "Platform ID (GUID) or name. This is an optional argument. When not specified, the current platform is used.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "sound": {
+        "description": "Sound ID (GUID), name, or path.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "source": {
+        "description": "Source ID (GUID), name, or path. The source must be a child of the sound.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "sound",
+      "source"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Setting the active source for a Sound Voice. The Sound has a main source and an alternate source.",
+      "title": "Setting the active source for a Sound Voice.",
+      "args": {
+        "sound": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+        "source": "{66666666-7777-8888-9999-AAAAAAAAAAAA}"
+      }
+    }
+  ]
+}

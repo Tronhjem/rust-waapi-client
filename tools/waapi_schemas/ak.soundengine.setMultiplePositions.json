@@ -1,0 +1,183 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Game Object identifier.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "positions": {
+        "type": "array",
+        "description": "Array of positions to apply.",
+        "maxItems": 65535,
+        "items": {
+          "type": "object",
+          "properties": {
+            "position": {
+              "type": "object",
+              "properties": {
+                "orientationFront": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "X Position."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Y Position."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Z Position."
+                    }
+                  },
+                  "description": "Orientation of the listener.",
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false
+                },
+                "orientationTop": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "X Position."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Y Position."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Z Position."
+                    }
+                  },
+                  "description": "Top orientation of the listener.",
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false
+                },
+                "position": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "description": "X Position."
+                    },
+                    "y": {
+                      "type": "number",
+                      "description": "Y Position."
+                    },
+                    "z": {
+                      "type": "number",
+                      "description": "Z Position."
+                    }
+                  },
+                  "description": "Position of the listener",
+                  "required": [
+                    "x",
+                    "y",
+                    "z"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "description": "A 3D position to set for the game object.",
+              "required": [
+                "orientationFront",
+                "orientationTop",
+                "position"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "description": "Position",
+          "required": [
+            "position"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "multiPositionType": {
+        "type": "integer",
+        "description": "Uses values from <tt>AK::SoundEngine::MultiPositionType</tt>.",
+        "minimum": 0,
+        "maximum": 2
+      }
+    },
+    "required": [
+      "gameObject",
+      "positions",
+      "multiPositionType"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets \"gameObject\" to multiple positions, as defined in \"positions\", to simulate multiple sources for one playing sound.",
+      "title": "Setting multiple positions for a game object",
+      "args": {
+        "gameObject": 1122334,
+        "positions": [
+          {
+            "position": {
+              "orientationFront": {
+                "x": 5,
+                "y": 20,
+                "z": 10
+              },
+              "orientationTop": {
+                "x": 70,
+                "y": 150,
+                "z": 6
+              },
+              "position": {
+                "x": 70,
+                "y": 150,
+                "z": 10
+              }
+            }
+          },
+          {
+            "position": {
+              "orientationFront": {
+                "x": -50,
+                "y": 80,
+                "z": 15
+              },
+              "orientationTop": {
+                "x": 2,
+                "y": 40,
+                "z": 6
+              },
+              "position": {
+                "x": 2,
+                "y": -20,
+                "z": 400
+              }
+            }
+          }
+        ],
+        "multiPositionType": 1
+      }
+    }
+  ]
+}

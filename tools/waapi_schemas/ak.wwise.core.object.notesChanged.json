@@ -1,0 +1,39 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every object's note change.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The object that had its notes changed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "newNotes": {
+        "type": "string",
+        "description": "The object's new notes."
+      },
+      "oldNotes": {
+        "type": "string",
+        "description": "The previous notes of the object."
+      }
+    },
+    "required": [
+      "object",
+      "newNotes",
+      "oldNotes"
+    ],
+    "additionalProperties": false
+  }
+}

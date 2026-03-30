@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID) of the Blend Track.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "child": {
+        "description": "The ID (GUID), name, or path of the object to unassign.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object",
+      "child"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Equivalent to deleting an entry in the Blend Tracks Editor.",
+      "title": "Removing a Blend Track assignment.",
+      "args": {
+        "object": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}",
+        "child": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+      }
+    }
+  ]
+}

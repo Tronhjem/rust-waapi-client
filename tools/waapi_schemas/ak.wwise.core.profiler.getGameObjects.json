@@ -1,0 +1,82 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "The time in milliseconds to query for game objects.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "An array of objects containing game object data.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The ID of the game object.",
+              "$ref": "common_definitions.json#/definitions/id64bits"
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the game object."
+            },
+            "registerTime": {
+              "description": "The time at which the game object was registered.",
+              "$ref": "common_definitions.json#/definitions/int32"
+            },
+            "unregisterTime": {
+              "description": "The time at which the game object was unregistered.",
+              "$ref": "common_definitions.json#/definitions/int32"
+            }
+          },
+          "description": "The game object and its registration data.",
+          "required": [
+            "id",
+            "name",
+            "registerTime",
+            "unregisterTime"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "id": 18446744073709551614,
+            "name": "Transport/Soundcaster",
+            "registerTime": 50000,
+            "unregisterTime": 75000
+          }
+        ]
+      },
+      "description": "Gets game objects where the registration time was 60,000 milliseconds or earlier.",
+      "title": "Query game objects registered at or before 1 minute.",
+      "args": {
+        "time": 60000
+      },
+      "options": {}
+    }
+  ]
+}

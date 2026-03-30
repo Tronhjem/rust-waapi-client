@@ -1,0 +1,34 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "enable": {
+        "type": "boolean",
+        "description": "If true, all playback will use original wav files. If false all playback will use converted files."
+      }
+    },
+    "required": [
+      "enable"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "description": "Setting the useOriginals global option to play converted files",
+      "title": "Playing converted files",
+      "args": {
+        "enable": false
+      }
+    }
+  ]
+}

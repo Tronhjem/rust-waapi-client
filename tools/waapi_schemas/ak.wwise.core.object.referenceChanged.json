@@ -1,0 +1,48 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for the object, the old reference and the new reference.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The object which had its reference changed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform if the reference was changed for a single platform. When not provided, the reference is changed for all platforms.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "reference": {
+        "type": "string",
+        "description": "The name of the reference that was changed. See the object's description in wobjects.xml for an object's possible references."
+      },
+      "old": {
+        "description": "The previous referenced object.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "new": {
+        "description": "The new referenced object.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "object",
+      "old",
+      "new",
+      "reference"
+    ],
+    "additionalProperties": false
+  }
+}

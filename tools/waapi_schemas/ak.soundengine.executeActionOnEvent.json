@@ -1,0 +1,63 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Associated game object ID.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "event": {
+        "description": "Either the ID (GUID), name or Short ID of the event.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      },
+      "actionType": {
+        "type": "integer",
+        "description": "Action to execute on all the elements that were played using the specified event. Uses values from <tt>AK::SoundEngine::AkActionOnEventType</tt>.",
+        "minimum": 0,
+        "maximum": 4
+      },
+      "transitionDuration": {
+        "description": "Fade duration (ms).",
+        "$ref": "common_definitions.json#/definitions/int32"
+      },
+      "fadeCurve": {
+        "type": "integer",
+        "description": "Use values from \\ref AkCurveInterpolation .",
+        "minimum": 0,
+        "maximum": 9
+      }
+    },
+    "required": [
+      "event",
+      "actionType",
+      "gameObject",
+      "transitionDuration",
+      "fadeCurve"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Executes a Stop action for the given Event, fading out with a 5 s log1 Curve.",
+      "title": "Launching a stop Action on Event",
+      "args": {
+        "gameObject": 1122334,
+        "event": "{FF59687C-48CF-4385-B1C5-CE84B0A63880}",
+        "actionType": 0,
+        "transitionDuration": 5000,
+        "fadeCurve": 2
+      }
+    }
+  ]
+}

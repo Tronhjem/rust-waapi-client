@@ -1,0 +1,123 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "File path to write the generated WAV file. This path normally uses the file extension WAV."
+      },
+      "channelConfig": {
+        "type": "string",
+        "description": "Channel configuration of the audio file. Default is 1.0. Please use the silence waveform for the ambisonics configurations, as the other tone signals will be incompatible with the format.",
+        "enum": [
+          "0.1",
+          "1.0",
+          "2.0",
+          "2.1",
+          "3.0",
+          "4.0",
+          "5.1",
+          "7.1",
+          "5.1.2",
+          "7.1.2",
+          "7.1.4",
+          "Ambisonics 1st order",
+          "Ambisonics 2nd order",
+          "Ambisonics 3rd order",
+          "Ambisonics 4th order",
+          "Ambisonics 5th order"
+        ]
+      },
+      "bitDepth": {
+        "type": "string",
+        "description": "Bit depth of the audio file. Default is int16.",
+        "enum": [
+          "int16",
+          "float32"
+        ]
+      },
+      "sampleRate": {
+        "type": "number",
+        "description": "Sample rate of the audio file. Default is 48000",
+        "minimum": 300,
+        "maximum": 192000
+      },
+      "setAnonymous": {
+        "type": "boolean",
+        "description": "Sets the channel configuration type to anonymous, this overrides the channel config but keeps the number of channels specified."
+      },
+      "sustainTime": {
+        "type": "number",
+        "description": "Number of seconds of the signal holds at the specified level. Default is 1 second.",
+        "minimum": 0
+      },
+      "sustainLevel": {
+        "type": "number",
+        "description": "Decibel attenuation for the sustained signal. Default is 0 dB.",
+        "minimum": -100,
+        "maximum": 0
+      },
+      "attackTime": {
+        "type": "number",
+        "description": "Number of seconds for the signal to reach sustain level. Default is 0 second.",
+        "minimum": 0
+      },
+      "releaseTime": {
+        "type": "number",
+        "description": "Number of seconds for the signal to release from sustain level. Default is 0 second.",
+        "minimum": 0
+      },
+      "waveform": {
+        "type": "string",
+        "description": "Waveform type. Default is silence.",
+        "enum": [
+          "silence",
+          "sine",
+          "triangle",
+          "square",
+          "whiteNoise"
+        ]
+      },
+      "waveformChannelMask": {
+        "type": "integer",
+        "description": "Specifies which channels receive waveform data. The channel mask is a bit field where each bit represents a channel. The least significant bit represents the channel at index zero. The bits with 0 are silent. When not specified, the default outputs waveform data on all channels."
+      },
+      "frequency": {
+        "type": "number",
+        "description": "Waveform frequency. Default is 440.",
+        "minimum": 1,
+        "maximum": 22000
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Generates a 1 second mono WAV file that contains a sine waveform, with a very short attack and release.",
+      "title": "Generating a short sine tone WAV file",
+      "args": {
+        "path": "C:\\WAV\\beep.wav",
+        "channelConfig": "1.0",
+        "sustainTime": 0.98,
+        "sustainLevel": 0,
+        "attackTime": 0.01,
+        "releaseTime": 0.01,
+        "waveform": "sine",
+        "frequency": 800
+      },
+      "options": {}
+    }
+  ]
+}

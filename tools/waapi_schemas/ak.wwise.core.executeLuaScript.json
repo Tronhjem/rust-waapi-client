@@ -1,0 +1,51 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "luaScript": {
+        "type": "string",
+        "description": "Defines the main Lua file to load and execute."
+      },
+      "luaPaths": {
+        "description": "Defines an array of paths to be used to search additional Lua modules. Here is an example of a Lua path 'C:/path_to_folder/?.lua'.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      },
+      "requires": {
+        "description": "Defines additional modules to be loaded at runtime using the require system. Note that the following folders are automatically added in the Lua path: PROJECT/Add-ons/Lua, APPDATA/Audiokinetic/Wwise/Add-ons/Lua, INSTALLDIR/Authoring/Data/Add-ons/Lua.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      },
+      "doFiles": {
+        "description": "Defines additional Lua files to load before the main Lua script is loaded and executed. It is also possible to specify a directory in which all Lua files will be loaded.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      }
+    },
+    "required": [
+      "luaScript"
+    ],
+    "additionalProperties": true
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": [
+          "boolean",
+          "object",
+          "array",
+          "number",
+          "string"
+        ],
+        "description": "Result returned by the Lua script. Use a return statement at the end of the script."
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  }
+}

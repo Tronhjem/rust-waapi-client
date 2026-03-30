@@ -60,43 +60,26 @@ impl WaapiResponse {
     }
 
     pub fn get_return_object(&self) -> Option<&HashMap<String, WaapiValue>> {
-        if let Some(WaapiValue::List(list)) = self.kwargs.get("return") {
-            if let Some(WaapiValue::Dict(dict)) = list.first() {
-                return Some(dict);
-            }
-        } else if let Some(WaapiValue::List(list)) = self.kwargs.get("objects") {
-            if let Some(WaapiValue::Dict(dict)) = list.first() {
-                return Some(dict);
-            }
-        }
-        None
+        self.result_list()?
+            .first()
+            .and_then(|v| if let WaapiValue::Dict(dict) = v { Some(dict) } else { None })
     }
 
     pub fn get_return_objects(&self) -> Vec<&HashMap<String, WaapiValue>> {
-        if let Some(WaapiValue::List(list)) = self.kwargs.get("return") {
-            return list
-                .iter()
-                .filter_map(|v| {
-                    if let WaapiValue::Dict(dict) = v {
-                        Some(dict)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-        } else if let Some(WaapiValue::List(list)) = self.kwargs.get("objects") {
-            return list
-                .iter()
-                .filter_map(|v| {
-                    if let WaapiValue::Dict(dict) = v {
-                        Some(dict)
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-        }
-        Vec::new()
+        self.result_list()
+            .map(|list| {
+                list.iter()
+                    .filter_map(|v| if let WaapiValue::Dict(dict) = v { Some(dict) } else { None })
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    fn result_list(&self) -> Option<&Vec<WaapiValue>> {
+        self.kwargs
+            .get("return")
+            .or_else(|| self.kwargs.get("objects"))
+            .and_then(|v| if let WaapiValue::List(list) = v { Some(list) } else { None })
     }
 
     pub fn get_return_string(&self, field: &str) -> Option<&str> {
@@ -128,7 +111,7 @@ impl WaapiClient {
     ///
     /// # Arguments
     /// * `level` - Optional log level filter. Defaults to "error" if None.
-    ///             Valid values: "trace", "debug", "info", "warn", "error"
+    ///   Valid values: "trace", "debug", "info", "warn", "error"
     ///
     /// # Example
     /// ```no_run
@@ -203,6 +186,24 @@ impl WaapiClient {
         }
     }
 
+    // pub async fn subscribe(
+    //     &mut self,
+    //     url: &str,
+    //     options: HashMap<String, wampire::Value>,
+    // ) -> WaapiResult<()> {
+    //     if let Ok(_sub) = self
+    //         .wamp_client
+    //         .subscribe(URI::new(url), options, Box::new(callback))
+    //         .await
+    //     {
+    //         Ok(())
+    //     } else {
+    //         Err(WaapiError::ConnectionFailed(
+    //             "Failed to subscribe".to_string(),
+    //         ))
+    //     }
+    // }
+
     pub async fn shutdown(mut self) -> WaapiResult<()> {
         self.shutdown_called = true;
         self.wamp_client
@@ -211,6 +212,11 @@ impl WaapiClient {
             .map_err(|e| WaapiError::ConnectionFailed(format!("{:?}", e)))
     }
 }
+
+// Testing callback
+// fn callback(_l: List, _d: Dict) {
+//     println!("Callback");
+// }
 
 impl Drop for WaapiClient {
     fn drop(&mut self) {

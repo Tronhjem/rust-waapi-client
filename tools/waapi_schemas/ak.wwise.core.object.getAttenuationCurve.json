@@ -1,0 +1,130 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of attenuation object.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform to get curves.  Set to null-guid for unlinked reference.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "curveType": {
+        "type": "string",
+        "description": "Type of attenuation curve.",
+        "enum": [
+          "VolumeDryUsage",
+          "VolumeWetGameUsage",
+          "VolumeWetUserUsage",
+          "LowPassFilterUsage",
+          "HighPassFilterUsage",
+          "SpreadUsage",
+          "FocusUsage",
+          "ObstructionVolumeUsage",
+          "ObstructionLPFUsage",
+          "ObstructionHPFUsage",
+          "OcclusionVolumeUsage",
+          "OcclusionLPFUsage",
+          "OcclusionHPFUsage",
+          "DiffractionVolumeUsage",
+          "DiffractionLPFUsage",
+          "DiffractionHPFUsage",
+          "TransmissionVolumeUsage",
+          "TransmissionLPFUsage",
+          "TransmissionHPFUsage"
+        ]
+      }
+    },
+    "required": [
+      "object",
+      "curveType"
+    ]
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "points": {
+        "description": "The attenuation curve.",
+        "$ref": "waapi_definitions.json#/definitions/pointsDefinition"
+      },
+      "curveType": {
+        "type": "string",
+        "description": "Name of attenuation curve.",
+        "enum": [
+          "VolumeDryUsage",
+          "VolumeWetGameUsage",
+          "VolumeWetUserUsage",
+          "LowPassFilterUsage",
+          "HighPassFilterUsage",
+          "SpreadUsage",
+          "FocusUsage",
+          "ObstructionVolumeUsage",
+          "ObstructionLPFUsage",
+          "ObstructionHPFUsage",
+          "OcclusionVolumeUsage",
+          "OcclusionLPFUsage",
+          "OcclusionHPFUsage",
+          "DiffractionVolumeUsage",
+          "DiffractionLPFUsage",
+          "DiffractionHPFUsage",
+          "TransmissionVolumeUsage",
+          "TransmissionLPFUsage",
+          "TransmissionHPFUsage"
+        ]
+      },
+      "use": {
+        "type": "string",
+        "description": "Defines whether the curve has no points, has its own set of points, or uses those of the VolumeDryUsage curve.",
+        "enum": [
+          "None",
+          "Custom",
+          "UseVolumeDry",
+          "UseProject"
+        ]
+      }
+    }
+  },
+  "examples": [
+    {
+      "result": {
+        "points": [
+          {
+            "shape": "Exp3",
+            "x": 0,
+            "y": 0
+          },
+          {
+            "shape": "SCurve",
+            "x": 30,
+            "y": -3
+          },
+          {
+            "shape": "Log1",
+            "x": 60,
+            "y": -5
+          },
+          {
+            "shape": "Linear",
+            "x": 100,
+            "y": -200
+          }
+        ],
+        "curveType": "VolumeDryUsage",
+        "use": "Custom"
+      },
+      "description": "Gets the \"curve\" from an object specified by \"object\"",
+      "title": "Getting an attenuation curve of an object",
+      "args": {
+        "object": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+        "platform": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "curveType": "VolumeDryUsage"
+      }
+    }
+  ]
+}

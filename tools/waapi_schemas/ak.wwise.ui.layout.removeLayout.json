@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the layout to unregister."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Unregisters a temporary layout, previously registered with \"setLayout\".",
+      "title": "Unregister a temporary layout",
+      "args": {
+        "name": "TemporaryLayout"
+      }
+    }
+  ]
+}

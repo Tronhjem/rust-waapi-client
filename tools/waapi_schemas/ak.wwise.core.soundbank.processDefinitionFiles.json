@@ -1,0 +1,43 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "array",
+        "description": "An array of SoundBank definition files.",
+        "items": {
+          "type": "string",
+          "description": "SoundBank Definition Files"
+        },
+        "minItems": 1
+      }
+    },
+    "description": "The path to the SoundBank Definition File.",
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "description": "Imports the SoundBank Definitions from the specified text files.",
+      "title": "Import SoundBank Definitions from file.",
+      "args": {
+        "files": [
+          "soundbank_definitions_1-3.txt",
+          "soundbank_definitions_4-401"
+        ]
+      }
+    }
+  ]
+}

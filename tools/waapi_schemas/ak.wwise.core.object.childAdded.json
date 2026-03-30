@@ -1,0 +1,34 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every child being added.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "parent": {
+        "description": "The parent object to which the object is added.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "child": {
+        "description": "The newly added child object.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "child",
+      "parent"
+    ],
+    "additionalProperties": false
+  }
+}

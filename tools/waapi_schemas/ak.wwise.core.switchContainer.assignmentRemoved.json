@@ -1,0 +1,35 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for the Switch Container and the assignment (pair of objects).",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "child": {
+        "description": "The child object that was assigned.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "stateOrSwitch": {
+        "description": "The State or Switch to which the child object was assigned.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "switchContainer": {
+        "description": "The Switch Container which had the assignment removed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "switchContainer",
+      "child",
+      "stateOrSwitch"
+    ],
+    "additionalProperties": false
+  }
+}
