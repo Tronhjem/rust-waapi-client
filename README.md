@@ -1,11 +1,13 @@
 # waapi-client
 
-A Rust client library for the Wwise Authoring API (WAAPI), providing a clean, type-safe interface for interacting with Audiokinetic Wwise.
+A Rust client library for the Wwise Authoring API (WAAPI), providing a clean interface for interacting with Audiokinetic Wwise.
 More information about WAAPI can be found here: https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
 This crate ships with a small, private WAMP v2 client that speaks JSON over WebSocket. It is no longer dependent on an external `wampire` submodule.
 
 ## Basic Usage
+
+`waapi-client` is async and built on `tokio`.
 
 ### Connecting to WAAPI
 
@@ -14,7 +16,7 @@ use waapi_client::{WaapiClient, WaapiResult};
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
-    // Connect to WAAPI (default: 127.0.0.1:8080)
+    // Connect to WAAPI (default: ws://127.0.0.1:8080/waapi)
     let mut client = WaapiClient::new(None).await?;
 
     // Make calls...
@@ -38,7 +40,7 @@ use waapi_client::serde_json::json;
 let response = client
     .call(ak::wwise::core::getInfo, None, None)
     .await?;
-println!("{}", serde_json::to_string_pretty(&response)?);
+println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
 ```
 
 ### Building Arguments
@@ -50,7 +52,7 @@ use waapi_client::serde_json::json;
 
 let args = json!({
     "from": {
-        "id": ["{GUID-HERE}"]
+        "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"]
     }
 });
 
@@ -65,24 +67,32 @@ let response = client
 
 ### Typed API
 
-For supported endpoints, use the generated typed methods under `client`:
+A subset of common endpoints has generated type-safe wrappers on `WaapiClient`. The generated methods serialize typed argument/option structs to JSON and deserialize the response for you:
 
 ```rust
 use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetinfoResponse;
 
 let info: WwiseCoreGetinfoResponse = client.get_info(()).await?;
-println!("Wwise version: {:?}", info.version);
+println!("Wwise version: {:?}", info.version.display_name);
+```
 
+```rust
 use waapi_client::api::generated::ak::wwise::core::object::{
     WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions,
 };
+use waapi_client::api::generated::primitives::ObjectQuery;
 
-let args = WwiseCoreObjectGetArgs::new(r"\Actor-Mixer Hierarchy\Default Work Unit\MySound".into())
-    .transform(vec![]);
+let args = WwiseCoreObjectGetArgs::new(ObjectQuery::Path(vec![
+    r"\Actor-Mixer Hierarchy\Default Work Unit\MySound".to_string(),
+]));
+
 let options = WwiseCoreObjectGetOptions::new()
     .return_fields(vec!["id".into(), "name".into(), "type".into()]);
+
 let response = client.object_get(args, options).await?;
 ```
+
+Typed methods are generated for a small set of endpoints (see `src/api/generated/client_impl.rs`). For all other WAAPI calls, use the escape-hatch `client.call` API.
 
 ### Specifying Return Fields
 
@@ -108,7 +118,7 @@ async fn main() -> WaapiResult<()> {
     let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
 
     let args = json!({
-        "from": { "id": ["{GUID}"] }
+        "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"] }
     });
     let options = json!({
         "return": ["id", "name", "type"]
@@ -118,16 +128,41 @@ async fn main() -> WaapiResult<()> {
         .call(ak::wwise::core::object::get, Some(args), Some(options))
         .await?;
 
-    println!("{}", serde_json::to_string_pretty(&response)?);
+    println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
 
     client.shutdown().await?;
     Ok(())
 }
 ```
 
+### Hand-Written Helpers
+
+In addition to the generated typed API, a few endpoints have hand-written helper builders that are easier to use than raw JSON. See `src/api/object_set.rs` for an example:
+
+```rust
+use waapi_client::WaapiClient;
+use waapi_client::api::object_set::{ObjectReturnOptions, ObjectSetArgs, ObjectSetItem};
+use waapi_client::api::{ObjectRef, PropertyValue};
+
+let mut client = WaapiClient::new(None).await?;
+
+let args = ObjectSetArgs::new(vec![
+    ObjectSetItem::new(ObjectRef::path(
+        r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
+    ))
+    .rename("MyRenamedSound")
+    .property("Volume", PropertyValue::Number(-6.0)),
+]);
+
+let options = ObjectReturnOptions::new(vec!["id".to_string(), "name".to_string()]);
+
+let response = client.object_set(args, options).await?;
+client.shutdown().await?;
+```
+
 ### Subscriptions
 
-Subscribe to WAAPI topics through the low-level WAMP client:
+Subscribe to WAAPI topics and receive events on an async channel:
 
 ```rust
 use waapi_client::waapi_topics_api::ak;
@@ -135,11 +170,13 @@ use waapi_client::serde_json::json;
 
 let options = json!({ "return": ["id", "name"] });
 let (id, mut events) = client
-    .subscribe(ak::wwise::core::object::nameChanged, Some(options))
+    .subscribe(ak::wwise::core::object::created, Some(options))
     .await?;
+
 while let Some(event) = events.recv().await {
-    println!("{}", serde_json::to_string_pretty(&event.kwargs)?);
+    println!("{}", waapi_client::serde_json::to_string_pretty(&event.kwargs)?);
 }
+
 client.unsubscribe(id).await?;
 ```
 
@@ -171,9 +208,13 @@ Run examples with:
 
 ```bash
 cargo run --example get_info
+cargo run --example get_info_typed
+cargo run --example typed_api
+cargo run --example subscribe
+cargo run --example object_set
 ```
 
-See the [`examples/`](examples/) directory for more usage examples.
+See the [`examples/`](examples/) directory for more usage examples. Most examples require Wwise running with WAAPI enabled on `127.0.0.1:8080`.
 
 ## Error Handling
 
