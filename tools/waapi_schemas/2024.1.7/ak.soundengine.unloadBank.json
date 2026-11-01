@@ -1,0 +1,26 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "soundBank": {
+        "description": "Either the ID (GUID), name, or Short ID of the SoundBank.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "soundBank"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": []
+}

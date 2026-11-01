@@ -1,0 +1,25 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "enable": {
+        "type": "boolean",
+        "description": "Indicates whether assertions should be enabled or disabled."
+      }
+    },
+    "required": [
+      "enable"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "uri": {
+        "type": "string",
+        "description": "Waapi URI (see ak.wwise.waapi.getTopics, ak.wwise.waapi.getFunctions)."
+      },
+      "includeExamples": {
+        "type": "boolean",
+        "description": "Include the examples provided in the schema. Default value is false."
+      }
+    },
+    "required": [
+      "uri"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "argsSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The argument schema. Only possible for functions.",
+        "additionalProperties": true
+      },
+      "optionsSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The option schema.",
+        "additionalProperties": true
+      },
+      "resultSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The result schema. Only possible for functions.",
+        "additionalProperties": true
+      },
+      "publishSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The publish schema. Only possible for topics.",
+        "additionalProperties": true
+      },
+      "examples": {
+        "type": "array",
+        "description": "The examples provided in the schema.",
+        "items": {
+          "type": "object",
+          "properties": {},
+          "description": "The example.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": []
+}

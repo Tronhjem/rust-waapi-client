@@ -1,0 +1,48 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "type": "boolean",
+        "description": "Whether the object is muted or not."
+      },
+      "objects": {
+        "type": "array",
+        "description": "An array of objects to mute.",
+        "items": {
+          "description": "The ID (GUID), name, or path of the object to mute.",
+          "$ref": "waapi_definitions.json#/definitions/objectArg"
+        },
+        "minItems": 1
+      }
+    },
+    "required": [
+      "objects",
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Mutes the object specified by \"object\".",
+      "title": "Mute a WwiseObject",
+      "args": {
+        "value": true,
+        "objects": [
+          "\\Actor-Mixer Hierarchy\\Default Work Unit\\Hello"
+        ]
+      }
+    }
+  ]
+}

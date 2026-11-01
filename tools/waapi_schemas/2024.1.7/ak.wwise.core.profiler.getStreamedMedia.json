@@ -1,0 +1,143 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for media, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of Streams.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "integer",
+              "description": "The priority of the stream."
+            },
+            "deviceName": {
+              "type": "string",
+              "description": "The name of the device from which the stream eminates."
+            },
+            "streamName": {
+              "type": "string",
+              "description": "The name given to the stream."
+            },
+            "fileSize": {
+              "type": "integer",
+              "description": "The size of the file being streamed."
+            },
+            "filePosition": {
+              "type": "number",
+              "description": "The position of the stream within the file, given as a percentage."
+            },
+            "bandwidthTotal": {
+              "type": "integer",
+              "description": "The rate at which the file was streamed in the last profiling frame. This value takes all transfers into account, including transfers that occurred from the Stream Manager's cache"
+            },
+            "bandwidthLowLevel": {
+              "type": "integer",
+              "description": "The rate at which the file was streamed in the last profiling frame. Unlike the Total Bandwidth field, this field value considers transfers that occurred from within the low-level device."
+            },
+            "referencedMemory": {
+              "type": "integer",
+              "description": "The amount of memory that is referenced by the stream. This excludes memory used for I/O transfers. It can be seen as a measure of how much data the stream may grant to the sound engine at any given time."
+            },
+            "estimatedThroughput": {
+              "type": "integer",
+              "description": "The estimated throughput of the stream. The sound engine estimates the rate at which it consumes data from a stream according to its encoding format and number of channels."
+            },
+            "active": {
+              "type": "boolean",
+              "description": "Indicates True if the stream was active at least once during the last profiling frame."
+            },
+            "targetBufferSize": {
+              "type": "integer",
+              "description": "The streaming device's target buffer length."
+            },
+            "bufferStatusBuffered": {
+              "type": "number",
+              "description": "The portion of requested data that is buffered, given as a percentage of the target buffer size."
+            }
+          },
+          "description": "Information about how each of the streams is managed by the Wwise sound engine.",
+          "required": [
+            "deviceName",
+            "streamName",
+            "fileSize",
+            "filePosition",
+            "priority",
+            "bandwidthTotal",
+            "bandwidthLowLevel",
+            "referencedMemory",
+            "estimatedThroughput",
+            "active",
+            "targetBufferSize",
+            "bufferStatusBuffered"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "priority": 50,
+            "deviceName": "Win32 Deferred",
+            "streamName": "1517878592",
+            "fileSize": 2304044,
+            "filePosition": 34.843780517578125,
+            "bandwidthTotal": 235177,
+            "bandwidthLowLevel": 235177,
+            "referencedMemory": 65536,
+            "estimatedThroughput": 192000,
+            "active": true,
+            "targetBufferSize": 38400,
+            "bufferStatusBuffered": 92.05678
+          },
+          {
+            "priority": 50,
+            "deviceName": "Win32 Deferred",
+            "streamName": "1517868960",
+            "fileSize": 6336044,
+            "filePosition": 12.670619010925291,
+            "bandwidthTotal": 235177,
+            "bandwidthLowLevel": 235177,
+            "referencedMemory": 65536,
+            "estimatedThroughput": 192000,
+            "active": true,
+            "targetBufferSize": 38400,
+            "bufferStatusBuffered": 100.0
+          }
+        ]
+      },
+      "description": "Queries the active Streamed Media in the current capture session at the latest capture time.",
+      "title": "Querying the Streamed Media at a point in time.",
+      "args": {
+        "time": "capture"
+      }
+    }
+  ]
+}

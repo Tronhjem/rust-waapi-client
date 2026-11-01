@@ -1,0 +1,50 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the layout to serialize."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "Layout": {
+        "$ref": "waapi_ui_definitions.json#/definitions/Layout",
+        "additionalProperties": true
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "Layout": {
+          "Name": "SerializedLayout",
+          "StackPanel": {
+            "Name": "StackPanel",
+            "@Children": [],
+            "Orientation": "Vertical",
+            "ID": "0000"
+          }
+        }
+      },
+      "description": "Returns a layout serialized in a JSON format.",
+      "title": "Serializing a specific layout",
+      "args": {
+        "name": "Designer"
+      }
+    }
+  ]
+}

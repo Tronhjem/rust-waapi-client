@@ -1,0 +1,50 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "description": "Either the ID (GUID), name, or Short ID of the State.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      },
+      "stateGroup": {
+        "description": "Either the ID (GUID), name, or Short ID of the State Group.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "stateGroup",
+      "state"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets \"stateGroup\" to \"state\".",
+      "title": "Setting the State Group to another State using names",
+      "args": {
+        "state": "Happy",
+        "stateGroup": "Character"
+      }
+    },
+    {
+      "return": {},
+      "description": "Sets \"stateGroup\" to \"state\".",
+      "title": "Setting the State Group to another State using Short IDs",
+      "args": {
+        "state": 1208172755,
+        "stateGroup": 1270826848
+      }
+    }
+  ]
+}

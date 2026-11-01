@@ -1,0 +1,77 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "classId": {
+        "description": "The ID (class ID) of the object to retrieve the property and reference names from.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to watch.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "oneOf": [
+      {
+        "required": [
+          "object"
+        ]
+      },
+      {
+        "required": [
+          "classId"
+        ]
+      }
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "An array of all properties and references for the specified object.",
+        "items": {
+          "type": "string",
+          "description": "The name of the property or reference."
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          "DelayTime",
+          "DryLevel",
+          "FeedForwardLevel",
+          "FeedBackLevel",
+          "EnableLFO",
+          "ModDepth",
+          "ModFrequency",
+          "ModWaveform",
+          "ModSmoothing",
+          "ModPWM",
+          "ModPhaseOffset",
+          "ModPhaseMode",
+          "ModPhaseSpread",
+          "WetDryMix",
+          "OutputLevel",
+          "ProcessCenter",
+          "ProcessLFE"
+        ]
+      },
+      "description": "Retrieves the list of property and reference names of an object.",
+      "title": "Retrieving the list of property and reference names of an object",
+      "args": {
+        "classId": 8192003
+      }
+    }
+  ]
+}

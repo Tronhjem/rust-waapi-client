@@ -1,3 +1,7 @@
 /target
 .DS_STORE
 /.codegraph
+__pycache__/
+*.pyc
+waapi_functions.txt
+waapi_topics.txt

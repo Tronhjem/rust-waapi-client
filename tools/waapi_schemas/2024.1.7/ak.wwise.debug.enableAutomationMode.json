@@ -1,0 +1,25 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "enable": {
+        "type": "boolean",
+        "description": "When set to true, the automation mode reduces the blocking of dialogs and popups. When set to false, it reverts to the normal mode."
+      }
+    },
+    "required": [
+      "enable"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

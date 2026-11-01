@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to set value.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "property": {
+        "type": "string",
+        "description": "The name of the property. For more information, refer to the property list of Wwise Objects listed in \\ref wobjects_index .",
+        "$ref": "waapi_definitions.json#/definitions/propertyName"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "linked": {
+        "type": "boolean",
+        "description": "Is it linked."
+      }
+    },
+    "required": [
+      "object",
+      "property",
+      "platform",
+      "linked"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

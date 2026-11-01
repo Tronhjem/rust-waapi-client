@@ -1,0 +1,68 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "channel": {
+        "description": "The log channel.",
+        "$ref": "waapi_definitions.json#/definitions/logCentralChannel"
+      }
+    },
+    "required": [
+      "channel"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "description": "The entries of the log.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/logCentralItem"
+        }
+      }
+    },
+    "required": [
+      "items"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "items": [
+          {
+            "severity": "Warning",
+            "message": "RTPC : object New Audio Bus, property PositioningType cannot be resolved; the RTPC is ignored.",
+            "platform": {
+              "id": "{F546017D-201A-49BD-8D4E-0A28F5DBB28D}",
+              "name": "Windows"
+            },
+            "time": 1523563779,
+            "parameters": [
+              "Init"
+            ],
+            "messageId": "ParamControlIntegrityIssue"
+          },
+          {
+            "severity": "Message",
+            "message": "2 message(s), 2 warning(s), 0 error(s), 0 fatal error(s)",
+            "time": 1523563779,
+            "messageId": ""
+          }
+        ]
+      },
+      "description": "Uses the channel 'soundbankGenerate' to retrieve the latest SoundBank generation log.",
+      "title": "Retrieving the SoundBank log",
+      "args": {
+        "channel": "soundbankGenerate"
+      }
+    }
+  ]
+}

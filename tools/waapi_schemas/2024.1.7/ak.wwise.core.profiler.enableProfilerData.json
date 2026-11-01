@@ -1,0 +1,89 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "dataTypes": {
+        "type": "array",
+        "description": "An array of data types.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Enable (true) or disable (false) capture for this type of profiler data. Defaults to true when not specified."
+            },
+            "dataType": {
+              "description": "Specifies the type of data you want to capture.",
+              "$ref": "waapi_definitions.json#/definitions/profilerDataType"
+            }
+          },
+          "description": "The data type and enable status.",
+          "required": [
+            "dataType"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "dataTypes"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Enable \"Voices Data\"",
+      "title": "Enabling the profiler data",
+      "args": {
+        "dataTypes": [
+          {
+            "enable": true,
+            "dataType": "voices"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "result": {},
+      "description": "Disable \"Voices Data\"",
+      "title": "Disabling profiler data",
+      "args": {
+        "dataTypes": [
+          {
+            "enable": false,
+            "dataType": "voices"
+          }
+        ]
+      },
+      "options": {}
+    },
+    {
+      "result": {},
+      "description": "Enable \"Voices Data\" and \"Voice Inspector Data\" using the default value (true) for the enable property",
+      "title": "Enabling profiler data required for ak.wwise.core.profiler.getVoiceContributions",
+      "args": {
+        "dataTypes": [
+          {
+            "dataType": "voices"
+          },
+          {
+            "dataType": "voiceInspector"
+          }
+        ]
+      },
+      "options": {}
+    }
+  ]
+}

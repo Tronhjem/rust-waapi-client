@@ -1,0 +1,30 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "The time at which the game object was registered. This is the elapsed time in milliseconds since the initialization of the sound engine.",
+        "$ref": "common_definitions.json#/definitions/int32"
+      },
+      "gameObjectId": {
+        "description": "The game object ID for the entry.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "gameObjectName": {
+        "type": "string",
+        "description": "The game object name for the entry."
+      }
+    },
+    "required": [
+      "time",
+      "gameObjectId",
+      "gameObjectName"
+    ],
+    "additionalProperties": false
+  }
+}

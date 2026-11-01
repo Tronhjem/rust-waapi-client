@@ -1,0 +1,22 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "integer",
+        "description": "The value of the Capture Time Cursor in ms."
+      }
+    },
+    "additionalProperties": false
+  }
+}

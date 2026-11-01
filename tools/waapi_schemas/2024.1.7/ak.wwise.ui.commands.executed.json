@@ -1,0 +1,36 @@
+{
+  "optionsSchema": {
+    "description": "Specifies the return options for every object returned.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturnOptions"
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "platforms": {
+        "type": "array",
+        "description": "An array of platform for which the command is executed. Each platform is an ID (GUID).",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/platformArg"
+        }
+      },
+      "command": {
+        "type": "string",
+        "description": "The command ID that was executed."
+      },
+      "objects": {
+        "type": "array",
+        "description": "The objects for which the command was executed. The objects are usually the selected objects. They are returned in the format specified in the options. Can be empty if no object is used.",
+        "items": {
+          "description": "The objects. Use the options to specify which data to return. Default returns id and name.",
+          "$ref": "waapi_definitions.json#/definitions/objectReturn"
+        }
+      }
+    },
+    "required": [
+      "command",
+      "objects",
+      "platforms"
+    ],
+    "additionalProperties": false
+  }
+}

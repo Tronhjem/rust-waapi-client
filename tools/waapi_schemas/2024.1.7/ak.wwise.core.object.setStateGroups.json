@@ -1,0 +1,46 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "stateGroups": {
+        "type": "array",
+        "description": "An array of State Group objects to set.",
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/objectArg"
+        }
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to which to add a State Group.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object",
+      "stateGroups"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Adds a State Group to a Sound.",
+      "title": "Adding a State Group to a Sound",
+      "args": {
+        "stateGroups": [
+          "\\States\\Default Work Unit\\MyStateGroup"
+        ],
+        "object": "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound"
+      }
+    }
+  ]
+}

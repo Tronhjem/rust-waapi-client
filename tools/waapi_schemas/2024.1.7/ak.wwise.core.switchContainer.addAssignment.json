@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "child": {
+        "description": "The ID (GUID), name, or path of the object to assign to a State. This object must be the child of a Switch Container.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "stateOrSwitch": {
+        "description": "The ID (GUID), name, or path of the State or Switch with which to assign. Must be the child of the Switch Group or State Group that is currently set for the Switch Container.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "child",
+      "stateOrSwitch"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Equivalent to dragging a child of a Switch Group to a State listed in the Assigned Objects view.",
+      "title": "Assigning a Switch Container's child to a State",
+      "args": {
+        "child": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}",
+        "stateOrSwitch": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+      }
+    }
+  ]
+}

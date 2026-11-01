@@ -1,0 +1,60 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "list": {
+        "type": "array",
+        "description": "An array of transport object.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "description": "The ID (GUID) of the object controlled by the transport object.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "gameObject": {
+              "description": "The game object used by the transport object.",
+              "$ref": "waapi_definitions.json#/definitions/gameObject"
+            },
+            "transport": {
+              "description": "Transport object ID.",
+              "$ref": "common_definitions.json#/definitions/uint32"
+            }
+          },
+          "description": "A transport object."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "result": {
+        "list": [
+          {
+            "object": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+            "gameObject": 1234,
+            "transport": 5
+          },
+          {
+            "object": "{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE}",
+            "gameObject": 6789,
+            "transport": 12
+          }
+        ]
+      },
+      "description": "Retrieves the list of transport objects.",
+      "title": "Retrieving the list of transport objects",
+      "args": {}
+    }
+  ]
+}

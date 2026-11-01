@@ -1,0 +1,46 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to control via the transport object.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "gameObject": {
+        "description": "The game object to use for playback.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "transport": {
+        "description": "Transport object ID to be used with all other ak.wwise.core.transport functions.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "transport": 1234
+      },
+      "description": "Creates a transport object for a given Wwise object.",
+      "title": "Creating a transport object",
+      "args": {
+        "object": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+      }
+    }
+  ]
+}

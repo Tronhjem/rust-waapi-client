@@ -1,0 +1,137 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Game Object identifier.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "position": {
+        "type": "object",
+        "properties": {
+          "orientationFront": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "X Position."
+              },
+              "y": {
+                "type": "number",
+                "description": "Y Position."
+              },
+              "z": {
+                "type": "number",
+                "description": "Z Position."
+              }
+            },
+            "description": "Orientation of the listener.",
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "additionalProperties": false
+          },
+          "orientationTop": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "X Position."
+              },
+              "y": {
+                "type": "number",
+                "description": "Y Position."
+              },
+              "z": {
+                "type": "number",
+                "description": "Z Position."
+              }
+            },
+            "description": "Top orientation of the listener.",
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "additionalProperties": false
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "X Position."
+              },
+              "y": {
+                "type": "number",
+                "description": "Y Position."
+              },
+              "z": {
+                "type": "number",
+                "description": "Z Position."
+              }
+            },
+            "description": "Position of the listener",
+            "required": [
+              "x",
+              "y",
+              "z"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "description": "The 3D position to set for the game object.",
+        "required": [
+          "orientationFront",
+          "orientationTop",
+          "position"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "gameObject",
+      "position"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets the position of \"gameObject\" to \"position/position\" with the provided orientation.",
+      "title": "Setting the position of a game object",
+      "args": {
+        "gameObject": 1122334,
+        "position": {
+          "orientationFront": {
+            "x": 100,
+            "y": 200,
+            "z": 0
+          },
+          "orientationTop": {
+            "x": 0,
+            "y": 0,
+            "z": 200
+          },
+          "position": {
+            "x": 5,
+            "y": 10,
+            "z": 100
+          }
+        }
+      }
+    }
+  ]
+}

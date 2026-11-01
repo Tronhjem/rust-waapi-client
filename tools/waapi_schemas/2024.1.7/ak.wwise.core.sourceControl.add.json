@@ -1,0 +1,48 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "description": "Array of files to add. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "description": "Array of log entries generated during the request.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfLogCentralItem"
+      }
+    },
+    "required": [
+      "log"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "log": []
+      },
+      "description": "Add two new audio files to the SFX directory and the source control.",
+      "title": "Adding a new files to source control.",
+      "args": {
+        "files": [
+          "//projet-file//Originals/SFX/newFile1.wav",
+          "//projet-file//Originals/SFX/newFile2.wav"
+        ]
+      }
+    }
+  ]
+}

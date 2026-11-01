@@ -1,0 +1,63 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to set value.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "value": {
+        "description": "The value of the object.",
+        "$ref": "common_definitions.json#/definitions/propertyValue"
+      },
+      "property": {
+        "type": "string",
+        "description": "The name of the property. For more information, refer to the property list of Wwise Objects listed in \\ref wobjects_index .",
+        "$ref": "waapi_definitions.json#/definitions/propertyName"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform. This is used to set values for unlinked properties. This is an optional argument. When not specified, the current platform is used to set the property.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      }
+    },
+    "required": [
+      "object",
+      "property",
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the \"Volume\" property of the object defined by \"object\" to \"Value\".",
+      "title": "Setting the volume",
+      "args": {
+        "object": "\\Master-Mixer Hierarchy\\Default Work Unit\\Master Audio Bus",
+        "value": -3,
+        "property": "Volume"
+      }
+    },
+    {
+      "result": {},
+      "description": "Sets the \"Volume\" property of the object defined by \"object\" to \"Value\".",
+      "title": "Setting the value of a specified property on the specified platform",
+      "args": {
+        "object": "\\Master-Mixer Hierarchy\\Default Work Unit\\Master Audio Bus",
+        "value": 5.7,
+        "property": "Volume",
+        "platform": "Windows"
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "template": {
+        "type": "string",
+        "description": "The template name (from WAFM)."
+      },
+      "container": {
+        "description": "The ID of the parent container (e.g. window).",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "container",
+      "template"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "handleID": {
+        "description": "The ID of the handle.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    }
+  },
+  "examples": []
+}

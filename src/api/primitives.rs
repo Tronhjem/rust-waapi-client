@@ -1,48 +1,57 @@
 //! Shared primitive types used across multiple WAAPI endpoints.
-//!
-//! These map to the shared definitions in `waapi_definitions.json` and
-//! `common_definitions.json` that are referenced by many endpoint schemas.
 
-use std::collections::HashMap;
-
-use crate::types::WaapiValue;
+use serde::{Deserialize, Serialize, Serializer};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Object and platform references
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Identifies an existing Wwise object.
-///
-/// Maps to `waapi_definitions.json#/definitions/objectArg`.
-/// All three variants serialize to a plain string — WAAPI disambiguates by
-/// content.
 #[derive(Debug, Clone)]
 pub enum ObjectRef {
     /// A GUID, e.g. `"{FF59687C-48CF-4385-B1C5-CE84B0A63880}"`.
     Guid(String),
-    /// A backslash-separated hierarchy path, e.g.
-    /// `"\Actor-Mixer Hierarchy\Default Work Unit\MySound"`.
+    /// A backslash-separated hierarchy path.
     Path(String),
     /// A unique qualified object name.
     Name(String),
 }
 
 impl ObjectRef {
-    pub fn guid(s: impl Into<String>) -> Self { ObjectRef::Guid(s.into()) }
-    pub fn path(s: impl Into<String>) -> Self { ObjectRef::Path(s.into()) }
-    pub fn name(s: impl Into<String>) -> Self { ObjectRef::Name(s.into()) }
+    pub fn guid(s: impl Into<String>) -> Self {
+        ObjectRef::Guid(s.into())
+    }
+    pub fn path(s: impl Into<String>) -> Self {
+        ObjectRef::Path(s.into())
+    }
+    pub fn name(s: impl Into<String>) -> Self {
+        ObjectRef::Name(s.into())
+    }
+}
 
-    pub(crate) fn to_waapi_value(&self) -> WaapiValue {
+impl Serialize for ObjectRef {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let s = match self {
             ObjectRef::Guid(s) | ObjectRef::Path(s) | ObjectRef::Name(s) => s,
         };
-        WaapiValue::String(s.clone())
+        serializer.serialize_str(s)
+    }
+}
+
+impl<'de> Deserialize<'de> for ObjectRef {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        if s.starts_with('{') && s.ends_with('}') {
+            Ok(ObjectRef::Guid(s))
+        } else if s.starts_with('\\') {
+            Ok(ObjectRef::Path(s))
+        } else {
+            Ok(ObjectRef::Name(s))
+        }
     }
 }
 
 /// Identifies a Wwise platform for platform-specific property overrides.
-///
-/// Maps to `waapi_definitions.json#/definitions/platformArg`.
 #[derive(Debug, Clone)]
 pub enum PlatformRef {
     Guid(String),
@@ -50,57 +59,83 @@ pub enum PlatformRef {
 }
 
 impl PlatformRef {
-    pub fn guid(s: impl Into<String>) -> Self { PlatformRef::Guid(s.into()) }
-    pub fn name(s: impl Into<String>) -> Self { PlatformRef::Name(s.into()) }
+    pub fn guid(s: impl Into<String>) -> Self {
+        PlatformRef::Guid(s.into())
+    }
+    pub fn name(s: impl Into<String>) -> Self {
+        PlatformRef::Name(s.into())
+    }
+}
 
-    pub(crate) fn to_waapi_value(&self) -> WaapiValue {
+impl Serialize for PlatformRef {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let s = match self {
             PlatformRef::Guid(s) | PlatformRef::Name(s) => s,
         };
-        WaapiValue::String(s.clone())
+        serializer.serialize_str(s)
+    }
+}
+
+impl<'de> Deserialize<'de> for PlatformRef {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        if s.starts_with('{') && s.ends_with('}') {
+            Ok(PlatformRef::Guid(s))
+        } else {
+            Ok(PlatformRef::Name(s))
+        }
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared enums (appear in multiple endpoint schemas)
+// Shared enums
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Action to take when a child with the same name already exists.
-///
-/// Used by `object.set`, `object.create`, and `audio.import`.
-/// Maps to the `onNameConflict` enum in those schemas.
 #[derive(Debug, Clone)]
 pub enum OnNameConflict {
-    /// Assign a new unique name to the incoming object.
     Rename,
-    /// Delete the existing object and replace it with the incoming one.
     Replace,
-    /// Return an error without making any change. (WAAPI default)
     Fail,
-    /// Merge the incoming object into the existing one.
     Merge,
 }
 
 impl OnNameConflict {
     pub(crate) fn as_str(&self) -> &str {
         match self {
-            OnNameConflict::Rename  => "rename",
+            OnNameConflict::Rename => "rename",
             OnNameConflict::Replace => "replace",
-            OnNameConflict::Fail    => "fail",
-            OnNameConflict::Merge   => "merge",
+            OnNameConflict::Fail => "fail",
+            OnNameConflict::Merge => "merge",
+        }
+    }
+}
+
+impl Serialize for OnNameConflict {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for OnNameConflict {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        match s.as_str() {
+            "rename" => Ok(OnNameConflict::Rename),
+            "replace" => Ok(OnNameConflict::Replace),
+            "fail" => Ok(OnNameConflict::Fail),
+            "merge" => Ok(OnNameConflict::Merge),
+            _ => Err(serde::de::Error::custom(format!(
+                "unknown OnNameConflict: {s}"
+            ))),
         }
     }
 }
 
 /// Action to take when an object already has items in a named list.
-///
-/// Used by `object.set` and `object.create`.
-/// Maps to the `listMode` enum in those schemas.
 #[derive(Debug, Clone)]
 pub enum ListMode {
-    /// Remove all existing items in the list and insert the new ones.
     ReplaceAll,
-    /// Append the new items after any existing ones. (WAAPI default)
     Append,
 }
 
@@ -108,7 +143,24 @@ impl ListMode {
     pub(crate) fn as_str(&self) -> &str {
         match self {
             ListMode::ReplaceAll => "replaceAll",
-            ListMode::Append     => "append",
+            ListMode::Append => "append",
+        }
+    }
+}
+
+impl Serialize for ListMode {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for ListMode {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(deserializer)?;
+        match s.as_str() {
+            "replaceAll" => Ok(ListMode::ReplaceAll),
+            "append" => Ok(ListMode::Append),
+            _ => Err(serde::de::Error::custom(format!("unknown ListMode: {s}"))),
         }
     }
 }
@@ -119,33 +171,56 @@ impl ListMode {
 
 /// A new Wwise object to create, nested under a parent via `children` or a
 /// named list via an `@`-prefixed field.
-///
-/// Used by `object.set` and `object.create`.
-/// Maps to `argsSchema.definitions.object` in those schemas.
-/// `object_type` and `name` are required; everything else is optional.
 #[derive(Debug, Clone)]
 pub struct ChildObject {
     /// The Wwise object type, e.g. `"Sound"`, `"Event"`, `"RandomSequenceContainer"`.
     pub object_type: String,
-    pub name:        String,
-    pub notes:       Option<String>,
-    pub platform:    Option<PlatformRef>,
+    pub name: String,
+    pub notes: Option<String>,
+    pub platform: Option<PlatformRef>,
     /// Nested children to create under this object (recursive).
-    pub children:    Vec<ChildObject>,
+    pub children: Vec<ChildObject>,
     /// `@PropertyName` / `@ReferenceName` / `@ListName` fields.
     /// Keys are bare names without the `@` prefix — it is added during serialization.
-    pub properties:  Vec<(String, PropertyValue)>,
+    pub properties: Vec<(String, PropertyValue)>,
+}
+
+impl Serialize for ChildObject {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeMap;
+        let len = 2
+            + usize::from(self.notes.is_some())
+            + usize::from(self.platform.is_some())
+            + usize::from(!self.children.is_empty())
+            + self.properties.len();
+        let mut ser = serializer.serialize_map(Some(len))?;
+        ser.serialize_entry("type", &self.object_type)?;
+        ser.serialize_entry("name", &self.name)?;
+        if let Some(notes) = &self.notes {
+            ser.serialize_entry("notes", notes)?;
+        }
+        if let Some(platform) = &self.platform {
+            ser.serialize_entry("platform", platform)?;
+        }
+        if !self.children.is_empty() {
+            ser.serialize_entry("children", &self.children)?;
+        }
+        for (key, value) in &self.properties {
+            ser.serialize_entry(&format!("@{key}"), value)?;
+        }
+        ser.end()
+    }
 }
 
 impl ChildObject {
     pub fn new(object_type: impl Into<String>, name: impl Into<String>) -> Self {
         ChildObject {
             object_type: object_type.into(),
-            name:        name.into(),
-            notes:       None,
-            platform:    None,
-            children:    Vec::new(),
-            properties:  Vec::new(),
+            name: name.into(),
+            notes: None,
+            platform: None,
+            children: Vec::new(),
+            properties: Vec::new(),
         }
     }
 
@@ -170,45 +245,9 @@ impl ChildObject {
         self.children.push(child);
         self
     }
-
-    pub(crate) fn to_waapi_value(&self) -> WaapiValue {
-        WaapiValue::Dict(self.to_map())
-    }
-
-    pub(crate) fn to_map(&self) -> HashMap<String, WaapiValue> {
-        let mut map = HashMap::new();
-
-        map.insert("type".into(), WaapiValue::String(self.object_type.clone()));
-        map.insert("name".into(), WaapiValue::String(self.name.clone()));
-
-        if let Some(notes) = &self.notes {
-            map.insert("notes".into(), WaapiValue::String(notes.clone()));
-        }
-        if let Some(platform) = &self.platform {
-            map.insert("platform".into(), platform.to_waapi_value());
-        }
-        if !self.children.is_empty() {
-            map.insert("children".into(), WaapiValue::List(
-                self.children.iter().map(|c| c.to_waapi_value()).collect(),
-            ));
-        }
-        for (key, value) in &self.properties {
-            map.insert(format!("@{key}"), value.to_waapi_value());
-        }
-
-        map
-    }
 }
 
 /// The value of a Wwise property or reference, set via an `@`-prefixed field.
-///
-/// Maps to the `anyOf` inside `patternProperties "^@[:_a-zA-Z0-9]+$"` in
-/// `object.set` and `object.create`.
-///
-/// Which variant is valid depends on the specific property:
-/// - `@Volume` → `Number`
-/// - `@OutputBus` → `String` (GUID, path, or name of the target object)
-/// - `@RTPC` → `ObjectList`
 #[derive(Debug, Clone)]
 pub enum PropertyValue {
     /// A numeric property (WAAPI accepts both float and integer).
@@ -225,19 +264,15 @@ pub enum PropertyValue {
     ObjectList(Vec<ChildObject>),
 }
 
-impl PropertyValue {
-    pub(crate) fn to_waapi_value(&self) -> WaapiValue {
+impl Serialize for PropertyValue {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            PropertyValue::Number(n)     => WaapiValue::Float(*n),
-            PropertyValue::Boolean(b)    => WaapiValue::Boolean(*b),
-            PropertyValue::String(s)     => WaapiValue::String(s.clone()),
-            PropertyValue::StringList(v) => WaapiValue::List(
-                v.iter().map(|s| WaapiValue::String(s.clone())).collect(),
-            ),
-            PropertyValue::Object(obj)   => obj.to_waapi_value(),
-            PropertyValue::ObjectList(v) => WaapiValue::List(
-                v.iter().map(|o| o.to_waapi_value()).collect(),
-            ),
+            PropertyValue::Number(n) => serializer.serialize_f64(*n),
+            PropertyValue::Boolean(b) => serializer.serialize_bool(*b),
+            PropertyValue::String(s) => serializer.serialize_str(s),
+            PropertyValue::StringList(v) => v.serialize(serializer),
+            PropertyValue::Object(obj) => obj.serialize(serializer),
+            PropertyValue::ObjectList(v) => v.serialize(serializer),
         }
     }
 }

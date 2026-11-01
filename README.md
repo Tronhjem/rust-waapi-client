@@ -3,8 +3,7 @@
 A Rust client library for the Wwise Authoring API (WAAPI), providing a clean, type-safe interface for interacting with Audiokinetic Wwise.
 More information about WAAPI can be found here: https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
-For now it's using a forked version of wampire for working with wamp. 
-https://github.com/Tronhjem/wamp-for-rust
+This crate ships with a small, private WAMP v2 client that speaks JSON over WebSocket. It is no longer dependent on an external `wampire` submodule.
 
 ## Basic Usage
 
@@ -16,142 +15,132 @@ use waapi_client::{WaapiClient, WaapiResult};
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     // Connect to WAAPI (default: 127.0.0.1:8080)
-    let mut client = WaapiClient::new(None)?;
-    
+    let mut client = WaapiClient::new(None).await?;
+
     // Make calls...
-    
+
     // Always shutdown when done
     client.shutdown().await?;
     Ok(())
 }
 ```
 
+`WaapiClient::new` accepts `None` for the default URL, a `host:port` string, or a full WebSocket URI such as `ws://127.0.0.1:8080/waapi`.
+
 ### Making Simple Calls
+
+The escape-hatch API works directly with `serde_json::Value`. `serde_json` is re-exported from the crate root, so the `json!` macro is available without an extra dependency:
 
 ```rust
 use waapi_client::waapi_function_api::ak;
+use waapi_client::serde_json::json;
 
-// Call without arguments
-let response = client.call(ak::wwise::core::getInfo, None, None).await?;
-response.print();
+let response = client
+    .call(ak::wwise::core::getInfo, None, None)
+    .await?;
+println!("{}", serde_json::to_string_pretty(&response)?);
 ```
 
 ### Building Arguments
 
-Use `WaapiArgs` to construct call arguments:
+Use `serde_json::json!` to build WAAPI kwargs:
 
 ```rust
-use waapi_client::{WaapiArgs, WaapiValue};
-use std::collections::HashMap;
+use waapi_client::serde_json::json;
 
-// Build a "from" query by ID
-let mut from_dict = HashMap::new();
-from_dict.insert(
-    "id".to_string(),
-    WaapiValue::List(vec![
-        WaapiValue::String("{GUID-HERE}".to_string())
-    ])
-);
+let args = json!({
+    "from": {
+        "id": ["{GUID-HERE}"]
+    }
+});
 
-let args = WaapiArgs::new()
-    .insert("from", WaapiValue::Dict(from_dict));
+let options = json!({
+    "return": ["id", "name", "type"]
+});
+
+let response = client
+    .call(ak::wwise::core::object::get, Some(args), Some(options))
+    .await?;
+```
+
+### Typed API
+
+For supported endpoints, use the generated typed methods under `client`:
+
+```rust
+use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetinfoResponse;
+
+let info: WwiseCoreGetinfoResponse = client.get_info(()).await?;
+println!("Wwise version: {:?}", info.version);
+
+use waapi_client::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions,
+};
+
+let args = WwiseCoreObjectGetArgs::new(r"\Actor-Mixer Hierarchy\Default Work Unit\MySound".into())
+    .transform(vec![]);
+let options = WwiseCoreObjectGetOptions::new()
+    .r#return(vec!["id".into(), "name".into(), "type".into()]);
+let response = client.object_get(args, options).await?;
 ```
 
 ### Specifying Return Fields
 
-Use `WaapiOptions` with type-safe `ReturnType` enum:
+For escape-hatch calls, return fields are a plain `Vec<String>` in the options object:
 
 ```rust
-use waapi_client::{WaapiOptions, ReturnType};
-
-let options = WaapiOptions::with_return(&[
-    ReturnType::Id,
-    ReturnType::Name,
-    ReturnType::Type,
-    ReturnType::Path,
-]);
+let options = json!({
+    "return": ["id", "name", "type", "path"]
+});
 ```
+
+Typed endpoint `Options` structs provide a `.r#return(...)` builder for the same purpose.
 
 ### Complete Example
 
 ```rust
-use std::collections::HashMap;
-use waapi_client::{
-    WaapiClient, WaapiArgs, WaapiOptions, WaapiValue, ReturnType,
-};
+use waapi_client::{WaapiClient, WaapiResult};
 use waapi_client::waapi_function_api::ak;
+use waapi_client::serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = WaapiClient::new(Some("127.0.0.1:8080"))?;
+async fn main() -> WaapiResult<()> {
+    let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
 
-    // Build arguments
-    let mut from_dict = HashMap::new();
-    from_dict.insert(
-        "id".to_string(),
-        WaapiValue::List(vec![
-            WaapiValue::String("{GUID}".to_string())
-        ])
-    );
-    let args = WaapiArgs::new()
-        .insert("from", WaapiValue::Dict(from_dict));
+    let args = json!({
+        "from": { "id": ["{GUID}"] }
+    });
+    let options = json!({
+        "return": ["id", "name", "type"]
+    });
 
-    // Specify return fields
-    let options = WaapiOptions::with_return(&[
-        ReturnType::Id,
-        ReturnType::Name,
-        ReturnType::Type,
-    ]);
-
-    // Make the call
     let response = client
         .call(ak::wwise::core::object::get, Some(args), Some(options))
         .await?;
 
-    // Extract values (type-safe)
-    if let Some(id) = response.get_return_value(ReturnType::Id) {
-        println!("Object ID: {:?}", id);
-    }
+    println!("{}", serde_json::to_string_pretty(&response)?);
 
     client.shutdown().await?;
     Ok(())
 }
 ```
 
-## Extracting Response Values
+### Subscriptions
 
-The `WaapiResponse` provides several helper methods:
+Subscribe to WAAPI topics through the low-level WAMP client:
 
 ```rust
-// Get raw kwargs value by key
-let value = response.get("return");
+use waapi_client::waapi_topics_api::ak;
+use waapi_client::serde_json::json;
 
-// Get the first object from the return/objects list
-if let Some(obj) = response.get_return_object() {
-    // obj is a HashMap<String, WaapiValue>
-    for (key, value) in obj {
-        println!("{}: {:?}", key, value);
-    }
+let options = json!({ "return": ["id", "name"] });
+let (id, mut events) = client
+    .subscribe(ak::wwise::core::object::nameChanged, Some(options))
+    .await?;
+while let Some(event) = events.recv().await {
+    println!("{}", serde_json::to_string_pretty(&event.kwargs)?);
 }
-
-// Get all return objects as a Vec
-let objects = response.get_return_objects();
-for obj in objects {
-    println!("Object: {:?}", obj);
-}
-
-// Get a specific field as string (for display)
-if let Some(name) = response.get_return_string("name") {
-    println!("Name: {}", name);
-}
-
-// Get a field value (type-safe, cloned for reuse in other calls)
-if let Some(id_value) = response.get_return_value(ReturnType::Id) {
-    // Reuse id_value in another call
-    let mut from_dict = HashMap::new();
-    from_dict.insert("id".to_string(), WaapiValue::List(vec![id_value]));
-    let args = WaapiArgs::new().insert("from", WaapiValue::Dict(from_dict));
-}
+client.unsubscribe(id).await?;
 ```
 
 ## API Endpoints
@@ -174,20 +163,7 @@ ak::wwise::ui::getSelectedObjects
 ak::wwise::ui::bringToForeground
 ```
 
-All 170+ WAAPI endpoints are available. See [src/api.rs](src/api.rs) for the complete list organized by module.
-
-## Return Types
-
-The `ReturnType` enum provides type-safe field names for common WAAPI return fields:
-
-- `Id`, `Name`, `Type`, `Notes`, `Path`
-- `Parent`, `Owner`, `Category`
-- `ChildrenCount`, `IsPlayable`
-- Audio source properties: `PlaybackDuration`, `MaxDurationSource`, etc.
-- Workunit properties: `WorkunitType`, `WorkunitIsDirty`, etc.
-- And many more...
-
-See [src/types.rs](src/types.rs) for the complete list.
+All 170+ WAAPI endpoints are available. See [`src/waapi_function_api.rs`](src/waapi_function_api.rs) for the complete list organized by module.
 
 ## Examples
 
@@ -197,17 +173,18 @@ Run examples with:
 cargo run --example get_info
 ```
 
-See the [examples/](examples/) directory for more usage examples.
+See the [`examples/`](examples/) directory for more usage examples.
 
 ## Error Handling
 
-The library uses a custom `WaapiError` type with variants:
+The library uses a custom `WaapiError` enum with the following variants:
 
-- `ConnectionFailed(String)` - Failed to connect to WAAPI
-- `CallFailed(String)` - WAAPI call returned an error
-- `ShutdownNotCalled` - Warning when client is dropped without shutdown
+- `Connection(String)` - Failed to connect to WAAPI or client already shut down
+- `Serialization(serde_json::Error)` - JSON serialization/deserialization failed
+- `Call(String)` - WAAPI call returned an error (includes the error URI, args, and kwargs)
+- `Wamp(WampError)` - Underlying WAMP/WebSocket protocol error
 
-Always call `shutdown()` before dropping the client to ensure clean disconnection.
+Always call `shutdown().await` before dropping the client to ensure clean disconnection.
 
 ## License
 
@@ -215,4 +192,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributing
 
-Contributions are more than welcome! 
+Contributions are more than welcome!

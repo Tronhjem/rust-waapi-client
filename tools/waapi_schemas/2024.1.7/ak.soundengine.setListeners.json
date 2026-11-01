@@ -1,0 +1,50 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "emitter": {
+        "description": "Emitter game object.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "listeners": {
+        "type": "array",
+        "description": "Array of listener game object IDs. Game objects must have been previously registered.",
+        "maxItems": 4294967295,
+        "items": {
+          "$ref": "waapi_definitions.json#/definitions/gameObject"
+        }
+      }
+    },
+    "required": [
+      "emitter",
+      "listeners"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets \"listeners\" as the list of active listeners for \"gameObject\".",
+      "title": "Setting a list of listeners for a game object",
+      "args": {
+        "emitter": 1122334,
+        "listeners": [
+          2233445,
+          5566778,
+          123456,
+          11222648
+        ]
+      }
+    }
+  ]
+}

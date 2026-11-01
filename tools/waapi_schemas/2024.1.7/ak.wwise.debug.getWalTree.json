@@ -1,0 +1,54 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "object",
+        "properties": {
+          "nodes": {
+            "type": "object",
+            "description": "Nodes in the WALTree",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "description": "Short ID of the node"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Type of the node"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Name of the node"
+                }
+              },
+              "required": [
+                "name",
+                "id",
+                "type"
+              ]
+            }
+          }
+        },
+        "description": "Result returned by the dump of WAL"
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  }
+}

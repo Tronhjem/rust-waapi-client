@@ -1,0 +1,53 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "size": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "The width of the window.",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "description": "The height of the window.",
+            "minimum": 1
+          }
+        },
+        "description": "The size of the window.",
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      },
+      "title": {
+        "type": "string",
+        "description": "The name of the window."
+      }
+    },
+    "required": [
+      "title",
+      "size"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "windowID": {
+        "description": "The ID of the window.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": []
+}

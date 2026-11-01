@@ -1,0 +1,87 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for RTPCs, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of RTPCs.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The ID (GUID) of the Game Parameter, LFO, Time, Envelope or MIDI Parameter object.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "name": {
+              "description": "The name of the Game Parameter, LFO, Time, Envelope or MIDI Parameter object.",
+              "$ref": "waapi_definitions.json#/definitions/uniqueName"
+            },
+            "value": {
+              "type": "number",
+              "description": "The value of the Game Parameter, LFO, Time, Envelope or MIDI Parameter at the cursor time."
+            },
+            "gameObjectId": {
+              "description": "The Game Object associated with the RTPC scope, or AK_INVALID_GAME_OBJECT for global scope RTPCs.",
+              "$ref": "waapi_definitions.json#/definitions/gameObject"
+            }
+          },
+          "description": "An RTPC associated with a playing voice. Use the return options to specify which property is required.",
+          "required": [
+            "id",
+            "name",
+            "gameObjectId",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "id": "{8CCB75BA-256A-4C7B-907F-9BEB03689F56}",
+            "name": "Footstep_weight",
+            "value": 50,
+            "gameObjectId": 10
+          },
+          {
+            "id": "{1FEAF6CE-113A-49F2-BCAA-9AFDDE35ADA5}",
+            "name": "Footstep_speed",
+            "value": 5,
+            "gameObjectId": 11
+          }
+        ]
+      },
+      "description": "Queries the active RTPCs in the current capture session at 30 secs (30,000 milliseconds).",
+      "title": "Querying the RTPC id and value at a point in time",
+      "args": {
+        "time": 30000
+      }
+    }
+  ]
+}

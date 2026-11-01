@@ -1,0 +1,91 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for voices, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      },
+      "voicePipelineID": {
+        "description": "The pipeline ID of a single voice to get.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Members to return for each voice. Defaults to Pipeline ID, Game Object ID and Object GUID.",
+        "$ref": "waapi_definitions.json#/definitions/voiceReturnOptions"
+      }
+    },
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of voices.",
+        "items": {
+          "description": "Voice item.",
+          "$ref": "waapi_definitions.json#/definitions/voiceReturn"
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "objectName": "MySound"
+          },
+          {
+            "objectName": "MyOtherSound"
+          }
+        ]
+      },
+      "description": "Queries the voices in the current capture session at 30 secs (30,000 milliseconds).",
+      "title": "Querying the sound names at a point in time",
+      "args": {
+        "time": 30000
+      },
+      "options": {
+        "return": [
+          "objectName"
+        ]
+      }
+    },
+    {
+      "result": {
+        "return": [
+          {
+            "gameObjectID": 18446744073709551614,
+            "gameObjectName": "Transport/Soundcaster"
+          }
+        ]
+      },
+      "description": "Specifies the Capture Time Cursor as a time to query the voices at the latest time of the capture session when the call is processed.",
+      "title": "Querying the game object properties of voices from the Capture Time Cursor",
+      "args": {
+        "time": "capture"
+      },
+      "options": {
+        "return": [
+          "gameObjectID",
+          "gameObjectName"
+        ]
+      }
+    }
+  ]
+}

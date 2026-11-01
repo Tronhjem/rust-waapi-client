@@ -1,0 +1,49 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Associated game object ID. Its default value is the transport game object.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "trigger": {
+        "description": "Either the ID (GUID), name, or Short ID of the Trigger.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "trigger"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Posts the specified \"trigger\" by name to be applied on \"gameObject\".",
+      "title": "Posting a Trigger by name",
+      "args": {
+        "gameObject": 1122334,
+        "trigger": "MyTrigger"
+      }
+    },
+    {
+      "result": {},
+      "description": "Posts the specified \"trigger\" by GUID to be applied on \"gameObject\".",
+      "title": "Posting a Trigger by GUID",
+      "args": {
+        "gameObject": 1122334,
+        "trigger": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+      }
+    }
+  ]
+}

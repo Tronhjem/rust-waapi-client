@@ -1,0 +1,115 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for cpu data, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of CPU statistics for each element.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "Class ID of the element."
+            },
+            "type": {
+              "type": "string",
+              "description": "The type of element. For example, Codec, Source, Effect, Mixer or Sink."
+            },
+            "elementName": {
+              "type": "string",
+              "description": "The name of the element on which we calculate CPU usage."
+            },
+            "instances": {
+              "type": "integer",
+              "description": "An estimation of the number of instances of the element."
+            },
+            "percentInclusive": {
+              "type": "number",
+              "description": "The percentage of CPU time spent in the execution of the element and those that it uses (calls)."
+            },
+            "percentExclusive": {
+              "type": "number",
+              "description": "The percentage of CPU time spent only in the execution of the element itself."
+            },
+            "millisecondsInclusive": {
+              "type": "number",
+              "description": "The milliseconds of CPU time spent in the execution of the element and those that it uses (calls)."
+            },
+            "millisecondsExclusive": {
+              "type": "number",
+              "description": "The milliseconds of CPU time spent only in the execution of the element itself."
+            }
+          },
+          "description": "Information about the amount of CPU percentage used by each element.",
+          "required": [
+            "elementName",
+            "id",
+            "instances",
+            "type",
+            "percentInclusive",
+            "percentExclusive",
+            "millisecondsInclusive",
+            "millisecondsExclusive"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "return"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "id": 52494344,
+            "type": "Global Extension",
+            "elementName": "Interactive Music",
+            "instances": 1,
+            "percentInclusive": 0.1809375137090683,
+            "percentExclusive": 0.001875000074505806,
+            "millisecondsInclusive": 0.019300000742077827,
+            "millisecondsExclusive": 0.00019999999494757503
+          },
+          {
+            "id": 8454147,
+            "type": "Effect",
+            "elementName": "Meter",
+            "instances": 3,
+            "percentInclusive": 0.1678125113248825,
+            "percentExclusive": 0.1678125113248825,
+            "millisecondsInclusive": 0.017899999395012856,
+            "millisecondsExclusive": 0.017899999395012856
+          }
+        ]
+      },
+      "description": "Queries the CPU usage in the current capture session at the latest capture time.",
+      "title": "Querying the CPU usage at a point in time.",
+      "args": {
+        "time": "capture"
+      }
+    }
+  ]
+}

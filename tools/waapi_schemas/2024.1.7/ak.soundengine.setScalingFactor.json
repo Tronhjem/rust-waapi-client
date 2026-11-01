@@ -1,0 +1,41 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "The game object identifier.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "attenuationScalingFactor": {
+        "type": "number",
+        "description": "The scaling factor, where 1 means 100%, 0.5 means 50%, 2 means 200%, and so on."
+      }
+    },
+    "required": [
+      "gameObject",
+      "attenuationScalingFactor"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets the scaling factor of \"gameObject\" to \"attenuationScalingFactor\" (200%).",
+      "title": "Setting the scaling factor of a game object",
+      "args": {
+        "gameObject": 1122334,
+        "attenuationScalingFactor": 2
+      }
+    }
+  ]
+}

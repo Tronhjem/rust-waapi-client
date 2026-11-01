@@ -1,0 +1,33 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "channel": {
+        "description": "The channel to clear. Default is 'general'.",
+        "$ref": "waapi_definitions.json#/definitions/logCentralChannel"
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Clears the entire log on the channel 'general'.",
+      "title": "Clearing the general log.",
+      "args": {
+        "channel": "general"
+      }
+    }
+  ]
+}

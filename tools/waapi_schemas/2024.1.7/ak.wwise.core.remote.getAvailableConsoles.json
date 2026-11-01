@@ -1,0 +1,92 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "consoles": {
+        "type": "array",
+        "description": "An array of remote consoles available.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the remote console as returned by the executable."
+            },
+            "host": {
+              "type": "string",
+              "description": "The IPv4 of the connected host. This can also be a file path if Wwise is connected to a local file (profiler session). For using WAAPI on Mac, please refer to \\ref waapi_path_on_mac ."
+            },
+            "platform": {
+              "type": "string",
+              "description": "Platform of the remote console as returned by the executable."
+            },
+            "appName": {
+              "type": "string",
+              "description": "The name of the connected application as returned by the executable. Must be used when connecting to a specific Sound Engine instance."
+            },
+            "commandPort": {
+              "description": "The command port. Can be used when connecting to a specific Sound Engine instance.",
+              "$ref": "common_definitions.json#/definitions/uint16"
+            },
+            "customPlatform": {
+              "type": "string",
+              "description": "Platform, as defined in the project platforms of the remote console as returned by the executable."
+            }
+          },
+          "description": "Describe the remote process.",
+          "required": [
+            "name",
+            "platform",
+            "customPlatform",
+            "host",
+            "appName",
+            "commandPort"
+          ]
+        }
+      }
+    },
+    "required": [
+      "consoles"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "consoles": [
+          {
+            "name": "MyConsole01",
+            "host": "127.0.0.1",
+            "platform": "Android",
+            "appName": "MyApp",
+            "commandPort": 57610,
+            "notificationPort": 57611,
+            "customPlatform": "CustomAndroid"
+          },
+          {
+            "name": "MyConsole02",
+            "host": "127.0.0.1",
+            "platform": "Windows",
+            "appName": "MyApp",
+            "commandPort": 57610,
+            "notificationPort": 57611,
+            "customPlatform": "CustomBuild01"
+          }
+        ]
+      },
+      "description": "Gets the available console for the connected sound engine.",
+      "title": "Getting available consoles",
+      "args": {}
+    }
+  ]
+}

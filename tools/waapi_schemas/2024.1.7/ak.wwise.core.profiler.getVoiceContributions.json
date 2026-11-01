@@ -1,0 +1,71 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for voices, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      },
+      "voicePipelineID": {
+        "description": "The pipeline ID of the voice to get contributions from.",
+        "$ref": "waapi_definitions.json#/definitions/pipelineID"
+      },
+      "bussesPipelineID": {
+        "type": "array",
+        "description": "An array of bus pipeline IDs.",
+        "items": {
+          "description": "The pipeline IDs of busses belonging to a common voice path. An empty array defaults to the dry path.",
+          "$ref": "waapi_definitions.json#/definitions/pipelineID"
+        }
+      }
+    },
+    "required": [
+      "voicePipelineID",
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "object",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "description": "A tree of contribution objects.",
+            "items": {
+              "$ref": "waapi_definitions.json#/definitions/voiceContributionsObject"
+            }
+          },
+          "volume": {
+            "type": "number",
+            "description": "The volume difference applied as a contribution."
+          },
+          "LPF": {
+            "type": "number",
+            "description": "The LPF difference applied as a contribution."
+          },
+          "HPF": {
+            "type": "number",
+            "description": "The HPF difference applied as a contribution."
+          }
+        },
+        "description": "The hierarchy of objects with parameters contributing to the voice, ordered from top-level parent to the voice object",
+        "required": [
+          "volume",
+          "LPF",
+          "HPF",
+          "objects"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "additionalProperties": false
+  }
+}

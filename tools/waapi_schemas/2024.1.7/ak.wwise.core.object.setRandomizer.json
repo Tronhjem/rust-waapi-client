@@ -1,0 +1,83 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "max": {
+        "type": "number",
+        "description": "Maximum value that the randomizer can offset by.",
+        "minimum": 0
+      },
+      "min": {
+        "type": "number",
+        "description": "Minimum value that the randomizer can offset by.",
+        "maximum": 0
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the object owning the property.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "property": {
+        "type": "string",
+        "description": "The name of the property. For more information, refer to the property list of Wwise Objects listed in \\ref wobjects_index .",
+        "$ref": "waapi_definitions.json#/definitions/propertyName"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "enabled": {
+        "type": "boolean",
+        "description": "Enabled state of the randomizer."
+      }
+    },
+    "additionalProperties": false,
+    "anyOf": [
+      {
+        "required": [
+          "object",
+          "property",
+          "enabled"
+        ]
+      },
+      {
+        "required": [
+          "object",
+          "property",
+          "min"
+        ]
+      },
+      {
+        "required": [
+          "object",
+          "property",
+          "max"
+        ]
+      }
+    ]
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the randomizer attributes corresponding to the \"Volume\" property of the object defined by \"object\".",
+      "title": "Setting the Volume randomizer values of a Sound object",
+      "args": {
+        "max": 6,
+        "min": -8,
+        "object": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+        "property": "Volume",
+        "platform": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "enabled": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "handleID": {
+        "description": "The ID of the handle.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "widgetID": {
+        "type": "string",
+        "description": "The ID of the widget."
+      }
+    },
+    "required": [
+      "handleID",
+      "widgetID"
+    ],
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "handleID": {
+        "description": "The ID of the handle.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "widgetID": {
+        "type": "string",
+        "description": "The ID of the widget."
+      }
+    },
+    "required": [
+      "handleID",
+      "widgetID"
+    ],
+    "additionalProperties": false
+  }
+}

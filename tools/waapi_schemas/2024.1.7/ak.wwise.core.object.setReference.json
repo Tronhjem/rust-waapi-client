@@ -1,0 +1,51 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the object which has the reference.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "value": {
+        "description": "The ID (GUID), name, path or definition of the object to be referred to.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform to link the reference. Set to null-guid for unlinked reference.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "reference": {
+        "type": "string",
+        "description": "The name of the reference to set. Refer to \\ref wobjects_index for more information on the references available."
+      }
+    },
+    "required": [
+      "object",
+      "reference",
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the Output Bus on the specified object.",
+      "title": "Setting an object reference",
+      "args": {
+        "object": "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound",
+        "value": "\\Master-Mixer Hierarchy\\Default Work Unit\\Master Audio Bus\\Environment Bus",
+        "reference": "OutputBus"
+      }
+    }
+  ]
+}

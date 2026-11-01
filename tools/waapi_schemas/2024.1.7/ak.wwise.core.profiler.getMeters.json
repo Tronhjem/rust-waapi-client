@@ -1,0 +1,179 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "time": {
+        "description": "Time in milliseconds to query for Performance Monitor data, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.",
+        "$ref": "waapi_definitions.json#/definitions/cursorTime"
+      }
+    },
+    "required": [
+      "time"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "description": "Specifies the return options for the meter object field. The defaults are name and ID.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturnOptions"
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "meters": {
+        "type": "array",
+        "description": "Array of registered meters.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "description": "The metered object.",
+              "$ref": "waapi_definitions.json#/definitions/objectReturn"
+            },
+            "source": {
+              "type": "string",
+              "description": "The type of meter data.",
+              "enum": [
+                "Bus",
+                "DeviceMainMix",
+                "DevicePassthrough",
+                "DeviceSystemAudioObjects"
+              ]
+            },
+            "configurationName": {
+              "type": "string",
+              "description": "The name of the channel configuration."
+            },
+            "configurationMask": {
+              "type": "integer",
+              "description": "The bit field of the channel configuration."
+            },
+            "configurationType": {
+              "type": "string",
+              "description": "The type of the configuration for the meter.",
+              "enum": [
+                "Anonymous",
+                "Standard",
+                "Ambisonic",
+                "Objects"
+              ]
+            },
+            "channels": {
+              "type": "array",
+              "description": "An array of channels for this object, in the same order as the Meter in Wwise.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the channel."
+                  },
+                  "value": {
+                    "type": "number",
+                    "description": "The channel value in decibels."
+                  }
+                },
+                "description": "The channel value with corresponding name.",
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "The meter information.",
+          "required": [
+            "object",
+            "source",
+            "configurationName",
+            "configurationMask",
+            "configurationType",
+            "channels"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "meters"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "meters": [
+          {
+            "object": {
+              "id": "{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}",
+              "name": "Master Audio Bus"
+            },
+            "source": "Bus",
+            "configurationName": "2.0",
+            "configurationMask": 3,
+            "configurationType": "Standard",
+            "channels": [
+              {
+                "name": "L",
+                "value": 0.00794849544763565
+              },
+              {
+                "name": "R",
+                "value": -764.6162109375
+              }
+            ]
+          },
+          {
+            "object": {
+              "id": "{0DE372C2-4E96-4096-9E61-781BC76313F3}",
+              "name": "Bus"
+            },
+            "source": "Bus",
+            "configurationName": "7.1",
+            "configurationMask": 1599,
+            "configurationType": "Standard",
+            "channels": [
+              {
+                "name": "L",
+                "value": 0.00794849544763565
+              },
+              {
+                "name": "R",
+                "value": -764.6162109375
+              },
+              {
+                "name": "C",
+                "value": -764.6162109375
+              },
+              {
+                "name": "BL",
+                "value": -764.6162109375
+              },
+              {
+                "name": "BR",
+                "value": -764.6162109375
+              },
+              {
+                "name": "SL",
+                "value": -764.6162109375
+              },
+              {
+                "name": "SR",
+                "value": -764.6162109375
+              },
+              {
+                "name": "LFE",
+                "value": -764.6162109375
+              }
+            ]
+          }
+        ]
+      },
+      "description": "Gets the meter values for all registered busses. In this example, one of the busses is configured in 7.1 and is registered with \\ref ak_wwise_core_profiler_registermeter.",
+      "title": "Retrieving the meter values after registering a bus for meter",
+      "args": {
+        "time": "capture"
+      }
+    }
+  ]
+}

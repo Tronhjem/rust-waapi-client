@@ -1,0 +1,34 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "return": {
+        "description": "Data to be returned for every object.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "description": "The state object that changed. Default return is id and name.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "stateGroup": {
+        "description": "The state group object that changed. Default return is id and name.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "stateGroup",
+      "state"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,3 +1,0 @@
-[submodule "src/wamp"]
-	path = src/wamp
-	url = git@github.com:Tronhjem/wamp-for-rust.git

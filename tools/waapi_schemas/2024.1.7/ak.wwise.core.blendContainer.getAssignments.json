@@ -1,0 +1,103 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), the Blend Track.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "Array of Blend Track assignments.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "child": {
+              "description": "The ID (GUID) of the assigned child.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "index": {
+              "type": "integer",
+              "description": "The index of the child among the Blend Track's assignments. If a value is provided, it will be clamped to the range [0-n], where n is the current number of assignments. If a value is not provided, then the assignment will be added at the end."
+            },
+            "edges": {
+              "type": "array",
+              "description": "The configuration of the edges of the assignment within the Blend Track. This information is only useful if the Blend Track has a crossfade Game Parameter. If not specified, the edges will be configured using default values. If specified, there must be two edges: 0 = left, 1 = right.",
+              "maxItems": 2,
+              "items": {
+                "description": "The edge configuration of the Blend Track edge.",
+                "$ref": "waapi_definitions.json#/definitions/blendTrackEdge"
+              },
+              "minItems": 2
+            }
+          },
+          "description": "Blend Track assignment information."
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "child": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+            "index": 0,
+            "edges": [
+              {
+                "fadeMode": "Automatic",
+                "fadeShape": "SCurve",
+                "edgePosition": 0,
+                "fadePosition": 0
+              },
+              {
+                "fadeMode": "Automatic",
+                "fadeShape": "SCurve",
+                "edgePosition": 50,
+                "fadePosition": 50
+              }
+            ]
+          },
+          {
+            "child": "{D7126155-914E-4248-A8C1-4DABCCACA016}",
+            "index": 1,
+            "edges": [
+              {
+                "fadeMode": "Automatic",
+                "fadeShape": "SCurve",
+                "edgePosition": 50,
+                "fadePosition": 50
+              },
+              {
+                "fadeMode": "Automatic",
+                "fadeShape": "SCurve",
+                "edgePosition": 100,
+                "fadePosition": 100
+              }
+            ]
+          }
+        ]
+      },
+      "description": "Getting a Blend Track's assignment list.",
+      "title": "Getting a Blend Track's assignment list.",
+      "args": {
+        "object": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "description": "An optional explanatory message accomapnying the assert."
+      },
+      "fileName": {
+        "type": "string",
+        "description": "The name of the source file."
+      },
+      "expression": {
+        "type": "string",
+        "description": "The expression that failed."
+      },
+      "lineNumber": {
+        "type": "number",
+        "description": "The line number."
+      },
+      "callstack": {
+        "type": "string",
+        "description": "The callstack from the location of the assert."
+      }
+    },
+    "required": [
+      "expression",
+      "fileName",
+      "lineNumber",
+      "callstack"
+    ],
+    "additionalProperties": false
+  }
+}

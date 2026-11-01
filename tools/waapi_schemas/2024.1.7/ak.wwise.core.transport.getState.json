@@ -1,0 +1,50 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "transport": {
+        "description": "The transport object ID to be used with all other ak.wwise.core.transport functions.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      }
+    },
+    "required": [
+      "transport"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "type": "string",
+        "description": "The state of the transport object.",
+        "enum": [
+          "playing",
+          "stopped",
+          "paused"
+        ]
+      }
+    },
+    "required": [
+      "state"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "state": "playing"
+      },
+      "description": "Gets the State of the given transport object.",
+      "title": "Getting a transport object's State",
+      "args": {
+        "transport": 1234
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "gameObject": {
+        "description": "Associated game object ID.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "auxSendValues": {
+        "type": "array",
+        "description": "Array of AkAuxSendValue structures.",
+        "maxItems": 4,
+        "items": {
+          "type": "object",
+          "properties": {
+            "listener": {
+              "description": "Game object ID of the listener associated with this send.",
+              "$ref": "waapi_definitions.json#/definitions/gameObject"
+            },
+            "controlValue": {
+              "type": "number",
+              "description": "Value in the range [0.0f:1.0f], send level to auxiliary bus."
+            },
+            "auxBus": {
+              "description": "Either the ID (GUID), name or Short ID of the auxiliary bus.",
+              "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+            }
+          },
+          "description": "AkAuxSendValue structure.",
+          "required": [
+            "listener",
+            "auxBus",
+            "controlValue"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "gameObject",
+      "auxSendValues"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets the Auxiliary Busses of \"emitter\" for \"listener\"s specifying the bus name and value for each.",
+      "title": "Setting the Auxiliary Busses for a game object",
+      "args": {
+        "gameObject": 1122334,
+        "auxSendValues": [
+          {
+            "listener": 5566123,
+            "controlValue": 0.6,
+            "auxBus": "AuxBus1"
+          },
+          {
+            "listener": 226486,
+            "controlValue": 0.4,
+            "auxBus": "AuxBus2"
+          }
+        ]
+      }
+    }
+  ]
+}

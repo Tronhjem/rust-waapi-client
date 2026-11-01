@@ -1,0 +1,63 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "parent": {
+        "description": "The ID (GUID), name, or path of the object's new parent.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to be copied.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "autoAddToSourceControl": {
+        "type": "boolean",
+        "description": "Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true."
+      },
+      "onNameConflict": {
+        "type": "string",
+        "description": "The action to take if \"parent\" already has a child with the same name. Default value is \"fail\".",
+        "enum": [
+          "rename",
+          "replace",
+          "fail"
+        ]
+      },
+      "autoCheckOutToSourceControl": {
+        "type": "boolean",
+        "description": "Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true."
+      }
+    },
+    "required": [
+      "object",
+      "parent"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "description": "Specifies the return options for every object created.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturnOptions"
+  },
+  "resultSchema": {
+    "description": "The copied object.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturn"
+  },
+  "examples": [
+    {
+      "result": {
+        "id": "{AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE}",
+        "type": "Sound",
+        "shortId": 1234,
+        "name": "new_object_name",
+        "path": "\\Actor-Mixer Hierarchy\\Default Work Unit\\Sound1"
+      },
+      "description": "Copies the object specified by the \"object\" ID and makes that copy a child of \"parent\". The object is renamed if \"parent\" already contains a child with the same name.",
+      "title": "Copying an object to the given parent",
+      "args": {
+        "parent": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "object": "{A076AA65-B71A-45BB-8841-5A20C52CE727}",
+        "onNameConflict": "rename"
+      }
+    }
+  ]
+}

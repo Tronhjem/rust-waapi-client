@@ -1,0 +1,58 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "description": "Array of files for which to retrieve source control status. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      }
+    },
+    "required": [
+      "files"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "description": "Array of log entries generated during the request.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfLogCentralItem"
+      },
+      "result": {
+        "description": "Array of source control statuses.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfSourceControlStatus"
+      }
+    },
+    "required": [
+      "result",
+      "log"
+    ],
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "log": [],
+        "result": [
+          {
+            "owner": "user",
+            "status": "add"
+          }
+        ]
+      },
+      "description": "Returns the source control status and owner of the file.",
+      "title": "Getting the source control status of a file",
+      "args": {
+        "files": [
+          "//projet-file//Originals/SFX/existingFile.wav"
+        ]
+      }
+    }
+  ]
+}

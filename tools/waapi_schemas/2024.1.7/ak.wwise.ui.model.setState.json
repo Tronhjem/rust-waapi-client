@@ -1,0 +1,49 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "type": "array",
+        "description": "The widgets and attributes to set.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "array",
+              "description": "The new state to apply to the widget.",
+              "items": {
+                "$ref": "waapi_ui_definitions.json#/definitions/widgetAttributeEntry"
+              }
+            },
+            "widgetID": {
+              "type": "string",
+              "description": "The ID of the widget."
+            }
+          },
+          "description": "The widget and attributes to set.",
+          "additionalProperties": false
+        }
+      },
+      "handleID": {
+        "description": "The ID of the handle.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "handleID",
+      "state"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": []
+}

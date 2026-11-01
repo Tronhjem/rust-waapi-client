@@ -1,0 +1,69 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The ID (GUID), name, or path of the Switch Container.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "id"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "List of assignments (pairs of child and state).",
+        "items": {
+          "type": "object",
+          "properties": {
+            "child": {
+              "description": "The ID (GUID), name, or path of the child assigned to a State.",
+              "$ref": "waapi_definitions.json#/definitions/objectArg"
+            },
+            "stateOrSwitch": {
+              "description": "The ID (GUID), name, or path of the State or Switch to which the child is assigned.",
+              "$ref": "waapi_definitions.json#/definitions/objectArg"
+            }
+          },
+          "description": "Assignment (pair of child and state).",
+          "required": [
+            "child",
+            "stateOrSwitch"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "child": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}",
+            "stateOrSwitch": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+          },
+          {
+            "child": "{8B12D08F-B0D9-4403-9EFA-2E6338C197D1}",
+            "stateOrSwitch": "{B076BB65-B71A-45BB-8841-5A20C52CE738}"
+          }
+        ]
+      },
+      "description": "Gets the list of assignments for a Switch Container.",
+      "title": "Getting the assignments of a Switch Container",
+      "args": {
+        "id": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"
+      }
+    }
+  ]
+}

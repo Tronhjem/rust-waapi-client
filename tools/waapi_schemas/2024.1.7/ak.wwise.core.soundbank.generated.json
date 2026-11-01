@@ -1,0 +1,968 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for the SoundBank generated. Refer to \\ref wobjects_index for more information on the properties available.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "infoFile": {
+        "type": "boolean",
+        "description": "Embed the JSON SoundBank info file in the response."
+      },
+      "bankData": {
+        "type": "boolean",
+        "description": "Embed the base64 SoundBank data in the response."
+      },
+      "pluginInfo": {
+        "type": "boolean",
+        "description": "Embed the JSON PluginInfo file in the response."
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "platform": {
+        "type": "object",
+        "description": "The platform for which the SoundBank was generated."
+      },
+      "soundbank": {
+        "description": "The generated SoundBank. Use the return options to obtain specific details.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "language": {
+        "type": "object",
+        "description": "The language for which the SoundBank was generated. Only present when generating a SoundBank for a specific language."
+      },
+      "bankData": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "description": "Size of the SoundBank data when decoded."
+          },
+          "data": {
+            "type": "string",
+            "description": "Data of the SoundBank encoded in base64."
+          }
+        },
+        "description": "SoundBank data object containing the actual data encoded in base64 and the size."
+      },
+      "pluginInfo": {
+        "type": "object",
+        "properties": {
+          "Platform": {
+            "type": "string",
+            "description": "Name of the platform."
+          },
+          "BasePlatform": {
+            "type": "string",
+            "description": "The base platform the current platform is based off."
+          },
+          "PluginLibs": {
+            "type": "array",
+            "description": "List of the plugins",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Type": {
+                  "type": "string",
+                  "description": "Type of the plugin."
+                },
+                "LibName": {
+                  "type": "string",
+                  "description": "Display Name of the plugin."
+                },
+                "LibId": {
+                  "type": "string",
+                  "description": "Short ID of the plugin."
+                },
+                "DLL": {
+                  "type": "string",
+                  "description": "Name of the DLL for the plugin."
+                },
+                "StaticLib": {
+                  "type": "string",
+                  "description": "Name of the static lib for the plugin."
+                }
+              },
+              "description": "Plugin information.",
+              "required": [
+                "LibName",
+                "LibId",
+                "Type"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "description": "PluginInfo file info",
+        "required": [
+          "Platform",
+          "BasePlatform"
+        ],
+        "additionalProperties": false
+      },
+      "error": {
+        "type": "string",
+        "description": "The error message, if an error occurred. Only present if an error occurred."
+      },
+      "bankInfo": {
+        "type": "array",
+        "description": "All the information for SoundBank.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Color": {
+              "$ref": "#/definitions/color"
+            },
+            "Align": {
+              "type": "string",
+              "description": "Required alignment for media file. If not specified then the alignment is 16 bytes."
+            },
+            "Type": {
+              "type": "string",
+              "description": "SoundBank type. If the SoundBank is defined by the user, then the type is 'User'. Otherwise, the bank was auto defined by Wwise.",
+              "enum": [
+                "User",
+                "Event",
+                "Bus"
+              ]
+            },
+            "Language": {
+              "type": "string",
+              "description": "The name of the language being used in this SoundBank."
+            },
+            "Id": {
+              "type": "string",
+              "description": "Short ID of the resulting bank encoded in a string."
+            },
+            "GUID": {
+              "description": "GUID of the resulting SoundBank.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "ObjectPath": {
+              "type": "string",
+              "description": "Object path in the project."
+            },
+            "ShortName": {
+              "type": "string",
+              "description": "The name of the SoundBank."
+            },
+            "Path": {
+              "type": "string",
+              "description": "The file name of the SoundBank."
+            },
+            "Hash": {
+              "type": "string",
+              "description": "Hash value (128-bit) written to the associated SoundBank .bnk file. Used during SoundBank generation to check existing .bnk files for changes."
+            },
+            "DeviceMemory": {
+              "type": "string",
+              "description": "Does the media requires device memory or not.",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "Media": {
+              "type": "array",
+              "description": "All media files referenced by this SoundBank with their information.",
+              "items": {
+                "$ref": "waapi_definitions.json#/definitions/mediaDescriptor",
+                "additionalProperties": false
+              }
+            },
+            "ExternalSources": {
+              "type": "array",
+              "description": "All external sources referenced by this SoundBank with their information.",
+              "items": {
+                "description": "External source descriptor.",
+                "#ref": "waapi_definitions.json#/definitions/externalSourceDescriptor"
+              }
+            },
+            "Plugins": {
+              "description": "Plug-in descriptors.",
+              "#ref": "waapi_definitions.json#/definitions/pluginDescriptorGroup"
+            },
+            "Events": {
+              "type": "array",
+              "description": "All the events included in this SoundBank with their information.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the event."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the event."
+                  },
+                  "GUID": {
+                    "description": "GUID of the event.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "MediaRefs": {
+                    "type": "array",
+                    "description": "List of all media files used by this event.",
+                    "items": {
+                      "description": "Referenced media file entry",
+                      "$ref": "waapi_definitions.json#/definitions/mediaReference"
+                    }
+                  },
+                  "ExternalSourceRefs": {
+                    "type": "array",
+                    "description": "List of all external sources used by this event.",
+                    "items": {
+                      "description": "Referenced external source entry",
+                      "$ref": "waapi_definitions.json#/definitions/externalSourceReference"
+                    }
+                  },
+                  "PluginRefs": {
+                    "description": "List of all plug-ins used by this event.",
+                    "$ref": "waapi_definitions.json#/definitions/pluginReferenceGroup"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  },
+                  "MaxAttenuation": {
+                    "type": "string",
+                    "description": "The max distance for the attenuation of the event as a floating point value."
+                  },
+                  "DurationType": {
+                    "type": "string",
+                    "description": "The kind of duration, possible values: OneShot, Unknown, Infinite, Mixed."
+                  },
+                  "DurationMin": {
+                    "type": "string",
+                    "description": "The minimum value for the duration as a floating point value."
+                  },
+                  "DurationMax": {
+                    "type": "string",
+                    "description": "The maximum value for the duration as a floating point value."
+                  },
+                  "AuxBusRefs": {
+                    "type": "array",
+                    "description": "List of all Aux Busses referenced by this event.",
+                    "items": {
+                      "description": "Reference to Aux Bus.",
+                      "$ref": "waapi_definitions.json#/definitions/auxBusReference"
+                    }
+                  },
+                  "ActionSetState": {
+                    "type": "array",
+                    "description": "List of set State actions in Event.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the State."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "GroupId": {
+                          "type": "string",
+                          "description": "Short ID of the State Group."
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the State."
+                        },
+                        "GUID": {
+                          "description": "GUID of the State.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Set State Action information.",
+                      "required": [
+                        "GroupId",
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "ActionSetSwitch": {
+                    "type": "array",
+                    "description": "List of set Switch actions in Event.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the Switch."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "GroupId": {
+                          "type": "string",
+                          "description": "Short ID of the Switch Group."
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the Switch."
+                        },
+                        "GUID": {
+                          "description": "GUID of the Switch.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Set Switch Action information.",
+                      "required": [
+                        "GroupId",
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "ActionTrigger": {
+                    "type": "array",
+                    "description": "List of Trigger actions in Event.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the Trigger."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the Trigger."
+                        },
+                        "GUID": {
+                          "description": "GUID of the Trigger.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Trigger Action information.",
+                      "required": [
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "ActionSetFX": {
+                    "type": "array",
+                    "description": "List of Set Effect actions in Event.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the Effect."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the Effect."
+                        },
+                        "GUID": {
+                          "description": "GUID of the Effect.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Set Effect Action information.",
+                      "required": [
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "SwitchContainers": {
+                    "type": "array",
+                    "description": "List of association of switch container value to its used media.",
+                    "items": {
+                      "description": "SwitchContainer entry",
+                      "$ref": "#/definitions/switchContainer"
+                    }
+                  }
+                },
+                "description": "Event information",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "DialogueEvents": {
+              "type": "array",
+              "description": "All the dialogue events included in this SoundBank with their information.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the dialogue event."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Arguments": {
+                    "type": "array",
+                    "description": "List of dialogue event's arguments.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the dialogue event."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the dialogue event."
+                        },
+                        "GUID": {
+                          "description": "GUID of the dialogue event.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Argument information",
+                      "required": [
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the dialogue event."
+                  },
+                  "GUID": {
+                    "description": "GUID of the dialogue event.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  }
+                },
+                "description": "Dialogue Event information",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "Busses": {
+              "type": "array",
+              "description": "List of all AuxBus used in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the Bus."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the Bus."
+                  },
+                  "GUID": {
+                    "description": "GUID of the Bus.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "PluginRefs": {
+                    "description": "Array of plug-in references.",
+                    "$ref": "waapi_definitions.json#/definitions/pluginReferenceGroup"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  },
+                  "MaxAttenuation": {
+                    "type": "string",
+                    "description": "The max distance for the attenuation of the bus as a floating point value."
+                  },
+                  "AuxBusRefs": {
+                    "type": "array",
+                    "description": "List of Aux Busses referenced by this event.",
+                    "items": {
+                      "description": "Reference to Aux Bus.",
+                      "$ref": "waapi_definitions.json#/definitions/auxBusReference"
+                    }
+                  }
+                },
+                "description": "Bus information.",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "AuxBusses": {
+              "type": "array",
+              "description": "List of all AuxBus used in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the AuxBus."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the AuxBus."
+                  },
+                  "GUID": {
+                    "description": "GUID of the AuxBus.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "PluginRefs": {
+                    "description": "Array of plug-in references.",
+                    "$ref": "waapi_definitions.json#/definitions/pluginReferenceGroup"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  },
+                  "MaxAttenuation": {
+                    "type": "string",
+                    "description": "The max distance for the attenuation of the aux bus as a floating point value."
+                  },
+                  "AuxBusRefs": {
+                    "type": "array",
+                    "description": "List of all Aux Busses referenced by this event.",
+                    "items": {
+                      "description": "Reference to Aux Bus.",
+                      "$ref": "waapi_definitions.json#/definitions/auxBusReference"
+                    }
+                  }
+                },
+                "description": "AuxBus information.",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "GameParameters": {
+              "type": "array",
+              "description": "List of all the Game Parameters/RTPC used in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the Game Parameter."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the Game Parameter."
+                  },
+                  "GUID": {
+                    "description": "GUID of the Game Parameter.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  }
+                },
+                "description": "GameParameter information",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "Triggers": {
+              "type": "array",
+              "description": "List of all Triggers used in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the Trigger."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the Trigger."
+                  },
+                  "GUID": {
+                    "description": "GUID of the Trigger.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  }
+                },
+                "description": "Trigger information.",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "StateGroups": {
+              "type": "array",
+              "description": "List of State Group included in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the State Group."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "States": {
+                    "type": "array",
+                    "description": "List of State included in this StateGroup.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the State."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the State."
+                        },
+                        "GUID": {
+                          "description": "GUID of the State.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "State information",
+                      "required": [
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the State Group."
+                  },
+                  "GUID": {
+                    "description": "GUID of the State Group.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  }
+                },
+                "description": "State Group information.",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "SwitchGroups": {
+              "type": "array",
+              "description": "List of SwitchGroup included in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the SwitchGroup."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the SwitchGroup."
+                  },
+                  "GUID": {
+                    "description": "GUID of the SwitchGroup.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  },
+                  "GameParameterRef": {
+                    "type": "object",
+                    "properties": {
+                      "Id": {
+                        "type": "string",
+                        "description": "Short ID of the Game Parameter."
+                      }
+                    },
+                    "description": "Game Parameter used to control the Switch Group.",
+                    "required": [
+                      "Id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "Switches": {
+                    "type": "array",
+                    "description": "List of the Switch contained in this SwitchGroup.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Name of the Switch."
+                        },
+                        "Color": {
+                          "$ref": "#/definitions/color"
+                        },
+                        "Id": {
+                          "type": "string",
+                          "description": "Short ID of the Switch."
+                        },
+                        "GUID": {
+                          "description": "GUID of the Switch.",
+                          "$ref": "common_definitions.json#/definitions/guid"
+                        },
+                        "ObjectPath": {
+                          "type": "string",
+                          "description": "Object path in the project."
+                        }
+                      },
+                      "description": "Switch information.",
+                      "required": [
+                        "Id",
+                        "Name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "description": "SwitchGroup information",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "AcousticTextures": {
+              "type": "array",
+              "description": "List of all Acoustic Textures used in this SoundBank.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string",
+                    "description": "Name of the Acoustic Texture."
+                  },
+                  "Color": {
+                    "$ref": "#/definitions/color"
+                  },
+                  "Id": {
+                    "type": "string",
+                    "description": "Short ID of the Acoustic Texture."
+                  },
+                  "GUID": {
+                    "description": "GUID of the Acoustic Texture.",
+                    "$ref": "common_definitions.json#/definitions/guid"
+                  },
+                  "ObjectPath": {
+                    "type": "string",
+                    "description": "Object path in the project."
+                  },
+                  "Properties": {
+                    "type": "array",
+                    "description": "List of Acoustic Texture properties.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Name": {
+                          "type": "string",
+                          "description": "Acoustic Texture property name."
+                        },
+                        "Type": {
+                          "type": "string",
+                          "description": "Acoustic Texture property type."
+                        },
+                        "Value": {
+                          "type": "string",
+                          "description": "Acoustic Texture property value."
+                        }
+                      },
+                      "description": "Acoustic Texture property information."
+                    }
+                  }
+                },
+                "description": "Acoustic texture information.",
+                "required": [
+                  "Id",
+                  "Name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "description": "SoundBank information.",
+          "required": [
+            "Id",
+            "ShortName",
+            "Language"
+          ],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": [
+      "soundbank",
+      "platform"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+      "switchContainer": {
+        "type": "object",
+        "properties": {
+          "Children": {
+            "type": "array",
+            "description": "Children of this switch container value.",
+            "items": {
+              "description": "Child entry of the switch container",
+              "$ref": "#/definitions/switchContainer"
+            }
+          },
+          "SwitchValue": {
+            "type": "object",
+            "properties": {
+              "Color": {
+                "$ref": "#/definitions/color"
+              },
+              "GroupType": {
+                "type": "string",
+                "description": "Group type.",
+                "enum": [
+                  "Switch",
+                  "State"
+                ]
+              },
+              "Default": {
+                "type": "string",
+                "description": "Whether the Switch/State value is the switch container's default. If not specified then the value is false.",
+                "enum": [
+                  "true",
+                  "false"
+                ]
+              },
+              "GroupId": {
+                "type": "string",
+                "description": "Switch/State group short Id."
+              },
+              "Id": {
+                "type": "string",
+                "description": "Switch/State short Id."
+              },
+              "GUID": {
+                "description": "GUID of the switch container value used.",
+                "$ref": "common_definitions.json#/definitions/guid"
+              }
+            },
+            "description": "Group id and value used for switch container.",
+            "required": [
+              "GroupType",
+              "GroupId",
+              "Id"
+            ],
+            "additionalProperties": false
+          },
+          "MediaRefs": {
+            "type": "array",
+            "description": "List of all media files used by this event.",
+            "items": {
+              "description": "Referenced media file entry",
+              "$ref": "waapi_definitions.json#/definitions/mediaReference"
+            }
+          },
+          "ExternalSourceRefs": {
+            "type": "array",
+            "description": "List of all external sources used by this event.",
+            "items": {
+              "description": "Referenced external source entry",
+              "$ref": "waapi_definitions.json#/definitions/externalSourceReference"
+            }
+          },
+          "PluginRefs": {
+            "description": "List of all plug-ins used by this event.",
+            "$ref": "waapi_definitions.json#/definitions/pluginReferenceGroup"
+          }
+        },
+        "description": "Association of switch container value to its used resources.",
+        "required": [
+          "SwitchValue"
+        ],
+        "additionalProperties": false
+      },
+      "color": {
+        "type": "string",
+        "description": "Color index for this object. To determine the RGB values, consult the theme color definitions in Authoring\\Data\\Themes\\dark\\main.json, and locate the ObjectColor_PaletteColor entries."
+      }
+    }
+  }
+}

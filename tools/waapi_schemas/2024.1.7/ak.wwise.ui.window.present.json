@@ -1,0 +1,26 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "windowID": {
+        "description": "The ID of the window.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "windowID"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": []
+}

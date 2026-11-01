@@ -1,0 +1,38 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "files": {
+        "description": "Array of files to rename or move. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      },
+      "newFiles": {
+        "description": "Array of new files. File paths must be absolute.",
+        "$ref": "common_definitions.json#/definitions/arrayOfString"
+      }
+    },
+    "required": [
+      "files",
+      "newFiles"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "log": {
+        "description": "Array of log entries generated during the request.",
+        "$ref": "waapi_definitions.json#/definitions/arrayOfLogCentralItem"
+      }
+    },
+    "required": [
+      "log"
+    ],
+    "additionalProperties": false
+  }
+}

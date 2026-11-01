@@ -1,0 +1,30 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "autoCheckOutToSourceControl": {
+        "type": "boolean",
+        "description": "Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true."
+      }
+    },
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Saves the current project.",
+      "title": "Saving the current project",
+      "args": {}
+    }
+  ]
+}

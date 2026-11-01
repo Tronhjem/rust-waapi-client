@@ -1,0 +1,43 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "stateProperties": {
+        "$ref": "waapi_definitions.json#/definitions/statePropertiesArg"
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the object to which to set the state properties.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object",
+      "stateProperties"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Sets BypassEffects and Volume state properties to a Sound.",
+      "title": "Set state properties to a Sound",
+      "args": {
+        "stateProperties": [
+          "BypassEffects",
+          "Volume"
+        ],
+        "object": "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound"
+      }
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "commands": {
+        "description": "Data for the commands to be registered.",
+        "$ref": "waapi_definitions.json#/definitions/addOnsCommands"
+      }
+    },
+    "required": [
+      "commands"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Registers a command that has no program. Typically used as a callback in Waapi. Simplest example.",
+      "title": "Registering a command with no program",
+      "args": {
+        "commands": [
+          {
+            "id": "sample.programlessregistration",
+            "displayName": "Programless registration"
+          }
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Registers a command that's shown in a new Extra menu.",
+      "title": "Registering a command to edit in Visual Studio Code",
+      "args": {
+        "commands": [
+          {
+            "id": "ak.edit_in_vscode",
+            "displayName": "Edit in Visual Studio Code",
+            "args": "${filePath}",
+            "defaultShortcut": "C",
+            "program": "code",
+            "startMode": "MultipleSelectionSingleProcessSpaceSeparated",
+            "cwd": "",
+            "contextMenu": {
+              "basePath": "Editors",
+              "enabledFor": "Sound,ActorMixer,SwitchContainer,RandomSequenceContainer"
+            },
+            "mainMenu": {
+              "basePath": "Extra"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "result": {},
+      "description": "Registers a command that's shown in the contextual menu only",
+      "title": "Registering a command to edit in Wavosaur",
+      "args": {
+        "commands": [
+          {
+            "id": "ak.open_in_wavosaur",
+            "displayName": "Edit in Wavosaur",
+            "args": "${originalWavFilePath}",
+            "defaultShortcut": "W",
+            "program": "c:\\Wavosaur.1.1.0.0-x64(en)\\Wavosaur.exe",
+            "cwd": "",
+            "contextMenu": {}
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "stateGroup": {
+        "description": "Either the ID (GUID), unique qualified name, or path of the State Group.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "stateGroup"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "description": "Specifies the return options for every object returned.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturnOptions"
+  },
+  "resultSchema": {
+    "description": "The returned State Group.",
+    "$ref": "waapi_definitions.json#/definitions/objectReturn",
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "return": {
+        "id": "{77978341-EB33-48DF-BC59-343B5460E692}",
+        "name": "Blasted"
+      },
+      "description": "Gets the current state of the PlayerHealth State Group by GUID",
+      "title": "Get the state of a State Group.",
+      "args": {
+        "stateGroup": "{04DA61D8-C090-4BA1-A0A3-CCAD0587AE0E}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "For internal use only! The ID (GUID) to assign to the newly created Object.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the Blend Track."
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the Blend Container.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object",
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The ID (GUID) of the Blend Track.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "type": {
+        "type": "string",
+        "description": "The type of the object. Refer to \\ref wobjects_index for more information on the types available."
+      },
+      "shortId": {
+        "type": "integer",
+        "description": "The Short ID of the object."
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the Blend Track."
+      }
+    },
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {
+        "id": "{D7126155-914E-4248-A8C1-4DABCCACA016}"
+      },
+      "description": "Equivalent to clicking New Blend Track in the Blend Track Editor.",
+      "title": "Adding a Blend Track to a Blend Container",
+      "args": {
+        "name": "newBlendTrack",
+        "object": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"
+      }
+    }
+  ]
+}

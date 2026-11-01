@@ -1,0 +1,43 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The ID of the function."
+      },
+      "result": {
+        "type": "object",
+        "properties": {},
+        "description": "The result returned from the function.",
+        "additionalProperties": true
+      },
+      "args": {
+        "type": "object",
+        "properties": {},
+        "description": "The arguments passed to the function.",
+        "additionalProperties": true
+      },
+      "options": {
+        "type": "object",
+        "properties": {},
+        "description": "The options passed to the function.",
+        "additionalProperties": true
+      }
+    },
+    "required": [
+      "id"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  }
+}

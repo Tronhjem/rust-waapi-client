@@ -1,0 +1,55 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "The path to the project WPROJ file. The path must use the same name for the WPROJ and the parent directory folder. For example: c:\\\\Projects\\\\MYPROJECT\\\\MYPROJECT.wproj. For using WAAPI on Mac, please refer to \\ref waapi_path_on_mac .",
+        "pattern": "\\.[Ww][Pp][Rr][Oo][Jj]$"
+      },
+      "platforms": {
+        "description": "Specifies the platform or platforms supported by the new project. If not specified, only Windows is used.",
+        "$ref": "waapi_definitions.json#/definitions/platformsToCreateArg"
+      },
+      "languages": {
+        "description": "Array of languages to creates for this project. If not specified, the English(US) language is created. When multiple languages are specified, the first one becomes the default language.",
+        "$ref": "waapi_definitions.json#/definitions/languagesToCreateArg"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Creates the .wproj project specified by path.",
+      "title": "Creating a new project",
+      "args": {
+        "path": "C:\\projects\\myWwiseProject.wproj"
+      }
+    },
+    {
+      "result": {},
+      "description": "Creates the .wproj project specified by path.",
+      "title": "Creating a new project for Android platform",
+      "args": {
+        "path": "C:\\projects\\myWwiseProject.wproj",
+        "platforms": {
+          "basePlatform": "Android"
+        }
+      }
+    }
+  ]
+}

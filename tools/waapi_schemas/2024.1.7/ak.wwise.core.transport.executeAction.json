@@ -1,0 +1,73 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "transport": {
+        "description": "The transport object ID to be used with all other ak.wwise.core.transport functions.",
+        "$ref": "common_definitions.json#/definitions/uint32"
+      },
+      "action": {
+        "type": "string",
+        "description": "The action to execute.",
+        "enum": [
+          "play",
+          "stop",
+          "pause",
+          "playStop",
+          "playDirectly"
+        ]
+      }
+    },
+    "required": [
+      "action"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Plays the given transport object.",
+      "title": "Playing a transport object",
+      "args": {
+        "transport": 1234,
+        "action": "play"
+      }
+    },
+    {
+      "result": {},
+      "description": "Stops all transport objects.",
+      "title": "Stopping all transport objects",
+      "args": {
+        "action": "stop"
+      }
+    },
+    {
+      "result": {},
+      "description": "Toggles playback (pause / resume) on the given transport object.",
+      "title": "Toggling playback (pause / resume) on a transport object",
+      "args": {
+        "transport": 1234,
+        "action": "pause"
+      }
+    },
+    {
+      "result": {},
+      "description": "Toggles playback (play / stop) on the given transport object.",
+      "title": "Toggling playback (play / stop) on a transport object",
+      "args": {
+        "transport": 1234,
+        "action": "playStop"
+      }
+    }
+  ]
+}

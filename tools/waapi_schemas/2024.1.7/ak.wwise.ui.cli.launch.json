@@ -1,0 +1,19 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": true
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "The host to connect to. The host can be a computer name, an IPv4 address, an IP:PORT pair, or a full path to a saved capture (.prof file). Use 127.0.0.1 to connect to localhost."
+      },
+      "appName": {
+        "type": "string",
+        "description": "The value in the Application Name column from the Remote Connection dialog in Wwise, or from from ak.wwise.core.remote.getAvailableConsoles. If you are running more than one Sound Engine instance, you can specify the name of the application to connect to."
+      },
+      "commandPort": {
+        "description": "The command port. If you are running two or more Sound Engine instances that use the same application name, you can specify the command port to distinguish between different applications sharing the same name. You don't need to use this if the application name is unique. When using this, you must also provide appName. You can obtain this information from ak.wwise.core.remote.getAvailableConsoles.",
+        "$ref": "common_definitions.json#/definitions/uint16"
+      },
+      "notificationPort": {
+        "description": "Unused.",
+        "$ref": "common_definitions.json#/definitions/uint16"
+      }
+    },
+    "required": [
+      "host"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "examples": [
+    {
+      "result": {},
+      "description": "Connects to a game named Cube on the same computer.",
+      "title": "Connecting to Cube",
+      "args": {
+        "host": "127.0.0.1",
+        "appName": "Cube"
+      }
+    },
+    {
+      "result": {},
+      "description": "Connects to a saved profile (.prof file) via a specified full path.",
+      "title": "Connecting to a profile",
+      "args": {
+        "host": "C:\\WwiseProjects\\WwiseProject\\ProfilingSession12.prof"
+      }
+    }
+  ]
+}
