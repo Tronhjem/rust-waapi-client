@@ -23,7 +23,7 @@ async fn main() {
             }
 
             let options = waapi_client::api::generated::ak::wwise::ui::WwiseUiGetselectedobjectsOptions::new()
-                .r#return(vec!["id".to_string()]);
+                .return_fields(vec!["id".to_string()]);
 
             match client.ui_get_selected_objects((), options).await {
                 Ok(selected) => {

@@ -79,7 +79,7 @@ python generate_api_rs.py
 Overwrites `../src/waapi_function_api.rs` and `../src/waapi_topics_api.rs` with:
 - Proper nested module structure matching WAAPI hierarchy
 - All function/topic endpoints as public constants
-- Rust keyword escaping (e.g., `move` becomes `r#move`)
+- Rust keyword suffixing (e.g., `move` becomes `move_`)
 - Alphabetically sorted functions and modules
 
 **Example:**

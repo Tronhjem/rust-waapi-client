@@ -13,7 +13,7 @@ pub struct WwiseCoreObjectCreateArgs {
     pub parent: ObjectRef,
     /// The Wwise object type to create.
     #[serde(rename = "type")]
-    pub r#type: String,
+    pub object_type: String,
     /// The name of the new object.
     pub name: String,
     /// Action to take on a name conflict.
@@ -36,10 +36,10 @@ pub struct WwiseCoreObjectCreateArgs {
 }
 
 impl WwiseCoreObjectCreateArgs {
-    pub fn new(parent: ObjectRef, r#type: String, name: String) -> Self {
+    pub fn new(parent: ObjectRef, object_type: String, name: String) -> Self {
         Self {
             parent,
-            r#type,
+            object_type,
             name,
             on_name_conflict: None,
             platform: None,
@@ -82,7 +82,7 @@ pub struct WwiseCoreObjectCreateOptions {
     /// Fields to return.
     #[serde(rename = "return")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#return: Option<Vec<String>>,
+    pub return_fields: Option<Vec<String>>,
     /// Platform for return values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
@@ -96,8 +96,8 @@ impl WwiseCoreObjectCreateOptions {
         Self::default()
     }
 
-    pub fn r#return(mut self, r#return: impl Into<Vec<String>>) -> Self {
-        self.r#return = Some(r#return.into());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 

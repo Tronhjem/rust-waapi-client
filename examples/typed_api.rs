@@ -27,7 +27,7 @@ async fn main() -> WaapiResult<()> {
     let selected = client
         .ui_get_selected_objects(
             (),
-            WwiseUiGetselectedobjectsOptions::new().r#return(vec![
+            WwiseUiGetselectedobjectsOptions::new().return_fields(vec![
                 "id".to_string(),
                 "name".to_string(),
                 "type".to_string(),
@@ -44,7 +44,7 @@ async fn main() -> WaapiResult<()> {
                 WwiseCoreObjectGetArgs::new(ObjectQuery::Id(vec![
                     first.id.clone().unwrap_or_default(),
                 ])),
-                WwiseCoreObjectGetOptions::new().r#return(vec![
+                WwiseCoreObjectGetOptions::new().return_fields(vec![
                     "id".to_string(),
                     "name".to_string(),
                     "type".to_string(),

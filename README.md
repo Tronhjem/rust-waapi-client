@@ -80,7 +80,7 @@ use waapi_client::api::generated::ak::wwise::core::object::{
 let args = WwiseCoreObjectGetArgs::new(r"\Actor-Mixer Hierarchy\Default Work Unit\MySound".into())
     .transform(vec![]);
 let options = WwiseCoreObjectGetOptions::new()
-    .r#return(vec!["id".into(), "name".into(), "type".into()]);
+    .return_fields(vec!["id".into(), "name".into(), "type".into()]);
 let response = client.object_get(args, options).await?;
 ```
 
@@ -94,7 +94,7 @@ let options = json!({
 });
 ```
 
-Typed endpoint `Options` structs provide a `.r#return(...)` builder for the same purpose.
+Typed endpoint `Options` structs provide a `.return_fields(...)` builder for the same purpose.
 
 ### Complete Example
 

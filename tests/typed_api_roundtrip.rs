@@ -43,7 +43,7 @@ fn object_get_args_serializes_to_expected_shape() {
 #[test]
 fn object_get_options_serializes_return_keyword() {
     let options = WwiseCoreObjectGetOptions::new()
-        .r#return(vec!["id".to_string(), "name".to_string()])
+        .return_fields(vec!["id".to_string(), "name".to_string()])
         .platform(PlatformRef::Name("Windows".to_string()));
 
     let value = serde_json::to_value(&options).unwrap();
@@ -122,7 +122,7 @@ fn audio_import_args_serializes_imports_and_defaults() {
 #[test]
 fn audio_import_options_serializes_return_and_platform() {
     let options = WwiseCoreAudioImportOptions::new()
-        .r#return(vec!["id".to_string(), "name".to_string()])
+        .return_fields(vec!["id".to_string(), "name".to_string()])
         .platform(PlatformRef::Guid("{GUID}".to_string()));
 
     let value = serde_json::to_value(&options).unwrap();
@@ -139,7 +139,7 @@ fn project_save_args_serializes_empty_args() {
 
 #[test]
 fn ui_get_selected_objects_options_serializes() {
-    let options = WwiseUiGetselectedobjectsOptions::new().r#return(vec!["id".to_string()]);
+    let options = WwiseUiGetselectedobjectsOptions::new().return_fields(vec!["id".to_string()]);
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id"]]);
 }

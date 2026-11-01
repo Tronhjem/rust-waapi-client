@@ -37,7 +37,7 @@ pub struct WwiseCoreObjectGetOptions {
     /// List of fields to return for each object.
     #[serde(rename = "return")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#return: Option<Vec<String>>,
+    pub return_fields: Option<Vec<String>>,
     /// Platform to use for platform-specific values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
@@ -51,8 +51,8 @@ impl WwiseCoreObjectGetOptions {
         Self::default()
     }
 
-    pub fn r#return(mut self, r#return: impl Into<Vec<String>>) -> Self {
-        self.r#return = Some(r#return.into());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
@@ -74,5 +74,5 @@ pub struct WwiseCoreObjectGetResponse {
     pub objects: Vec<WwiseObject>,
     /// Fields that were returned.
     #[serde(rename = "return")]
-    pub r#return: Vec<String>,
+    pub return_fields: Vec<String>,
 }

@@ -25,7 +25,7 @@ pub struct WwiseUiGetselectedobjectsOptions {
     /// Fields to return.
     #[serde(rename = "return")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#return: Option<Vec<String>>,
+    pub return_fields: Option<Vec<String>>,
     /// Platform for return values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
@@ -39,8 +39,8 @@ impl WwiseUiGetselectedobjectsOptions {
         Self::default()
     }
 
-    pub fn r#return(mut self, r#return: impl Into<Vec<String>>) -> Self {
-        self.r#return = Some(r#return.into());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 

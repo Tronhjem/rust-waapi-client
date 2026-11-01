@@ -227,10 +227,20 @@ def snake_case(s: str) -> str:
     return "".join(out)
 
 
+FIELD_RENAMES: Dict[str, str] = {
+    "return": "return_fields",
+    "type": "object_type",
+    "use": "use_mode",
+    "where": "where_filter",
+}
+
+
 def safe_ident(s: str) -> str:
-    """Escape Rust keywords when using a string as an identifier."""
+    """Avoid Rust keywords when using a string as an identifier."""
+    if s in FIELD_RENAMES:
+        return FIELD_RENAMES[s]
     if s in RUST_KEYWORDS:
-        return f"r#{s}"
+        return f"{s}_"
     return s
 
 
@@ -241,11 +251,10 @@ def struct_name(endpoint: Endpoint, suffix: str) -> str:
 
 
 def rust_field_name(name: str) -> str:
-    """Return a Rust-idiomatic snake_case field name, escaping keywords."""
-    s = snake_case(name)
-    if s in RUST_KEYWORDS:
-        return f"r#{s}"
-    return s
+    """Return a Rust-idiomatic snake_case field name without raw identifiers."""
+    if name in FIELD_RENAMES:
+        return FIELD_RENAMES[name]
+    return safe_ident(snake_case(name))
 
 
 def serde_rename_attr(name: str) -> str:

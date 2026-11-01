@@ -87,7 +87,7 @@ pub mod ak {
                 pub const getTypes: &str = "ak.wwise.core.object.getTypes";
                 pub const isLinked: &str = "ak.wwise.core.object.isLinked";
                 pub const isPropertyEnabled: &str = "ak.wwise.core.object.isPropertyEnabled";
-                pub const r#move: &str = "ak.wwise.core.object.move";
+                pub const move_: &str = "ak.wwise.core.object.move";
                 pub const pasteProperties: &str = "ak.wwise.core.object.pasteProperties";
                 pub const set: &str = "ak.wwise.core.object.set";
                 pub const setAttenuationCurve: &str = "ak.wwise.core.object.setAttenuationCurve";
@@ -156,7 +156,7 @@ pub mod ak {
                 pub const delete: &str = "ak.wwise.core.sourceControl.delete";
                 pub const getSourceFiles: &str = "ak.wwise.core.sourceControl.getSourceFiles";
                 pub const getStatus: &str = "ak.wwise.core.sourceControl.getStatus";
-                pub const r#move: &str = "ak.wwise.core.sourceControl.move";
+                pub const move_: &str = "ak.wwise.core.sourceControl.move";
                 pub const revert: &str = "ak.wwise.core.sourceControl.revert";
                 pub const setProvider: &str = "ak.wwise.core.sourceControl.setProvider";
             }

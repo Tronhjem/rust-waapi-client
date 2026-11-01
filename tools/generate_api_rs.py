@@ -32,7 +32,7 @@ def parse_function_path(func: str) -> Tuple[List[str], str]:
 
 
 def escape_if_keyword(name: str) -> str:
-    return f'r#{name}' if name in RUST_KEYWORDS else name
+    return f'{name}_' if name in RUST_KEYWORDS else name
 
 
 def build_module_tree(functions: List[str]) -> Dict:
