@@ -3,115 +3,169 @@
 
 use crate::{WaapiClient, WaapiResult};
 
-use crate::api::generated::ak::soundengine::{SoundenginePosteventArgs, SoundenginePosteventResponse};
-use crate::api::generated::ak::soundengine::{SoundengineSetrtpcvalueArgs};
-use crate::api::generated::ak::wwise::core::{WwiseCoreGetinfoResponse};
-use crate::api::generated::ak::wwise::core::audio::{WwiseCoreAudioImportArgs, WwiseCoreAudioImportOptions, WwiseCoreAudioImportResponse};
-use crate::api::generated::ak::wwise::core::object::{WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse};
-use crate::api::generated::ak::wwise::core::object::{WwiseCoreObjectCreateArgs, WwiseCoreObjectCreateOptions, WwiseCoreObjectCreateResponse};
-use crate::api::generated::ak::wwise::core::object::{WwiseCoreObjectDeleteArgs};
-use crate::api::generated::ak::wwise::core::project::{WwiseCoreProjectSaveArgs};
-use crate::api::generated::ak::wwise::ui::{WwiseUiGetselectedobjectsOptions, WwiseUiGetselectedobjectsResponse};
+use crate::api::generated::ak::soundengine::SoundengineSetRtpcValueArgs;
+use crate::api::generated::ak::soundengine::{
+    SoundenginePostEventArgs, SoundenginePostEventResponse,
+};
+use crate::api::generated::ak::wwise::core::WwiseCoreGetInfoResponse;
+use crate::api::generated::ak::wwise::core::audio::{
+    WwiseCoreAudioImportArgs, WwiseCoreAudioImportOptions, WwiseCoreAudioImportResponse,
+};
+use crate::api::generated::ak::wwise::core::object::WwiseCoreObjectDeleteArgs;
+use crate::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectCreateArgs, WwiseCoreObjectCreateResponse,
+};
+use crate::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse,
+};
+use crate::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectSetArgs, WwiseCoreObjectSetOptions, WwiseCoreObjectSetResponse,
+};
+use crate::api::generated::ak::wwise::core::project::WwiseCoreProjectSaveArgs;
+use crate::api::generated::ak::wwise::ui::{
+    WwiseUiGetSelectedObjectsOptions, WwiseUiGetSelectedObjectsResponse,
+};
 
 impl WaapiClient {
-
-    /// Posts an event to the sound engine.
-    /// URI: `ak.soundengine.postEvent`.
-    pub async fn soundengine_post_event(
-        &mut self,
-        args: SoundenginePosteventArgs,
-    ) -> WaapiResult<SoundenginePosteventResponse> {
-        let value = self.call("ak.soundengine.postEvent", Some(serde_json::to_value(&args)?), None).await?;
-        let response: SoundenginePosteventResponse = serde_json::from_value(value)?;
-        Ok(response)
-    }
-
-    /// Sets the value of a real-time parameter control.
-    /// URI: `ak.soundengine.setRTPCValue`.
-    pub async fn soundengine_set_rtpc_value(
-        &mut self,
-        args: SoundengineSetrtpcvalueArgs,
-    ) -> WaapiResult<()> {
-        self.call("ak.soundengine.setRTPCValue", Some(serde_json::to_value(&args)?), None).await?;
-        Ok(())
-    }
-
-    /// Returns information about the currently running instance of Wwise.
-    /// URI: `ak.wwise.core.getInfo`.
-    pub async fn get_info(
-        &mut self,
-        _args: (),
-    ) -> WaapiResult<WwiseCoreGetinfoResponse> {
+    /// `ak.wwise.core.getInfo`.
+    pub async fn get_info(&mut self) -> WaapiResult<WwiseCoreGetInfoResponse> {
         let value = self.call("ak.wwise.core.getInfo", None, None).await?;
-        let response: WwiseCoreGetinfoResponse = serde_json::from_value(value)?;
+        let response: WwiseCoreGetInfoResponse = serde_json::from_value(value)?;
         Ok(response)
     }
 
-    /// Imports audio files and creates Wwise objects.
-    /// URI: `ak.wwise.core.audio.import`.
-    pub async fn audio_import(
-        &mut self,
-        args: WwiseCoreAudioImportArgs,
-        options: WwiseCoreAudioImportOptions,
-    ) -> WaapiResult<WwiseCoreAudioImportResponse> {
-        let value = self.call("ak.wwise.core.audio.import", Some(serde_json::to_value(&args)?), Some(serde_json::to_value(&options)?)).await?;
-        let response: WwiseCoreAudioImportResponse = serde_json::from_value(value)?;
-        Ok(response)
-    }
-
-    /// Performs a query and returns data for each object in the result.
-    /// URI: `ak.wwise.core.object.get`.
+    /// `ak.wwise.core.object.get`.
     pub async fn object_get(
         &mut self,
         args: WwiseCoreObjectGetArgs,
         options: WwiseCoreObjectGetOptions,
     ) -> WaapiResult<WwiseCoreObjectGetResponse> {
-        let value = self.call("ak.wwise.core.object.get", Some(serde_json::to_value(&args)?), Some(serde_json::to_value(&options)?)).await?;
+        let value = self
+            .call(
+                "ak.wwise.core.object.get",
+                Some(serde_json::to_value(&args)?),
+                Some(serde_json::to_value(&options)?),
+            )
+            .await?;
         let response: WwiseCoreObjectGetResponse = serde_json::from_value(value)?;
         Ok(response)
     }
 
-    /// Creates the specified object under the specified parent.
-    /// URI: `ak.wwise.core.object.create`.
+    /// `ak.wwise.core.object.create`.
     pub async fn object_create(
         &mut self,
         args: WwiseCoreObjectCreateArgs,
-        options: WwiseCoreObjectCreateOptions,
     ) -> WaapiResult<WwiseCoreObjectCreateResponse> {
-        let value = self.call("ak.wwise.core.object.create", Some(serde_json::to_value(&args)?), Some(serde_json::to_value(&options)?)).await?;
+        let value = self
+            .call(
+                "ak.wwise.core.object.create",
+                Some(serde_json::to_value(&args)?),
+                None,
+            )
+            .await?;
         let response: WwiseCoreObjectCreateResponse = serde_json::from_value(value)?;
         Ok(response)
     }
 
-    /// Deletes the specified object.
-    /// URI: `ak.wwise.core.object.delete`.
-    pub async fn object_delete(
-        &mut self,
-        args: WwiseCoreObjectDeleteArgs,
-    ) -> WaapiResult<()> {
-        self.call("ak.wwise.core.object.delete", Some(serde_json::to_value(&args)?), None).await?;
+    /// `ak.wwise.core.object.delete`.
+    pub async fn object_delete(&mut self, args: WwiseCoreObjectDeleteArgs) -> WaapiResult<()> {
+        self.call(
+            "ak.wwise.core.object.delete",
+            Some(serde_json::to_value(&args)?),
+            None,
+        )
+        .await?;
         Ok(())
     }
 
-    /// Saves the current project.
-    /// URI: `ak.wwise.core.project.save`.
-    pub async fn project_save(
+    /// `ak.wwise.core.object.set`.
+    pub async fn object_set(
         &mut self,
-        args: WwiseCoreProjectSaveArgs,
-    ) -> WaapiResult<()> {
-        self.call("ak.wwise.core.project.save", Some(serde_json::to_value(&args)?), None).await?;
+        args: WwiseCoreObjectSetArgs,
+        options: WwiseCoreObjectSetOptions,
+    ) -> WaapiResult<WwiseCoreObjectSetResponse> {
+        let value = self
+            .call(
+                "ak.wwise.core.object.set",
+                Some(serde_json::to_value(&args)?),
+                Some(serde_json::to_value(&options)?),
+            )
+            .await?;
+        let response: WwiseCoreObjectSetResponse = serde_json::from_value(value)?;
+        Ok(response)
+    }
+
+    /// `ak.wwise.core.audio.import`.
+    pub async fn audio_import(
+        &mut self,
+        args: WwiseCoreAudioImportArgs,
+        options: WwiseCoreAudioImportOptions,
+    ) -> WaapiResult<WwiseCoreAudioImportResponse> {
+        let value = self
+            .call(
+                "ak.wwise.core.audio.import",
+                Some(serde_json::to_value(&args)?),
+                Some(serde_json::to_value(&options)?),
+            )
+            .await?;
+        let response: WwiseCoreAudioImportResponse = serde_json::from_value(value)?;
+        Ok(response)
+    }
+
+    /// `ak.wwise.core.project.save`.
+    pub async fn project_save(&mut self, args: WwiseCoreProjectSaveArgs) -> WaapiResult<()> {
+        self.call(
+            "ak.wwise.core.project.save",
+            Some(serde_json::to_value(&args)?),
+            None,
+        )
+        .await?;
         Ok(())
     }
 
-    /// Returns the list of objects currently selected in the UI.
-    /// URI: `ak.wwise.ui.getSelectedObjects`.
+    /// `ak.wwise.ui.getSelectedObjects`.
     pub async fn ui_get_selected_objects(
         &mut self,
-        _args: (),
-        options: WwiseUiGetselectedobjectsOptions,
-    ) -> WaapiResult<WwiseUiGetselectedobjectsResponse> {
-        let value = self.call("ak.wwise.ui.getSelectedObjects", None, Some(serde_json::to_value(&options)?)).await?;
-        let response: WwiseUiGetselectedobjectsResponse = serde_json::from_value(value)?;
+        options: WwiseUiGetSelectedObjectsOptions,
+    ) -> WaapiResult<WwiseUiGetSelectedObjectsResponse> {
+        let value = self
+            .call(
+                "ak.wwise.ui.getSelectedObjects",
+                None,
+                Some(serde_json::to_value(&options)?),
+            )
+            .await?;
+        let response: WwiseUiGetSelectedObjectsResponse = serde_json::from_value(value)?;
         Ok(response)
+    }
+
+    /// `ak.soundengine.postEvent`.
+    pub async fn soundengine_post_event(
+        &mut self,
+        args: SoundenginePostEventArgs,
+    ) -> WaapiResult<SoundenginePostEventResponse> {
+        let value = self
+            .call(
+                "ak.soundengine.postEvent",
+                Some(serde_json::to_value(&args)?),
+                None,
+            )
+            .await?;
+        let response: SoundenginePostEventResponse = serde_json::from_value(value)?;
+        Ok(response)
+    }
+
+    /// `ak.soundengine.setRTPCValue`.
+    pub async fn soundengine_set_rtpc_value(
+        &mut self,
+        args: SoundengineSetRtpcValueArgs,
+    ) -> WaapiResult<()> {
+        self.call(
+            "ak.soundengine.setRTPCValue",
+            Some(serde_json::to_value(&args)?),
+            None,
+        )
+        .await?;
+        Ok(())
     }
 }

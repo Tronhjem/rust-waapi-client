@@ -3,7 +3,7 @@
 //! Run with: cargo run --example subscribe
 
 use log::{error, info};
-use tokio::time::{timeout, Duration};
+use tokio::time::{Duration, timeout};
 use waapi_client::WaapiClient;
 use waapi_client::waapi_topics_api::ak;
 

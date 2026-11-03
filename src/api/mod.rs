@@ -1,5 +1,4 @@
 pub mod generated;
-pub mod object_set;
 pub mod primitives;
 
 pub use primitives::{

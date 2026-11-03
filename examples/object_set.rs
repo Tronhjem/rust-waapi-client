@@ -4,8 +4,11 @@
 //! Run with: cargo run --example object_set
 
 use waapi_client::WaapiClient;
-use waapi_client::api::object_set::{ObjectReturnOptions, ObjectSetArgs, ObjectSetItem};
-use waapi_client::api::{ObjectRef, PropertyValue};
+use waapi_client::api::ObjectRef;
+use waapi_client::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectSetArgs, WwiseCoreObjectSetItem, WwiseCoreObjectSetOptions,
+};
+use waapi_client::api::generated::primitives::ObjectReturnField;
 
 #[tokio::main]
 async fn main() {
@@ -16,15 +19,16 @@ async fn main() {
         .expect("Failed to connect to WAAPI");
 
     // Example: rename an object and set a property.
-    let rename_and_set = ObjectSetArgs::new(vec![
-        ObjectSetItem::new(ObjectRef::path(
+    let rename_and_set = WwiseCoreObjectSetArgs::new(vec![
+        WwiseCoreObjectSetItem::new(ObjectRef::path(
             "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound",
         ))
-        .rename("MyRenamedSound")
-        .property("Volume", PropertyValue::Number(-6.0)),
+        .name("MyRenamedSound")
+        .property("Volume", -6.0),
     ]);
 
-    let options = ObjectReturnOptions::new(vec!["id".to_string(), "name".to_string()]);
+    let options = WwiseCoreObjectSetOptions::new()
+        .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
 
     match client.object_set(rename_and_set, options).await {
         Ok(response) => {

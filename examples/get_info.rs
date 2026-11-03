@@ -1,60 +1,28 @@
-use log::{debug, error, info};
-use serde_json::json;
-use waapi_client::WaapiClient;
+//! Minimal typed-API quickstart: connect and call `ak.wwise.core.getInfo`.
+//!
+//! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
+//! Run with: cargo run --example get_info
+
+use log::info;
+use waapi_client::{WaapiClient, WaapiResult};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let test_address: &str = "127.0.0.1:8080";
-    info!("Connecting to WAAPI at {}", test_address);
+    let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
+    info!("Connected. Calling ak.wwise.core.getInfo...");
 
-    match WaapiClient::new(Some(test_address)).await {
-        Ok(mut client) => {
-            info!("Successfully connected to WAAPI");
+    let info = client.get_info().await?;
 
-            debug!("Calling getInfo endpoint");
-            match client.get_info(()).await {
-                Ok(info) => {
-                    info!("Wwise: {} ({})", info.display_name, info.platform);
-                    info!("Version: {:?}", info.version);
-                }
-                Err(e) => error!("getInfo failed: {e}"),
-            }
+    info!("Wwise display name: {}", info.display_name);
+    info!("Platform: {}", info.platform);
+    info!("Version: {}", info.version.display_name);
+    info!("Schema version: {}", info.version.schema);
+    info!("Install directory: {}", info.directories.install);
 
-            let options = waapi_client::api::generated::ak::wwise::ui::WwiseUiGetselectedobjectsOptions::new()
-                .return_fields(vec!["id".to_string()]);
+    client.shutdown().await?;
+    info!("Disconnected.");
 
-            match client.ui_get_selected_objects((), options).await {
-                Ok(selected) => {
-                    info!("Selected {} objects", selected.objects.len());
-                    for obj in &selected.objects {
-                        info!("  selected id: {:?}", obj.id);
-                    }
-                }
-                Err(e) => error!("getSelectedObjects failed: {e}"),
-            }
-
-            let args = json!({
-                "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"] }
-            });
-            let options = json!({
-                "return": ["id", "type", "name", "notes"]
-            });
-
-            info!("Getting object details");
-            match client.call("ak.wwise.core.object.get", Some(args), Some(options)).await {
-                Ok(value) => info!("object.get result: {value}"),
-                Err(e) => error!("object.get failed: {e}"),
-            }
-
-            info!("Shutting down WAAPI client");
-            if let Err(e) = client.shutdown().await {
-                error!("Shutdown failed: {e}");
-            }
-        }
-        Err(e) => {
-            error!("Failed to connect to WAAPI at {}: {}", test_address, e);
-        }
-    }
+    Ok(())
 }

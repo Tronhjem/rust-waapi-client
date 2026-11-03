@@ -220,8 +220,17 @@ impl<'de> Visitor<'de> for MessageVisitor {
                     .next_element::<String>()?
                     .ok_or_else(|| de::Error::custom("missing error uri"))?;
                 let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
-                let kwargs = seq.next_element::<Value>()?.unwrap_or(Value::Object(serde_json::Map::new()));
-                Ok(Message::Error(request_type, request_id, details, error, args, kwargs))
+                let kwargs = seq
+                    .next_element::<Value>()?
+                    .unwrap_or(Value::Object(serde_json::Map::new()));
+                Ok(Message::Error(
+                    request_type,
+                    request_id,
+                    details,
+                    error,
+                    args,
+                    kwargs,
+                ))
             }
             CALL => {
                 let request_id = seq
@@ -232,7 +241,9 @@ impl<'de> Visitor<'de> for MessageVisitor {
                     .next_element::<String>()?
                     .ok_or_else(|| de::Error::custom("missing procedure"))?;
                 let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
-                let kwargs = seq.next_element::<Value>()?.unwrap_or(Value::Object(serde_json::Map::new()));
+                let kwargs = seq
+                    .next_element::<Value>()?
+                    .unwrap_or(Value::Object(serde_json::Map::new()));
                 Ok(Message::Call(request_id, options, procedure, args, kwargs))
             }
             RESULT => {
@@ -241,7 +252,9 @@ impl<'de> Visitor<'de> for MessageVisitor {
                     .ok_or_else(|| de::Error::custom("missing result request id"))?;
                 let details = seq.next_element::<Value>()?.unwrap_or(Value::Null);
                 let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
-                let kwargs = seq.next_element::<Value>()?.unwrap_or(Value::Object(serde_json::Map::new()));
+                let kwargs = seq
+                    .next_element::<Value>()?
+                    .unwrap_or(Value::Object(serde_json::Map::new()));
                 Ok(Message::Result(request_id, details, args, kwargs))
             }
             SUBSCRIBE => {
@@ -287,8 +300,16 @@ impl<'de> Visitor<'de> for MessageVisitor {
                     .ok_or_else(|| de::Error::custom("missing publication id"))?;
                 let details = seq.next_element::<Value>()?.unwrap_or(Value::Null);
                 let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
-                let kwargs = seq.next_element::<Value>()?.unwrap_or(Value::Object(serde_json::Map::new()));
-                Ok(Message::Event(subscription_id, publication_id, details, args, kwargs))
+                let kwargs = seq
+                    .next_element::<Value>()?
+                    .unwrap_or(Value::Object(serde_json::Map::new()));
+                Ok(Message::Event(
+                    subscription_id,
+                    publication_id,
+                    details,
+                    args,
+                    kwargs,
+                ))
             }
             _ => Err(de::Error::custom(format!("unknown message type {code}"))),
         }

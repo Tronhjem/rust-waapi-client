@@ -547,7 +547,10 @@ mod tests {
             .call("ak.wwise.core.getInfo", None, None)
             .await
             .unwrap_err();
-        assert!(matches!(err, crate::WaapiError::Wamp(WampError::ConnectionClosed)));
+        assert!(matches!(
+            err,
+            crate::WaapiError::Wamp(WampError::ConnectionClosed)
+        ));
         let _ = client.shutdown().await;
     }
 }

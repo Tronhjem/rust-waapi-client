@@ -5,46 +5,828 @@ pub use crate::api::primitives::{
     ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, PropertyValue,
 };
 
+/// Object reference accepted by soundengine endpoints: name, GUID, or Short ID.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SoundEngineObjectRef {
+    Name(String),
+    Guid(String),
+    ShortId(u32),
+}
+
+impl From<&str> for SoundEngineObjectRef {
+    fn from(s: &str) -> Self {
+        SoundEngineObjectRef::Name(s.to_string())
+    }
+}
+impl From<String> for SoundEngineObjectRef {
+    fn from(s: String) -> Self {
+        SoundEngineObjectRef::Name(s)
+    }
+}
+impl From<u32> for SoundEngineObjectRef {
+    fn from(id: u32) -> Self {
+        SoundEngineObjectRef::ShortId(id)
+    }
+}
+
+/// Event reference accepted by `soundengine.postEvent`.
+pub type EventRef = SoundEngineObjectRef;
+
+/// RTPC reference accepted by `soundengine.setRTPCValue`.
+pub type RtpcRef = SoundEngineObjectRef;
+
+/// Game object reference accepted by soundengine calls.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum GameObjectRef {
+    Id(u64),
+}
+
+impl From<u64> for GameObjectRef {
+    fn from(id: u64) -> Self {
+        GameObjectRef::Id(id)
+    }
+}
+impl From<u32> for GameObjectRef {
+    fn from(id: u32) -> Self {
+        GameObjectRef::Id(id as u64)
+    }
+}
+
+/// Language reference used in return options.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum LanguageRef {
+    Name(String),
+    Guid(String),
+}
+
+impl From<&str> for LanguageRef {
+    fn from(s: &str) -> Self {
+        LanguageRef::Name(s.to_string())
+    }
+}
+impl From<String> for LanguageRef {
+    fn from(s: String) -> Self {
+        LanguageRef::Name(s)
+    }
+}
+
+/// A field that can be requested in `return` options.
+#[derive(Debug, Clone)]
+pub enum ObjectReturnField {
+    Id,
+    Name,
+    Notes,
+    Type,
+    PluginName,
+    ShortId,
+    ClassId,
+    Category,
+    FilePath,
+    Workunit,
+    Parent,
+    Owner,
+    Path,
+    IsPlayable,
+    ChildrenCount,
+    TotalSize,
+    MediaSize,
+    ObjectSize,
+    StructureSize,
+    SoundConvertedWemFilePath,
+    SoundOriginalWavFilePath,
+    SoundbankBnkFilePathLegacy,
+    MusicTransitionRootLegacy,
+    MusicPlaylistRootLegacy,
+    AudioSourcePlaybackDuration,
+    AudioSourceMaxDurationSource,
+    AudioSourceTrimValuesLegacy,
+    AudioSourceMaxRadiusAttenuation,
+    AudioSourceLanguageLegacy,
+    WorkunitIsDefaultLegacy,
+    WorkunitTypeLegacy,
+    WorkunitIsDirtyLegacy,
+    SwitchContainerChildContextLegacy,
+    ConvertedWemFilePath,
+    OriginalFilePath,
+    OriginalRelativeFilePath,
+    ConvertedFilePath,
+    OriginalWavFilePath,
+    SoundbankBnkFilePath,
+    MusicTransitionRoot,
+    MusicPlaylistRoot,
+    MusicTransitionObject,
+    TransitionObject,
+    PlaybackDuration,
+    Duration,
+    MaxDurationSource,
+    AudioSourceTrimValues,
+    MaxRadiusAttenuation,
+    AudioSourceLanguage,
+    WorkunitIsDefault,
+    WorkunitType,
+    WorkunitIsDirty,
+    WorkunitIsLoaded,
+    SwitchContainerChildContext,
+    IsExplicitMute,
+    IsExplicitSolo,
+    IsImplicitMute,
+    IsImplicitSolo,
+    IsIncluded,
+    IsLanguageIncluded,
+    Points,
+    States,
+    StateProperties,
+    StateGroups,
+    CustomStates,
+    OriginalState,
+    BlendTracks,
+    SupportsStates,
+    SuppportsRandomizer,
+    SwitchGroupGameParameter,
+    HasEmptySwitchStateAssignment,
+    ExtractEvents,
+    ExtractStructures,
+    ExtractMedia,
+    SoundbanksReferencingEvent,
+    ColorRgb,
+    /// Any other accessor, e.g. `@Property` or a dot-separated query.
+    Custom(String),
+}
+
+impl serde::Serialize for ObjectReturnField {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(match self {
+            ObjectReturnField::Id => "id",
+            ObjectReturnField::Name => "name",
+            ObjectReturnField::Notes => "notes",
+            ObjectReturnField::Type => "type",
+            ObjectReturnField::PluginName => "pluginName",
+            ObjectReturnField::ShortId => "shortId",
+            ObjectReturnField::ClassId => "classId",
+            ObjectReturnField::Category => "category",
+            ObjectReturnField::FilePath => "filePath",
+            ObjectReturnField::Workunit => "workunit",
+            ObjectReturnField::Parent => "parent",
+            ObjectReturnField::Owner => "owner",
+            ObjectReturnField::Path => "path",
+            ObjectReturnField::IsPlayable => "isPlayable",
+            ObjectReturnField::ChildrenCount => "childrenCount",
+            ObjectReturnField::TotalSize => "totalSize",
+            ObjectReturnField::MediaSize => "mediaSize",
+            ObjectReturnField::ObjectSize => "objectSize",
+            ObjectReturnField::StructureSize => "structureSize",
+            ObjectReturnField::SoundConvertedWemFilePath => "sound:convertedWemFilePath",
+            ObjectReturnField::SoundOriginalWavFilePath => "sound:originalWavFilePath",
+            ObjectReturnField::SoundbankBnkFilePathLegacy => "soundbank:bnkFilePath",
+            ObjectReturnField::MusicTransitionRootLegacy => "music:transitionRoot",
+            ObjectReturnField::MusicPlaylistRootLegacy => "music:playlistRoot",
+            ObjectReturnField::AudioSourcePlaybackDuration => "audioSource:playbackDuration",
+            ObjectReturnField::AudioSourceMaxDurationSource => "audioSource:maxDurationSource",
+            ObjectReturnField::AudioSourceTrimValuesLegacy => "audioSource:trimValues",
+            ObjectReturnField::AudioSourceMaxRadiusAttenuation => {
+                "audioSource:maxRadiusAttenuation"
+            }
+            ObjectReturnField::AudioSourceLanguageLegacy => "audioSource:language",
+            ObjectReturnField::WorkunitIsDefaultLegacy => "workunit:isDefault",
+            ObjectReturnField::WorkunitTypeLegacy => "workunit:type",
+            ObjectReturnField::WorkunitIsDirtyLegacy => "workunit:isDirty",
+            ObjectReturnField::SwitchContainerChildContextLegacy => "switchContainerChild:context",
+            ObjectReturnField::ConvertedWemFilePath => "convertedWemFilePath",
+            ObjectReturnField::OriginalFilePath => "originalFilePath",
+            ObjectReturnField::OriginalRelativeFilePath => "originalRelativeFilePath",
+            ObjectReturnField::ConvertedFilePath => "convertedFilePath",
+            ObjectReturnField::OriginalWavFilePath => "originalWavFilePath",
+            ObjectReturnField::SoundbankBnkFilePath => "soundbankBnkFilePath",
+            ObjectReturnField::MusicTransitionRoot => "musicTransitionRoot",
+            ObjectReturnField::MusicPlaylistRoot => "musicPlaylistRoot",
+            ObjectReturnField::MusicTransitionObject => "musicTransitionObject",
+            ObjectReturnField::TransitionObject => "transitionObject",
+            ObjectReturnField::PlaybackDuration => "playbackDuration",
+            ObjectReturnField::Duration => "duration",
+            ObjectReturnField::MaxDurationSource => "maxDurationSource",
+            ObjectReturnField::AudioSourceTrimValues => "audioSourceTrimValues",
+            ObjectReturnField::MaxRadiusAttenuation => "maxRadiusAttenuation",
+            ObjectReturnField::AudioSourceLanguage => "audioSourceLanguage",
+            ObjectReturnField::WorkunitIsDefault => "workunitIsDefault",
+            ObjectReturnField::WorkunitType => "workunitType",
+            ObjectReturnField::WorkunitIsDirty => "workunitIsDirty",
+            ObjectReturnField::WorkunitIsLoaded => "workunitIsLoaded",
+            ObjectReturnField::SwitchContainerChildContext => "switchContainerChildContext",
+            ObjectReturnField::IsExplicitMute => "isExplicitMute",
+            ObjectReturnField::IsExplicitSolo => "isExplicitSolo",
+            ObjectReturnField::IsImplicitMute => "isImplicitMute",
+            ObjectReturnField::IsImplicitSolo => "isImplicitSolo",
+            ObjectReturnField::IsIncluded => "isIncluded",
+            ObjectReturnField::IsLanguageIncluded => "isLanguageIncluded",
+            ObjectReturnField::Points => "points",
+            ObjectReturnField::States => "states",
+            ObjectReturnField::StateProperties => "stateProperties",
+            ObjectReturnField::StateGroups => "stateGroups",
+            ObjectReturnField::CustomStates => "customStates",
+            ObjectReturnField::OriginalState => "originalState",
+            ObjectReturnField::BlendTracks => "blendTracks",
+            ObjectReturnField::SupportsStates => "supportsStates",
+            ObjectReturnField::SuppportsRandomizer => "suppportsRandomizer",
+            ObjectReturnField::SwitchGroupGameParameter => "switchGroupGameParameter",
+            ObjectReturnField::HasEmptySwitchStateAssignment => "hasEmptySwitchStateAssignment",
+            ObjectReturnField::ExtractEvents => "extractEvents",
+            ObjectReturnField::ExtractStructures => "extractStructures",
+            ObjectReturnField::ExtractMedia => "extractMedia",
+            ObjectReturnField::SoundbanksReferencingEvent => "soundbanksReferencingEvent",
+            ObjectReturnField::ColorRgb => "colorRGB",
+            ObjectReturnField::Custom(value) => value.as_str(),
+        })
+    }
+}
+
+impl From<&str> for ObjectReturnField {
+    fn from(s: &str) -> Self {
+        ObjectReturnField::Custom(s.to_string())
+    }
+}
+impl From<String> for ObjectReturnField {
+    fn from(s: String) -> Self {
+        ObjectReturnField::Custom(s)
+    }
+}
+
+/// Options controlling which fields are returned for each object.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct ObjectReturnOptions {
+    #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
+    pub return_fields: Option<Vec<ObjectReturnField>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub platform: Option<PlatformRef>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<LanguageRef>,
+}
+
+impl ObjectReturnOptions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn return_fields<I, T>(mut self, fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields = Some(fields.into_iter().map(Into::into).collect());
+        self
+    }
+
+    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
+        self.platform = Some(platform.into());
+        self
+    }
+
+    pub fn language(mut self, language: impl Into<LanguageRef>) -> Self {
+        self.language = Some(language.into());
+        self
+    }
+}
+
+/// Return fields for `ak.wwise.core.profiler.getBusses`.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum BusReturnField {
+    #[serde(rename = "pipelineID")]
+    PipelineId,
+    #[serde(rename = "mixBusID")]
+    MixBusId,
+    #[serde(rename = "objectGUID")]
+    ObjectGuid,
+    #[serde(rename = "objectName")]
+    ObjectName,
+    #[serde(rename = "gameObjectID")]
+    GameObjectId,
+    #[serde(rename = "gameObjectName")]
+    GameObjectName,
+    #[serde(rename = "deviceID")]
+    DeviceId,
+    #[serde(rename = "volume")]
+    Volume,
+    #[serde(rename = "downstreamGain")]
+    DownstreamGain,
+    #[serde(rename = "voiceCount")]
+    VoiceCount,
+    #[serde(rename = "effectCount")]
+    EffectCount,
+    #[serde(rename = "depth")]
+    Depth,
+}
+
+/// Return fields for `ak.wwise.core.profiler.getAudioObjects`.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum AudioObjectReturnField {
+    #[serde(rename = "busName")]
+    BusName,
+    #[serde(rename = "effectPluginName")]
+    EffectPluginName,
+    #[serde(rename = "audioObjectID")]
+    AudioObjectId,
+    #[serde(rename = "busPipelineID")]
+    BusPipelineId,
+    #[serde(rename = "gameObjectID")]
+    GameObjectId,
+    #[serde(rename = "gameObjectName")]
+    GameObjectName,
+    #[serde(rename = "audioObjectName")]
+    AudioObjectName,
+    #[serde(rename = "instigatorPipelineID")]
+    InstigatorPipelineId,
+    #[serde(rename = "busID")]
+    BusId,
+    #[serde(rename = "busGUID")]
+    BusGuid,
+    #[serde(rename = "spatializationMode")]
+    SpatializationMode,
+    #[serde(rename = "x")]
+    X,
+    #[serde(rename = "y")]
+    Y,
+    #[serde(rename = "z")]
+    Z,
+    #[serde(rename = "spread")]
+    Spread,
+    #[serde(rename = "focus")]
+    Focus,
+    #[serde(rename = "prevGain")]
+    PrevGain,
+    #[serde(rename = "nextGain")]
+    NextGain,
+    #[serde(rename = "channelConfig")]
+    ChannelConfig,
+    #[serde(rename = "effectClassID")]
+    EffectClassId,
+    #[serde(rename = "effectIndex")]
+    EffectIndex,
+    #[serde(rename = "metadata")]
+    Metadata,
+    #[serde(rename = "rmsMeter")]
+    RmsMeter,
+    #[serde(rename = "peakMeter")]
+    PeakMeter,
+}
+
+/// Return fields for `ak.wwise.core.profiler.getVoices`.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum VoiceReturnField {
+    #[serde(rename = "pipelineID")]
+    PipelineId,
+    #[serde(rename = "playingID")]
+    PlayingId,
+    #[serde(rename = "soundID")]
+    SoundId,
+    #[serde(rename = "gameObjectID")]
+    GameObjectId,
+    #[serde(rename = "gameObjectName")]
+    GameObjectName,
+    #[serde(rename = "objectGUID")]
+    ObjectGuid,
+    #[serde(rename = "objectName")]
+    ObjectName,
+    #[serde(rename = "playTargetID")]
+    PlayTargetId,
+    #[serde(rename = "playTargetGUID")]
+    PlayTargetGuid,
+    #[serde(rename = "playTargetName")]
+    PlayTargetName,
+    #[serde(rename = "baseVolume")]
+    BaseVolume,
+    #[serde(rename = "gameAuxSendVolume")]
+    GameAuxSendVolume,
+    #[serde(rename = "envelope")]
+    Envelope,
+    #[serde(rename = "normalizationGain")]
+    NormalizationGain,
+    #[serde(rename = "lowPassFilter")]
+    LowPassFilter,
+    #[serde(rename = "highPassFilter")]
+    HighPassFilter,
+    #[serde(rename = "priority")]
+    Priority,
+    #[serde(rename = "isStarted")]
+    IsStarted,
+    #[serde(rename = "isVirtual")]
+    IsVirtual,
+    #[serde(rename = "isForcedVirtual")]
+    IsForcedVirtual,
+}
+
+/// Determines how imported objects are created.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum ImportOperation {
+    #[serde(rename = "createNew")]
+    CreateNew,
+    #[serde(rename = "useExisting")]
+    UseExisting,
+    #[serde(rename = "replaceExisting")]
+    ReplaceExisting,
+}
+
+/// Severity level of an audio import log entry.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum LogSeverity {
+    #[serde(rename = "Message")]
+    Message,
+    #[serde(rename = "Warning")]
+    Warning,
+    #[serde(rename = "Error")]
+    Error,
+    #[serde(rename = "Fatal Error")]
+    FatalError,
+}
+
 /// A Wwise object as returned by `object.get` and similar endpoints.
-/// Fields are optional because their presence depends on the `return` options.
+/// Fields are optional because their presence depends on the `return` options;
+/// accessors not listed here (e.g. `@Property` values) land in `extra`.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct WwiseObject {
-    #[serde(default, rename = "id")]
+    /// The ID (GUID) of the object.
+    #[serde(default)]
     pub id: Option<String>,
+    /// The name of the object.
     #[serde(default)]
     pub name: Option<String>,
+    /// The notes of the object.
     #[serde(default)]
     pub notes: Option<String>,
-    #[serde(default, rename = "type")]
+    /// The type of the object
+    /// Refer to for more information on the types available.
+    #[serde(rename = "type", default)]
     pub object_type: Option<String>,
+    /// The name of the plug-in for Source, Effect, Mixer, Device and Metadata plug-in.
+    #[serde(rename = "pluginName", default)]
+    pub plugin_name: Option<String>,
+    /// The path of the object from the project root
+    /// Ex: '\\Containers\\Default Work Unit\\Sound1'
     #[serde(default)]
     pub path: Option<String>,
+    /// The parent of the object in the hierarchy.
     #[serde(default)]
     pub parent: Option<WwiseObjectRef>,
+    /// The owner of the object
+    /// This applies to objects being locally owned by other objects, such as custom effects, custom attenuations, etc.
     #[serde(default)]
     pub owner: Option<WwiseObjectRef>,
-    #[serde(default)]
-    pub workunit: Option<WwiseObjectRef>,
-    #[serde(default, rename = "isPlayable")]
+    /// True if the object can be played in Transport.
+    #[serde(rename = "isPlayable", default)]
     pub is_playable: Option<bool>,
-    #[serde(default, rename = "shortId")]
-    pub short_id: Option<u32>,
-    #[serde(default, rename = "classId")]
+    /// The Short ID of the object.
+    #[serde(rename = "shortId", default)]
+    pub short_id: Option<i64>,
+    /// The class ID of the object.
+    #[serde(rename = "classId", default)]
     pub class_id: Option<u32>,
+    /// The category of the object
+    /// Ex: 'Containers'
     #[serde(default)]
     pub category: Option<String>,
-    #[serde(default, rename = "filePath")]
+    /// The path to the file containing the object
+    /// The path can be a Work Unit file or a project file
+    /// For using WAAPI on Mac, please refer to .
+    #[serde(rename = "filePath", default)]
     pub file_path: Option<String>,
-    #[serde(default, rename = "childrenCount")]
-    pub children_count: Option<u32>,
-    #[serde(default, rename = "totalSize")]
-    pub total_size: Option<u64>,
-    #[serde(default, rename = "mediaSize")]
-    pub media_size: Option<u64>,
-    #[serde(default, rename = "objectSize")]
-    pub object_size: Option<u64>,
-    #[serde(default, rename = "structureSize")]
-    pub structure_size: Option<u64>
+    /// The parent Work Unit containing the object
+    /// The 'id' and the 'name' is returned.
+    #[serde(default)]
+    pub workunit: Option<WwiseObjectRef>,
+    /// The number of children for the object
+    /// Note, this is deprecated
+    /// The same result can be obtained with children.count().
+    #[serde(rename = "childrenCount", default)]
+    pub children_count: Option<f64>,
+    /// The amount of space (in bytes) this object and all of its children take up in a SoundBank
+    /// This does not include the objectSize
+    /// Note that SoundBanks need to be generated for this value to be accurate.
+    #[serde(rename = "totalSize", default)]
+    pub total_size: Option<i64>,
+    /// The total converted size (in bytes) of the media files of this object and all of its children
+    /// Note that SoundBanks need to be generated for this value to be accurate.
+    #[serde(rename = "mediaSize", default)]
+    pub media_size: Option<i64>,
+    /// The amount of space (in bytes) the meta-data of the object takes up in a SoundBank
+    /// This does not include media files
+    /// Note that SoundBanks need to be generated for this value to be accurate.
+    #[serde(rename = "objectSize", default)]
+    pub object_size: Option<i64>,
+    /// The amount of space (in bytes) the meta-data of the object and all of its children take up in a SoundBank
+    /// This does not include media files
+    /// Note that SoundBanks need to be generated for this value to be accurate.
+    #[serde(rename = "structureSize", default)]
+    pub structure_size: Option<i64>,
+    /// (DEPRECATED) The transition root containing all other transitions recursively
+    /// Note, this is deprecated
+    /// The TransitionRoot reference should be used instead.
+    #[serde(rename = "musicTransitionRoot", default)]
+    pub music_transition_root: Option<serde_json::Value>,
+    /// (DEPRECATED) The music playlist root containing all other music playlist items recursively
+    /// This applies to Music Playlist Containers only
+    /// Note, this is deprecated
+    /// The PlaylistRoot reference should be used instead.
+    #[serde(rename = "musicPlaylistRoot", default)]
+    pub music_playlist_root: Option<serde_json::Value>,
+    /// (DEPRECATED) The transition segment.
+    #[serde(rename = "musicTransitionObject", default)]
+    pub music_transition_object: Option<serde_json::Value>,
+    /// The transition segment.
+    #[serde(rename = "transitionObject", default)]
+    pub transition_object: Option<serde_json::Value>,
+    /// (DEPRECATED) Absolute path to the original wav file
+    /// Only valid for Sound and Audio Source objects
+    /// For using WAAPI on Mac, please refer to .
+    #[serde(rename = "originalWavFilePath", default)]
+    pub original_wav_file_path: Option<String>,
+    /// Absolute path to the original file
+    /// Only valid for Sound and Audio Source objects
+    /// For using WAAPI on Mac, please refer to .
+    #[serde(rename = "originalFilePath", default)]
+    pub original_file_path: Option<String>,
+    /// Relative (from project's Originals Folder) path to the original file
+    /// Only valid for Sound and Audio Source objects
+    /// For using WAAPI on Mac, please refer to .
+    #[serde(rename = "originalRelativeFilePath", default)]
+    pub original_relative_file_path: Option<String>,
+    /// The active source of the sound object.
+    #[serde(rename = "activeSource", default)]
+    pub active_source: Option<WwiseObjectRef>,
+    /// (DEPRECATED) Absolute path to the converted wem file
+    /// Specify the platform in the options
+    /// Only valid for Sound and Audio Source objects
+    /// To use WAAPI on Mac, please refer to .
+    #[serde(rename = "convertedWemFilePath", default)]
+    pub converted_wem_file_path: Option<String>,
+    /// Absolute path to the converted file
+    /// Specify the platform in the options
+    /// Only valid for Sound and Audio Source objects
+    /// To use WAAPI on Mac, please refer to .
+    #[serde(rename = "convertedFilePath", default)]
+    pub converted_file_path: Option<String>,
+    /// Absolute path to the generated SoundBank file associated with the SoundBank object
+    /// Only valid for SoundBank objects
+    /// To use WAAPI on Mac, please refer to .
+    #[serde(rename = "soundbankBnkFilePath", default)]
+    pub soundbank_bnk_file_path: Option<String>,
+    /// The duration root that contains the min and max durations and duration type
+    /// Note, this is deprecated
+    /// The duration should be used instead
+    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    #[serde(rename = "playbackDuration", default)]
+    pub playback_duration: Option<serde_json::Value>,
+    /// The duration root that contains the min and max durations and duration type
+    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    #[serde(default)]
+    pub duration: Option<serde_json::Value>,
+    /// Audio source with the longest duration
+    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    #[serde(rename = "maxDurationSource", default)]
+    pub max_duration_source: Option<serde_json::Value>,
+    /// Range of time for which the audio source is trimmed.
+    #[serde(rename = "audioSourceTrimValues", default)]
+    pub audio_source_trim_values: Option<serde_json::Value>,
+    /// Attenuation with the largest radius
+    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    #[serde(rename = "maxRadiusAttenuation", default)]
+    pub max_radius_attenuation: Option<serde_json::Value>,
+    /// Language associated to the audio source
+    /// This only applies to Audio Source objects directly.
+    #[serde(rename = "audioSourceLanguage", default)]
+    pub audio_source_language: Option<WwiseObjectRef>,
+    /// The total number of channels present in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalTotalChannelCount", default)]
+    pub original_total_channel_count: Option<f64>,
+    /// The number of channels in the normal plane of the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalNormalChannelCount", default)]
+    pub original_normal_channel_count: Option<f64>,
+    /// The number of channels in the height plane of the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalHeightChannelCount", default)]
+    pub original_height_channel_count: Option<f64>,
+    /// The number of low frequency channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalLFEChannelCount", default)]
+    pub original_lfe_channel_count: Option<f64>,
+    /// The number of normal and height channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalNonLFEChannelCount", default)]
+    pub original_non_lfe_channel_count: Option<f64>,
+    /// The number of anonymous channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalAnonymousChannelCount", default)]
+    pub original_anonymous_channel_count: Option<f64>,
+    /// The number of ambisonics channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalAmbisonicsChannelCount", default)]
+    pub original_ambisonics_channel_count: Option<f64>,
+    /// The configuration of the channels in the audio source (Ex : 7.1.4)
+    /// For anonymous channels, returns Anonymous
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalChannelConfig", default)]
+    pub original_channel_config: Option<String>,
+    /// The mask associated with the channel's configuration
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalChannelMask", default)]
+    pub original_channel_mask: Option<f64>,
+    /// The sample rate for the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalSampleRate", default)]
+    pub original_sample_rate: Option<f64>,
+    /// The sample rate for the audio source
+    /// Either 16 or 24
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalBitDepth", default)]
+    pub original_bit_depth: Option<f64>,
+    /// The file size in bytes for the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalFileSize", default)]
+    pub original_file_size: Option<f64>,
+    /// The data size for bytes the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalDataSize", default)]
+    pub original_data_size: Option<f64>,
+    /// The number of samples in the audio file
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalSampleCount", default)]
+    pub original_sample_count: Option<f64>,
+    /// The file duration in seconds
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalDuration", default)]
+    pub original_duration: Option<f64>,
+    /// The audio file's codec
+    /// For original files, it will always be PCM
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "originalCodec", default)]
+    pub original_codec: Option<String>,
+    /// The total number of channels present in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedTotalChannelCount", default)]
+    pub converted_total_channel_count: Option<f64>,
+    /// The number of channels in the normal plane of the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedNormalChannelCount", default)]
+    pub converted_normal_channel_count: Option<f64>,
+    /// The number of channels in the height plane of the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedHeightChannelCount", default)]
+    pub converted_height_channel_count: Option<f64>,
+    /// The number of low frequency channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedLFEChannelCount", default)]
+    pub converted_lfe_channel_count: Option<f64>,
+    /// The number of normal and height channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedNonLFEChannelCount", default)]
+    pub converted_non_lfe_channel_count: Option<f64>,
+    /// The number of anonymous channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedAnonymousChannelCount", default)]
+    pub converted_anonymous_channel_count: Option<f64>,
+    /// The number of ambisonics channels in the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedAmbisonicsChannelCount", default)]
+    pub converted_ambisonics_channel_count: Option<f64>,
+    /// The configuration of the channels in the audio source (Ex : 7.1.4)
+    /// For anonymous channels, returns Anonymous
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedChannelConfig", default)]
+    pub converted_channel_config: Option<String>,
+    /// The mask associated with the channel's configuration
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedChannelMask", default)]
+    pub converted_channel_mask: Option<f64>,
+    /// The sample rate for the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedSampleRate", default)]
+    pub converted_sample_rate: Option<f64>,
+    /// The sample rate for the audio source, expressed as a string
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedSampleRateSetting", default)]
+    pub converted_sample_rate_setting: Option<String>,
+    /// The sample rate for the audio source
+    /// Either 16 or 24
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedBitDepth", default)]
+    pub converted_bit_depth: Option<f64>,
+    /// The file size in bytes for the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedFileSize", default)]
+    pub converted_file_size: Option<f64>,
+    /// The data size for bytes the audio source
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedDataSize", default)]
+    pub converted_data_size: Option<f64>,
+    /// The number of samples in the audio file
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedSampleCount", default)]
+    pub converted_sample_count: Option<f64>,
+    /// The file duration in seconds
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedDuration", default)]
+    pub converted_duration: Option<f64>,
+    /// The duration (in seconds) of the trimmed audio source
+    /// Differs from generic Duration field because the original file does not include Trim Begind/End
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedTrimmedDuration", default)]
+    pub converted_trimmed_duration: Option<f64>,
+    /// The audio file's codec
+    /// For original files, it will always be PCM
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "convertedCodec", default)]
+    pub converted_codec: Option<String>,
+    /// The format specified in the Conversion Settings for the associated audio source
+    /// This differs from convertedCodec because the file does not have to be converted
+    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    #[serde(rename = "conversionFormat", default)]
+    pub conversion_format: Option<String>,
+    /// True if the work unit is the default.
+    #[serde(rename = "workunitIsDefault", default)]
+    pub workunit_is_default: Option<bool>,
+    /// The type of the Work Unit
+    /// Please note that, like Work Units, physical folders have the type "WorkUnit"
+    /// Physical folders have the workunitType "folder".
+    #[serde(rename = "workunitType", default)]
+    pub workunit_type: Option<String>,
+    /// True if a Work Unit or a Project (wproj file) is dirty, meaning it was modified but not saved.
+    #[serde(rename = "workunitIsDirty", default)]
+    pub workunit_is_dirty: Option<bool>,
+    /// True if a Work Unit is currently loaded in the Project
+    /// False if it has been unloaded.
+    #[serde(rename = "workunitIsLoaded", default)]
+    pub workunit_is_loaded: Option<bool>,
+    /// The context object associated with the child of a Switch Container
+    /// This object holds the properties associated with the child that are context-dependent for the Switch Container (for example: the properties of the '1st only' checkbox).
+    #[serde(rename = "switchContainerChildContext", default)]
+    pub switch_container_child_context: Option<serde_json::Value>,
+    /// The game parameter object associated with a Switch Group.
+    #[serde(rename = "switchGroupGameParameter", default)]
+    pub switch_group_game_parameter: Option<WwiseObjectRef>,
+    /// Whether or not the object has been muted explicitly
+    /// Explicitly muting an object implicitly mutes the descendant objects.
+    #[serde(rename = "isExplicitMute", default)]
+    pub is_explicit_mute: Option<bool>,
+    /// Whether or not the object has been soloed explicitly
+    /// Soloing an object silences all the other objects in the project except this one.
+    #[serde(rename = "isExplicitSolo", default)]
+    pub is_explicit_solo: Option<bool>,
+    /// Whether or not the object has been muted implicitly
+    /// Explicitly muting an object implicitly mutes the descendant objects.
+    #[serde(rename = "isImplicitMute", default)]
+    pub is_implicit_mute: Option<bool>,
+    /// Whether or not the object has been soloed implicitly
+    /// Soloing an object silences all the other objects in the project except this one.
+    #[serde(rename = "isImplicitSolo", default)]
+    pub is_implicit_solo: Option<bool>,
+    /// Whether or not the object is Included
+    /// Specify the platform in the options
+    /// This takes into consideration the Inclusion status of the object's ancestors.
+    #[serde(rename = "isIncluded", default)]
+    pub is_included: Option<bool>,
+    /// Whether or not the Audio Source object's language is included for the current platform.
+    #[serde(rename = "isLanguageIncluded", default)]
+    pub is_language_included: Option<bool>,
+    /// This only applies to Curve objects.
+    #[serde(default)]
+    pub points: Option<serde_json::Value>,
+    #[serde(rename = "stateProperties", default)]
+    pub state_properties: Option<serde_json::Value>,
+    /// The State Group objects associated with this object.
+    #[serde(rename = "stateGroups", default)]
+    pub state_groups: Vec<WwiseObjectRef>,
+    /// The Custom State objects associated with this object that have defined values.
+    #[serde(rename = "customStates", default)]
+    pub custom_states: Vec<WwiseObjectRef>,
+    /// The state associated with the custom state object
+    /// This applies to custom state objects which can be obtained using the 'customStates' return option.
+    #[serde(rename = "originalState", default)]
+    pub original_state: Option<WwiseObjectRef>,
+    /// Whether or not the object supports the use of States on any of its properties.
+    #[serde(rename = "supportsStates", default)]
+    pub supports_states: Option<bool>,
+    /// Whether or not the object supports the use of a Randomizer on any of its properties.
+    #[serde(rename = "supportsRandomizer", default)]
+    pub supports_randomizer: Option<bool>,
+    /// Returns true if there are empty objects or paths assigned to any Switches or States this object uses.
+    #[serde(rename = "hasEmptySwitchStateAssignment", default)]
+    pub has_empty_switch_state_assignment: Option<bool>,
+    /// The Event objects extracted from the current SoundBank.
+    #[serde(rename = "extractEvents", default)]
+    pub extract_events: Vec<WwiseObjectRef>,
+    /// The object structures extracted from the current SoundBank.
+    #[serde(rename = "extractStructures", default)]
+    pub extract_structures: Vec<WwiseObjectRef>,
+    /// The Media files extracted from the current SoundBank.
+    #[serde(rename = "extractMedia", default)]
+    pub extract_media: Vec<String>,
+    /// The SoundBank objects referencing the current event object.
+    #[serde(rename = "soundbanksReferencingEvent", default)]
+    pub soundbanks_referencing_event: Vec<WwiseObjectRef>,
+    #[serde(flatten)]
+    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 /// A lightweight object reference returned inside other objects.
@@ -56,188 +838,21 @@ pub struct WwiseObjectRef {
     pub name: Option<String>,
 }
 
-/// Platform or language reference used in options.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum LanguageRef {
-    Name(String),
-    Guid(String),
-}
-
-impl From<&str> for LanguageRef {
-    fn from(s: &str) -> Self { LanguageRef::Name(s.to_string()) }
-}
-impl From<String> for LanguageRef {
-    fn from(s: String) -> Self { LanguageRef::Name(s) }
-}
-
-/// Event reference accepted by `soundengine.postEvent`.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum EventRef {
-    Name(String),
-    Guid(String),
-    ShortId(u32),
-}
-
-impl From<&str> for EventRef {
-    fn from(s: &str) -> Self { EventRef::Name(s.to_string()) }
-}
-impl From<String> for EventRef {
-    fn from(s: String) -> Self { EventRef::Name(s) }
-}
-impl From<u32> for EventRef {
-    fn from(id: u32) -> Self { EventRef::ShortId(id) }
-}
-
-/// Game object reference accepted by soundengine calls.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum GameObjectRef {
-    Id(u64),
-}
-
-impl From<u64> for GameObjectRef {
-    fn from(id: u64) -> Self { GameObjectRef::Id(id) }
-}
-impl From<u32> for GameObjectRef {
-    fn from(id: u32) -> Self { GameObjectRef::Id(id as u64) }
-}
-
-/// RTPC reference accepted by `soundengine.setRTPCValue`.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum RtpcRef {
-    Name(String),
-    Guid(String),
-    ShortId(u32),
-}
-
-impl From<&str> for RtpcRef {
-    fn from(s: &str) -> Self { RtpcRef::Name(s.to_string()) }
-}
-impl From<String> for RtpcRef {
-    fn from(s: String) -> Self { RtpcRef::Name(s) }
-}
-impl From<u32> for RtpcRef {
-    fn from(id: u32) -> Self { RtpcRef::ShortId(id) }
-}
-
-/// Import operation mode for `audio.import`.
-#[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
-pub enum ImportOperation {
-    #[serde(rename = "createNew")]
-    CreateNew,
-    #[serde(rename = "useExisting")]
-    #[default]
-    UseExisting,
-    #[serde(rename = "replaceExisting")]
-    ReplaceExisting,
-}
-
-/// One item in the `imports` array for `audio.import`.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct ImportItem {
-    #[serde(skip_serializing_if = "Option::is_none", rename = "objectPath")]
-    pub object_path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "objectType")]
-    pub object_type: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "importLanguage")]
-    pub import_language: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "importLocation")]
-    pub import_location: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioFile")]
-    pub audio_file: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioFileBase64")]
-    pub audio_file_base64: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "originalsSubFolder")]
-    pub originals_sub_folder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub event: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioSourceNotes")]
-    pub audio_source_notes: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "switchAssignation")]
-    pub switch_assignation: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "dialogueEvent")]
-    pub dialogue_event: Option<String>,
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
-}
-
-impl ImportItem {    pub fn new(object_path: impl Into<String>) -> Self {
-        Self {
-            object_path: Some(object_path.into()),
-            ..Default::default()
-        }
-    }
-}
-
-/// Default values applied to every item in `audio.import`.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct ImportDefaults {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub notes: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "objectType")]
-    pub object_type: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "importLanguage")]
-    pub import_language: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "importLocation")]
-    pub import_location: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioFile")]
-    pub audio_file: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioFileBase64")]
-    pub audio_file_base64: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "objectPath")]
-    pub object_path: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "originalsSubFolder")]
-    pub originals_sub_folder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub event: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "audioSourceNotes")]
-    pub audio_source_notes: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "switchAssignation")]
-    pub switch_assignation: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "dialogueEvent")]
-    pub dialogue_event: Option<String>,
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
-}
-
-/// One entry in the audio import log.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ImportLogEntry {    #[serde(rename = "severity")]
-    pub severity: LogSeverity,
-    #[serde(rename = "message")]
-    pub message: String,
-    #[serde(default, rename = "index")]
-    pub index: Option<i64>,
-}
-
-/// Severity of an audio import log entry.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
-pub enum LogSeverity {    #[serde(rename = "Message")]
-    Message,
-    #[serde(rename = "Warning")]
-    Warning,
-    #[serde(rename = "Error")]
-    Error,
-    #[serde(rename = "Fatal Error")]
-    FatalError,
-}
-
 /// Argument to the `from` field of `object.get`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum ObjectQuery {
-    #[serde(rename = "ofType")]
-    OfType(Vec<String>),
+    #[serde(rename = "id")]
+    Id(Vec<serde_json::Value>),
     #[serde(rename = "search")]
     Search(Vec<String>),
     #[serde(rename = "name")]
     Name(Vec<String>),
     #[serde(rename = "path")]
     Path(Vec<String>),
-    #[serde(rename = "id")]
-    Id(Vec<String>),
+    #[serde(rename = "ofType")]
+    OfType(Vec<String>),
+    #[serde(rename = "query")]
+    Query(Vec<String>),
 }
 
 impl From<&str> for ObjectQuery {
@@ -252,56 +867,331 @@ impl From<String> for ObjectQuery {
 }
 impl From<Vec<String>> for ObjectQuery {
     fn from(v: Vec<String>) -> Self {
-        ObjectQuery::Id(v)
+        ObjectQuery::Id(v.into_iter().map(serde_json::Value::String).collect())
     }
 }
 
+/// Selector for an `object.get` select transformation.
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub enum TransformSelect {
+    #[serde(rename = "parent")]
+    Parent,
+    #[serde(rename = "children")]
+    Children,
+    #[serde(rename = "descendants")]
+    Descendants,
+    #[serde(rename = "ancestors")]
+    Ancestors,
+    #[serde(rename = "referencesTo")]
+    ReferencesTo,
+}
+
 /// A single transformation step in an `object.get` query.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum Transform {
+    Select {
+        select: Vec<TransformSelect>,
+    },
+    Distinct(String),
+    Range {
+        range: Vec<f64>,
+    },
+    Where {
+        #[serde(rename = "where")]
+        where_: Vec<serde_json::Value>,
+    },
+}
+
+/// Wwise version information returned by `getInfo`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct VersionInfo {
+    /// Wwise version name.
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    /// Version year.
+    pub year: i64,
+    /// Version's major number
+    pub major: i64,
+    /// Version's minor number.
+    pub minor: i64,
+    /// Build number.
+    pub build: i64,
+    /// Special name given to a version.
+    pub nickname: String,
+    /// Schema version for the Wwise Project and Work Units.
+    pub schema: i64,
+}
+
+/// Directories used by Wwise, returned by `getInfo`.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct Transform {
+pub struct DirectoriesInfo {
+    /// The Wwise user data directory root.
+    pub user: String,
+    /// The root directory of Wwise
+    /// This is the installation directory.
+    pub install: String,
+    /// The Wwise Authoring root directory
+    pub authoring: String,
+    /// The bin directory, where Wwise.exe is located.
+    pub bin: String,
+    /// The help directory.
+    pub help: String,
+}
+
+/// One item in the `imports` array for `audio.import`.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ImportItem {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    #[serde(rename = "objectType", skip_serializing_if = "Option::is_none")]
+    pub object_type: Option<String>,
+    #[serde(rename = "importLanguage", skip_serializing_if = "Option::is_none")]
+    pub import_language: Option<String>,
+    /// Object ID (GUID), name, or path used as root relative object paths.
+    #[serde(rename = "importLocation", skip_serializing_if = "Option::is_none")]
+    pub import_location: Option<ObjectRef>,
+    #[serde(rename = "audioFile", skip_serializing_if = "Option::is_none")]
+    pub audio_file: Option<String>,
+    #[serde(rename = "audioFileBase64", skip_serializing_if = "Option::is_none")]
+    pub audio_file_base64: Option<String>,
+    #[serde(rename = "objectPath")]
+    pub object_path: String,
+    #[serde(rename = "originalsSubFolder", skip_serializing_if = "Option::is_none")]
+    pub originals_sub_folder: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event: Option<String>,
+    #[serde(rename = "audioSourceNotes", skip_serializing_if = "Option::is_none")]
+    pub audio_source_notes: Option<String>,
+    #[serde(rename = "switchAssignation", skip_serializing_if = "Option::is_none")]
+    pub switch_assignation: Option<String>,
+    #[serde(rename = "dialogueEvent", skip_serializing_if = "Option::is_none")]
+    pub dialogue_event: Option<String>,
     #[serde(flatten)]
     pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
-/// Object return options reused across endpoints.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct ObjectReturnOptions {
-    #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_fields: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub platform: Option<PlatformRef>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub language: Option<LanguageRef>,
+impl ImportItem {
+    pub fn new(object_path: String) -> Self {
+        Self {
+            object_path,
+            notes: None,
+            object_type: None,
+            import_language: None,
+            import_location: None,
+            audio_file: None,
+            audio_file_base64: None,
+            originals_sub_folder: None,
+            event: None,
+            audio_source_notes: None,
+            switch_assignation: None,
+            dialogue_event: None,
+            extra: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn notes(mut self, notes: impl Into<String>) -> Self {
+        self.notes = Some(notes.into());
+        self
+    }
+
+    pub fn object_type(mut self, object_type: impl Into<String>) -> Self {
+        self.object_type = Some(object_type.into());
+        self
+    }
+
+    pub fn import_language(mut self, import_language: impl Into<String>) -> Self {
+        self.import_language = Some(import_language.into());
+        self
+    }
+
+    pub fn import_location(mut self, import_location: impl Into<ObjectRef>) -> Self {
+        self.import_location = Some(import_location.into());
+        self
+    }
+
+    pub fn audio_file(mut self, audio_file: impl Into<String>) -> Self {
+        self.audio_file = Some(audio_file.into());
+        self
+    }
+
+    pub fn audio_file_base64(mut self, audio_file_base64: impl Into<String>) -> Self {
+        self.audio_file_base64 = Some(audio_file_base64.into());
+        self
+    }
+
+    pub fn originals_sub_folder(mut self, originals_sub_folder: impl Into<String>) -> Self {
+        self.originals_sub_folder = Some(originals_sub_folder.into());
+        self
+    }
+
+    pub fn event(mut self, event: impl Into<String>) -> Self {
+        self.event = Some(event.into());
+        self
+    }
+
+    pub fn audio_source_notes(mut self, audio_source_notes: impl Into<String>) -> Self {
+        self.audio_source_notes = Some(audio_source_notes.into());
+        self
+    }
+
+    pub fn switch_assignation(mut self, switch_assignation: impl Into<String>) -> Self {
+        self.switch_assignation = Some(switch_assignation.into());
+        self
+    }
+
+    pub fn dialogue_event(mut self, dialogue_event: impl Into<String>) -> Self {
+        self.dialogue_event = Some(dialogue_event.into());
+        self
+    }
+
+    /// Set an arbitrary `@`-prefixed property, reference, or list field.
+    /// The key must include the `@` prefix, e.g. `"@Volume"`.
+    pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
+        self.extra.insert(key.into(), value.into());
+        self
+    }
 }
 
-/// Version information returned by `getInfo`.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct VersionInfo {    #[serde(default, rename = "displayName")]
-    pub display_name: Option<String>,
-    #[serde(default)]
-    pub year: Option<u32>,
-    #[serde(default)]
-    pub major: Option<u32>,
-    #[serde(default)]
-    pub minor: Option<u32>,
-    #[serde(default)]
-    pub build: Option<u32>,
-    #[serde(default, rename = "nickname")]
-    pub nickname: Option<String>,
-    #[serde(default)]
-    pub schema: Option<u32>,
+/// Default values applied to every item in `audio.import`.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct ImportDefaults {
+    /// The "Notes" field of the created object.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    /// Specifies the type of object to create when importing an audio file
+    /// This type can also be specified directly in the objectPath
+    /// Refer to for the available types.
+    #[serde(rename = "objectType", skip_serializing_if = "Option::is_none")]
+    pub object_type: Option<String>,
+    /// Imports the language for the audio file import (taken from the project's defined languages, found in the WPROJ file LanguageList).
+    #[serde(rename = "importLanguage", skip_serializing_if = "Option::is_none")]
+    pub import_language: Option<String>,
+    /// Object ID (GUID), name, or path used as root relative object paths.
+    #[serde(rename = "importLocation", skip_serializing_if = "Option::is_none")]
+    pub import_location: Option<ObjectRef>,
+    /// Path to media file to import
+    /// This path must be accessible from Wwise
+    /// For using WAAPI on Mac, please refer to .
+    #[serde(rename = "audioFile", skip_serializing_if = "Option::is_none")]
+    pub audio_file: Option<String>,
+    /// Base64 encoded WAV audio file data to import with its target file path relative to the Originals folder, separated by a vertical bar
+    /// E.g
+    /// 'MySound.wav|UklGRu...'.
+    #[serde(rename = "audioFileBase64", skip_serializing_if = "Option::is_none")]
+    pub audio_file_base64: Option<String>,
+    /// The path and name of the object(s) to be created
+    /// The path uses backslashes and can either be absolute or relative
+    /// Object types can be specified before the name
+    /// For example: \verbatim \\Actor-Mixer Hierarchy\\Default Work Unit\\<Random Container>MyContainer\\<Sound>MySound
+    /// \endverbatim Refer to for the available types.
+    #[serde(rename = "objectPath", skip_serializing_if = "Option::is_none")]
+    pub object_path: Option<String>,
+    /// Specifies the 'originals' sub-folder in which to place the imported audio file
+    /// This folder is relative to the 'originals' folder in which the file would normally be imported
+    /// Example: if importing an SFX, then the audio file is imported to the folder Originals\\SFX\\originalsPath.
+    #[serde(rename = "originalsSubFolder", skip_serializing_if = "Option::is_none")]
+    pub originals_sub_folder: Option<String>,
+    /// Defines the path and name of an Event to be created for the imported object
+    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event: Option<String>,
+    /// The "Notes" field of the created audio source object.
+    #[serde(rename = "audioSourceNotes", skip_serializing_if = "Option::is_none")]
+    pub audio_source_notes: Option<String>,
+    /// Defines a Switch Group or State Group that is associated to a Switch Container, within the Actor-Mixer Hierarchy only
+    /// Also defines which Switch Container's child is assigned to which Switch or State from the associated group
+    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    #[serde(rename = "switchAssignation", skip_serializing_if = "Option::is_none")]
+    pub switch_assignation: Option<String>,
+    /// Defines the path and name of a Dialogue Event to be created for the imported object
+    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    #[serde(rename = "dialogueEvent", skip_serializing_if = "Option::is_none")]
+    pub dialogue_event: Option<String>,
+    #[serde(flatten)]
+    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
-/// Directory information returned by `getInfo`.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct DirectoriesInfo {    #[serde(default)]
-    pub user: Option<String>,
+impl ImportDefaults {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn notes(mut self, notes: impl Into<String>) -> Self {
+        self.notes = Some(notes.into());
+        self
+    }
+
+    pub fn object_type(mut self, object_type: impl Into<String>) -> Self {
+        self.object_type = Some(object_type.into());
+        self
+    }
+
+    pub fn import_language(mut self, import_language: impl Into<String>) -> Self {
+        self.import_language = Some(import_language.into());
+        self
+    }
+
+    pub fn import_location(mut self, import_location: impl Into<ObjectRef>) -> Self {
+        self.import_location = Some(import_location.into());
+        self
+    }
+
+    pub fn audio_file(mut self, audio_file: impl Into<String>) -> Self {
+        self.audio_file = Some(audio_file.into());
+        self
+    }
+
+    pub fn audio_file_base64(mut self, audio_file_base64: impl Into<String>) -> Self {
+        self.audio_file_base64 = Some(audio_file_base64.into());
+        self
+    }
+
+    pub fn object_path(mut self, object_path: impl Into<String>) -> Self {
+        self.object_path = Some(object_path.into());
+        self
+    }
+
+    pub fn originals_sub_folder(mut self, originals_sub_folder: impl Into<String>) -> Self {
+        self.originals_sub_folder = Some(originals_sub_folder.into());
+        self
+    }
+
+    pub fn event(mut self, event: impl Into<String>) -> Self {
+        self.event = Some(event.into());
+        self
+    }
+
+    pub fn audio_source_notes(mut self, audio_source_notes: impl Into<String>) -> Self {
+        self.audio_source_notes = Some(audio_source_notes.into());
+        self
+    }
+
+    pub fn switch_assignation(mut self, switch_assignation: impl Into<String>) -> Self {
+        self.switch_assignation = Some(switch_assignation.into());
+        self
+    }
+
+    pub fn dialogue_event(mut self, dialogue_event: impl Into<String>) -> Self {
+        self.dialogue_event = Some(dialogue_event.into());
+        self
+    }
+
+    /// Set an arbitrary `@`-prefixed property, reference, or list field.
+    /// The key must include the `@` prefix, e.g. `"@Volume"`.
+    pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
+        self.extra.insert(key.into(), value.into());
+        self
+    }
+}
+
+/// One entry in the audio import log.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ImportLogEntry {
+    pub severity: LogSeverity,
+    /// The description message of the log item.
+    pub message: String,
+    /// The index of the import command to which the log applies.
     #[serde(default)]
-    pub install: Option<String>,
-    #[serde(default)]
-    pub authoring: Option<String>,
-    #[serde(default)]
-    pub bin: Option<String>,
-    #[serde(default)]
-    pub help: Option<String>,
+    pub index: Option<f64>,
 }

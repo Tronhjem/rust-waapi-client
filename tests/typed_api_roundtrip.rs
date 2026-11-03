@@ -1,4 +1,4 @@
-use serde_json::{json, Value};
+use serde_json::json;
 use waapi_client::api::generated::ak::soundengine::{
     SoundenginePosteventArgs, SoundengineSetrtpcvalueArgs,
 };
@@ -8,25 +8,24 @@ use waapi_client::api::generated::ak::wwise::core::audio::{
 };
 use waapi_client::api::generated::ak::wwise::core::object::{
     WwiseCoreObjectCreateArgs, WwiseCoreObjectDeleteArgs, WwiseCoreObjectGetArgs,
-    WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse,
+    WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse, WwiseCoreObjectSetArgs,
+    WwiseCoreObjectSetItem, WwiseCoreObjectSetResponse,
 };
 use waapi_client::api::generated::ak::wwise::core::project::WwiseCoreProjectSaveArgs;
 use waapi_client::api::generated::ak::wwise::ui::{
     WwiseUiGetselectedobjectsOptions, WwiseUiGetselectedobjectsResponse,
 };
 use waapi_client::api::generated::primitives::{
-    GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, OnNameConflict,
-    PlatformRef, RtpcRef, Transform,
+    GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
+    OnNameConflict, PlatformRef, RtpcRef, Transform, TransformSelect,
 };
 use waapi_client::api::primitives::ObjectRef;
 
 #[test]
 fn object_get_args_serializes_to_expected_shape() {
-    let mut transform = Transform::default();
-    transform.extra.insert(
-        "select".to_string(),
-        Value::Array(vec![Value::String("children".to_string())]),
-    );
+    let transform = Transform::Select {
+        select: vec![TransformSelect::Children],
+    };
     let args = WwiseCoreObjectGetArgs::new(ObjectQuery::from(
         r"\Actor-Mixer Hierarchy\Default Work Unit",
     ))
@@ -37,7 +36,7 @@ fn object_get_args_serializes_to_expected_shape() {
         value["from"]["path"],
         json!([r"\Actor-Mixer Hierarchy\Default Work Unit"])
     );
-    assert!(value["transform"].is_array());
+    assert_eq!(value["transform"][0]["select"], json!(["children"]));
 }
 
 #[test]
@@ -49,6 +48,18 @@ fn object_get_options_serializes_return_keyword() {
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id", "name"]]);
     assert_eq!(value["platform"], "Windows");
+}
+
+#[test]
+fn object_return_options_accept_typed_fields() {
+    let options = WwiseCoreObjectGetOptions::new().return_fields([
+        ObjectReturnField::Id,
+        ObjectReturnField::Name,
+        ObjectReturnField::Custom("@Volume".to_string()),
+    ]);
+
+    let value = serde_json::to_value(&options).unwrap();
+    assert_eq!(value["return"], json!(["id", "name", "@Volume"]));
 }
 
 #[test]
@@ -78,7 +89,8 @@ fn object_delete_args_serializes_object_ref() {
 
 #[test]
 fn soundengine_post_event_args_serializes() {
-    let args = SoundenginePosteventArgs::new("Play_Test".into(), GameObjectRef::from(42u64));
+    let args =
+        SoundenginePosteventArgs::new("Play_Test".into()).game_object(GameObjectRef::from(42u64));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["event"], "Play_Test");
@@ -87,7 +99,8 @@ fn soundengine_post_event_args_serializes() {
 
 #[test]
 fn soundengine_set_rtpc_value_args_serializes() {
-    let args = SoundengineSetrtpcvalueArgs::new("Volume".into(), 0.75, GameObjectRef::from(100u32));
+    let args = SoundengineSetrtpcvalueArgs::new("Volume".into(), 0.75)
+        .game_object(GameObjectRef::from(100u32));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["rtpc"], "Volume");
@@ -97,7 +110,7 @@ fn soundengine_set_rtpc_value_args_serializes() {
 
 #[test]
 fn audio_import_args_serializes_imports_and_defaults() {
-    let mut item = ImportItem::new(r"\Actor-Mixer Hierarchy\Default Work Unit\MySound");
+    let mut item = ImportItem::new(r"\Actor-Mixer Hierarchy\Default Work Unit\MySound".to_string());
     item.audio_file = Some(r"C:\Audio\MySound.wav".to_string());
 
     let defaults = ImportDefaults {
@@ -178,8 +191,8 @@ fn get_info_response_deserializes() {
     let resp: WwiseCoreGetinfoResponse = serde_json::from_value(json).unwrap();
     assert_eq!(resp.display_name, "Wwise");
     assert_eq!(resp.platform, "x64");
-    assert_eq!(resp.version.display_name, Some("2024.1.7".to_string()));
-    assert_eq!(resp.version.schema, Some(108));
+    assert_eq!(resp.version.display_name, "2024.1.7");
+    assert_eq!(resp.version.schema, 108);
     assert_eq!(
         resp.session_id,
         "{FF59687C-48CF-4385-B1C5-CE84B0A63880}".to_string()
@@ -189,22 +202,22 @@ fn get_info_response_deserializes() {
     assert_eq!(resp.process_id, 12345);
     assert_eq!(
         resp.directories.install,
-        Some("C:/Program Files/Audiokinetic/Wwise 2024.1.7.8863".to_string())
+        "C:/Program Files/Audiokinetic/Wwise 2024.1.7.8863"
     );
 }
 
 #[test]
 fn object_get_response_deserializes() {
+    // Real wire shape: the object array is returned under the "return" key.
     let json = json!({
-        "objects": [
+        "return": [
             {
                 "id": "{GUID-1}",
                 "name": "MySound",
                 "type": "Sound",
                 "shortId": 12345
             }
-        ],
-        "return": ["id", "name", "type", "shortId"]
+        ]
     });
 
     let resp: WwiseCoreObjectGetResponse = serde_json::from_value(json).unwrap();
@@ -265,5 +278,69 @@ fn object_ref_deserialization_roundtrip() {
     assert_eq!(
         serde_json::to_value(path).unwrap(),
         r"\Events\Default Work Unit\Play_Test"
+    );
+}
+
+#[test]
+fn object_set_args_serializes_to_expected_shape() {
+    let args = WwiseCoreObjectSetArgs::new(vec![
+        WwiseCoreObjectSetItem::new(ObjectRef::path(
+            r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
+        ))
+        .name("NewName")
+        .notes("set from the typed API")
+        .property("Volume", -6.0)
+        .property(
+            "OutputBus",
+            r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus",
+        ),
+    ])
+    .list_mode(waapi_client::api::generated::primitives::ListMode::Append);
+
+    let value = serde_json::to_value(&args).unwrap();
+    let item = &value["objects"][0];
+    assert_eq!(
+        item["object"],
+        r"\Actor-Mixer Hierarchy\Default Work Unit\MySound"
+    );
+    assert_eq!(item["name"], "NewName");
+    assert_eq!(item["notes"], "set from the typed API");
+    assert_eq!(item["@Volume"], -6.0);
+    assert_eq!(
+        item["@OutputBus"],
+        r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus"
+    );
+    assert!(item.get("children").is_none());
+    assert_eq!(value["listMode"], "append");
+}
+
+#[test]
+fn object_set_response_deserializes_with_extra_fields() {
+    let raw = json!({
+        "objects": [
+            {
+                "id": "{BAE891BA-E025-43ED-A4D1-4DC55C68E7CA}",
+                "name": "Sound",
+                "@RTPC": [{"id": "{31DA7AE1-B215-4689-A5F7-67A9C5B3DFDC}", "name": ""}]
+            },
+            {
+                "id": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}",
+                "name": "Default Work Unit",
+                "children": [{"id": "{66666666-7777-8888-9999-AAAAAAAAAAAA}", "name": "Boom"}]
+            }
+        ]
+    });
+
+    let response: WwiseCoreObjectSetResponse = serde_json::from_value(raw).unwrap();
+    assert_eq!(response.objects.len(), 2);
+    assert_eq!(
+        response.objects[0].id.as_deref(),
+        Some("{BAE891BA-E025-43ED-A4D1-4DC55C68E7CA}")
+    );
+    assert!(response.objects[0].extra.contains_key("@RTPC"));
+    assert_eq!(response.objects[1].children.len(), 1);
+    assert_eq!(
+        response.objects[1].children[0].name.as_deref(),
+        Some("Boom")
     );
 }

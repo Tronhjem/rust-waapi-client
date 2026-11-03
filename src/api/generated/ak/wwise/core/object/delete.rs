@@ -5,15 +5,17 @@
 
 use crate::api::generated::primitives::*;
 
-
 /// Arguments for `ak.wwise.core.object.delete`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct WwiseCoreObjectDeleteArgs {
-    /// The object to delete.
+    /// The ID (GUID), name, or path of the object to be deleted.
     pub object: ObjectRef,
-    /// Automatically check out affected work units.
-    #[serde(rename = "autoCheckOutToSourceControl")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project
+    /// Defaults to true.
+    #[serde(
+        rename = "autoCheckOutToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_check_out_to_source_control: Option<bool>,
 }
 
@@ -25,20 +27,11 @@ impl WwiseCoreObjectDeleteArgs {
         }
     }
 
-    pub fn auto_check_out_to_source_control(mut self, auto_check_out_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_check_out_to_source_control(
+        mut self,
+        auto_check_out_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
         self
-    }
-}
-
-/// Options for `ak.wwise.core.object.delete`.
-#[derive(Debug, Clone, serde::Serialize)]
-#[derive(Default)]
-pub struct WwiseCoreObjectDeleteOptions {
-}
-
-impl WwiseCoreObjectDeleteOptions {
-    pub fn new() -> Self {
-        Self::default()
     }
 }
