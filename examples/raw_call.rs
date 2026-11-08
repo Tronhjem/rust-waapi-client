@@ -7,6 +7,7 @@
 use log::{error, info};
 use waapi_client::WaapiClient;
 use waapi_client::serde_json::json;
+use waapi_client::waapi_function_api::ak;
 
 #[tokio::main]
 async fn main() {
@@ -16,6 +17,22 @@ async fn main() {
         .await
         .expect("Failed to connect to WAAPI");
 
+    // ======================================================================== 
+    // Simple get info call with ak.wwise.core.getInfo
+    // ======================================================================== 
+    info!("Getting info:");
+    match client
+        .call(ak::wwise::core::getInfo, None, None)
+        .await
+    {
+        Ok(value) => info!("getinfo result: {value}"),
+        Err(e) => error!("getInfo failed: {e}"),
+    }
+
+    // ======================================================================== 
+    // ak.wwise.core.object.get
+    // ======================================================================== 
+    info!("Getting Objects:");
     // Any WAAPI URI works; args and options are plain serde_json values.
     let args = json!({
         "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"] }
@@ -25,18 +42,13 @@ async fn main() {
     });
 
     match client
-        .call("ak.wwise.core.object.get", Some(args), Some(options))
+        .call(ak::wwise::core::object::get, Some(args), Some(options))
         .await
     {
         Ok(value) => info!("object.get result: {value}"),
         Err(e) => error!("object.get failed: {e}"),
     }
-
-    // Endpoint URIs are also available as constants.
-    info!(
-        "same URI via constant: {}",
-        waapi_client::waapi_function_api::ak::wwise::core::object::get
-    );
+    // ======================================================================== 
 
     client.shutdown().await.unwrap();
 }
