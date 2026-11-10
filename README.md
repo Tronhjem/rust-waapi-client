@@ -31,11 +31,10 @@ async fn main() -> WaapiResult<()> {
 
 ### Making Simple Calls
 
-The JSON value API works with `WaapiFunction` and `serde_json::Value` (use `call_raw` if you need to pass an arbitrary `&str`). `serde_json` is re-exported from the crate root, so the `json!` macro is available without an extra dependency:
+The JSON value API works with `WaapiFunction` and `serde_json::Value` (use `call_raw` if you need to pass an arbitrary `&str`). The `json!` macro is re-exported from the crate root, so applications can build JSON kwargs without adding a direct `serde_json` dependency:
 
 ```rust
-use waapi_client::WaapiFunction;
-use waapi_client::serde_json::json;
+use waapi_client::{WaapiFunction, json};
 
 let response = client
     .call(WaapiFunction::ak_wwise_core_getInfo, None, None)
@@ -45,11 +44,10 @@ println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
 
 ### Building Arguments
 
-Use `serde_json::json!` to build WAAPI kwargs:
+Use `waapi_client::json!` to build WAAPI kwargs:
 
 ```rust
-use waapi_client::WaapiFunction;
-use waapi_client::serde_json::json;
+use waapi_client::{WaapiFunction, json};
 
 let args = json!({
     "from": {
@@ -110,8 +108,7 @@ Typed endpoint `Options` structs provide a `.return_fields(...)` builder for the
 ### Complete Example
 
 ```rust
-use waapi_client::{WaapiClient, WaapiFunction, WaapiResult};
-use waapi_client::serde_json::json;
+use waapi_client::{WaapiClient, WaapiFunction, WaapiResult, json};
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
@@ -169,8 +166,7 @@ client.shutdown().await?;
 Subscribe to WAAPI topics and receive events on an async channel:
 
 ```rust
-use waapi_client::WaapiTopic;
-use waapi_client::serde_json::json;
+use waapi_client::{WaapiTopic, json};
 
 let options = json!({ "return": ["id", "name"] });
 let (id, mut events) = client

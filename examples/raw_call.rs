@@ -5,8 +5,7 @@
 //! Run with: cargo run --example raw_call
 
 use log::{error, info};
-use waapi_client::serde_json::json;
-use waapi_client::{WaapiClient, WaapiFunction};
+use waapi_client::{WaapiClient, WaapiFunction, json};
 
 #[tokio::main]
 async fn main() {
