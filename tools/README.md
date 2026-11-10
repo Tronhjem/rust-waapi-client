@@ -39,7 +39,7 @@ The `<version>` directory is derived from `ak.wwise.core.getInfo` (e.g. `2024.1.
 
 ### generate_waapi_uri.py
 
-Generates the Rust `src/waapi_function_api.rs` and `src/waapi_topics_api.rs` files from the versioned schemas in `tools/waapi_schemas/<version>/`, creating a properly structured module hierarchy with all WAAPI function and topic endpoints as `&str` constants.
+Generates the Rust `src/waapi_function_api.rs` and `src/waapi_topics_api.rs` files from the versioned schemas in `tools/waapi_schemas/<version>/`, creating both a structured `ak::...` module hierarchy of `&str` constants and the `WaapiFunction` / `WaapiTopic` enums backed by those constants.
 
 **Requirements:**
 - Python 3.6+
@@ -52,8 +52,8 @@ python tools/generate_waapi_uri.py
 
 **Output:**
 Overwrites `src/waapi_function_api.rs` and `src/waapi_topics_api.rs` with:
-- Proper nested module structure matching WAAPI hierarchy
-- All function/topic endpoints as public `&str` constants (used by both raw `client.call` / `client.subscribe` and the generated typed API)
+- Proper nested module structure matching WAAPI hierarchy (`ak::...` `&str` constants)
+- `WaapiFunction` and `WaapiTopic` enums whose `as_str()` returns the `ak::...` `&str` constants
 - Rust keyword suffixing (e.g., `move` becomes `move_`)
 - Alphabetically sorted functions and modules
 

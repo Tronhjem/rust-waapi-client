@@ -8,6 +8,7 @@ Usage:
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -17,6 +18,14 @@ RUST_KEYWORDS = {'move', 'type', 'mod', 'use', 'fn', 'let', 'if', 'else', 'for',
                  'while', 'loop', 'match', 'return', 'break', 'continue', 'const',
                  'static', 'struct', 'enum', 'trait', 'impl', 'self', 'super',
                  'crate', 'pub', 'extern', 'unsafe', 'async', 'await', 'dyn'}
+
+
+def uri_variant_name(uri: str) -> str:
+    return uri.replace(".", "_")
+
+
+def uri_const_path(uri: str) -> str:
+    return "::".join(escape_if_keyword(s) for s in uri.split("."))
 
 
 def parse_function_path(func: str) -> Tuple[List[str], str]:
@@ -108,13 +117,58 @@ def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
     return lines
 
 
-def generate_api_file(functions: List[str], output_path: Path):
+def generate_enum_code(uris: List[str], enum_name: str) -> List[str]:
+    sorted_uris = sorted(uris)
+    lines = [
+        '',
+        f'/// Typed URI enum for `{enum_name}` endpoints.',
+        '#[allow(non_camel_case_types)]',
+        '#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]',
+        f'pub enum {enum_name} {{',
+    ]
+    for uri in sorted_uris:
+        variant = uri_variant_name(uri)
+        lines.append(f'    /// `{uri}`')
+        lines.append(f'    {variant},')
+    lines.extend([
+        '}',
+        '',
+        f'impl {enum_name} {{',
+        "    pub const fn as_str(self) -> &'static str {",
+        '        match self {',
+    ])
+    for uri in sorted_uris:
+        variant = uri_variant_name(uri)
+        const_path = uri_const_path(uri)
+        lines.append(f'            Self::{variant} => {const_path},')
+    lines.extend([
+        '        }',
+        '    }',
+        '}',
+        '',
+        f'impl std::fmt::Display for {enum_name} {{',
+        "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {",
+        '        f.write_str(self.as_str())',
+        '    }',
+        '}',
+        '',
+        f'impl AsRef<str> for {enum_name} {{',
+        '    fn as_ref(&self) -> &str {',
+        '        self.as_str()',
+        '    }',
+        '}',
+    ])
+    return lines
+
+
+def generate_api_file(functions: List[str], output_path: Path, enum_name: str):
     """
-    Generate the complete api.rs file.
+    Generate the complete URI module and enum file.
     
     Args:
-        functions: List of WAAPI function paths
-        output_path: Path to write the api.rs file
+        functions: List of WAAPI URI paths
+        output_path: Path to write the Rust file
+        enum_name: Name of the generated URI enum
     """
     # Build the module tree
     tree = build_module_tree(functions)
@@ -127,10 +181,11 @@ def generate_api_file(functions: List[str], output_path: Path):
     
     module_lines = generate_module_code(tree, 0)
     lines.extend(module_lines)
+    lines.extend(generate_enum_code(functions, enum_name))
     content = '\n'.join(lines) + '\n'
     output_path.write_text(content, encoding='utf-8')
     
-    print(f"Generated {output_path} with {len(functions)} functions")
+    print(f"Generated {output_path} with {len(functions)} entries ({enum_name})")
 
 
 def load_endpoints_from_schemas(schema_dir: Path) -> Tuple[List[str], List[str]]:
@@ -158,8 +213,8 @@ def main():
     src_dir = script_dir.parent / "src"
 
     functions, topics = load_endpoints_from_schemas(schema_dir)
-    generate_api_file(functions, src_dir / "waapi_function_api.rs")
-    generate_api_file(topics, src_dir / "waapi_topics_api.rs")
+    generate_api_file(functions, src_dir / "waapi_function_api.rs", "WaapiFunction")
+    generate_api_file(topics, src_dir / "waapi_topics_api.rs", "WaapiTopic")
 
 
 if __name__ == '__main__':

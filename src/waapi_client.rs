@@ -3,6 +3,8 @@ use std::fmt;
 use serde_json::Value;
 use tokio::sync::mpsc;
 
+use crate::waapi_function_api::WaapiFunction;
+use crate::waapi_topics_api::WaapiTopic;
 pub use crate::wamp::Event;
 use crate::wamp::{WampClient, WampError};
 
@@ -84,11 +86,24 @@ impl WaapiClient {
         })
     }
 
-    /// Low-level WAAPI call.
+    /// WAAPI call using a known [`WaapiFunction`] and raw JSON arguments/options.
     ///
     /// `args` is passed as the WAMP `CALL` keyword arguments (`ArgumentsKw`), and
     /// `options` is passed as the WAMP `CALL` `Options` dictionary (e.g. `{"return": ["id", "name"]}`).
     pub async fn call(
+        &mut self,
+        uri: WaapiFunction,
+        args: Option<Value>,
+        options: Option<Value>,
+    ) -> WaapiResult<Value> {
+        self.call_raw(uri.as_str(), args, options).await
+    }
+
+    /// Low-level WAAPI call taking a raw URI string.
+    ///
+    /// Prefer [`WaapiClient::call`] or the typed endpoint methods when calling
+    /// known WAAPI endpoints.
+    pub async fn call_raw(
         &mut self,
         uri: &str,
         args: Option<Value>,
@@ -109,7 +124,7 @@ impl WaapiClient {
     /// Serializes typed args/options and deserializes the response.
     pub async fn call_typed<Args, Options, Response>(
         &mut self,
-        uri: &str,
+        uri: WaapiFunction,
         args: Option<Args>,
         options: Option<Options>,
     ) -> WaapiResult<Response>
@@ -129,7 +144,7 @@ impl WaapiClient {
     /// Use for endpoints that return no useful data.
     pub async fn call_typed_void<Args, Options>(
         &mut self,
-        uri: &str,
+        uri: WaapiFunction,
         args: Option<Args>,
         options: Option<Options>,
     ) -> WaapiResult<()>
@@ -143,12 +158,24 @@ impl WaapiClient {
         Ok(())
     }
 
-    /// Subscribe to a WAAPI topic with optional subscription options (e.g. `{"return": ["id", "name"]}`).
+    /// Subscribe to a known [`WaapiTopic`] with optional subscription options (e.g. `{"return": ["id", "name"]}`).
     ///
     /// Returns an unbounded receiver of [`Event`] values. Dropping the
     /// receiver does not unsubscribe on the server; call [`WaapiClient::unsubscribe`]
     /// with the returned subscription id when done.
     pub async fn subscribe(
+        &mut self,
+        topic: WaapiTopic,
+        options: Option<Value>,
+    ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)> {
+        self.subscribe_raw(topic.as_str(), options).await
+    }
+
+    /// Low-level WAAPI topic subscription taking a raw topic string.
+    ///
+    /// Prefer [`WaapiClient::subscribe`] or [`WaapiClient::subscribe_typed`] when
+    /// subscribing to known WAAPI topics.
+    pub async fn subscribe_raw(
         &mut self,
         topic: &str,
         options: Option<Value>,
@@ -169,7 +196,7 @@ impl WaapiClient {
     /// Serializes typed options before subscribing.
     pub async fn subscribe_typed<Options>(
         &mut self,
-        topic: &str,
+        topic: WaapiTopic,
         options: Option<Options>,
     ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)>
     where

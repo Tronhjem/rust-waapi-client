@@ -260,3 +260,618 @@ pub mod ak {
         }
     }
 }
+
+/// Typed URI enum for `WaapiFunction` endpoints.
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum WaapiFunction {
+    /// `ak.soundengine.executeActionOnEvent`
+    ak_soundengine_executeActionOnEvent,
+    /// `ak.soundengine.getState`
+    ak_soundengine_getState,
+    /// `ak.soundengine.getSwitch`
+    ak_soundengine_getSwitch,
+    /// `ak.soundengine.loadBank`
+    ak_soundengine_loadBank,
+    /// `ak.soundengine.postEvent`
+    ak_soundengine_postEvent,
+    /// `ak.soundengine.postMsgMonitor`
+    ak_soundengine_postMsgMonitor,
+    /// `ak.soundengine.postTrigger`
+    ak_soundengine_postTrigger,
+    /// `ak.soundengine.registerGameObj`
+    ak_soundengine_registerGameObj,
+    /// `ak.soundengine.resetRTPCValue`
+    ak_soundengine_resetRTPCValue,
+    /// `ak.soundengine.seekOnEvent`
+    ak_soundengine_seekOnEvent,
+    /// `ak.soundengine.setDefaultListeners`
+    ak_soundengine_setDefaultListeners,
+    /// `ak.soundengine.setGameObjectAuxSendValues`
+    ak_soundengine_setGameObjectAuxSendValues,
+    /// `ak.soundengine.setGameObjectOutputBusVolume`
+    ak_soundengine_setGameObjectOutputBusVolume,
+    /// `ak.soundengine.setListenerSpatialization`
+    ak_soundengine_setListenerSpatialization,
+    /// `ak.soundengine.setListeners`
+    ak_soundengine_setListeners,
+    /// `ak.soundengine.setMultiplePositions`
+    ak_soundengine_setMultiplePositions,
+    /// `ak.soundengine.setObjectObstructionAndOcclusion`
+    ak_soundengine_setObjectObstructionAndOcclusion,
+    /// `ak.soundengine.setPosition`
+    ak_soundengine_setPosition,
+    /// `ak.soundengine.setRTPCValue`
+    ak_soundengine_setRTPCValue,
+    /// `ak.soundengine.setScalingFactor`
+    ak_soundengine_setScalingFactor,
+    /// `ak.soundengine.setState`
+    ak_soundengine_setState,
+    /// `ak.soundengine.setSwitch`
+    ak_soundengine_setSwitch,
+    /// `ak.soundengine.stopAll`
+    ak_soundengine_stopAll,
+    /// `ak.soundengine.stopPlayingID`
+    ak_soundengine_stopPlayingID,
+    /// `ak.soundengine.unloadBank`
+    ak_soundengine_unloadBank,
+    /// `ak.soundengine.unregisterGameObj`
+    ak_soundengine_unregisterGameObj,
+    /// `ak.wwise.core.audio.convert`
+    ak_wwise_core_audio_convert,
+    /// `ak.wwise.core.audio.import`
+    ak_wwise_core_audio_import,
+    /// `ak.wwise.core.audio.importTabDelimited`
+    ak_wwise_core_audio_importTabDelimited,
+    /// `ak.wwise.core.audio.mute`
+    ak_wwise_core_audio_mute,
+    /// `ak.wwise.core.audio.resetMute`
+    ak_wwise_core_audio_resetMute,
+    /// `ak.wwise.core.audio.resetSolo`
+    ak_wwise_core_audio_resetSolo,
+    /// `ak.wwise.core.audio.setConversionPlugin`
+    ak_wwise_core_audio_setConversionPlugin,
+    /// `ak.wwise.core.audio.solo`
+    ak_wwise_core_audio_solo,
+    /// `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInRegion`
+    ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInRegion,
+    /// `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInTrimmedRegion`
+    ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInTrimmedRegion,
+    /// `ak.wwise.core.blendContainer.addAssignment`
+    ak_wwise_core_blendContainer_addAssignment,
+    /// `ak.wwise.core.blendContainer.addTrack`
+    ak_wwise_core_blendContainer_addTrack,
+    /// `ak.wwise.core.blendContainer.getAssignments`
+    ak_wwise_core_blendContainer_getAssignments,
+    /// `ak.wwise.core.blendContainer.removeAssignment`
+    ak_wwise_core_blendContainer_removeAssignment,
+    /// `ak.wwise.core.executeLuaScript`
+    ak_wwise_core_executeLuaScript,
+    /// `ak.wwise.core.gameParameter.setRange`
+    ak_wwise_core_gameParameter_setRange,
+    /// `ak.wwise.core.getInfo`
+    ak_wwise_core_getInfo,
+    /// `ak.wwise.core.getProjectInfo`
+    ak_wwise_core_getProjectInfo,
+    /// `ak.wwise.core.log.addItem`
+    ak_wwise_core_log_addItem,
+    /// `ak.wwise.core.log.clear`
+    ak_wwise_core_log_clear,
+    /// `ak.wwise.core.log.get`
+    ak_wwise_core_log_get,
+    /// `ak.wwise.core.object.copy`
+    ak_wwise_core_object_copy,
+    /// `ak.wwise.core.object.create`
+    ak_wwise_core_object_create,
+    /// `ak.wwise.core.object.delete`
+    ak_wwise_core_object_delete,
+    /// `ak.wwise.core.object.diff`
+    ak_wwise_core_object_diff,
+    /// `ak.wwise.core.object.get`
+    ak_wwise_core_object_get,
+    /// `ak.wwise.core.object.getAttenuationCurve`
+    ak_wwise_core_object_getAttenuationCurve,
+    /// `ak.wwise.core.object.getPropertyAndReferenceNames`
+    ak_wwise_core_object_getPropertyAndReferenceNames,
+    /// `ak.wwise.core.object.getPropertyInfo`
+    ak_wwise_core_object_getPropertyInfo,
+    /// `ak.wwise.core.object.getTypes`
+    ak_wwise_core_object_getTypes,
+    /// `ak.wwise.core.object.isLinked`
+    ak_wwise_core_object_isLinked,
+    /// `ak.wwise.core.object.isPropertyEnabled`
+    ak_wwise_core_object_isPropertyEnabled,
+    /// `ak.wwise.core.object.move`
+    ak_wwise_core_object_move,
+    /// `ak.wwise.core.object.pasteProperties`
+    ak_wwise_core_object_pasteProperties,
+    /// `ak.wwise.core.object.set`
+    ak_wwise_core_object_set,
+    /// `ak.wwise.core.object.setAttenuationCurve`
+    ak_wwise_core_object_setAttenuationCurve,
+    /// `ak.wwise.core.object.setLinked`
+    ak_wwise_core_object_setLinked,
+    /// `ak.wwise.core.object.setName`
+    ak_wwise_core_object_setName,
+    /// `ak.wwise.core.object.setNotes`
+    ak_wwise_core_object_setNotes,
+    /// `ak.wwise.core.object.setProperty`
+    ak_wwise_core_object_setProperty,
+    /// `ak.wwise.core.object.setRandomizer`
+    ak_wwise_core_object_setRandomizer,
+    /// `ak.wwise.core.object.setReference`
+    ak_wwise_core_object_setReference,
+    /// `ak.wwise.core.object.setStateGroups`
+    ak_wwise_core_object_setStateGroups,
+    /// `ak.wwise.core.object.setStateProperties`
+    ak_wwise_core_object_setStateProperties,
+    /// `ak.wwise.core.ping`
+    ak_wwise_core_ping,
+    /// `ak.wwise.core.profiler.enableProfilerData`
+    ak_wwise_core_profiler_enableProfilerData,
+    /// `ak.wwise.core.profiler.getAudioObjects`
+    ak_wwise_core_profiler_getAudioObjects,
+    /// `ak.wwise.core.profiler.getBusses`
+    ak_wwise_core_profiler_getBusses,
+    /// `ak.wwise.core.profiler.getCpuUsage`
+    ak_wwise_core_profiler_getCpuUsage,
+    /// `ak.wwise.core.profiler.getCursorTime`
+    ak_wwise_core_profiler_getCursorTime,
+    /// `ak.wwise.core.profiler.getGameObjects`
+    ak_wwise_core_profiler_getGameObjects,
+    /// `ak.wwise.core.profiler.getLoadedMedia`
+    ak_wwise_core_profiler_getLoadedMedia,
+    /// `ak.wwise.core.profiler.getMeters`
+    ak_wwise_core_profiler_getMeters,
+    /// `ak.wwise.core.profiler.getPerformanceMonitor`
+    ak_wwise_core_profiler_getPerformanceMonitor,
+    /// `ak.wwise.core.profiler.getRTPCs`
+    ak_wwise_core_profiler_getRTPCs,
+    /// `ak.wwise.core.profiler.getStreamedMedia`
+    ak_wwise_core_profiler_getStreamedMedia,
+    /// `ak.wwise.core.profiler.getVoiceContributions`
+    ak_wwise_core_profiler_getVoiceContributions,
+    /// `ak.wwise.core.profiler.getVoices`
+    ak_wwise_core_profiler_getVoices,
+    /// `ak.wwise.core.profiler.registerMeter`
+    ak_wwise_core_profiler_registerMeter,
+    /// `ak.wwise.core.profiler.saveCapture`
+    ak_wwise_core_profiler_saveCapture,
+    /// `ak.wwise.core.profiler.startCapture`
+    ak_wwise_core_profiler_startCapture,
+    /// `ak.wwise.core.profiler.stopCapture`
+    ak_wwise_core_profiler_stopCapture,
+    /// `ak.wwise.core.profiler.unregisterMeter`
+    ak_wwise_core_profiler_unregisterMeter,
+    /// `ak.wwise.core.project.save`
+    ak_wwise_core_project_save,
+    /// `ak.wwise.core.remote.connect`
+    ak_wwise_core_remote_connect,
+    /// `ak.wwise.core.remote.disconnect`
+    ak_wwise_core_remote_disconnect,
+    /// `ak.wwise.core.remote.getAvailableConsoles`
+    ak_wwise_core_remote_getAvailableConsoles,
+    /// `ak.wwise.core.remote.getConnectionStatus`
+    ak_wwise_core_remote_getConnectionStatus,
+    /// `ak.wwise.core.sound.setActiveSource`
+    ak_wwise_core_sound_setActiveSource,
+    /// `ak.wwise.core.soundbank.convertExternalSources`
+    ak_wwise_core_soundbank_convertExternalSources,
+    /// `ak.wwise.core.soundbank.generate`
+    ak_wwise_core_soundbank_generate,
+    /// `ak.wwise.core.soundbank.getInclusions`
+    ak_wwise_core_soundbank_getInclusions,
+    /// `ak.wwise.core.soundbank.processDefinitionFiles`
+    ak_wwise_core_soundbank_processDefinitionFiles,
+    /// `ak.wwise.core.soundbank.setInclusions`
+    ak_wwise_core_soundbank_setInclusions,
+    /// `ak.wwise.core.sourceControl.add`
+    ak_wwise_core_sourceControl_add,
+    /// `ak.wwise.core.sourceControl.checkOut`
+    ak_wwise_core_sourceControl_checkOut,
+    /// `ak.wwise.core.sourceControl.commit`
+    ak_wwise_core_sourceControl_commit,
+    /// `ak.wwise.core.sourceControl.delete`
+    ak_wwise_core_sourceControl_delete,
+    /// `ak.wwise.core.sourceControl.getSourceFiles`
+    ak_wwise_core_sourceControl_getSourceFiles,
+    /// `ak.wwise.core.sourceControl.getStatus`
+    ak_wwise_core_sourceControl_getStatus,
+    /// `ak.wwise.core.sourceControl.move`
+    ak_wwise_core_sourceControl_move,
+    /// `ak.wwise.core.sourceControl.revert`
+    ak_wwise_core_sourceControl_revert,
+    /// `ak.wwise.core.sourceControl.setProvider`
+    ak_wwise_core_sourceControl_setProvider,
+    /// `ak.wwise.core.switchContainer.addAssignment`
+    ak_wwise_core_switchContainer_addAssignment,
+    /// `ak.wwise.core.switchContainer.getAssignments`
+    ak_wwise_core_switchContainer_getAssignments,
+    /// `ak.wwise.core.switchContainer.removeAssignment`
+    ak_wwise_core_switchContainer_removeAssignment,
+    /// `ak.wwise.core.transport.create`
+    ak_wwise_core_transport_create,
+    /// `ak.wwise.core.transport.destroy`
+    ak_wwise_core_transport_destroy,
+    /// `ak.wwise.core.transport.executeAction`
+    ak_wwise_core_transport_executeAction,
+    /// `ak.wwise.core.transport.getList`
+    ak_wwise_core_transport_getList,
+    /// `ak.wwise.core.transport.getState`
+    ak_wwise_core_transport_getState,
+    /// `ak.wwise.core.transport.prepare`
+    ak_wwise_core_transport_prepare,
+    /// `ak.wwise.core.transport.useOriginals`
+    ak_wwise_core_transport_useOriginals,
+    /// `ak.wwise.core.undo.beginGroup`
+    ak_wwise_core_undo_beginGroup,
+    /// `ak.wwise.core.undo.cancelGroup`
+    ak_wwise_core_undo_cancelGroup,
+    /// `ak.wwise.core.undo.endGroup`
+    ak_wwise_core_undo_endGroup,
+    /// `ak.wwise.core.undo.redo`
+    ak_wwise_core_undo_redo,
+    /// `ak.wwise.core.undo.undo`
+    ak_wwise_core_undo_undo,
+    /// `ak.wwise.debug.enableAsserts`
+    ak_wwise_debug_enableAsserts,
+    /// `ak.wwise.debug.enableAutomationMode`
+    ak_wwise_debug_enableAutomationMode,
+    /// `ak.wwise.debug.generateToneWAV`
+    ak_wwise_debug_generateToneWAV,
+    /// `ak.wwise.debug.getWalTree`
+    ak_wwise_debug_getWalTree,
+    /// `ak.wwise.debug.restartWaapiServers`
+    ak_wwise_debug_restartWaapiServers,
+    /// `ak.wwise.debug.testAssert`
+    ak_wwise_debug_testAssert,
+    /// `ak.wwise.debug.testCrash`
+    ak_wwise_debug_testCrash,
+    /// `ak.wwise.debug.validateCall`
+    ak_wwise_debug_validateCall,
+    /// `ak.wwise.ui.bringToForeground`
+    ak_wwise_ui_bringToForeground,
+    /// `ak.wwise.ui.captureScreen`
+    ak_wwise_ui_captureScreen,
+    /// `ak.wwise.ui.cli.executeLuaScript`
+    ak_wwise_ui_cli_executeLuaScript,
+    /// `ak.wwise.ui.cli.launch`
+    ak_wwise_ui_cli_launch,
+    /// `ak.wwise.ui.commands.execute`
+    ak_wwise_ui_commands_execute,
+    /// `ak.wwise.ui.commands.getCommands`
+    ak_wwise_ui_commands_getCommands,
+    /// `ak.wwise.ui.commands.register`
+    ak_wwise_ui_commands_register,
+    /// `ak.wwise.ui.commands.unregister`
+    ak_wwise_ui_commands_unregister,
+    /// `ak.wwise.ui.getSelectedObjects`
+    ak_wwise_ui_getSelectedObjects,
+    /// `ak.wwise.ui.layout.dockView`
+    ak_wwise_ui_layout_dockView,
+    /// `ak.wwise.ui.layout.getCurrentLayoutName`
+    ak_wwise_ui_layout_getCurrentLayoutName,
+    /// `ak.wwise.ui.layout.getElementRectangle`
+    ak_wwise_ui_layout_getElementRectangle,
+    /// `ak.wwise.ui.layout.getLayout`
+    ak_wwise_ui_layout_getLayout,
+    /// `ak.wwise.ui.layout.getLayoutNames`
+    ak_wwise_ui_layout_getLayoutNames,
+    /// `ak.wwise.ui.layout.getOrCreateView`
+    ak_wwise_ui_layout_getOrCreateView,
+    /// `ak.wwise.ui.layout.getViewHandle`
+    ak_wwise_ui_layout_getViewHandle,
+    /// `ak.wwise.ui.layout.getViewInstances`
+    ak_wwise_ui_layout_getViewInstances,
+    /// `ak.wwise.ui.layout.getViewTypes`
+    ak_wwise_ui_layout_getViewTypes,
+    /// `ak.wwise.ui.layout.moveSplitter`
+    ak_wwise_ui_layout_moveSplitter,
+    /// `ak.wwise.ui.layout.removeLayout`
+    ak_wwise_ui_layout_removeLayout,
+    /// `ak.wwise.ui.layout.setLayout`
+    ak_wwise_ui_layout_setLayout,
+    /// `ak.wwise.ui.layout.switchLayout`
+    ak_wwise_ui_layout_switchLayout,
+    /// `ak.wwise.ui.layout.undockView`
+    ak_wwise_ui_layout_undockView,
+    /// `ak.wwise.ui.model.createHandle`
+    ak_wwise_ui_model_createHandle,
+    /// `ak.wwise.ui.model.destroyHandle`
+    ak_wwise_ui_model_destroyHandle,
+    /// `ak.wwise.ui.model.getState`
+    ak_wwise_ui_model_getState,
+    /// `ak.wwise.ui.model.registerWafm`
+    ak_wwise_ui_model_registerWafm,
+    /// `ak.wwise.ui.model.setState`
+    ak_wwise_ui_model_setState,
+    /// `ak.wwise.ui.project.close`
+    ak_wwise_ui_project_close,
+    /// `ak.wwise.ui.project.create`
+    ak_wwise_ui_project_create,
+    /// `ak.wwise.ui.project.open`
+    ak_wwise_ui_project_open,
+    /// `ak.wwise.ui.signal.emit`
+    ak_wwise_ui_signal_emit,
+    /// `ak.wwise.ui.window.close`
+    ak_wwise_ui_window_close,
+    /// `ak.wwise.ui.window.create`
+    ak_wwise_ui_window_create,
+    /// `ak.wwise.ui.window.present`
+    ak_wwise_ui_window_present,
+    /// `ak.wwise.waapi.getFunctions`
+    ak_wwise_waapi_getFunctions,
+    /// `ak.wwise.waapi.getSchema`
+    ak_wwise_waapi_getSchema,
+    /// `ak.wwise.waapi.getTopics`
+    ak_wwise_waapi_getTopics,
+}
+
+impl WaapiFunction {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::ak_soundengine_executeActionOnEvent => ak::soundengine::executeActionOnEvent,
+            Self::ak_soundengine_getState => ak::soundengine::getState,
+            Self::ak_soundengine_getSwitch => ak::soundengine::getSwitch,
+            Self::ak_soundengine_loadBank => ak::soundengine::loadBank,
+            Self::ak_soundengine_postEvent => ak::soundengine::postEvent,
+            Self::ak_soundengine_postMsgMonitor => ak::soundengine::postMsgMonitor,
+            Self::ak_soundengine_postTrigger => ak::soundengine::postTrigger,
+            Self::ak_soundengine_registerGameObj => ak::soundengine::registerGameObj,
+            Self::ak_soundengine_resetRTPCValue => ak::soundengine::resetRTPCValue,
+            Self::ak_soundengine_seekOnEvent => ak::soundengine::seekOnEvent,
+            Self::ak_soundengine_setDefaultListeners => ak::soundengine::setDefaultListeners,
+            Self::ak_soundengine_setGameObjectAuxSendValues => {
+                ak::soundengine::setGameObjectAuxSendValues
+            }
+            Self::ak_soundengine_setGameObjectOutputBusVolume => {
+                ak::soundengine::setGameObjectOutputBusVolume
+            }
+            Self::ak_soundengine_setListenerSpatialization => {
+                ak::soundengine::setListenerSpatialization
+            }
+            Self::ak_soundengine_setListeners => ak::soundengine::setListeners,
+            Self::ak_soundengine_setMultiplePositions => ak::soundengine::setMultiplePositions,
+            Self::ak_soundengine_setObjectObstructionAndOcclusion => {
+                ak::soundengine::setObjectObstructionAndOcclusion
+            }
+            Self::ak_soundengine_setPosition => ak::soundengine::setPosition,
+            Self::ak_soundengine_setRTPCValue => ak::soundengine::setRTPCValue,
+            Self::ak_soundengine_setScalingFactor => ak::soundengine::setScalingFactor,
+            Self::ak_soundengine_setState => ak::soundengine::setState,
+            Self::ak_soundengine_setSwitch => ak::soundengine::setSwitch,
+            Self::ak_soundengine_stopAll => ak::soundengine::stopAll,
+            Self::ak_soundengine_stopPlayingID => ak::soundengine::stopPlayingID,
+            Self::ak_soundengine_unloadBank => ak::soundengine::unloadBank,
+            Self::ak_soundengine_unregisterGameObj => ak::soundengine::unregisterGameObj,
+            Self::ak_wwise_core_audio_convert => ak::wwise::core::audio::convert,
+            Self::ak_wwise_core_audio_import => ak::wwise::core::audio::import,
+            Self::ak_wwise_core_audio_importTabDelimited => {
+                ak::wwise::core::audio::importTabDelimited
+            }
+            Self::ak_wwise_core_audio_mute => ak::wwise::core::audio::mute,
+            Self::ak_wwise_core_audio_resetMute => ak::wwise::core::audio::resetMute,
+            Self::ak_wwise_core_audio_resetSolo => ak::wwise::core::audio::resetSolo,
+            Self::ak_wwise_core_audio_setConversionPlugin => {
+                ak::wwise::core::audio::setConversionPlugin
+            }
+            Self::ak_wwise_core_audio_solo => ak::wwise::core::audio::solo,
+            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInRegion => {
+                ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInRegion
+            }
+            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInTrimmedRegion => {
+                ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInTrimmedRegion
+            }
+            Self::ak_wwise_core_blendContainer_addAssignment => {
+                ak::wwise::core::blendContainer::addAssignment
+            }
+            Self::ak_wwise_core_blendContainer_addTrack => {
+                ak::wwise::core::blendContainer::addTrack
+            }
+            Self::ak_wwise_core_blendContainer_getAssignments => {
+                ak::wwise::core::blendContainer::getAssignments
+            }
+            Self::ak_wwise_core_blendContainer_removeAssignment => {
+                ak::wwise::core::blendContainer::removeAssignment
+            }
+            Self::ak_wwise_core_executeLuaScript => ak::wwise::core::executeLuaScript,
+            Self::ak_wwise_core_gameParameter_setRange => ak::wwise::core::gameParameter::setRange,
+            Self::ak_wwise_core_getInfo => ak::wwise::core::getInfo,
+            Self::ak_wwise_core_getProjectInfo => ak::wwise::core::getProjectInfo,
+            Self::ak_wwise_core_log_addItem => ak::wwise::core::log::addItem,
+            Self::ak_wwise_core_log_clear => ak::wwise::core::log::clear,
+            Self::ak_wwise_core_log_get => ak::wwise::core::log::get,
+            Self::ak_wwise_core_object_copy => ak::wwise::core::object::copy,
+            Self::ak_wwise_core_object_create => ak::wwise::core::object::create,
+            Self::ak_wwise_core_object_delete => ak::wwise::core::object::delete,
+            Self::ak_wwise_core_object_diff => ak::wwise::core::object::diff,
+            Self::ak_wwise_core_object_get => ak::wwise::core::object::get,
+            Self::ak_wwise_core_object_getAttenuationCurve => {
+                ak::wwise::core::object::getAttenuationCurve
+            }
+            Self::ak_wwise_core_object_getPropertyAndReferenceNames => {
+                ak::wwise::core::object::getPropertyAndReferenceNames
+            }
+            Self::ak_wwise_core_object_getPropertyInfo => ak::wwise::core::object::getPropertyInfo,
+            Self::ak_wwise_core_object_getTypes => ak::wwise::core::object::getTypes,
+            Self::ak_wwise_core_object_isLinked => ak::wwise::core::object::isLinked,
+            Self::ak_wwise_core_object_isPropertyEnabled => {
+                ak::wwise::core::object::isPropertyEnabled
+            }
+            Self::ak_wwise_core_object_move => ak::wwise::core::object::move_,
+            Self::ak_wwise_core_object_pasteProperties => ak::wwise::core::object::pasteProperties,
+            Self::ak_wwise_core_object_set => ak::wwise::core::object::set,
+            Self::ak_wwise_core_object_setAttenuationCurve => {
+                ak::wwise::core::object::setAttenuationCurve
+            }
+            Self::ak_wwise_core_object_setLinked => ak::wwise::core::object::setLinked,
+            Self::ak_wwise_core_object_setName => ak::wwise::core::object::setName,
+            Self::ak_wwise_core_object_setNotes => ak::wwise::core::object::setNotes,
+            Self::ak_wwise_core_object_setProperty => ak::wwise::core::object::setProperty,
+            Self::ak_wwise_core_object_setRandomizer => ak::wwise::core::object::setRandomizer,
+            Self::ak_wwise_core_object_setReference => ak::wwise::core::object::setReference,
+            Self::ak_wwise_core_object_setStateGroups => ak::wwise::core::object::setStateGroups,
+            Self::ak_wwise_core_object_setStateProperties => {
+                ak::wwise::core::object::setStateProperties
+            }
+            Self::ak_wwise_core_ping => ak::wwise::core::ping,
+            Self::ak_wwise_core_profiler_enableProfilerData => {
+                ak::wwise::core::profiler::enableProfilerData
+            }
+            Self::ak_wwise_core_profiler_getAudioObjects => {
+                ak::wwise::core::profiler::getAudioObjects
+            }
+            Self::ak_wwise_core_profiler_getBusses => ak::wwise::core::profiler::getBusses,
+            Self::ak_wwise_core_profiler_getCpuUsage => ak::wwise::core::profiler::getCpuUsage,
+            Self::ak_wwise_core_profiler_getCursorTime => ak::wwise::core::profiler::getCursorTime,
+            Self::ak_wwise_core_profiler_getGameObjects => {
+                ak::wwise::core::profiler::getGameObjects
+            }
+            Self::ak_wwise_core_profiler_getLoadedMedia => {
+                ak::wwise::core::profiler::getLoadedMedia
+            }
+            Self::ak_wwise_core_profiler_getMeters => ak::wwise::core::profiler::getMeters,
+            Self::ak_wwise_core_profiler_getPerformanceMonitor => {
+                ak::wwise::core::profiler::getPerformanceMonitor
+            }
+            Self::ak_wwise_core_profiler_getRTPCs => ak::wwise::core::profiler::getRTPCs,
+            Self::ak_wwise_core_profiler_getStreamedMedia => {
+                ak::wwise::core::profiler::getStreamedMedia
+            }
+            Self::ak_wwise_core_profiler_getVoiceContributions => {
+                ak::wwise::core::profiler::getVoiceContributions
+            }
+            Self::ak_wwise_core_profiler_getVoices => ak::wwise::core::profiler::getVoices,
+            Self::ak_wwise_core_profiler_registerMeter => ak::wwise::core::profiler::registerMeter,
+            Self::ak_wwise_core_profiler_saveCapture => ak::wwise::core::profiler::saveCapture,
+            Self::ak_wwise_core_profiler_startCapture => ak::wwise::core::profiler::startCapture,
+            Self::ak_wwise_core_profiler_stopCapture => ak::wwise::core::profiler::stopCapture,
+            Self::ak_wwise_core_profiler_unregisterMeter => {
+                ak::wwise::core::profiler::unregisterMeter
+            }
+            Self::ak_wwise_core_project_save => ak::wwise::core::project::save,
+            Self::ak_wwise_core_remote_connect => ak::wwise::core::remote::connect,
+            Self::ak_wwise_core_remote_disconnect => ak::wwise::core::remote::disconnect,
+            Self::ak_wwise_core_remote_getAvailableConsoles => {
+                ak::wwise::core::remote::getAvailableConsoles
+            }
+            Self::ak_wwise_core_remote_getConnectionStatus => {
+                ak::wwise::core::remote::getConnectionStatus
+            }
+            Self::ak_wwise_core_sound_setActiveSource => ak::wwise::core::sound::setActiveSource,
+            Self::ak_wwise_core_soundbank_convertExternalSources => {
+                ak::wwise::core::soundbank::convertExternalSources
+            }
+            Self::ak_wwise_core_soundbank_generate => ak::wwise::core::soundbank::generate,
+            Self::ak_wwise_core_soundbank_getInclusions => {
+                ak::wwise::core::soundbank::getInclusions
+            }
+            Self::ak_wwise_core_soundbank_processDefinitionFiles => {
+                ak::wwise::core::soundbank::processDefinitionFiles
+            }
+            Self::ak_wwise_core_soundbank_setInclusions => {
+                ak::wwise::core::soundbank::setInclusions
+            }
+            Self::ak_wwise_core_sourceControl_add => ak::wwise::core::sourceControl::add,
+            Self::ak_wwise_core_sourceControl_checkOut => ak::wwise::core::sourceControl::checkOut,
+            Self::ak_wwise_core_sourceControl_commit => ak::wwise::core::sourceControl::commit,
+            Self::ak_wwise_core_sourceControl_delete => ak::wwise::core::sourceControl::delete,
+            Self::ak_wwise_core_sourceControl_getSourceFiles => {
+                ak::wwise::core::sourceControl::getSourceFiles
+            }
+            Self::ak_wwise_core_sourceControl_getStatus => {
+                ak::wwise::core::sourceControl::getStatus
+            }
+            Self::ak_wwise_core_sourceControl_move => ak::wwise::core::sourceControl::move_,
+            Self::ak_wwise_core_sourceControl_revert => ak::wwise::core::sourceControl::revert,
+            Self::ak_wwise_core_sourceControl_setProvider => {
+                ak::wwise::core::sourceControl::setProvider
+            }
+            Self::ak_wwise_core_switchContainer_addAssignment => {
+                ak::wwise::core::switchContainer::addAssignment
+            }
+            Self::ak_wwise_core_switchContainer_getAssignments => {
+                ak::wwise::core::switchContainer::getAssignments
+            }
+            Self::ak_wwise_core_switchContainer_removeAssignment => {
+                ak::wwise::core::switchContainer::removeAssignment
+            }
+            Self::ak_wwise_core_transport_create => ak::wwise::core::transport::create,
+            Self::ak_wwise_core_transport_destroy => ak::wwise::core::transport::destroy,
+            Self::ak_wwise_core_transport_executeAction => {
+                ak::wwise::core::transport::executeAction
+            }
+            Self::ak_wwise_core_transport_getList => ak::wwise::core::transport::getList,
+            Self::ak_wwise_core_transport_getState => ak::wwise::core::transport::getState,
+            Self::ak_wwise_core_transport_prepare => ak::wwise::core::transport::prepare,
+            Self::ak_wwise_core_transport_useOriginals => ak::wwise::core::transport::useOriginals,
+            Self::ak_wwise_core_undo_beginGroup => ak::wwise::core::undo::beginGroup,
+            Self::ak_wwise_core_undo_cancelGroup => ak::wwise::core::undo::cancelGroup,
+            Self::ak_wwise_core_undo_endGroup => ak::wwise::core::undo::endGroup,
+            Self::ak_wwise_core_undo_redo => ak::wwise::core::undo::redo,
+            Self::ak_wwise_core_undo_undo => ak::wwise::core::undo::undo,
+            Self::ak_wwise_debug_enableAsserts => ak::wwise::debug::enableAsserts,
+            Self::ak_wwise_debug_enableAutomationMode => ak::wwise::debug::enableAutomationMode,
+            Self::ak_wwise_debug_generateToneWAV => ak::wwise::debug::generateToneWAV,
+            Self::ak_wwise_debug_getWalTree => ak::wwise::debug::getWalTree,
+            Self::ak_wwise_debug_restartWaapiServers => ak::wwise::debug::restartWaapiServers,
+            Self::ak_wwise_debug_testAssert => ak::wwise::debug::testAssert,
+            Self::ak_wwise_debug_testCrash => ak::wwise::debug::testCrash,
+            Self::ak_wwise_debug_validateCall => ak::wwise::debug::validateCall,
+            Self::ak_wwise_ui_bringToForeground => ak::wwise::ui::bringToForeground,
+            Self::ak_wwise_ui_captureScreen => ak::wwise::ui::captureScreen,
+            Self::ak_wwise_ui_cli_executeLuaScript => ak::wwise::ui::cli::executeLuaScript,
+            Self::ak_wwise_ui_cli_launch => ak::wwise::ui::cli::launch,
+            Self::ak_wwise_ui_commands_execute => ak::wwise::ui::commands::execute,
+            Self::ak_wwise_ui_commands_getCommands => ak::wwise::ui::commands::getCommands,
+            Self::ak_wwise_ui_commands_register => ak::wwise::ui::commands::register,
+            Self::ak_wwise_ui_commands_unregister => ak::wwise::ui::commands::unregister,
+            Self::ak_wwise_ui_getSelectedObjects => ak::wwise::ui::getSelectedObjects,
+            Self::ak_wwise_ui_layout_dockView => ak::wwise::ui::layout::dockView,
+            Self::ak_wwise_ui_layout_getCurrentLayoutName => {
+                ak::wwise::ui::layout::getCurrentLayoutName
+            }
+            Self::ak_wwise_ui_layout_getElementRectangle => {
+                ak::wwise::ui::layout::getElementRectangle
+            }
+            Self::ak_wwise_ui_layout_getLayout => ak::wwise::ui::layout::getLayout,
+            Self::ak_wwise_ui_layout_getLayoutNames => ak::wwise::ui::layout::getLayoutNames,
+            Self::ak_wwise_ui_layout_getOrCreateView => ak::wwise::ui::layout::getOrCreateView,
+            Self::ak_wwise_ui_layout_getViewHandle => ak::wwise::ui::layout::getViewHandle,
+            Self::ak_wwise_ui_layout_getViewInstances => ak::wwise::ui::layout::getViewInstances,
+            Self::ak_wwise_ui_layout_getViewTypes => ak::wwise::ui::layout::getViewTypes,
+            Self::ak_wwise_ui_layout_moveSplitter => ak::wwise::ui::layout::moveSplitter,
+            Self::ak_wwise_ui_layout_removeLayout => ak::wwise::ui::layout::removeLayout,
+            Self::ak_wwise_ui_layout_setLayout => ak::wwise::ui::layout::setLayout,
+            Self::ak_wwise_ui_layout_switchLayout => ak::wwise::ui::layout::switchLayout,
+            Self::ak_wwise_ui_layout_undockView => ak::wwise::ui::layout::undockView,
+            Self::ak_wwise_ui_model_createHandle => ak::wwise::ui::model::createHandle,
+            Self::ak_wwise_ui_model_destroyHandle => ak::wwise::ui::model::destroyHandle,
+            Self::ak_wwise_ui_model_getState => ak::wwise::ui::model::getState,
+            Self::ak_wwise_ui_model_registerWafm => ak::wwise::ui::model::registerWafm,
+            Self::ak_wwise_ui_model_setState => ak::wwise::ui::model::setState,
+            Self::ak_wwise_ui_project_close => ak::wwise::ui::project::close,
+            Self::ak_wwise_ui_project_create => ak::wwise::ui::project::create,
+            Self::ak_wwise_ui_project_open => ak::wwise::ui::project::open,
+            Self::ak_wwise_ui_signal_emit => ak::wwise::ui::signal::emit,
+            Self::ak_wwise_ui_window_close => ak::wwise::ui::window::close,
+            Self::ak_wwise_ui_window_create => ak::wwise::ui::window::create,
+            Self::ak_wwise_ui_window_present => ak::wwise::ui::window::present,
+            Self::ak_wwise_waapi_getFunctions => ak::wwise::waapi::getFunctions,
+            Self::ak_wwise_waapi_getSchema => ak::wwise::waapi::getSchema,
+            Self::ak_wwise_waapi_getTopics => ak::wwise::waapi::getTopics,
+        }
+    }
+}
+
+impl std::fmt::Display for WaapiFunction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl AsRef<str> for WaapiFunction {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}

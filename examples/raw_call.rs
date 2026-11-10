@@ -5,9 +5,8 @@
 //! Run with: cargo run --example raw_call
 
 use log::{error, info};
-use waapi_client::WaapiClient;
 use waapi_client::serde_json::json;
-use waapi_client::waapi_function_api::ak;
+use waapi_client::{WaapiClient, WaapiFunction};
 
 #[tokio::main]
 async fn main() {
@@ -21,7 +20,10 @@ async fn main() {
     // Simple get info call with ak.wwise.core.getInfo
     // ========================================================================
     info!("Getting info:");
-    match client.call(ak::wwise::core::getInfo, None, None).await {
+    match client
+        .call(WaapiFunction::ak_wwise_core_getInfo, None, None)
+        .await
+    {
         Ok(value) => info!("getinfo result: {value}"),
         Err(e) => error!("getInfo failed: {e}"),
     }
@@ -30,19 +32,36 @@ async fn main() {
     // ak.wwise.core.object.get
     // ========================================================================
     info!("Getting Objects:");
-    // Any WAAPI URI works; args and options are plain serde_json values.
+    // Any known WAAPI URI works via WaapiFunction; args and options are plain serde_json values.
     let args = json!({
-        "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"] }
+        "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit\Testing"] }
     });
     let options = json!({
         "return": ["id", "type", "name", "notes"]
     });
 
     match client
-        .call(ak::wwise::core::object::get, Some(args), Some(options))
+        .call(
+            WaapiFunction::ak_wwise_core_object_get,
+            Some(args),
+            Some(options),
+        )
         .await
     {
-        Ok(value) => info!("object.get result: {value}"),
+        Ok(value) => {
+            if let Some(items) = value["return"].as_array() {
+                for obj in items {
+                    let id = obj["id"].as_str().unwrap_or_default();
+                    let name = obj["name"].as_str().unwrap_or_default();
+                    let obj_type = obj["type"].as_str().unwrap_or_default();
+                    let notes = obj["notes"].as_str().unwrap_or_default();
+                    info!("id = {id}");
+                    info!("name = {name}");
+                    info!("type = {obj_type}");
+                    info!("notes = {notes}");
+                }
+            }
+        }
         Err(e) => error!("object.get failed: {e}"),
     }
     // ========================================================================

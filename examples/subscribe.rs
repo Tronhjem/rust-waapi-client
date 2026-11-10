@@ -4,8 +4,7 @@
 
 use log::{error, info};
 use tokio::time::{Duration, timeout};
-use waapi_client::WaapiClient;
-use waapi_client::waapi_topics_api::ak;
+use waapi_client::{WaapiClient, WaapiTopic};
 
 #[tokio::main]
 async fn main() {
@@ -18,7 +17,7 @@ async fn main() {
         Ok(mut client) => {
             info!("Successfully connected to WAAPI");
 
-            let topic = ak::wwise::core::object::created;
+            let topic = WaapiTopic::ak_wwise_core_object_created;
             let options = waapi_client::serde_json::json!({ "return": ["id", "name", "type"] });
             match client.subscribe(topic, Some(options)).await {
                 Ok((subscription_id, mut events)) => {

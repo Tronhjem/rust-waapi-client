@@ -489,7 +489,7 @@ mod tests {
 
         let res = client
             .call(
-                "ak.wwise.core.object.get",
+                crate::WaapiFunction::ak_wwise_core_object_get,
                 Some(json!({ "from": { "ofType": ["Sound"] } })),
                 Some(json!({ "return": ["id", "name"] })),
             )
@@ -499,7 +499,7 @@ mod tests {
 
         let (sub_id, mut events) = client
             .subscribe(
-                "ak.wwise.core.object.created",
+                crate::WaapiTopic::ak_wwise_core_object_created,
                 Some(json!({ "return": ["id"] })),
             )
             .await
@@ -544,7 +544,7 @@ mod tests {
             .await
             .unwrap();
         let err = client
-            .call("ak.wwise.core.getInfo", None, None)
+            .call(crate::WaapiFunction::ak_wwise_core_getInfo, None, None)
             .await
             .unwrap_err();
         assert!(matches!(

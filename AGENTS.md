@@ -17,15 +17,15 @@ RUST_LOG=info cargo run --example get_info
 - `src/wamp/` — Private, minimal WAMP v2 client (JSON/WebSocket only). Not a submodule.
 - `src/waapi_client.rs` — `WaapiClient` wraps `WampClient`; default URL is `ws://127.0.0.1:8080/waapi`.
 - `src/types.rs` — Re-exports of `serde_json::Value`/`Map` for convenience.
-- `src/waapi_function_api.rs` / `src/waapi_topics_api.rs` — Auto-generated const strings for all WAAPI RPC endpoints and subscription topics.
+- `src/waapi_function_api.rs` / `src/waapi_topics_api.rs` — Auto-generated const strings (`ak::...`) and typed URI enums (`WaapiFunction` / `WaapiTopic`) for all WAAPI RPC endpoints and subscription topics.
 - `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`).
 
 ## Important patterns
 
 - `WaapiClient::new` is async.
 - Always call `client.shutdown().await` before dropping; `Drop` prints a warning if you do not.
-- The escape-hatch call is `client.call(uri, Option<serde_json::Value>, Option<serde_json::Value>) -> WaapiResult<serde_json::Value>`.
-- The typed API delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed`, which serialize typed args/options and deserialize the response. This keeps `WaapiClient` as the single entry point for calls and avoids duplicating serialization logic in generated code.
+- `client.call(WaapiFunction, Option<serde_json::Value>, Option<serde_json::Value>) -> WaapiResult<serde_json::Value>` and `client.subscribe(WaapiTopic, Option<serde_json::Value>)` take typed URI enums (whose `.as_str()` returns the `ak::...` `&str` constants). Use `call_raw` / `subscribe_raw` if a raw `&str` URI is needed.
+- The typed API delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed` using `WaapiFunction` / `WaapiTopic`, which serialize typed args/options and deserialize the response. This keeps `WaapiClient` as the single entry point for calls and avoids duplicating serialization logic in generated code.
 - `pub use serde_json;` is re-exported from the crate root, so `waapi_client::serde_json::json!` works without an explicit `serde_json` dependency.
 - The generated module hierarchy mirrors WAAPI URI dot-notation, e.g. `ak.wwise.core.object.get` → `ak::wwise::core::object::get`.
 

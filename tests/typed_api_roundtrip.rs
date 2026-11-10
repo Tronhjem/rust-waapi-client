@@ -344,3 +344,21 @@ fn object_set_response_deserializes_with_extra_fields() {
         Some("Boom")
     );
 }
+
+#[test]
+fn waapi_uri_enums_map_to_const_strings() {
+    use waapi_client::{WaapiFunction, WaapiTopic, waapi_function_api, waapi_topics_api};
+
+    assert_eq!(
+        WaapiFunction::ak_wwise_core_getInfo.as_str(),
+        waapi_function_api::ak::wwise::core::getInfo
+    );
+    assert_eq!(
+        WaapiFunction::ak_wwise_core_object_move.as_str(),
+        waapi_function_api::ak::wwise::core::object::move_
+    );
+    assert_eq!(
+        WaapiTopic::ak_wwise_core_object_created.as_str(),
+        waapi_topics_api::ak::wwise::core::object::created
+    );
+}

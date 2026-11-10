@@ -31,14 +31,14 @@ async fn main() -> WaapiResult<()> {
 
 ### Making Simple Calls
 
-The escape-hatch API works directly with `serde_json::Value`. `serde_json` is re-exported from the crate root, so the `json!` macro is available without an extra dependency:
+The JSON value API works with `WaapiFunction` and `serde_json::Value` (use `call_raw` if you need to pass an arbitrary `&str`). `serde_json` is re-exported from the crate root, so the `json!` macro is available without an extra dependency:
 
 ```rust
-use waapi_client::waapi_function_api::ak;
+use waapi_client::WaapiFunction;
 use waapi_client::serde_json::json;
 
 let response = client
-    .call(ak::wwise::core::getInfo, None, None)
+    .call(WaapiFunction::ak_wwise_core_getInfo, None, None)
     .await?;
 println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
 ```
@@ -48,6 +48,7 @@ println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
 Use `serde_json::json!` to build WAAPI kwargs:
 
 ```rust
+use waapi_client::WaapiFunction;
 use waapi_client::serde_json::json;
 
 let args = json!({
@@ -61,7 +62,7 @@ let options = json!({
 });
 
 let response = client
-    .call(ak::wwise::core::object::get, Some(args), Some(options))
+    .call(WaapiFunction::ak_wwise_core_object_get, Some(args), Some(options))
     .await?;
 ```
 
@@ -109,8 +110,7 @@ Typed endpoint `Options` structs provide a `.return_fields(...)` builder for the
 ### Complete Example
 
 ```rust
-use waapi_client::{WaapiClient, WaapiResult};
-use waapi_client::waapi_function_api::ak;
+use waapi_client::{WaapiClient, WaapiFunction, WaapiResult};
 use waapi_client::serde_json::json;
 
 #[tokio::main]
@@ -125,7 +125,7 @@ async fn main() -> WaapiResult<()> {
     });
 
     let response = client
-        .call(ak::wwise::core::object::get, Some(args), Some(options))
+        .call(WaapiFunction::ak_wwise_core_object_get, Some(args), Some(options))
         .await?;
 
     println!("{}", waapi_client::serde_json::to_string_pretty(&response)?);
@@ -135,26 +135,30 @@ async fn main() -> WaapiResult<()> {
 }
 ```
 
-### Hand-Written Helpers
+### Setting Object Properties
 
-In addition to the generated typed API, a few endpoints have hand-written helper builders that are easier to use than raw JSON. See `src/api/object_set.rs` for an example:
+See `examples/object_set.rs` for setting properties on Wwise objects using the generated builders:
 
 ```rust
 use waapi_client::WaapiClient;
-use waapi_client::api::object_set::{ObjectReturnOptions, ObjectSetArgs, ObjectSetItem};
+use waapi_client::api::generated::ak::wwise::core::object::{
+    WwiseCoreObjectSetArgs, WwiseCoreObjectSetItem, WwiseCoreObjectSetOptions,
+};
+use waapi_client::api::generated::primitives::ObjectReturnField;
 use waapi_client::api::{ObjectRef, PropertyValue};
 
 let mut client = WaapiClient::new(None).await?;
 
-let args = ObjectSetArgs::new(vec![
-    ObjectSetItem::new(ObjectRef::path(
+let args = WwiseCoreObjectSetArgs::new(vec![
+    WwiseCoreObjectSetItem::new(ObjectRef::path(
         r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
     ))
-    .rename("MyRenamedSound")
+    .name("MyRenamedSound")
     .property("Volume", PropertyValue::Number(-6.0)),
 ]);
 
-let options = ObjectReturnOptions::new(vec!["id".to_string(), "name".to_string()]);
+let options = WwiseCoreObjectSetOptions::new()
+    .return_fields(vec![ObjectReturnField::Id, ObjectReturnField::Name]);
 
 let response = client.object_set(args, options).await?;
 client.shutdown().await?;
@@ -165,12 +169,12 @@ client.shutdown().await?;
 Subscribe to WAAPI topics and receive events on an async channel:
 
 ```rust
-use waapi_client::waapi_topics_api::ak;
+use waapi_client::WaapiTopic;
 use waapi_client::serde_json::json;
 
 let options = json!({ "return": ["id", "name"] });
 let (id, mut events) = client
-    .subscribe(ak::wwise::core::object::created, Some(options))
+    .subscribe(WaapiTopic::ak_wwise_core_object_created, Some(options))
     .await?;
 
 while let Some(event) = events.recv().await {

@@ -8,3 +8,5 @@ mod wamp;
 
 pub use serde_json;
 pub use waapi_client::{Event, WaapiClient, WaapiError, WaapiResult};
+pub use waapi_function_api::WaapiFunction;
+pub use waapi_topics_api::WaapiTopic;
