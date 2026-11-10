@@ -25,7 +25,7 @@ RUST_LOG=info cargo run --example get_info
 - `WaapiClient::new` is async.
 - Always call `client.shutdown().await` before dropping; `Drop` prints a warning if you do not.
 - The escape-hatch call is `client.call(uri, Option<serde_json::Value>, Option<serde_json::Value>) -> WaapiResult<serde_json::Value>`.
-- The typed API serializes structs directly to `serde_json::Value` and deserializes the response; there is no intermediate `WaapiValue` layer.
+- The typed API delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed`, which serialize typed args/options and deserialize the response. This keeps `WaapiClient` as the single entry point for calls and avoids duplicating serialization logic in generated code.
 - `pub use serde_json;` is re-exported from the crate root, so `waapi_client::serde_json::json!` works without an explicit `serde_json` dependency.
 - The generated module hierarchy mirrors WAAPI URI dot-notation, e.g. `ak.wwise.core.object.get` → `ak::wwise::core::object::get`.
 
@@ -34,11 +34,10 @@ RUST_LOG=info cargo run --example get_info
 Requires Wwise running with WAAPI enabled and the Python `waapi-client` package installed.
 
 ```bash
-python tools/get_waapi_functions.py   # writes tools/waapi_functions.txt, tools/waapi_topics.txt
-python tools/get_waapi_schemas.py     # writes tools/waapi_schemas/<uri>.json (reference only)
-python tools/generate_api_rs.py       # overwrites src/waapi_function_api.rs and src/waapi_topics_api.rs
+python tools/get_waapi_definitions.py  # writes tools/waapi_schemas/<version>/
+python tools/generate_waapi_uri.py    # overwrites src/waapi_function_api.rs and src/waapi_topics_api.rs
 python tools/generate_typed_api.py    # overwrites src/api/generated/
 cargo build && cargo test
 ```
 
-`generate_api_rs.py` only reads `waapi_functions.txt` and `waapi_topics.txt`; the JSON schemas are for human reference.
+Both `generate_waapi_uri.py` and `generate_typed_api.py` read the versioned schemas in `tools/waapi_schemas/<version>/` offline (no running Wwise instance needed once schemas are fetched).

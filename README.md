@@ -67,12 +67,12 @@ let response = client
 
 ### Typed API
 
-A subset of common endpoints has generated type-safe wrappers on `WaapiClient`. The generated methods serialize typed argument/option structs to JSON and deserialize the response for you:
+A subset of common endpoints has generated type-safe wrappers on `WaapiClient`. These methods delegate to internal `call_typed` / `call_typed_void` helpers that serialize typed argument/option structs and deserialize the response for you:
 
 ```rust
-use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetinfoResponse;
+use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetInfoResponse;
 
-let info: WwiseCoreGetinfoResponse = client.get_info(()).await?;
+let info: WwiseCoreGetInfoResponse = client.get_info().await?;
 println!("Wwise version: {:?}", info.version.display_name);
 ```
 

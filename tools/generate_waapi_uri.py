@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
 """
-Generate api.rs from functions.txt
-
-This script reads the WAAPI function list from functions.txt and generates
-a properly structured Rust module file (api.rs) with all endpoints organized
-by their namespace hierarchy.
+Generate src/waapi_function_api.rs and src/waapi_topics_api.rs from the
+versioned WAAPI JSON schemas in tools/waapi_schemas/<version>/.
 
 Usage:
-    python generate_api_rs.py
+    python tools/generate_waapi_uri.py
 """
 
 import json
-from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+SCHEMA_VERSION = "2024.1.7"
 
 RUST_KEYWORDS = {'move', 'type', 'mod', 'use', 'fn', 'let', 'if', 'else', 'for', 
                  'while', 'loop', 'match', 'return', 'break', 'continue', 'const',
@@ -135,28 +133,34 @@ def generate_api_file(functions: List[str], output_path: Path):
     print(f"Generated {output_path} with {len(functions)} functions")
 
 
-def generate_from_text(file_name, out_file_name, waapi_type):
-    script_dir = Path(__file__).parent
-    functions_file = script_dir / file_name
-    output_file = script_dir.parent / 'src' / out_file_name
-    
-    if not functions_file.exists():
-        print(f"Error: {functions_file} not found!")
-        print("Run get_waapi_functions.py first to generate functions.txt")
-        return 1
-    
-    with open(functions_file, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    
-    functions = data.get(waapi_type, [])
-    
-    if not functions:
-        print("Error: No functions found in functions.txt")
-        return 1
-    
-    generate_api_file(functions, output_file)
+def load_endpoints_from_schemas(schema_dir: Path) -> Tuple[List[str], List[str]]:
+    if not schema_dir.exists():
+        raise FileNotFoundError(
+            f"{schema_dir} not found! Run tools/get_waapi_definitions.py first."
+        )
+
+    functions: List[str] = []
+    topics: List[str] = []
+    for path in sorted(schema_dir.glob("ak.*.json")):
+        uri = path.stem
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if "publishSchema" in data:
+            topics.append(uri)
+        else:
+            functions.append(uri)
+
+    return functions, topics
+
+
+def main():
+    script_dir = Path(__file__).resolve().parent
+    schema_dir = script_dir / "waapi_schemas" / SCHEMA_VERSION
+    src_dir = script_dir.parent / "src"
+
+    functions, topics = load_endpoints_from_schemas(schema_dir)
+    generate_api_file(functions, src_dir / "waapi_function_api.rs")
+    generate_api_file(topics, src_dir / "waapi_topics_api.rs")
 
 
 if __name__ == '__main__':
-    generate_from_text("waapi_functions.txt","waapi_function_api.rs", 'functions')
-    generate_from_text("waapi_topics.txt", "waapi_topics_api.rs", 'topics')
+    main()

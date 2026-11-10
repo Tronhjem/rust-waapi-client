@@ -17,21 +17,18 @@ async fn main() {
         .await
         .expect("Failed to connect to WAAPI");
 
-    // ======================================================================== 
+    // ========================================================================
     // Simple get info call with ak.wwise.core.getInfo
-    // ======================================================================== 
+    // ========================================================================
     info!("Getting info:");
-    match client
-        .call(ak::wwise::core::getInfo, None, None)
-        .await
-    {
+    match client.call(ak::wwise::core::getInfo, None, None).await {
         Ok(value) => info!("getinfo result: {value}"),
         Err(e) => error!("getInfo failed: {e}"),
     }
 
-    // ======================================================================== 
+    // ========================================================================
     // ak.wwise.core.object.get
-    // ======================================================================== 
+    // ========================================================================
     info!("Getting Objects:");
     // Any WAAPI URI works; args and options are plain serde_json values.
     let args = json!({
@@ -48,7 +45,7 @@ async fn main() {
         Ok(value) => info!("object.get result: {value}"),
         Err(e) => error!("object.get failed: {e}"),
     }
-    // ======================================================================== 
+    // ========================================================================
 
     client.shutdown().await.unwrap();
 }

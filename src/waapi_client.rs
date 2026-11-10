@@ -104,6 +104,45 @@ impl WaapiClient {
         Ok(result)
     }
 
+    /// Type-safe WAAPI call.
+    ///
+    /// Serializes typed args/options and deserializes the response.
+    pub async fn call_typed<Args, Options, Response>(
+        &mut self,
+        uri: &str,
+        args: Option<Args>,
+        options: Option<Options>,
+    ) -> WaapiResult<Response>
+    where
+        Args: serde::Serialize,
+        Options: serde::Serialize,
+        Response: serde::de::DeserializeOwned,
+    {
+        let args = args.map(serde_json::to_value).transpose()?;
+        let options = options.map(serde_json::to_value).transpose()?;
+        let value = self.call(uri, args, options).await?;
+        Ok(serde_json::from_value(value)?)
+    }
+
+    /// Type-safe WAAPI call that discards the response.
+    ///
+    /// Use for endpoints that return no useful data.
+    pub async fn call_typed_void<Args, Options>(
+        &mut self,
+        uri: &str,
+        args: Option<Args>,
+        options: Option<Options>,
+    ) -> WaapiResult<()>
+    where
+        Args: serde::Serialize,
+        Options: serde::Serialize,
+    {
+        let args = args.map(serde_json::to_value).transpose()?;
+        let options = options.map(serde_json::to_value).transpose()?;
+        self.call(uri, args, options).await?;
+        Ok(())
+    }
+
     /// Subscribe to a WAAPI topic with optional subscription options (e.g. `{"return": ["id", "name"]}`).
     ///
     /// Returns an unbounded receiver of [`Event`] values. Dropping the
@@ -123,6 +162,21 @@ impl WaapiClient {
             .await
             .map_err(WaapiError::from)?;
         Ok((id, rx))
+    }
+
+    /// Type-safe WAAPI subscription.
+    ///
+    /// Serializes typed options before subscribing.
+    pub async fn subscribe_typed<Options>(
+        &mut self,
+        topic: &str,
+        options: Option<Options>,
+    ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)>
+    where
+        Options: serde::Serialize,
+    {
+        let options = options.map(serde_json::to_value).transpose()?;
+        self.subscribe(topic, options).await
     }
 
     /// Unsubscribe from a previously subscribed topic.

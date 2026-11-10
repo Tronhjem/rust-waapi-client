@@ -1,5 +1,5 @@
 /target
-.DS_STORE
+.DS_Store
 /.codegraph
 __pycache__/
 *.pyc
