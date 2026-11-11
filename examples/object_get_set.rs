@@ -12,6 +12,7 @@ use waapi_client::api::generated::ak::wwise::core::object::{
     WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions, WwiseCoreObjectSetArgs,
     WwiseCoreObjectSetItem, WwiseCoreObjectSetOptions,
 };
+use waapi_client::api::generated::ak::wwise::ui::WwiseUiGetSelectedObjectsOptions;
 use waapi_client::api::generated::primitives::{ObjectQuery, ObjectReturnField};
 use waapi_client::{WaapiClient, WaapiResult};
 
@@ -48,7 +49,7 @@ async fn main() -> WaapiResult<()> {
     let selected = client
         .wwise()
         .ui()
-        .get_selected_objects(WwiseCoreObjectGetOptions::new().return_fields([
+        .get_selected_objects(WwiseUiGetSelectedObjectsOptions::new().return_fields([
             ObjectReturnField::Id,
             ObjectReturnField::Name,
             ObjectReturnField::Type,

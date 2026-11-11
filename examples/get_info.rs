@@ -13,7 +13,7 @@ async fn main() -> WaapiResult<()> {
     let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
     info!("Connected. Calling ak.wwise.core.getInfo...");
 
-    let info = client.get_info().await?;
+    let info = client.wwise().core().get_info().await?;
 
     info!("Wwise display name: {}", info.display_name);
     info!("Platform: {}", info.platform);

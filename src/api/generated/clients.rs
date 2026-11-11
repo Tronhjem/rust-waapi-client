@@ -62,6 +62,30 @@ impl<'a> WwiseClient<'a> {
     }
 }
 
+pub struct SoundengineClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> SoundengineClient<'a> {
+    /// `ak.soundengine.postEvent`.
+    pub async fn post_event(
+        &mut self,
+        args: SoundenginePostEventArgs,
+    ) -> WaapiResult<SoundenginePostEventResponse> {
+        self.client
+            .call_typed::<_, (), _>(WaapiFunction::ak_soundengine_postEvent, Some(args), None)
+            .await
+    }
+
+    /// `ak.soundengine.setRTPCValue`.
+    pub async fn set_rtpc_value(&mut self, args: SoundengineSetRtpcValueArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setRTPCValue, Some(args), None)
+            .await?;
+        Ok(())
+    }
+}
+
 pub struct WwiseCoreClient<'a> {
     client: &'a mut WaapiClient,
 }
@@ -89,6 +113,26 @@ impl<'a> WwiseCoreClient<'a> {
     pub async fn get_info(&mut self) -> WaapiResult<WwiseCoreGetInfoResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None)
+            .await
+    }
+}
+
+pub struct WwiseUiClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseUiClient<'a> {
+    /// `ak.wwise.ui.getSelectedObjects`.
+    pub async fn get_selected_objects(
+        &mut self,
+        options: WwiseUiGetSelectedObjectsOptions,
+    ) -> WaapiResult<WwiseUiGetSelectedObjectsResponse> {
+        self.client
+            .call_typed::<(), _, _>(
+                WaapiFunction::ak_wwise_ui_getSelectedObjects,
+                None,
+                Some(options),
+            )
             .await
     }
 }
@@ -177,50 +221,6 @@ impl<'a> WwiseCoreProjectClient<'a> {
     pub async fn save(&mut self, args: WwiseCoreProjectSaveArgs) -> WaapiResult<()> {
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
-            .await?;
-        Ok(())
-    }
-}
-
-pub struct WwiseUiClient<'a> {
-    client: &'a mut WaapiClient,
-}
-
-impl<'a> WwiseUiClient<'a> {
-    /// `ak.wwise.ui.getSelectedObjects`.
-    pub async fn get_selected_objects(
-        &mut self,
-        options: WwiseUiGetSelectedObjectsOptions,
-    ) -> WaapiResult<WwiseUiGetSelectedObjectsResponse> {
-        self.client
-            .call_typed::<(), _, _>(
-                WaapiFunction::ak_wwise_ui_getSelectedObjects,
-                None,
-                Some(options),
-            )
-            .await
-    }
-}
-
-pub struct SoundengineClient<'a> {
-    client: &'a mut WaapiClient,
-}
-
-impl<'a> SoundengineClient<'a> {
-    /// `ak.soundengine.postEvent`.
-    pub async fn post_event(
-        &mut self,
-        args: SoundenginePostEventArgs,
-    ) -> WaapiResult<SoundenginePostEventResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_soundengine_postEvent, Some(args), None)
-            .await
-    }
-
-    /// `ak.soundengine.setRTPCValue`.
-    pub async fn set_rtpc_value(&mut self, args: SoundengineSetRtpcValueArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setRTPCValue, Some(args), None)
             .await?;
         Ok(())
     }

@@ -1,7 +1,7 @@
 AI tasks:
 [x] Make json macro wrapper for serde, in wappi client crate for easier use of raw calls. User should be able to not have to import in every app and just include waapi client
 
-[ ] we have both a chained API and a direct API. We need to evaluate which one is better and determine which one to use. Then correct the examples and generation to only have the one we decided for.
+[x] we have both a chained API and a direct API. We need to evaluate which one is better and determine which one to use. Then correct the examples and generation to only have the one we decided for.
 
 [ ] Define a set of WaapiError::Connection enums to be used instead of passing a string so we have a fixed set of errors for the connection
 

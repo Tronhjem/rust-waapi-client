@@ -1,4 +1,4 @@
-//! Demonstrates the type-safe `object_set` wrapper.
+//! Demonstrates the type-safe `wwise().core().object().set` wrapper.
 //!
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example object_set
@@ -30,7 +30,13 @@ async fn main() {
     let options = WwiseCoreObjectSetOptions::new()
         .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
 
-    match client.object_set(rename_and_set, options).await {
+    match client
+        .wwise()
+        .core()
+        .object()
+        .set(rename_and_set, options)
+        .await
+    {
         Ok(response) => {
             for obj in response.objects {
                 println!(

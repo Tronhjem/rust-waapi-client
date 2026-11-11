@@ -91,7 +91,7 @@ python tools/generate_typed_api.py
 ```
 
 **Output:**
-Overwrites `src/api/generated/` with typed argument, option, and response structs plus `WaapiClient` helper methods (`client_impl.rs`) and chained namespace clients (`clients.rs`).
+Overwrites `src/api/generated/` with typed argument, option, and response structs plus chained namespace clients (`clients.rs`).
 
 ## Workflow
 

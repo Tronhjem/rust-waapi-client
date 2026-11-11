@@ -66,12 +66,12 @@ let response = client
 
 ### Typed API
 
-A subset of common endpoints has generated type-safe wrappers on `WaapiClient`. These methods delegate to internal `call_typed` / `call_typed_void` helpers that serialize typed argument/option structs and deserialize the response for you:
+Common endpoints have generated type-safe wrappers exposed via a chained namespace API on `WaapiClient` that mirrors WAAPI URI dot-notation (`client.ak().wwise()...` or the top-level shortcuts `client.wwise()` and `client.soundengine()`). These methods delegate to internal `call_typed` / `call_typed_void` helpers that serialize typed argument/option structs and deserialize the response for you:
 
 ```rust
 use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetInfoResponse;
 
-let info: WwiseCoreGetInfoResponse = client.get_info().await?;
+let info: WwiseCoreGetInfoResponse = client.wwise().core().get_info().await?;
 println!("Wwise version: {:?}", info.version.display_name);
 ```
 
@@ -88,10 +88,10 @@ let args = WwiseCoreObjectGetArgs::new(ObjectQuery::Path(vec![
 let options = WwiseCoreObjectGetOptions::new()
     .return_fields(vec!["id".into(), "name".into(), "type".into()]);
 
-let response = client.object_get(args, options).await?;
+let response = client.wwise().core().object().get(args, options).await?;
 ```
 
-Typed methods are generated for a small set of endpoints (see `src/api/generated/client_impl.rs`). For all other WAAPI calls, use the escape-hatch `client.call` API.
+Typed chained methods are generated in `src/api/generated/clients.rs`. For all other WAAPI calls, use the escape-hatch `client.call` API.
 
 ### Specifying Return Fields
 
@@ -157,7 +157,7 @@ let args = WwiseCoreObjectSetArgs::new(vec![
 let options = WwiseCoreObjectSetOptions::new()
     .return_fields(vec![ObjectReturnField::Id, ObjectReturnField::Name]);
 
-let response = client.object_set(args, options).await?;
+let response = client.wwise().core().object().set(args, options).await?;
 client.shutdown().await?;
 ```
 
@@ -208,10 +208,11 @@ Run examples with:
 
 ```bash
 cargo run --example get_info
-cargo run --example get_info_typed
-cargo run --example typed_api
-cargo run --example subscribe
+cargo run --example chained_api
+cargo run --example object_get_set
 cargo run --example object_set
+cargo run --example raw_call
+cargo run --example subscribe
 ```
 
 See the [`examples/`](examples/) directory for more usage examples. Most examples require Wwise running with WAAPI enabled on `127.0.0.1:8080`.
