@@ -18,7 +18,7 @@ RUST_LOG=info cargo run --example get_info
 - `src/waapi_client.rs` — `WaapiClient` wraps `WampClient`; default URL is `ws://127.0.0.1:8080/waapi`.
 - `src/types.rs` — Re-exports of `serde_json::Value`/`Map` for convenience.
 - `src/waapi_function_api.rs` / `src/waapi_topics_api.rs` — Auto-generated const strings (`ak::...`) and typed URI enums (`WaapiFunction` / `WaapiTopic`) for all WAAPI RPC endpoints and subscription topics.
-- `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`).
+- `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`, including `Property` from `WObjects.xml`, shared `primitives.rs`, endpoint modules under `ak/`, and chained namespace clients in `clients.rs`).
 
 ## Important patterns
 

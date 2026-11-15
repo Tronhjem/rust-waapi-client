@@ -1,23 +1,22 @@
 use serde_json::json;
 use waapi_client::api::generated::ak::soundengine::{
-    SoundenginePosteventArgs, SoundengineSetrtpcvalueArgs,
+    SoundenginePostEventArgs, SoundengineSetRtpcValueArgs,
 };
-use waapi_client::api::generated::ak::wwise::core::WwiseCoreGetinfoResponse;
+use waapi_client::api::generated::ak::wwise::core::CoreGetInfoResponse;
 use waapi_client::api::generated::ak::wwise::core::audio::{
-    WwiseCoreAudioImportArgs, WwiseCoreAudioImportOptions,
+    CoreAudioImportArgs, CoreAudioImportOptions,
 };
 use waapi_client::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectCreateArgs, WwiseCoreObjectDeleteArgs, WwiseCoreObjectGetArgs,
-    WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse, WwiseCoreObjectSetArgs,
-    WwiseCoreObjectSetItem, WwiseCoreObjectSetResponse,
+    CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
+    CoreObjectGetResponse, CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetResponse,
 };
-use waapi_client::api::generated::ak::wwise::core::project::WwiseCoreProjectSaveArgs;
+use waapi_client::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
 use waapi_client::api::generated::ak::wwise::ui::{
-    WwiseUiGetselectedobjectsOptions, WwiseUiGetselectedobjectsResponse,
+    UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
 use waapi_client::api::generated::primitives::{
     GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
-    OnNameConflict, PlatformRef, RtpcRef, Transform, TransformSelect,
+    OnNameConflict, PlatformRef, Property, RtpcRef, Transform, TransformSelect,
 };
 use waapi_client::api::primitives::ObjectRef;
 
@@ -26,7 +25,7 @@ fn object_get_args_serializes_to_expected_shape() {
     let transform = Transform::Select {
         select: vec![TransformSelect::Children],
     };
-    let args = WwiseCoreObjectGetArgs::new(ObjectQuery::from(
+    let args = CoreObjectGetArgs::new(ObjectQuery::from(
         r"\Actor-Mixer Hierarchy\Default Work Unit",
     ))
     .transform(vec![transform]);
@@ -41,7 +40,7 @@ fn object_get_args_serializes_to_expected_shape() {
 
 #[test]
 fn object_get_options_serializes_return_keyword() {
-    let options = WwiseCoreObjectGetOptions::new()
+    let options = CoreObjectGetOptions::new()
         .return_fields(vec!["id".to_string(), "name".to_string()])
         .platform(PlatformRef::Name("Windows".to_string()));
 
@@ -52,10 +51,10 @@ fn object_get_options_serializes_return_keyword() {
 
 #[test]
 fn object_return_options_accept_typed_fields() {
-    let options = WwiseCoreObjectGetOptions::new().return_fields([
+    let options = CoreObjectGetOptions::new().return_fields([
         ObjectReturnField::Id,
         ObjectReturnField::Name,
-        ObjectReturnField::Custom("@Volume".to_string()),
+        ObjectReturnField::Property(Property::Volume),
     ]);
 
     let value = serde_json::to_value(&options).unwrap();
@@ -64,7 +63,7 @@ fn object_return_options_accept_typed_fields() {
 
 #[test]
 fn object_create_args_serializes_required_and_optional_fields() {
-    let args = WwiseCoreObjectCreateArgs::new(
+    let args = CoreObjectCreateArgs::new(
         ObjectRef::path(r"\Actor-Mixer Hierarchy"),
         "Folder".to_string(),
         "MyFolder".to_string(),
@@ -80,8 +79,7 @@ fn object_create_args_serializes_required_and_optional_fields() {
 
 #[test]
 fn object_delete_args_serializes_object_ref() {
-    let args =
-        WwiseCoreObjectDeleteArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-000000000001}"));
+    let args = CoreObjectDeleteArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-000000000001}"));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["object"], "{00000000-0000-0000-0000-000000000001}");
@@ -90,7 +88,7 @@ fn object_delete_args_serializes_object_ref() {
 #[test]
 fn soundengine_post_event_args_serializes() {
     let args =
-        SoundenginePosteventArgs::new("Play_Test".into()).game_object(GameObjectRef::from(42u64));
+        SoundenginePostEventArgs::new("Play_Test".into()).game_object(GameObjectRef::from(42u64));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["event"], "Play_Test");
@@ -99,7 +97,7 @@ fn soundengine_post_event_args_serializes() {
 
 #[test]
 fn soundengine_set_rtpc_value_args_serializes() {
-    let args = SoundengineSetrtpcvalueArgs::new("Volume".into(), 0.75)
+    let args = SoundengineSetRtpcValueArgs::new("Volume".into(), 0.75)
         .game_object(GameObjectRef::from(100u32));
 
     let value = serde_json::to_value(&args).unwrap();
@@ -118,7 +116,7 @@ fn audio_import_args_serializes_imports_and_defaults() {
         ..Default::default()
     };
 
-    let args = WwiseCoreAudioImportArgs::new(vec![item])
+    let args = CoreAudioImportArgs::new(vec![item])
         .import_operation(ImportOperation::CreateNew)
         .default(defaults);
 
@@ -134,7 +132,7 @@ fn audio_import_args_serializes_imports_and_defaults() {
 
 #[test]
 fn audio_import_options_serializes_return_and_platform() {
-    let options = WwiseCoreAudioImportOptions::new()
+    let options = CoreAudioImportOptions::new()
         .return_fields(vec!["id".to_string(), "name".to_string()])
         .platform(PlatformRef::Guid("{GUID}".to_string()));
 
@@ -145,14 +143,14 @@ fn audio_import_options_serializes_return_and_platform() {
 
 #[test]
 fn project_save_args_serializes_empty_args() {
-    let args = WwiseCoreProjectSaveArgs::new();
+    let args = CoreProjectSaveArgs::new();
     let value = serde_json::to_value(&args).unwrap();
     assert!(value.as_object().unwrap().is_empty());
 }
 
 #[test]
 fn ui_get_selected_objects_options_serializes() {
-    let options = WwiseUiGetselectedobjectsOptions::new().return_fields(vec!["id".to_string()]);
+    let options = UiGetSelectedObjectsOptions::new().return_fields(vec!["id".to_string()]);
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id"]]);
 }
@@ -188,7 +186,7 @@ fn get_info_response_deserializes() {
         }
     });
 
-    let resp: WwiseCoreGetinfoResponse = serde_json::from_value(json).unwrap();
+    let resp: CoreGetInfoResponse = serde_json::from_value(json).unwrap();
     assert_eq!(resp.display_name, "Wwise");
     assert_eq!(resp.platform, "x64");
     assert_eq!(resp.version.display_name, "2024.1.7");
@@ -220,7 +218,7 @@ fn object_get_response_deserializes() {
         ]
     });
 
-    let resp: WwiseCoreObjectGetResponse = serde_json::from_value(json).unwrap();
+    let resp: CoreObjectGetResponse = serde_json::from_value(json).unwrap();
     assert_eq!(resp.objects.len(), 1);
     let obj = &resp.objects[0];
     assert_eq!(obj.id, Some("{GUID-1}".to_string()));
@@ -242,7 +240,7 @@ fn ui_get_selected_objects_response_deserializes() {
         "return": ["id", "name", "type"]
     });
 
-    let resp: WwiseUiGetselectedobjectsResponse = serde_json::from_value(json).unwrap();
+    let resp: UiGetSelectedObjectsResponse = serde_json::from_value(json).unwrap();
     assert_eq!(resp.objects.len(), 1);
     assert_eq!(resp.objects[0].name, Some("MyEvent".to_string()));
 }
@@ -283,15 +281,15 @@ fn object_ref_deserialization_roundtrip() {
 
 #[test]
 fn object_set_args_serializes_to_expected_shape() {
-    let args = WwiseCoreObjectSetArgs::new(vec![
-        WwiseCoreObjectSetItem::new(ObjectRef::path(
+    let args = CoreObjectSetArgs::new(vec![
+        CoreObjectSetItem::new(ObjectRef::path(
             r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
         ))
         .name("NewName")
         .notes("set from the typed API")
-        .property("Volume", -6.0)
+        .property(Property::Volume, -6.0)
         .property(
-            "OutputBus",
+            Property::OutputBus,
             r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus",
         ),
     ])
@@ -331,17 +329,35 @@ fn object_set_response_deserializes_with_extra_fields() {
         ]
     });
 
-    let response: WwiseCoreObjectSetResponse = serde_json::from_value(raw).unwrap();
+    let response: CoreObjectSetResponse = serde_json::from_value(raw).unwrap();
     assert_eq!(response.objects.len(), 2);
     assert_eq!(
         response.objects[0].id.as_deref(),
         Some("{BAE891BA-E025-43ED-A4D1-4DC55C68E7CA}")
     );
-    assert!(response.objects[0].extra.contains_key("@RTPC"));
+    assert!(response.objects[0].property(Property::RTPC).is_some());
     assert_eq!(response.objects[1].children.len(), 1);
     assert_eq!(
         response.objects[1].children[0].name.as_deref(),
         Some("Boom")
+    );
+}
+
+#[test]
+fn property_enum_maps_to_bare_and_at_prefixed_strings() {
+    assert_eq!(Property::Volume.as_str(), "Volume");
+    assert_eq!(Property::Volume.as_at_str(), "@Volume");
+    assert_eq!(Property::Volume.as_ref(), "Volume");
+    assert_eq!(Property::_3DSpatialization.as_str(), "3DSpatialization");
+    assert_eq!(Property::_3DSpatialization.as_at_str(), "@3DSpatialization");
+    assert_eq!(serde_json::to_value(Property::Pitch).unwrap(), "Pitch");
+    assert_eq!(
+        serde_json::from_value::<Property>(json!("Volume")).unwrap(),
+        Property::Volume
+    );
+    assert_eq!(
+        serde_json::from_value::<Property>(json!("@Volume")).unwrap(),
+        Property::Volume
     );
 }
 

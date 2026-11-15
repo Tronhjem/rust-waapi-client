@@ -7,7 +7,7 @@ use crate::api::generated::primitives::*;
 
 /// Arguments for `ak.wwise.core.audio.import`.
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct WwiseCoreAudioImportArgs {
+pub struct CoreAudioImportArgs {
     /// Determines if Wwise automatically performs a source control Add operation on the imported files
     /// Defaults to true.
     #[serde(
@@ -32,7 +32,7 @@ pub struct WwiseCoreAudioImportArgs {
     pub default: Option<ImportDefaults>,
 }
 
-impl WwiseCoreAudioImportArgs {
+impl CoreAudioImportArgs {
     pub fn new(imports: Vec<ImportItem>) -> Self {
         Self {
             imports,
@@ -72,11 +72,11 @@ impl WwiseCoreAudioImportArgs {
 
 /// Options for `ak.wwise.core.audio.import`.
 
-pub type WwiseCoreAudioImportOptions = ObjectReturnOptions;
+pub type CoreAudioImportOptions = ObjectReturnOptions;
 
 /// Response from `ak.wwise.core.audio.import`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreAudioImportResponse {
+pub struct CoreAudioImportResponse {
     /// The list of imported original files.
     pub files: Vec<String>,
     /// The audio import log.

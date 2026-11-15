@@ -7,23 +7,23 @@ use crate::api::generated::ak::soundengine::SoundengineSetRtpcValueArgs;
 use crate::api::generated::ak::soundengine::{
     SoundenginePostEventArgs, SoundenginePostEventResponse,
 };
-use crate::api::generated::ak::wwise::core::WwiseCoreGetInfoResponse;
+use crate::api::generated::ak::wwise::core::CoreGetInfoResponse;
 use crate::api::generated::ak::wwise::core::audio::{
-    WwiseCoreAudioImportArgs, WwiseCoreAudioImportOptions, WwiseCoreAudioImportResponse,
+    CoreAudioImportArgs, CoreAudioImportOptions, CoreAudioImportResponse,
 };
-use crate::api::generated::ak::wwise::core::object::WwiseCoreObjectDeleteArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectDeleteArgs;
 use crate::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectCreateArgs, WwiseCoreObjectCreateResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions, WwiseCoreObjectGetResponse,
+    CoreObjectCreateArgs, CoreObjectCreateResponse,
 };
 use crate::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectSetArgs, WwiseCoreObjectSetOptions, WwiseCoreObjectSetResponse,
+    CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectGetResponse,
 };
-use crate::api::generated::ak::wwise::core::project::WwiseCoreProjectSaveArgs;
+use crate::api::generated::ak::wwise::core::object::{
+    CoreObjectSetArgs, CoreObjectSetOptions, CoreObjectSetResponse,
+};
+use crate::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
 use crate::api::generated::ak::wwise::ui::{
-    WwiseUiGetSelectedObjectsOptions, WwiseUiGetSelectedObjectsResponse,
+    UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
 
 pub struct AkClient<'a> {
@@ -110,7 +110,7 @@ impl<'a> WwiseCoreClient<'a> {
     }
 
     /// `ak.wwise.core.getInfo`.
-    pub async fn get_info(&mut self) -> WaapiResult<WwiseCoreGetInfoResponse> {
+    pub async fn get_info(&mut self) -> WaapiResult<CoreGetInfoResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None)
             .await
@@ -125,8 +125,8 @@ impl<'a> WwiseUiClient<'a> {
     /// `ak.wwise.ui.getSelectedObjects`.
     pub async fn get_selected_objects(
         &mut self,
-        options: WwiseUiGetSelectedObjectsOptions,
-    ) -> WaapiResult<WwiseUiGetSelectedObjectsResponse> {
+        options: UiGetSelectedObjectsOptions,
+    ) -> WaapiResult<UiGetSelectedObjectsResponse> {
         self.client
             .call_typed::<(), _, _>(
                 WaapiFunction::ak_wwise_ui_getSelectedObjects,
@@ -145,9 +145,9 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// `ak.wwise.core.object.get`.
     pub async fn get(
         &mut self,
-        args: WwiseCoreObjectGetArgs,
-        options: WwiseCoreObjectGetOptions,
-    ) -> WaapiResult<WwiseCoreObjectGetResponse> {
+        args: CoreObjectGetArgs,
+        options: CoreObjectGetOptions,
+    ) -> WaapiResult<CoreObjectGetResponse> {
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_object_get,
@@ -160,15 +160,15 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// `ak.wwise.core.object.create`.
     pub async fn create(
         &mut self,
-        args: WwiseCoreObjectCreateArgs,
-    ) -> WaapiResult<WwiseCoreObjectCreateResponse> {
+        args: CoreObjectCreateArgs,
+    ) -> WaapiResult<CoreObjectCreateResponse> {
         self.client
             .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_create, Some(args), None)
             .await
     }
 
     /// `ak.wwise.core.object.delete`.
-    pub async fn delete(&mut self, args: WwiseCoreObjectDeleteArgs) -> WaapiResult<()> {
+    pub async fn delete(&mut self, args: CoreObjectDeleteArgs) -> WaapiResult<()> {
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_delete, Some(args), None)
             .await?;
@@ -178,9 +178,9 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// `ak.wwise.core.object.set`.
     pub async fn set(
         &mut self,
-        args: WwiseCoreObjectSetArgs,
-        options: WwiseCoreObjectSetOptions,
-    ) -> WaapiResult<WwiseCoreObjectSetResponse> {
+        args: CoreObjectSetArgs,
+        options: CoreObjectSetOptions,
+    ) -> WaapiResult<CoreObjectSetResponse> {
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_object_set,
@@ -199,9 +199,9 @@ impl<'a> WwiseCoreAudioClient<'a> {
     /// `ak.wwise.core.audio.import`.
     pub async fn import(
         &mut self,
-        args: WwiseCoreAudioImportArgs,
-        options: WwiseCoreAudioImportOptions,
-    ) -> WaapiResult<WwiseCoreAudioImportResponse> {
+        args: CoreAudioImportArgs,
+        options: CoreAudioImportOptions,
+    ) -> WaapiResult<CoreAudioImportResponse> {
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_audio_import,
@@ -218,7 +218,7 @@ pub struct WwiseCoreProjectClient<'a> {
 
 impl<'a> WwiseCoreProjectClient<'a> {
     /// `ak.wwise.core.project.save`.
-    pub async fn save(&mut self, args: WwiseCoreProjectSaveArgs) -> WaapiResult<()> {
+    pub async fn save(&mut self, args: CoreProjectSaveArgs) -> WaapiResult<()> {
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
             .await?;

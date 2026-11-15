@@ -5,9 +5,9 @@
 
 use log::info;
 use waapi_client::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions,
+    CoreObjectGetArgs, CoreObjectGetOptions,
 };
-use waapi_client::api::generated::ak::wwise::ui::WwiseUiGetSelectedObjectsOptions;
+use waapi_client::api::generated::ak::wwise::ui::UiGetSelectedObjectsOptions;
 use waapi_client::api::generated::primitives::{ObjectQuery, ObjectReturnField};
 use waapi_client::{WaapiClient, WaapiResult};
 
@@ -28,8 +28,8 @@ async fn main() -> WaapiResult<()> {
         .core()
         .object()
         .get(
-            WwiseCoreObjectGetArgs::new(ObjectQuery::from(r"\Actor-Mixer Hierarchy")),
-            WwiseCoreObjectGetOptions::new().return_fields([
+            CoreObjectGetArgs::new(ObjectQuery::from(r"\Actor-Mixer Hierarchy")),
+            CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
                 ObjectReturnField::Type,
@@ -41,9 +41,7 @@ async fn main() -> WaapiResult<()> {
     let selected = client
         .wwise()
         .ui()
-        .get_selected_objects(
-            WwiseUiGetSelectedObjectsOptions::new().return_fields(["name", "type"]),
-        )
+        .get_selected_objects(UiGetSelectedObjectsOptions::new().return_fields(["name", "type"]))
         .await?;
     info!("{} objects selected in the UI", selected.objects.len());
 

@@ -26,9 +26,10 @@ ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 OUTPUT_DIR = os.path.join(ROOT_DIR, "tools", "waapi_schemas")
 
 DEFINITION_FILES = [
-    "common_definitions.json",
-    "waapi_definitions.json",
-    "waapi_ui_definitions.json",
+    ("Data/Schemas/Definitions/common_definitions.json", "common_definitions.json"),
+    ("Data/Schemas/Definitions/waapi_definitions.json", "waapi_definitions.json"),
+    ("Data/Schemas/Definitions/waapi_ui_definitions.json", "waapi_ui_definitions.json"),
+    ("Data/WObjects/WObjects.xml", "WObjects.xml"),
 ]
 
 
@@ -68,14 +69,13 @@ def fetch_schemas(client, uris, version_dir):
 
 
 def copy_definitions(authoring_dir, version_dir):
-    source_dir = os.path.join(authoring_dir, "Data", "Schemas", "Definitions")
     target_dir = os.path.join(version_dir, "Definitions")
     os.makedirs(target_dir, exist_ok=True)
 
     copied = 0
-    for filename in DEFINITION_FILES:
-        source = os.path.join(source_dir, filename)
-        target = os.path.join(target_dir, filename)
+    for rel_source, target_name in DEFINITION_FILES:
+        source = os.path.join(authoring_dir, *rel_source.split("/"))
+        target = os.path.join(target_dir, target_name)
         if os.path.isfile(source):
             shutil.copy2(source, target)
             copied += 1

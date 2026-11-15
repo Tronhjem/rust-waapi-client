@@ -5,4 +5,4 @@ pub mod audio;
 mod get_info;
 pub mod object;
 pub mod project;
-pub use get_info::{WwiseCoreGetInfoResponse, WwiseCoreGetinfoResponse};
+pub use get_info::CoreGetInfoResponse;

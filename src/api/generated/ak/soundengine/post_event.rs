@@ -36,7 +36,3 @@ pub struct SoundenginePostEventResponse {
     #[serde(rename = "return")]
     pub playing_id: u32,
 }
-
-pub type SoundenginePosteventArgs = SoundenginePostEventArgs;
-
-pub type SoundenginePosteventResponse = SoundenginePostEventResponse;

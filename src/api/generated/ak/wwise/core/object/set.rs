@@ -7,7 +7,7 @@ use crate::api::generated::primitives::*;
 
 /// One object specification in the `objects` array of `object.set`.
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct WwiseCoreObjectSetItem {
+pub struct CoreObjectSetItem {
     /// The new name of "object".
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -38,7 +38,7 @@ pub struct WwiseCoreObjectSetItem {
     pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
-impl WwiseCoreObjectSetItem {
+impl CoreObjectSetItem {
     pub fn new(object: ObjectRef) -> Self {
         Self {
             object,
@@ -88,6 +88,17 @@ impl WwiseCoreObjectSetItem {
         self
     }
 
+    /// Set a `@`-prefixed property, reference, or list field.
+    /// Accepts a [`Property`] variant (e.g. `Property::Volume`) or a bare property name (`"Volume"`).
+    pub fn property(mut self, name: impl AsRef<str>, value: impl serde::Serialize) -> Self {
+        let name = name.as_ref().strip_prefix('@').unwrap_or(name.as_ref());
+        self.extra.insert(
+            format!("@{name}"),
+            serde_json::to_value(value).expect("value must serialize to JSON"),
+        );
+        self
+    }
+
     /// Set an arbitrary `@`-prefixed property, reference, or list field.
     /// The key must include the `@` prefix, e.g. `"@Volume"`.
     pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
@@ -96,21 +107,9 @@ impl WwiseCoreObjectSetItem {
     }
 }
 
-impl WwiseCoreObjectSetItem {
-    /// Set a `@`-prefixed property, reference, or list field.
-    /// Pass the bare name without the `@` prefix, e.g. `"Volume"`.
-    pub fn property(mut self, name: impl Into<String>, value: impl serde::Serialize) -> Self {
-        self.extra.insert(
-            format!("@{}", name.into()),
-            serde_json::to_value(value).expect("value must serialize to JSON"),
-        );
-        self
-    }
-}
-
 /// Arguments for `ak.wwise.core.object.set`.
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct WwiseCoreObjectSetArgs {
+pub struct CoreObjectSetArgs {
     /// Unless overriden by an individual "object", the ID (GUID) or unique name of the platform used when setting properties and references via this operation
     /// Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -133,11 +132,11 @@ pub struct WwiseCoreObjectSetArgs {
     #[serde(rename = "listMode", skip_serializing_if = "Option::is_none")]
     pub list_mode: Option<ListMode>,
     /// An array of objects on which to set values and create child or list objects.
-    pub objects: Vec<WwiseCoreObjectSetItem>,
+    pub objects: Vec<CoreObjectSetItem>,
 }
 
-impl WwiseCoreObjectSetArgs {
-    pub fn new(objects: Vec<WwiseCoreObjectSetItem>) -> Self {
+impl CoreObjectSetArgs {
+    pub fn new(objects: Vec<CoreObjectSetItem>) -> Self {
         Self {
             objects,
             platform: None,
@@ -173,11 +172,11 @@ impl WwiseCoreObjectSetArgs {
 
 /// Options for `ak.wwise.core.object.set`.
 
-pub type WwiseCoreObjectSetOptions = ObjectReturnOptions;
+pub type CoreObjectSetOptions = ObjectReturnOptions;
 
 /// One object entry in the `object.set` response.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreObjectSetObject {
+pub struct CoreObjectSetObject {
     /// The ID (GUID) of the parent.
     #[serde(default)]
     pub id: Option<String>,
@@ -191,10 +190,19 @@ pub struct WwiseCoreObjectSetObject {
     pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
+impl CoreObjectSetObject {
+    /// Look up a property value in `extra` (checks `"@Property"` first, then `"Property"`).
+    pub fn property(&self, prop: Property) -> Option<&serde_json::Value> {
+        self.extra
+            .get(prop.as_at_str())
+            .or_else(|| self.extra.get(prop.as_str()))
+    }
+}
+
 /// Response from `ak.wwise.core.object.set`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreObjectSetResponse {
+pub struct CoreObjectSetResponse {
     /// Array of {object, created objects} associations for each parent object.
     #[serde(default)]
-    pub objects: Vec<WwiseCoreObjectSetObject>,
+    pub objects: Vec<CoreObjectSetObject>,
 }

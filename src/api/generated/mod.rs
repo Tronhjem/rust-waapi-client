@@ -4,3 +4,6 @@
 pub mod ak;
 pub mod clients;
 pub mod primitives;
+pub mod properties;
+
+pub use properties::Property;

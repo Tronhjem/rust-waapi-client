@@ -7,7 +7,7 @@ use crate::api::generated::primitives::*;
 
 /// Arguments for `ak.wwise.core.object.create`.
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct WwiseCoreObjectCreateArgs {
+pub struct CoreObjectCreateArgs {
     /// For internal use only! The ID (GUID) to assign to the newly created Object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -48,7 +48,7 @@ pub struct WwiseCoreObjectCreateArgs {
     pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
-impl WwiseCoreObjectCreateArgs {
+impl CoreObjectCreateArgs {
     pub fn new(parent: ObjectRef, object_type: String, name: String) -> Self {
         Self {
             parent,
@@ -103,6 +103,17 @@ impl WwiseCoreObjectCreateArgs {
         self
     }
 
+    /// Set a `@`-prefixed property, reference, or list field.
+    /// Accepts a [`Property`] variant (e.g. `Property::Volume`) or a bare property name (`"Volume"`).
+    pub fn property(mut self, name: impl AsRef<str>, value: impl serde::Serialize) -> Self {
+        let name = name.as_ref().strip_prefix('@').unwrap_or(name.as_ref());
+        self.extra.insert(
+            format!("@{name}"),
+            serde_json::to_value(value).expect("value must serialize to JSON"),
+        );
+        self
+    }
+
     /// Set an arbitrary `@`-prefixed property, reference, or list field.
     /// The key must include the `@` prefix, e.g. `"@Volume"`.
     pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
@@ -113,7 +124,7 @@ impl WwiseCoreObjectCreateArgs {
 
 /// Response from `ak.wwise.core.object.create`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreObjectCreateResponse {
+pub struct CoreObjectCreateResponse {
     /// The ID (GUID) of the newly created Object.
     #[serde(default)]
     pub id: Option<String>,

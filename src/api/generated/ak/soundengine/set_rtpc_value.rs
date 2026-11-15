@@ -32,5 +32,3 @@ impl SoundengineSetRtpcValueArgs {
         self
     }
 }
-
-pub type SoundengineSetrtpcvalueArgs = SoundengineSetRtpcValueArgs;

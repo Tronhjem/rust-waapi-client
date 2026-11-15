@@ -7,7 +7,7 @@ use crate::api::generated::primitives::*;
 
 /// Arguments for `ak.wwise.core.project.save`.
 #[derive(Debug, Clone, Default, serde::Serialize)]
-pub struct WwiseCoreProjectSaveArgs {
+pub struct CoreProjectSaveArgs {
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project
     /// Defaults to true.
     #[serde(
@@ -17,7 +17,7 @@ pub struct WwiseCoreProjectSaveArgs {
     pub auto_check_out_to_source_control: Option<bool>,
 }
 
-impl WwiseCoreProjectSaveArgs {
+impl CoreProjectSaveArgs {
     pub fn new() -> Self {
         Self::default()
     }

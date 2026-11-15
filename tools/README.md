@@ -28,9 +28,11 @@ tools/waapi_schemas/<version>/
   ak.wwise.core.object.set.json
   ...
   Definitions/
+    WObjects.xml
     common_definitions.json
     waapi_definitions.json
     waapi_ui_definitions.json
+    wafm_definitions.json
 ```
 
 The `<version>` directory is derived from `ak.wwise.core.getInfo` (e.g. `2024.1.7`).
@@ -91,7 +93,7 @@ python tools/generate_typed_api.py
 ```
 
 **Output:**
-Overwrites `src/api/generated/` with typed argument, option, and response structs plus chained namespace clients (`clients.rs`).
+Overwrites `src/api/generated/` with typed argument, option, and response structs, the `Property` enum (`properties.rs`, generated from `Definitions/WObjects.xml`), shared primitives (`primitives.rs`), and chained namespace clients (`clients.rs`).
 
 ## Workflow
 

@@ -7,7 +7,7 @@ use crate::api::generated::primitives::*;
 
 /// Response from `ak.wwise.core.getInfo`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreGetInfoResponse {
+pub struct CoreGetInfoResponse {
     /// Wwise display name.
     #[serde(rename = "displayName")]
     pub display_name: String,
@@ -39,5 +39,3 @@ pub struct WwiseCoreGetInfoResponse {
     /// Collection of directories used by Wwise.
     pub directories: DirectoriesInfo,
 }
-
-pub type WwiseCoreGetinfoResponse = WwiseCoreGetInfoResponse;

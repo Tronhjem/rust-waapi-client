@@ -8,7 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.object.get`. Specify either a WAQL query or
 /// a `from` query; both are optional in the schema but one is required in practice.
 #[derive(Debug, Clone, Default, serde::Serialize)]
-pub struct WwiseCoreObjectGetArgs {
+pub struct CoreObjectGetArgs {
     /// A WAQL query.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub waql: Option<String>,
@@ -20,7 +20,7 @@ pub struct WwiseCoreObjectGetArgs {
     pub transform: Option<Vec<Transform>>,
 }
 
-impl WwiseCoreObjectGetArgs {
+impl CoreObjectGetArgs {
     pub fn new(from: ObjectQuery) -> Self {
         Self {
             waql: None,
@@ -55,11 +55,11 @@ impl WwiseCoreObjectGetArgs {
 
 /// Options for `ak.wwise.core.object.get`.
 
-pub type WwiseCoreObjectGetOptions = ObjectReturnOptions;
+pub type CoreObjectGetOptions = ObjectReturnOptions;
 
 /// Response from `ak.wwise.core.object.get`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WwiseCoreObjectGetResponse {
+pub struct CoreObjectGetResponse {
     /// An array of objects found, with properties matching what was supplied in the options.
     #[serde(rename = "return", default)]
     pub objects: Vec<WwiseObject>,

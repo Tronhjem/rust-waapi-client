@@ -7,13 +7,13 @@
 //! The example modifies whatever object is currently selected in the Wwise
 //! authoring UI (sets its notes and Volume), so select something first.
 
-use waapi_client::api::ObjectRef;
 use waapi_client::api::generated::ak::wwise::core::object::{
-    WwiseCoreObjectGetArgs, WwiseCoreObjectGetOptions, WwiseCoreObjectSetArgs,
-    WwiseCoreObjectSetItem, WwiseCoreObjectSetOptions,
+    CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectSetArgs, CoreObjectSetItem,
+    CoreObjectSetOptions,
 };
-use waapi_client::api::generated::ak::wwise::ui::WwiseUiGetSelectedObjectsOptions;
+use waapi_client::api::generated::ak::wwise::ui::UiGetSelectedObjectsOptions;
 use waapi_client::api::generated::primitives::{ObjectQuery, ObjectReturnField};
+use waapi_client::api::{ObjectRef, Property};
 use waapi_client::{WaapiClient, WaapiResult};
 
 #[tokio::main]
@@ -28,16 +28,17 @@ async fn main() -> WaapiResult<()> {
         .core()
         .object()
         .get(
-            WwiseCoreObjectGetArgs::new(ObjectQuery::from(
+            CoreObjectGetArgs::new(ObjectQuery::from(
                 r"\Actor-Mixer Hierarchy\Default Work Unit",
             )),
-            WwiseCoreObjectGetOptions::new().return_fields([
+            CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
                 ObjectReturnField::ChildrenCount,
             ]),
         )
         .await?;
+
     for obj in &get.objects {
         println!(
             "get: {:?} ({:?}) has {:?} children",
@@ -49,34 +50,38 @@ async fn main() -> WaapiResult<()> {
     let selected = client
         .wwise()
         .ui()
-        .get_selected_objects(WwiseUiGetSelectedObjectsOptions::new().return_fields([
+        .get_selected_objects(UiGetSelectedObjectsOptions::new().return_fields([
             ObjectReturnField::Id,
             ObjectReturnField::Name,
             ObjectReturnField::Type,
         ]))
         .await?;
+
     if selected.objects.is_empty() {
         println!("Nothing selected in Wwise - select an object and run again.");
         client.shutdown().await?;
         return Ok(());
     }
+
     let target = &selected.objects[0];
     let target_id = target.id.clone().expect("requested id return field");
+
     println!(
         "Selected: {:?} (type {:?})",
         target.name, target.object_type
     );
 
     // 3. Modify it: set notes and the Volume property.
-    let set_args = WwiseCoreObjectSetArgs::new(vec![
-        WwiseCoreObjectSetItem::new(ObjectRef::guid(target_id))
+    let set_args = CoreObjectSetArgs::new(vec![
+        CoreObjectSetItem::new(ObjectRef::guid(target_id))
             .notes("Modified by the waapi-client object_get_set example.")
-            .property("Volume", -3.0),
+            .property(Property::Volume, -3.0),
     ]);
-    let set_options = WwiseCoreObjectSetOptions::new().return_fields([
+
+    let set_options = CoreObjectSetOptions::new().return_fields([
         ObjectReturnField::Id,
         ObjectReturnField::Name,
-        ObjectReturnField::Custom("@Volume".to_string()),
+        ObjectReturnField::Property(Property::Volume),
     ]);
 
     match client
@@ -92,7 +97,7 @@ async fn main() -> WaapiResult<()> {
                     "set: {:?} ({:?}) @Volume is now {:?}",
                     obj.name,
                     obj.id,
-                    obj.extra.get("@Volume")
+                    obj.property(Property::Volume)
                 );
             }
         }
