@@ -553,4 +553,112 @@ mod tests {
         ));
         let _ = client.shutdown().await;
     }
+
+    #[tokio::test]
+    async fn call_error_returns_waapi_error_and_recovers_session() {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+
+        let server = tokio::spawn(async move {
+            let (stream, _) = listener.accept().await.unwrap();
+            let ws = accept_hdr_async(stream, |_req: &ServerRequest, mut resp: Response| {
+                resp.headers_mut()
+                    .insert("Sec-WebSocket-Protocol", "wamp.2.json".parse().unwrap());
+                Ok(resp)
+            })
+            .await
+            .unwrap();
+            let (mut write, mut read) = ws.split();
+
+            // 1. Handshake
+            let _ = read.next().await;
+            send_msg(&mut write, &Message::Welcome(1, json!({})))
+                .await
+                .unwrap();
+
+            // 2. First CALL fails with WAMP ERROR (48 = CALL)
+            let WsMessage::Text(text) = read.next().await.unwrap().unwrap() else {
+                panic!("expected text frame");
+            };
+            let first_call: Message = serde_json::from_str(text.as_str()).unwrap();
+            let Message::Call(req_id, _, proc_uri, _, _) = first_call else {
+                panic!("expected CALL message");
+            };
+            assert_eq!(proc_uri, "ak.wwise.core.object.create");
+
+            let err_msg = Message::Error(
+                48,
+                req_id,
+                json!({}),
+                "ak.wwise.invalid_arguments".to_string(),
+                vec![],
+                json!({ "message": "'parent' already has child with same name." }),
+            );
+            send_msg(&mut write, &err_msg).await.unwrap();
+
+            // 3. Second CALL on the same session succeeds
+            let WsMessage::Text(text) = read.next().await.unwrap().unwrap() else {
+                panic!("expected text frame");
+            };
+            let second_call: Message = serde_json::from_str(text.as_str()).unwrap();
+            let Message::Call(req_id2, _, proc_uri2, _, _) = second_call else {
+                panic!("expected second CALL message");
+            };
+            assert_eq!(proc_uri2, "ak.wwise.core.object.get");
+
+            let ok_msg = Message::Result(
+                req_id2,
+                json!({}),
+                vec![],
+                json!({ "return": [{ "id": "{1234}", "name": "HealthySound" }] }),
+            );
+            send_msg(&mut write, &ok_msg).await.unwrap();
+
+            // 4. Expect GOODBYE
+            let WsMessage::Text(text) = read.next().await.unwrap().unwrap() else {
+                panic!("expected text frame");
+            };
+            let goodbye: Message = serde_json::from_str(text.as_str()).unwrap();
+            assert!(matches!(goodbye, Message::Goodbye(_, _)));
+        });
+
+        let mut client = crate::WaapiClient::new(Some(&addr.to_string()))
+            .await
+            .unwrap();
+
+        let err = client
+            .wwise()
+            .core()
+            .object()
+            .create(
+                crate::api::ak::wwise::core::object::CoreObjectCreateArgs::new(
+                    crate::ObjectRef::from(r"\Actor-Mixer Hierarchy\Default Work Unit"),
+                    crate::ObjectType::Sound,
+                    "DuplicateSound".to_string(),
+                )
+                .on_name_conflict(crate::api::OnNameConflict::Fail),
+            )
+            .await
+            .expect_err("Expected WaapiError::Call from WAMP ERROR response");
+        assert!(matches!(err, crate::WaapiError::Call(_)));
+
+        // Verify the same session remains healthy for subsequent typed calls
+        let got = client
+            .wwise()
+            .core()
+            .object()
+            .get(
+                crate::api::ak::wwise::core::object::CoreObjectGetArgs::new(
+                    crate::api::ObjectQuery::from("{1234}"),
+                ),
+                crate::api::ak::wwise::core::object::CoreObjectGetOptions::new(),
+            )
+            .await
+            .expect("Session should recover cleanly after WaapiError::Call");
+        assert_eq!(got.objects.len(), 1);
+        assert_eq!(got.objects[0].name.as_deref(), Some("HealthySound"));
+
+        client.shutdown().await.unwrap();
+        server.await.unwrap();
+    }
 }

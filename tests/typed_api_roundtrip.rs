@@ -23,13 +23,18 @@ use waapi_client::api::primitives::ObjectRef;
 
 #[test]
 fn object_get_args_serializes_to_expected_shape() {
-    let transform = Transform::Select {
-        select: vec![TransformSelect::Children],
-    };
     let args = CoreObjectGetArgs::new(ObjectQuery::from(
         r"\Actor-Mixer Hierarchy\Default Work Unit",
     ))
-    .transform(vec![transform]);
+    .transform(vec![
+        Transform::select(TransformSelect::Children),
+        Transform::distinct(),
+        Transform::range(0, 10),
+        Transform::where_name_contains("Footstep"),
+        Transform::where_name_matches(".*_01$"),
+        Transform::where_type_is_in([ObjectType::Sound, ObjectType::ActorMixer]),
+        Transform::where_category_is_in(["Actor-Mixer Hierarchy"]),
+    ]);
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(
@@ -37,6 +42,24 @@ fn object_get_args_serializes_to_expected_shape() {
         json!([r"\Actor-Mixer Hierarchy\Default Work Unit"])
     );
     assert_eq!(value["transform"][0]["select"], json!(["children"]));
+    assert_eq!(value["transform"][1], json!("distinct"));
+    assert_eq!(value["transform"][2]["range"], json!([0, 10]));
+    assert_eq!(
+        value["transform"][3]["where"],
+        json!(["name:contains", "Footstep"])
+    );
+    assert_eq!(
+        value["transform"][4]["where"],
+        json!(["name:matches", ".*_01$"])
+    );
+    assert_eq!(
+        value["transform"][5]["where"],
+        json!(["type:isIn", ["Sound", "ActorMixer"]])
+    );
+    assert_eq!(
+        value["transform"][6]["where"],
+        json!(["category:isIn", ["Actor-Mixer Hierarchy"]])
+    );
 }
 
 #[test]

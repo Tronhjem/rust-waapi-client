@@ -174,7 +174,109 @@ async fn audio_import_base64_sequence() {
         sound_children.objects
     );
 
-    // 4. Clean up the temporary ActorMixer
+    // 4. Request a broad set of ObjectReturnField accessors on the WorkUnit and imported Sound
+    //    to verify WwiseObject field deserialization against live Wwise responses
+    let rich_workunit_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(DEFAULT_WORK_UNIT_PATH)),
+            CoreObjectGetOptions::new().return_fields(vec![
+                ObjectReturnField::Id,
+                ObjectReturnField::Name,
+                ObjectReturnField::Type,
+                ObjectReturnField::Path,
+                ObjectReturnField::FilePath,
+                ObjectReturnField::WorkunitIsDefault,
+                ObjectReturnField::WorkunitType,
+                ObjectReturnField::WorkunitIsDirty,
+            ]),
+        )
+        .await
+        .expect("Failed to query rich WorkUnit return fields");
+    let wu = &rich_workunit_resp.objects[0];
+    assert_eq!(wu.workunit_is_default, Some(true));
+    assert_eq!(wu.workunit_type.as_deref(), Some("rootFile"));
+    assert!(wu.file_path.as_deref().is_some_and(|p| !p.is_empty()));
+
+    let rich_sound_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(imported_sound_id)),
+            CoreObjectGetOptions::new().return_fields(vec![
+                ObjectReturnField::Id,
+                ObjectReturnField::Name,
+                ObjectReturnField::Notes,
+                ObjectReturnField::Type,
+                ObjectReturnField::ShortId,
+                ObjectReturnField::ClassId,
+                ObjectReturnField::Category,
+                ObjectReturnField::FilePath,
+                ObjectReturnField::Workunit,
+                ObjectReturnField::Parent,
+                ObjectReturnField::Owner,
+                ObjectReturnField::Path,
+                ObjectReturnField::IsPlayable,
+                ObjectReturnField::ChildrenCount,
+                ObjectReturnField::TotalSize,
+                ObjectReturnField::MediaSize,
+                ObjectReturnField::ObjectSize,
+                ObjectReturnField::StructureSize,
+                ObjectReturnField::OriginalFilePath,
+                ObjectReturnField::OriginalWavFilePath,
+                ObjectReturnField::OriginalRelativeFilePath,
+                ObjectReturnField::PlaybackDuration,
+                ObjectReturnField::Duration,
+                ObjectReturnField::MaxDurationSource,
+                ObjectReturnField::AudioSourceTrimValues,
+                ObjectReturnField::AudioSourceLanguage,
+                ObjectReturnField::IsExplicitMute,
+                ObjectReturnField::IsExplicitSolo,
+                ObjectReturnField::IsImplicitMute,
+                ObjectReturnField::IsImplicitSolo,
+                ObjectReturnField::IsIncluded,
+            ]),
+        )
+        .await
+        .expect("Failed to query rich WwiseObject return fields on imported Sound");
+
+    let rich_sound = &rich_sound_resp.objects[0];
+    assert_eq!(rich_sound.object_type, Some(ObjectType::Sound));
+    assert_eq!(rich_sound.class_id, Some(ObjectType::Sound.class_id()));
+    assert!(rich_sound.short_id.is_some_and(|id| id > 0));
+    assert!(
+        rich_sound
+            .category
+            .as_deref()
+            .is_some_and(|c| !c.is_empty())
+    );
+    assert_eq!(rich_sound.is_playable, Some(true));
+    assert_eq!(rich_sound.children_count, Some(1.0));
+    assert_eq!(rich_sound.is_explicit_mute, Some(false));
+    assert_eq!(rich_sound.is_explicit_solo, Some(false));
+    assert_eq!(rich_sound.is_implicit_mute, Some(false));
+    assert_eq!(rich_sound.is_implicit_solo, Some(false));
+    assert_eq!(rich_sound.is_included, Some(true));
+    assert_eq!(
+        rich_sound.parent.as_ref().and_then(|p| p.id.as_deref()),
+        Some(mixer_id.as_str())
+    );
+    assert!(
+        rich_sound.workunit.as_ref().and_then(|w| w.name.as_deref()) == Some("Default Work Unit")
+    );
+    assert!(
+        rich_sound
+            .original_file_path
+            .as_deref()
+            .is_some_and(|p| p.ends_with("WaapiSeqTestTone.wav"))
+    );
+    assert!(rich_sound.duration.is_some());
+    assert!(rich_sound.playback_duration.is_some());
+
+    // 5. Clean up the temporary ActorMixer
     client
         .wwise()
         .core()

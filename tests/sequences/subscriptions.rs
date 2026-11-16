@@ -19,14 +19,12 @@ async fn recv_matching_object_event(
 ) -> (WwiseObject, Event) {
     tokio::time::timeout(Duration::from_secs(5), async {
         while let Some(event) = rx.recv().await {
-            if let Some(obj_val) = event.kwargs.get("object") {
-                if let Ok(obj) =
+            if let Some(obj_val) = event.kwargs.get("object")
+                && let Ok(obj) =
                     waapi_client::serde_json::from_value::<WwiseObject>(obj_val.clone())
-                {
-                    if obj.id.as_deref() == Some(expected_id) {
-                        return (obj, event);
-                    }
-                }
+                && obj.id.as_deref() == Some(expected_id)
+            {
+                return (obj, event);
             }
         }
         panic!("Subscription channel closed before receiving event for {expected_id}");
@@ -56,6 +54,7 @@ async fn object_events_subscription_sequence() {
         )
         .await
         .expect("Failed to create parent ActorMixer for subscription sequence");
+
     let mixer_id = mixer_created.id.expect("Created ActorMixer missing id");
 
     let sub_opts = ObjectReturnOptions::new().return_fields(vec![

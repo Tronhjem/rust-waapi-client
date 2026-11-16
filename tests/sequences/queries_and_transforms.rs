@@ -5,7 +5,7 @@ use waapi_client::api::ak::wwise::core::object::{
 use waapi_client::api::{
     ObjectQuery, ObjectReturnField, OnNameConflict, Transform, TransformSelect,
 };
-use waapi_client::{ChildObject, ObjectRef, ObjectType};
+use waapi_client::{ChildObject, ObjectRef, ObjectType, Property};
 
 const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const EVENTS_WORK_UNIT_PATH: &str = r"\Events\Default Work Unit";
@@ -133,11 +133,20 @@ async fn object_get_queries_and_transforms_sequence() {
                 ObjectType::Event,
                 QUERY_EVENT_NAME.to_string(),
             )
-            .on_name_conflict(OnNameConflict::Replace),
+            .on_name_conflict(OnNameConflict::Replace)
+            .children(vec![
+                ChildObject::new(ObjectType::Action, "")
+                    .property(Property::ActionType, 1)
+                    .property(Property::Target, alpha_id.as_str()),
+            ]),
         )
         .await
         .expect("Failed to create temporary Event for qualified Name query");
     let event_id = created_event.id.expect("Created Event missing id");
+    let action_id = created_event.children[0]
+        .id
+        .clone()
+        .expect("Created Action child missing id");
 
     let qualified_name = format!("Event:{QUERY_EVENT_NAME}");
     let by_name_resp = client
@@ -212,17 +221,27 @@ async fn object_get_queries_and_transforms_sequence() {
         .expect("Failed to query objects using WAQL");
     assert_eq!(waql_resp.objects.len(), 2);
 
-    // 8. Transform: Parent and Ancestors from leaf SoundAlpha
+    // 8. TransformSelect: Children, Parent, Ancestors, and ReferencesTo
+    let children_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str()))
+                .transform(vec![Transform::select(TransformSelect::Children)]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query Children transform");
+    assert_eq!(children_resp.objects.len(), 2);
+
     let parent_resp = client
         .wwise()
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str())).transform(vec![
-                Transform::Select {
-                    select: vec![TransformSelect::Parent],
-                },
-            ]),
+            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+                .transform(vec![Transform::select(TransformSelect::Parent)]),
             return_opts.clone(),
         )
         .await
@@ -238,11 +257,8 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str())).transform(vec![
-                Transform::Select {
-                    select: vec![TransformSelect::Ancestors],
-                },
-            ]),
+            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+                .transform(vec![Transform::select(TransformSelect::Ancestors)]),
             return_opts.clone(),
         )
         .await
@@ -254,23 +270,171 @@ async fn object_get_queries_and_transforms_sequence() {
             .any(|o| o.id.as_deref() == Some(mixer_id.as_str()))
     );
 
-    // 9. Transform: Descendants + Range pagination
-    let paged_resp = client
+    let refs_to_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+                .transform(vec![Transform::select(TransformSelect::ReferencesTo)]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query ReferencesTo transform");
+    assert!(
+        refs_to_resp
+            .objects
+            .iter()
+            .any(|o| o.id.as_deref() == Some(action_id.as_str())
+                && o.object_type == Some(ObjectType::Action))
+    );
+
+    // 9. Transform::distinct: Selecting Parent from two sibling sounds produces 2 duplicate
+    //    RandomContainer entries without distinct, and 1 entry with Transform::distinct().
+    let duplicate_parents_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(vec![alpha_id.clone(), beta_id.clone()]))
+                .transform(vec![Transform::select(TransformSelect::Parent)]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query Parent of two sibling sounds");
+    assert_eq!(duplicate_parents_resp.objects.len(), 2);
+
+    let distinct_parent_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(vec![alpha_id.clone(), beta_id.clone()]))
+                .transform(vec![
+                    Transform::select(TransformSelect::Parent),
+                    Transform::distinct(),
+                ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query distinct Parent of two sibling sounds");
+    assert_eq!(distinct_parent_resp.objects.len(), 1);
+    assert_eq!(
+        distinct_parent_resp.objects[0].name.as_deref(),
+        Some(RANDOM_CONTAINER_NAME)
+    );
+
+    // 10. Transform::range: Paginate all 4 descendants in two pages of 2 ([0, 2] and [2, 2])
+    let page_one_resp = client
         .wwise()
         .core()
         .object()
         .get(
             CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
-                Transform::Select {
-                    select: vec![TransformSelect::Descendants],
-                },
-                Transform::Range { range: vec![0, 2] },
+                Transform::select(TransformSelect::Descendants),
+                Transform::range(0, 2),
+            ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query Descendants page 1 with Range transform");
+    assert_eq!(page_one_resp.objects.len(), 2);
+
+    let page_two_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+                Transform::select(TransformSelect::Descendants),
+                Transform::range(2, 2),
+            ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to query Descendants page 2 with Range transform");
+    assert_eq!(page_two_resp.objects.len(), 2);
+    assert_ne!(page_one_resp.objects[0].id, page_two_resp.objects[0].id);
+
+    // 11. Transform::Where predicates (name:contains, name:matches, type:isIn)
+    let where_contains_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+                Transform::select(TransformSelect::Descendants),
+                Transform::where_name_contains("Sound"),
+            ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to filter Descendants with where_name_contains");
+    assert_eq!(where_contains_resp.objects.len(), 2);
+
+    let where_matches_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+                Transform::select(TransformSelect::Descendants),
+                Transform::where_name_matches(".*Alpha$"),
+            ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to filter Descendants with where_name_matches");
+    assert_eq!(where_matches_resp.objects.len(), 1);
+    assert_eq!(
+        where_matches_resp.objects[0].id.as_deref(),
+        Some(alpha_id.as_str())
+    );
+
+    let where_type_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+                Transform::select(TransformSelect::Descendants),
+                Transform::where_type_is_in([
+                    ObjectType::SwitchContainer,
+                    ObjectType::RandomSequenceContainer,
+                ]),
+            ]),
+            return_opts.clone(),
+        )
+        .await
+        .expect("Failed to filter Descendants with where_type_is_in");
+    assert_eq!(where_type_resp.objects.len(), 2);
+    assert!(where_type_resp.objects.iter().all(|o| matches!(
+        o.object_type,
+        Some(ObjectType::SwitchContainer | ObjectType::RandomSequenceContainer)
+    )));
+
+    // 12. Multi-step chained Transform pipeline:
+    //     Select(Descendants) -> where_type_is_in([Sound]) -> where_name_contains("Beta") -> range(0, 1)
+    let chained_transform_resp = client
+        .wwise()
+        .core()
+        .object()
+        .get(
+            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+                Transform::select(TransformSelect::Descendants),
+                Transform::where_type_is_in([ObjectType::Sound]),
+                Transform::where_name_contains("Beta"),
+                Transform::range(0, 1),
             ]),
             return_opts,
         )
         .await
-        .expect("Failed to query Descendants with Range transform");
-    assert_eq!(paged_resp.objects.len(), 2);
+        .expect("Failed to run multi-step chained Transform pipeline");
+    assert_eq!(chained_transform_resp.objects.len(), 1);
+    assert_eq!(
+        chained_transform_resp.objects[0].id.as_deref(),
+        Some(beta_id.as_str())
+    );
 
     // 10. Clean up test hierarchy and temporary Event
     client

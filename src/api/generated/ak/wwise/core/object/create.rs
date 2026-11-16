@@ -133,5 +133,5 @@ pub struct CoreObjectCreateResponse {
     pub name: Option<String>,
     /// The children of objects created.
     #[serde(default)]
-    pub children: Vec<serde_json::Value>,
+    pub children: Vec<CoreObjectCreateResponse>,
 }

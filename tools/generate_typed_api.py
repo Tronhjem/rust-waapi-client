@@ -254,7 +254,7 @@ def rust_type(sch, ctx, self_name=None):
     if t == "boolean":
         return "bool"
     if t == "array":
-        return f"Vec<{rust_type(sch.get('items', {}), ctx)}>"
+        return f"Vec<{rust_type(sch.get('items', {}), ctx, self_name)}>"
     if t == "object":
         props = sch.get("properties", {})
         if "id" in props and "name" in props:
@@ -1019,6 +1019,85 @@ pub enum Transform {
         #[serde(rename = "where")]
         where_: Vec<serde_json::Value>,
     },
+}
+
+impl Transform {
+    /// Select related objects (`parent`, `children`, `descendants`, `ancestors`, or `referencesTo`).
+    pub fn select(selector: TransformSelect) -> Self {
+        Transform::Select {
+            select: vec![selector],
+        }
+    }
+
+    /// Deduplicate the current object list (`"distinct"`).
+    pub fn distinct() -> Self {
+        Transform::Distinct("distinct".to_string())
+    }
+
+    /// Take a slice of results starting at 0-based `from` with length `count` (`[from, count]`).
+    pub fn range(from: usize, count: usize) -> Self {
+        Transform::Range {
+            range: vec![from, count],
+        }
+    }
+
+    /// Filter objects whose name contains `substring` (case-insensitive, `["name:contains", substring]`).
+    pub fn where_name_contains(substring: impl Into<String>) -> Self {
+        Transform::Where {
+            where_: vec![
+                serde_json::Value::String("name:contains".to_string()),
+                serde_json::Value::String(substring.into()),
+            ],
+        }
+    }
+
+    /// Filter objects whose name matches regular expression `regex` (`["name:matches", regex]`).
+    pub fn where_name_matches(regex: impl Into<String>) -> Self {
+        Transform::Where {
+            where_: vec![
+                serde_json::Value::String("name:matches".to_string()),
+                serde_json::Value::String(regex.into()),
+            ],
+        }
+    }
+
+    /// Filter objects whose type is in `types` (`["type:isIn", [...]]`).
+    pub fn where_type_is_in(types: impl IntoIterator<Item = ObjectType>) -> Self {
+        let list = types
+            .into_iter()
+            .map(|t| serde_json::Value::String(t.as_str().to_string()))
+            .collect();
+        Transform::Where {
+            where_: vec![
+                serde_json::Value::String("type:isIn".to_string()),
+                serde_json::Value::Array(list),
+            ],
+        }
+    }
+
+    /// Filter objects whose category is in `categories` (`["category:isIn", [...]]`).
+    pub fn where_category_is_in<I, S>(categories: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        let list = categories
+            .into_iter()
+            .map(|c| serde_json::Value::String(c.into()))
+            .collect();
+        Transform::Where {
+            where_: vec![
+                serde_json::Value::String("category:isIn".to_string()),
+                serde_json::Value::Array(list),
+            ],
+        }
+    }
+}
+
+impl From<TransformSelect> for Transform {
+    fn from(selector: TransformSelect) -> Self {
+        Transform::select(selector)
+    }
 }"""
 
 
