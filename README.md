@@ -140,6 +140,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 - **Domain-specific return field enums**: Rather than untyped strings, `waapi_definitions.json` return expressions are generated as strongly-typed enums:
   - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` (and `From<&str>` / `From<String>`) for arbitrary dot-accessor queries.
   - `BusReturnField`, `AudioObjectReturnField`, and `VoiceReturnField` for profiler queries.
+- **Generated `ObjectType` enum (`WObjects.xml`)**: `src/api/generated/object_types.rs` (re-exported as `waapi_client::ObjectType` and `waapi_client::api::ObjectType`) is generated from the `<WwiseObject>` definitions in `Definitions/WObjects.xml` and contains all 72 Wwise object types (e.g. `ObjectType::Sound`, `ObjectType::ActorMixer`, `ObjectType::Event`, `ObjectType::Folder`, `ObjectType::RandomSequenceContainer`). It is used in `CoreObjectCreateArgs`, `ChildObject`, `WwiseObject`, `ObjectQuery::OfType`, `ImportItem`, and `ImportDefaults`, and provides `as_str()`, `class_id()`, `from_class_id()`, `FromStr`, `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`.
 - **Generated `Property` enum (`WObjects.xml`)**: `src/api/generated/properties.rs` (re-exported as `waapi_client::Property` and `waapi_client::api::Property`) is generated from `Definitions/WObjects.xml` and contains all 464 Wwise object properties, references, and object lists (e.g. `Property::Volume`, `Property::Pitch`, `Property::Lowpass`, `Property::OutputBus`, `Property::RTPC`). `Property::as_str()` returns the bare `&'static str` (`"Volume"`), `Property::as_at_str()` returns the `@`-prefixed `&'static str` (`"@Volume"`), and `Property` implements `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`.
 - **Dynamic `@Property` fields (`patternProperties`)**: Schemas that accept or return open-ended `@`-prefixed properties (such as `CoreObjectSetItem`, `CoreObjectCreateArgs`, `ImportItem`, `ImportDefaults`, `WwiseObject`, and `CoreObjectSetObject`) include `#[serde(flatten)] pub extra: HashMap<String, serde_json::Value>` along with `.property(Property::Volume, value)` / `.extra(key, value)` builder methods on request structs and `.property(Property::Volume) -> Option<&serde_json::Value>` lookup helpers on response structs.
 - **Field naming**: JSON `camelCase` wire names are converted to Rust `snake_case` with `#[serde(rename = "...")]` emitted automatically whenever the wire name differs (e.g. `type` → `object_type`, `return` → `objects` / `playing_id` / `return_fields`).
@@ -300,6 +301,21 @@ The library uses a custom `WaapiError` enum with the following variants:
 - `Wamp(WampError)` - Underlying WAMP/WebSocket protocol error
 
 Always call `shutdown().await` before dropping the client to ensure clean disconnection.
+
+## Testing
+
+```bash
+# Run all tests (unit tests, offline roundtrip tests, and live Wwise sequence tests)
+cargo test
+
+# Run only offline serialization/deserialization roundtrip tests (no Wwise required)
+cargo test --test typed_api_roundtrip
+
+# Run live end-to-end WAAPI sequence tests
+cargo test --test wwise_sequences
+```
+
+> **Note:** `tests/wwise_sequences.rs` (`tests/sequences/`) runs end-to-end command sequences against a live Wwise Authoring instance (`127.0.0.1:8080`) with an open project. Each sequence creates temporary objects under the default work units, exercises the API, verifies state, and deletes all temporary objects before shutting down.
 
 ## License
 

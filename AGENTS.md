@@ -6,9 +6,11 @@ Rust client library for the Wwise Authoring API (WAAPI) over WAMP/WebSocket.
 
 ```bash
 cargo build
-cargo test
+cargo test                              # runs unit, roundtrip, and live Wwise sequence tests
+cargo test --test typed_api_roundtrip   # offline serialization/deserialization tests only
+cargo test --test wwise_sequences       # live sequence tests (requires Wwise open with a project on 127.0.0.1:8080)
 cargo test <test_name>
-cargo run --example get_info     # requires Wwise running with WAAPI on 127.0.0.1:8080
+cargo run --example get_info            # requires Wwise running with WAAPI on 127.0.0.1:8080
 RUST_LOG=info cargo run --example get_info
 ```
 
@@ -18,7 +20,8 @@ RUST_LOG=info cargo run --example get_info
 - `src/waapi_client.rs` — `WaapiClient` wraps `WampClient`; default URL is `ws://127.0.0.1:8080/waapi`.
 - `src/types.rs` — Re-exports of `serde_json::Value`/`Map` for convenience.
 - `src/waapi_function_api.rs` / `src/waapi_topics_api.rs` — Auto-generated const strings (`ak::...`) and typed URI enums (`WaapiFunction` / `WaapiTopic`) for all WAAPI RPC endpoints and subscription topics.
-- `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`, including `Property` from `WObjects.xml`, shared `primitives.rs`, endpoint modules under `ak/`, and chained namespace clients in `clients.rs`).
+- `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`, including `ObjectType` and `Property` from `WObjects.xml`, shared `primitives.rs`, endpoint modules under `ak/`, and chained namespace clients in `clients.rs`).
+- `tests/wwise_sequences.rs` & `tests/sequences/` — End-to-end WAAPI command sequence tests against a live Wwise instance.
 
 ## Important patterns
 

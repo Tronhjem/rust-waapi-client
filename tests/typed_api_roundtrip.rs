@@ -15,8 +15,9 @@ use waapi_client::api::generated::ak::wwise::ui::{
     UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
 use waapi_client::api::generated::primitives::{
-    GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
-    OnNameConflict, PlatformRef, Property, RtpcRef, Transform, TransformSelect,
+    ChildObject, GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery,
+    ObjectReturnField, ObjectType, OnNameConflict, PlatformRef, Property, PropertyValue, RtpcRef,
+    Transform, TransformSelect,
 };
 use waapi_client::api::primitives::ObjectRef;
 
@@ -65,16 +66,23 @@ fn object_return_options_accept_typed_fields() {
 fn object_create_args_serializes_required_and_optional_fields() {
     let args = CoreObjectCreateArgs::new(
         ObjectRef::path(r"\Actor-Mixer Hierarchy"),
-        "Folder".to_string(),
+        ObjectType::Folder,
         "MyFolder".to_string(),
     )
-    .on_name_conflict(OnNameConflict::Rename);
+    .on_name_conflict(OnNameConflict::Rename)
+    .children(vec![
+        ChildObject::new(ObjectType::Sound, "MySound")
+            .property(Property::Volume, PropertyValue::Number(-3.0)),
+    ]);
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["parent"], r"\Actor-Mixer Hierarchy");
     assert_eq!(value["type"], "Folder");
     assert_eq!(value["name"], "MyFolder");
     assert_eq!(value["onNameConflict"], "rename");
+    assert_eq!(value["children"][0]["type"], "Sound");
+    assert_eq!(value["children"][0]["name"], "MySound");
+    assert_eq!(value["children"][0]["@Volume"], -3.0);
 }
 
 #[test]
@@ -112,7 +120,7 @@ fn audio_import_args_serializes_imports_and_defaults() {
     item.audio_file = Some(r"C:\Audio\MySound.wav".to_string());
 
     let defaults = ImportDefaults {
-        object_type: Some("Sound".to_string()),
+        object_type: Some(ObjectType::Sound),
         ..Default::default()
     };
 
@@ -223,7 +231,7 @@ fn object_get_response_deserializes() {
     let obj = &resp.objects[0];
     assert_eq!(obj.id, Some("{GUID-1}".to_string()));
     assert_eq!(obj.name, Some("MySound".to_string()));
-    assert_eq!(obj.object_type, Some("Sound".to_string()));
+    assert_eq!(obj.object_type, Some(ObjectType::Sound));
     assert_eq!(obj.short_id, Some(12345));
 }
 
@@ -359,6 +367,23 @@ fn property_enum_maps_to_bare_and_at_prefixed_strings() {
         serde_json::from_value::<Property>(json!("@Volume")).unwrap(),
         Property::Volume
     );
+}
+
+#[test]
+fn object_type_enum_maps_to_names_class_ids_and_queries() {
+    assert_eq!(ObjectType::Sound.as_str(), "Sound");
+    assert_eq!(ObjectType::Sound.as_ref(), "Sound");
+    assert_eq!(ObjectType::Sound.class_id(), 65552);
+    assert_eq!(ObjectType::from_class_id(65552), Some(ObjectType::Sound));
+    assert_eq!(ObjectType::ActorMixer.class_id(), 524304);
+    assert_eq!(
+        "ActorMixer".parse::<ObjectType>().unwrap(),
+        ObjectType::ActorMixer
+    );
+
+    let query = ObjectQuery::from(ObjectType::Sound);
+    let value = serde_json::to_value(&query).unwrap();
+    assert_eq!(value["ofType"], json!(["Sound"]));
 }
 
 #[test]

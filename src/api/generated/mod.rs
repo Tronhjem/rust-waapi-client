@@ -3,7 +3,9 @@
 
 pub mod ak;
 pub mod clients;
+pub mod object_types;
 pub mod primitives;
 pub mod properties;
 
+pub use object_types::ObjectType;
 pub use properties::Property;

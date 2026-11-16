@@ -19,6 +19,6 @@ macro_rules! json {
         $crate::serde_json::json!($($json)*)
     };
 }
-pub use api::Property;
+pub use api::{ChildObject, ObjectRef, ObjectType, Property};
 pub use waapi_function_api::WaapiFunction;
 pub use waapi_topics_api::WaapiTopic;

@@ -14,7 +14,7 @@ pub struct CoreObjectCreateArgs {
     /// The type of the new object
     /// Refer to for possible object types.
     #[serde(rename = "type")]
-    pub object_type: String,
+    pub object_type: ObjectType,
     /// The name of the new object.
     pub name: String,
     /// The notes or comments of the new object.
@@ -27,7 +27,7 @@ pub struct CoreObjectCreateArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub children: Option<Vec<WwiseObjectRef>>,
+    pub children: Option<Vec<ChildObject>>,
     /// The ID (GUID) or unique name of the platform used when setting properties via this command
     /// Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,7 +49,7 @@ pub struct CoreObjectCreateArgs {
 }
 
 impl CoreObjectCreateArgs {
-    pub fn new(parent: ObjectRef, object_type: String, name: String) -> Self {
+    pub fn new(parent: ObjectRef, object_type: ObjectType, name: String) -> Self {
         Self {
             parent,
             object_type,
@@ -80,7 +80,7 @@ impl CoreObjectCreateArgs {
         self
     }
 
-    pub fn children(mut self, children: impl Into<Vec<WwiseObjectRef>>) -> Self {
+    pub fn children(mut self, children: impl Into<Vec<ChildObject>>) -> Self {
         self.children = Some(children.into());
         self
     }

@@ -9,6 +9,12 @@ repository = "https://github.com/Tronhjem/rust-waapi-client"
 
 keywords = ["wwise", "waapi", "audio", "audiokinetic", "game-audio"]
 categories = ["api-bindings", "multimedia::audio"]
+include = [
+    "/src/**/*.rs",
+    "/Cargo.toml",
+    "/README.md",
+    "/LICENSE*",
+]
 
 [dependencies]
 tokio = { version = "1", default-features = false, features = ["rt", "sync", "macros"] }

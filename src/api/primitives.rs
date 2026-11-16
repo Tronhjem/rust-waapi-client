@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize, Serializer};
 
+use crate::api::generated::ObjectType;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Object and platform references
 // ─────────────────────────────────────────────────────────────────────────────
@@ -26,6 +28,24 @@ impl ObjectRef {
     }
     pub fn name(s: impl Into<String>) -> Self {
         ObjectRef::Name(s.into())
+    }
+}
+
+impl From<String> for ObjectRef {
+    fn from(s: String) -> Self {
+        if s.starts_with('{') && s.ends_with('}') {
+            ObjectRef::Guid(s)
+        } else if s.starts_with('\\') {
+            ObjectRef::Path(s)
+        } else {
+            ObjectRef::Name(s)
+        }
+    }
+}
+
+impl From<&str> for ObjectRef {
+    fn from(s: &str) -> Self {
+        Self::from(s.to_string())
     }
 }
 
@@ -173,8 +193,8 @@ impl<'de> Deserialize<'de> for ListMode {
 /// named list via an `@`-prefixed field.
 #[derive(Debug, Clone)]
 pub struct ChildObject {
-    /// The Wwise object type, e.g. `"Sound"`, `"Event"`, `"RandomSequenceContainer"`.
-    pub object_type: String,
+    /// The Wwise object type, e.g. [`ObjectType::Sound`], [`ObjectType::Event`], [`ObjectType::RandomSequenceContainer`].
+    pub object_type: ObjectType,
     pub name: String,
     pub notes: Option<String>,
     pub platform: Option<PlatformRef>,
@@ -213,9 +233,9 @@ impl Serialize for ChildObject {
 }
 
 impl ChildObject {
-    pub fn new(object_type: impl Into<String>, name: impl Into<String>) -> Self {
+    pub fn new(object_type: ObjectType, name: impl Into<String>) -> Self {
         ChildObject {
-            object_type: object_type.into(),
+            object_type,
             name: name.into(),
             notes: None,
             platform: None,
@@ -235,14 +255,20 @@ impl ChildObject {
     }
 
     /// Add a property, reference, or list field.
-    /// Pass the bare name without the `@` prefix, e.g. `"Volume"` not `"@Volume"`.
-    pub fn property(mut self, name: impl Into<String>, value: PropertyValue) -> Self {
-        self.properties.push((name.into(), value));
+    /// Accepts a [`crate::Property`] variant (e.g. `Property::Volume`) or a property name (`"Volume"`).
+    pub fn property(mut self, name: impl AsRef<str>, value: impl Into<PropertyValue>) -> Self {
+        let bare = name.as_ref().strip_prefix('@').unwrap_or(name.as_ref());
+        self.properties.push((bare.to_string(), value.into()));
         self
     }
 
     pub fn child(mut self, child: ChildObject) -> Self {
         self.children.push(child);
+        self
+    }
+
+    pub fn children(mut self, children: impl Into<Vec<ChildObject>>) -> Self {
+        self.children.extend(children.into());
         self
     }
 }
@@ -262,6 +288,60 @@ pub enum PropertyValue {
     Object(Box<ChildObject>),
     /// Create new objects and insert them into this named list.
     ObjectList(Vec<ChildObject>),
+}
+
+impl From<f64> for PropertyValue {
+    fn from(n: f64) -> Self {
+        PropertyValue::Number(n)
+    }
+}
+
+impl From<f32> for PropertyValue {
+    fn from(n: f32) -> Self {
+        PropertyValue::Number(f64::from(n))
+    }
+}
+
+impl From<i64> for PropertyValue {
+    fn from(n: i64) -> Self {
+        PropertyValue::Number(n as f64)
+    }
+}
+
+impl From<i32> for PropertyValue {
+    fn from(n: i32) -> Self {
+        PropertyValue::Number(f64::from(n))
+    }
+}
+
+impl From<bool> for PropertyValue {
+    fn from(b: bool) -> Self {
+        PropertyValue::Boolean(b)
+    }
+}
+
+impl From<String> for PropertyValue {
+    fn from(s: String) -> Self {
+        PropertyValue::String(s)
+    }
+}
+
+impl From<&str> for PropertyValue {
+    fn from(s: &str) -> Self {
+        PropertyValue::String(s.to_string())
+    }
+}
+
+impl From<ChildObject> for PropertyValue {
+    fn from(obj: ChildObject) -> Self {
+        PropertyValue::Object(Box::new(obj))
+    }
+}
+
+impl From<Vec<ChildObject>> for PropertyValue {
+    fn from(list: Vec<ChildObject>) -> Self {
+        PropertyValue::ObjectList(list)
+    }
 }
 
 impl Serialize for PropertyValue {
