@@ -4,12 +4,11 @@
 //! named `Play_EventTestSound` in the current project.
 
 use waapi_client::{
-    GameObjectRef, Position, Vector3, WaapiClient,
-    api::ak::soundengine::{
+    api::{ak::soundengine::{
         SoundenginePostEventArgs, SoundengineRegisterGameObjArgs,
         SoundengineSetDefaultListenersArgs, SoundengineSetPositionArgs,
         SoundengineUnregisterGameObjArgs,
-    },
+    }, SoundEngineObjectRef}, GameObjectRef, Position, Vector3, WaapiClient
 };
 
 const LISTENER_ID: u64 = 1;
@@ -66,9 +65,10 @@ async fn main() -> waapi_client::WaapiResult<()> {
         .await?;
 
     // Post the event on the emitter game object.
+    let event_name = SoundEngineObjectRef::Name(EVENT_NAME.to_string());
     let response = client
         .soundengine()
-        .post_event(SoundenginePostEventArgs::new(EVENT_NAME.into()).game_object(EMITTER_ID))
+        .post_event(SoundenginePostEventArgs::new(event_name).game_object(EMITTER_ID))
         .await?;
 
     println!("Posted {EVENT_NAME} on game object {EMITTER_ID}");
