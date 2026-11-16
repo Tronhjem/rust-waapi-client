@@ -9,5 +9,5 @@ pub use generated::primitives::{
 };
 pub use generated::{ObjectType, Property};
 pub use primitives::{
-    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, PropertyValue,
+    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
 };

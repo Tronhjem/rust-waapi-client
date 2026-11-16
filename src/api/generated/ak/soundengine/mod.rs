@@ -3,5 +3,13 @@
 
 mod post_event;
 pub use post_event::{SoundenginePostEventArgs, SoundenginePostEventResponse};
+mod register_game_obj;
+pub use register_game_obj::SoundengineRegisterGameObjArgs;
+mod set_default_listeners;
+pub use set_default_listeners::SoundengineSetDefaultListenersArgs;
+mod set_position;
+pub use set_position::SoundengineSetPositionArgs;
 mod set_rtpc_value;
 pub use set_rtpc_value::SoundengineSetRtpcValueArgs;
+mod unregister_game_obj;
+pub use unregister_game_obj::SoundengineUnregisterGameObjArgs;

@@ -147,7 +147,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 
 ### 5. Currently Generated Typed Endpoints
 
-The following 10 endpoints currently have generated typed structs and chained methods under `waapi_client::api::generated`:
+The following 14 endpoints currently have generated typed structs and chained methods under `waapi_client::api::generated`:
 
 | WAAPI URI | Chained Method on `WaapiClient` | Module (`waapi_client::api::generated::*`) | `Args` Type | `Options` Type | `Response` Type |
 |---|---|---|---|---|---|
@@ -161,6 +161,10 @@ The following 10 endpoints currently have generated typed structs and chained me
 | `ak.wwise.ui.getSelectedObjects` | `client.wwise().ui().get_selected_objects(options)` | `ak::wwise::ui` | — | `UiGetSelectedObjectsOptions` (`ObjectReturnOptions`) | `UiGetSelectedObjectsResponse` |
 | `ak.soundengine.postEvent` | `client.soundengine().post_event(args)` | `ak::soundengine` | `SoundenginePostEventArgs` | — | `SoundenginePostEventResponse` |
 | `ak.soundengine.setRTPCValue` | `client.soundengine().set_rtpc_value(args)` | `ak::soundengine` | `SoundengineSetRtpcValueArgs` | — | `()` |
+| `ak.soundengine.registerGameObj` | `client.soundengine().register_game_obj(args)` | `ak::soundengine` | `SoundengineRegisterGameObjArgs` | — | `()` |
+| `ak.soundengine.unregisterGameObj` | `client.soundengine().unregister_game_obj(args)` | `ak::soundengine` | `SoundengineUnregisterGameObjArgs` | — | `()` |
+| `ak.soundengine.setPosition` | `client.soundengine().set_position(args)` | `ak::soundengine` | `SoundengineSetPositionArgs` (`Position`, `Vector3`) | — | `()` |
+| `ak.soundengine.setDefaultListeners` | `client.soundengine().set_default_listeners(args)` | `ak::soundengine` | `SoundengineSetDefaultListenersArgs` | — | `()` |
 
 For any of the 170 WAAPI functions or 34 topics not yet in the table above, use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 
@@ -286,6 +290,7 @@ cargo run --example chained_api
 cargo run --example object_get_set
 cargo run --example object_set
 cargo run --example raw_call
+cargo run --example register_and_post_event
 cargo run --example subscribe
 ```
 

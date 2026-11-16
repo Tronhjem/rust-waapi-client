@@ -30,6 +30,10 @@ PILOT_ENDPOINTS = [
     "ak.wwise.ui.getSelectedObjects",
     "ak.soundengine.postEvent",
     "ak.soundengine.setRTPCValue",
+    "ak.soundengine.registerGameObj",
+    "ak.soundengine.unregisterGameObj",
+    "ak.soundengine.setPosition",
+    "ak.soundengine.setDefaultListeners",
 ]
 
 # Constructor parameter order where the schema's `required` list differs from
@@ -62,6 +66,7 @@ PROP_TYPE_OVERRIDES = {
     ("ak.wwise.core.getInfo", "directories"): "DirectoriesInfo",
     ("ak.wwise.core.audio.import", "imports"): "Vec<ImportItem>",
     ("ak.wwise.core.audio.import", "default"): "ImportDefaults",
+    ("ak.soundengine.setPosition", "args", "position"): "Position",
 }
 
 # Well-known $ref targets mapped to Rust types. Hand-written types live in
@@ -877,7 +882,8 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append("pub use super::object_types::ObjectType;")
     parts.append("pub use super::properties::Property;")
     parts.append("pub use crate::api::primitives::{")
-    parts.append("    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, PropertyValue,")
+    parts.append("    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position,")
+    parts.append("    PropertyValue, Vector3,")
     parts.append("};")
     parts.append("")
     parts.append(STATIC_REFS)
@@ -935,6 +941,12 @@ pub type RtpcRef = SoundEngineObjectRef;
 #[serde(untagged)]
 pub enum GameObjectRef {
     Id(u64),
+}
+
+impl GameObjectRef {
+    pub fn game_object(id: u64) -> Self {
+        GameObjectRef::Id(id)
+    }
 }
 
 impl From<u64> for GameObjectRef {

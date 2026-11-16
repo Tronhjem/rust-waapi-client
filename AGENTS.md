@@ -11,6 +11,7 @@ cargo test --test typed_api_roundtrip   # offline serialization/deserialization 
 cargo test --test wwise_sequences       # live sequence tests (requires Wwise open with a project on 127.0.0.1:8080)
 cargo test <test_name>
 cargo run --example get_info            # requires Wwise running with WAAPI on 127.0.0.1:8080
+cargo run --example register_and_post_event  # requires Wwise running with WAAPI and event "Play_EventTestSound"
 RUST_LOG=info cargo run --example get_info
 ```
 

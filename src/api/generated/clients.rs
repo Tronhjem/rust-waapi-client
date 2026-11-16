@@ -3,7 +3,11 @@
 
 use crate::{WaapiClient, WaapiFunction, WaapiResult};
 
+use crate::api::generated::ak::soundengine::SoundengineRegisterGameObjArgs;
+use crate::api::generated::ak::soundengine::SoundengineSetDefaultListenersArgs;
+use crate::api::generated::ak::soundengine::SoundengineSetPositionArgs;
 use crate::api::generated::ak::soundengine::SoundengineSetRtpcValueArgs;
+use crate::api::generated::ak::soundengine::SoundengineUnregisterGameObjArgs;
 use crate::api::generated::ak::soundengine::{
     SoundenginePostEventArgs, SoundenginePostEventResponse,
 };
@@ -81,6 +85,59 @@ impl<'a> SoundengineClient<'a> {
     pub async fn set_rtpc_value(&mut self, args: SoundengineSetRtpcValueArgs) -> WaapiResult<()> {
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setRTPCValue, Some(args), None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.soundengine.registerGameObj`.
+    pub async fn register_game_obj(
+        &mut self,
+        args: SoundengineRegisterGameObjArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_soundengine_registerGameObj,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.soundengine.unregisterGameObj`.
+    pub async fn unregister_game_obj(
+        &mut self,
+        args: SoundengineUnregisterGameObjArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_soundengine_unregisterGameObj,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.soundengine.setPosition`.
+    pub async fn set_position(&mut self, args: SoundengineSetPositionArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setPosition, Some(args), None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.soundengine.setDefaultListeners`.
+    pub async fn set_default_listeners(
+        &mut self,
+        args: SoundengineSetDefaultListenersArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_soundengine_setDefaultListeners,
+                Some(args),
+                None,
+            )
             .await?;
         Ok(())
     }

@@ -6,7 +6,7 @@ pub use super::object_types::ObjectType;
 pub use super::properties::Property;
 
 pub use crate::api::primitives::{
-    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, PropertyValue,
+    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
 };
 
 /// Object reference accepted by soundengine endpoints: name, GUID, or Short ID.
@@ -45,6 +45,12 @@ pub type RtpcRef = SoundEngineObjectRef;
 #[serde(untagged)]
 pub enum GameObjectRef {
     Id(u64),
+}
+
+impl GameObjectRef {
+    pub fn game_object(id: u64) -> Self {
+        GameObjectRef::Id(id)
+    }
 }
 
 impl From<u64> for GameObjectRef {

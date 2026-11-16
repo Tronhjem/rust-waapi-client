@@ -108,6 +108,53 @@ impl<'de> Deserialize<'de> for PlatformRef {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 3D position helpers for soundengine spatial audio endpoints
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// A 3D vector used for position and orientation.
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+pub struct Vector3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl Vector3 {
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+}
+
+/// A complete game-object position: position plus front/top orientation vectors.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Position {
+    #[serde(rename = "orientationFront")]
+    pub orientation_front: Vector3,
+    #[serde(rename = "orientationTop")]
+    pub orientation_top: Vector3,
+    pub position: Vector3,
+}
+
+impl Position {
+    pub fn new(position: Vector3, orientation_front: Vector3, orientation_top: Vector3) -> Self {
+        Self {
+            position,
+            orientation_front,
+            orientation_top,
+        }
+    }
+
+    /// Position at the origin looking down +Z with +Y up.
+    pub fn origin() -> Self {
+        Self {
+            position: Vector3::new(0.0, 0.0, 0.0),
+            orientation_front: Vector3::new(0.0, 0.0, 1.0),
+            orientation_top: Vector3::new(0.0, 1.0, 0.0),
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Shared enums
 // ─────────────────────────────────────────────────────────────────────────────
 
