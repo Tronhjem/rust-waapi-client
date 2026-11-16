@@ -4,11 +4,12 @@
 //! named `Play_EventTestSound` in the current project.
 
 use waapi_client::{
+    GameObjectRef, Position, Vector3, WaapiClient,
     api::ak::soundengine::{
         SoundenginePostEventArgs, SoundengineRegisterGameObjArgs,
         SoundengineSetDefaultListenersArgs, SoundengineSetPositionArgs,
         SoundengineUnregisterGameObjArgs,
-    }, GameObjectRef, Position, Vector3, WaapiClient
+    },
 };
 
 const LISTENER_ID: u64 = 1;
@@ -45,7 +46,7 @@ async fn main() -> waapi_client::WaapiResult<()> {
         ]))
         .await?;
 
-    // Place the emitter at the origin, facing down +Z with +Y up.
+    // Place the listener at the origin with default forward/up orientation.
     client
         .soundengine()
         .set_position(SoundengineSetPositionArgs::new(
@@ -54,11 +55,13 @@ async fn main() -> waapi_client::WaapiResult<()> {
         ))
         .await?;
 
+    // Offset the emitter using Vector3 arithmetic: 2 units behind and 2 units right of the listener.
+    let emitter_position = Vector3::forward * -2.0 + Vector3::right * 2.0;
     client
         .soundengine()
         .set_position(SoundengineSetPositionArgs::new(
             GameObjectRef::game_object(EMITTER_ID),
-            Position::new(Vector3::new(-2.0,0.0,-2.0), Vector3::new(1.0,0.0,0.0), Vector3::new(0.0,1.0,0.0)),
+            Position::new(emitter_position),
         ))
         .await?;
 

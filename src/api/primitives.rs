@@ -112,16 +112,93 @@ impl<'de> Deserialize<'de> for PlatformRef {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// A 3D vector used for position and orientation.
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub struct Vector3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
+#[allow(non_upper_case_globals)]
 impl Vector3 {
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
+    }
+
+    /// (1, 0, 0)
+    pub const forward: Self = Self::new(1.0, 0.0, 0.0);
+    /// (0, 1, 0)
+    pub const up: Self = Self::new(0.0, 1.0, 0.0);
+    /// (0, 0, 1)
+    pub const right: Self = Self::new(0.0, 0.0, 1.0);
+
+    pub fn add(self, other: Self) -> Self {
+        Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
+    }
+
+    pub fn sub(self, other: Self) -> Self {
+        Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
+    }
+
+    pub fn mul(self, other: Self) -> Self {
+        Self::new(self.x * other.x, self.y * other.y, self.z * other.z)
+    }
+
+    pub fn div(self, other: Self) -> Self {
+        Self::new(self.x / other.x, self.y / other.y, self.z / other.z)
+    }
+
+    pub fn scale(self, scalar: f64) -> Self {
+        Self::new(self.x * scalar, self.y * scalar, self.z * scalar)
+    }
+}
+
+impl std::ops::Add for Vector3 {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        self.add(other)
+    }
+}
+
+impl std::ops::Sub for Vector3 {
+    type Output = Self;
+    fn sub(self, other: Self) -> Self {
+        self.sub(other)
+    }
+}
+
+impl std::ops::Mul for Vector3 {
+    type Output = Self;
+    fn mul(self, other: Self) -> Self {
+        self.mul(other)
+    }
+}
+
+impl std::ops::Mul<f64> for Vector3 {
+    type Output = Self;
+    fn mul(self, scalar: f64) -> Self {
+        self.scale(scalar)
+    }
+}
+
+impl std::ops::Mul<Vector3> for f64 {
+    type Output = Vector3;
+    fn mul(self, v: Vector3) -> Vector3 {
+        v.scale(self)
+    }
+}
+
+impl std::ops::Div for Vector3 {
+    type Output = Self;
+    fn div(self, other: Self) -> Self {
+        self.div(other)
+    }
+}
+
+impl std::ops::Div<f64> for Vector3 {
+    type Output = Self;
+    fn div(self, scalar: f64) -> Self {
+        Self::new(self.x / scalar, self.y / scalar, self.z / scalar)
     }
 }
 
@@ -135,8 +212,31 @@ pub struct Position {
     pub position: Vector3,
 }
 
+impl Default for Position {
+    fn default() -> Self {
+        Self {
+            position: Vector3::default(),
+            orientation_front: Vector3::forward,
+            orientation_top: Vector3::up,
+        }
+    }
+}
+
 impl Position {
-    pub fn new(position: Vector3, orientation_front: Vector3, orientation_top: Vector3) -> Self {
+    /// Position at `position` with default forward/up orientation.
+    pub fn new(position: Vector3) -> Self {
+        Self {
+            position,
+            ..Self::default()
+        }
+    }
+
+    /// Full control over position and orientation.
+    pub fn with_orientations(
+        position: Vector3,
+        orientation_front: Vector3,
+        orientation_top: Vector3,
+    ) -> Self {
         Self {
             position,
             orientation_front,
@@ -144,13 +244,9 @@ impl Position {
         }
     }
 
-    /// Position at the origin looking down +Z with +Y up.
+    /// Position at the origin with default forward/up orientation.
     pub fn origin() -> Self {
-        Self {
-            position: Vector3::new(0.0, 0.0, 0.0),
-            orientation_front: Vector3::new(0.0, 0.0, 1.0),
-            orientation_top: Vector3::new(0.0, 1.0, 0.0),
-        }
+        Self::default()
     }
 }
 
