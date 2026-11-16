@@ -9,6 +9,7 @@ use waapi_client::api::{ObjectReturnField, ObjectReturnOptions, OnNameConflict, 
 use waapi_client::{Event, ObjectRef, ObjectType, Property, WaapiTopic};
 
 const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
+const SUB_ACTOR_MIXER_NAME: &str = "WaapiSubTestActorMixer";
 const SUB_INITIAL_NAME: &str = "WaapiSubTestSound";
 const SUB_RENAMED_NAME: &str = "WaapiSubTestSoundRenamed";
 
@@ -40,16 +41,22 @@ async fn object_events_subscription_sequence() {
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 
-    // Clean up any leftover object from a previous interrupted run before subscribing
-    for name in [SUB_INITIAL_NAME, SUB_RENAMED_NAME] {
-        let path = format!(r"{DEFAULT_WORK_UNIT_PATH}\{name}");
-        let _ = client
-            .wwise()
-            .core()
-            .object()
-            .delete(CoreObjectDeleteArgs::new(ObjectRef::from(path.as_str())))
-            .await;
-    }
+    // Create a dedicated parent ActorMixer (replacing any leftover one from an interrupted run)
+    let mixer_created = client
+        .wwise()
+        .core()
+        .object()
+        .create(
+            CoreObjectCreateArgs::new(
+                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectType::ActorMixer,
+                SUB_ACTOR_MIXER_NAME.to_string(),
+            )
+            .on_name_conflict(OnNameConflict::Replace),
+        )
+        .await
+        .expect("Failed to create parent ActorMixer for subscription sequence");
+    let mixer_id = mixer_created.id.expect("Created ActorMixer missing id");
 
     let sub_opts = ObjectReturnOptions::new().return_fields(vec![
         ObjectReturnField::Id,
@@ -80,14 +87,14 @@ async fn object_events_subscription_sequence() {
         .await
         .expect("Failed to subscribe to ak.wwise.core.object.preDeleted");
 
-    // 2. Create a Sound object
+    // 2. Create a Sound object under the test ActorMixer
     let created = client
         .wwise()
         .core()
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectRef::from(mixer_id.as_str()),
                 ObjectType::Sound,
                 SUB_INITIAL_NAME.to_string(),
             )
@@ -174,6 +181,16 @@ async fn object_events_subscription_sequence() {
         .unsubscribe(pre_deleted_sub_id)
         .await
         .expect("Failed to unsubscribe from object.preDeleted");
+
+    client
+        .wwise()
+        .core()
+        .object()
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+            mixer_id.as_str(),
+        )))
+        .await
+        .expect("Failed to delete parent ActorMixer for subscription sequence");
 
     client
         .shutdown()
