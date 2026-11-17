@@ -125,12 +125,12 @@ impl Vector3 {
         Self { x, y, z }
     }
 
-    /// (1, 0, 0)
-    pub const forward: Self = Self::new(1.0, 0.0, 0.0);
+    /// (0, 0, 1)
+    pub const forward: Self = Self::new(0.0, 0.0, 1.0);
     /// (0, 1, 0)
     pub const up: Self = Self::new(0.0, 1.0, 0.0);
-    /// (0, 0, 1)
-    pub const right: Self = Self::new(0.0, 0.0, 1.0);
+    /// (1, 0, 0)
+    pub const right: Self = Self::new(1.0, 0.0, 0.0);
 
     pub fn add(self, other: Self) -> Self {
         Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -138,14 +138,6 @@ impl Vector3 {
 
     pub fn sub(self, other: Self) -> Self {
         Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-
-    pub fn mul(self, other: Self) -> Self {
-        Self::new(self.x * other.x, self.y * other.y, self.z * other.z)
-    }
-
-    pub fn div(self, other: Self) -> Self {
-        Self::new(self.x / other.x, self.y / other.y, self.z / other.z)
     }
 
     pub fn scale(self, scalar: f64) -> Self {
@@ -167,13 +159,6 @@ impl std::ops::Sub for Vector3 {
     }
 }
 
-impl std::ops::Mul for Vector3 {
-    type Output = Self;
-    fn mul(self, other: Self) -> Self {
-        self.mul(other)
-    }
-}
-
 impl std::ops::Mul<f64> for Vector3 {
     type Output = Self;
     fn mul(self, scalar: f64) -> Self {
@@ -185,13 +170,6 @@ impl std::ops::Mul<Vector3> for f64 {
     type Output = Vector3;
     fn mul(self, v: Vector3) -> Vector3 {
         v.scale(self)
-    }
-}
-
-impl std::ops::Div for Vector3 {
-    type Output = Self;
-    fn div(self, other: Self) -> Self {
-        self.div(other)
     }
 }
 

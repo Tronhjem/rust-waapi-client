@@ -1,9 +1,14 @@
 use super::connect_client;
-use waapi_client::api::ak::soundengine::{SoundenginePostEventArgs, SoundengineSetRtpcValueArgs};
+use waapi_client::api::ak::soundengine::{
+    SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetDefaultListenersArgs,
+    SoundengineSetPositionArgs, SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
+};
 use waapi_client::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
 use waapi_client::api::ak::wwise::ui::UiGetSelectedObjectsOptions;
 use waapi_client::api::{EventRef, ObjectReturnField, OnNameConflict, RtpcRef};
-use waapi_client::{ObjectRef, ObjectType, Property, WaapiFunction, json};
+use waapi_client::{
+    GameObjectRef, ObjectRef, ObjectType, Position, Property, Vector3, WaapiFunction, json,
+};
 
 const GAME_PARAMS_WU_PATH: &str = r"\Game Parameters\Default Work Unit";
 const EVENTS_WU_PATH: &str = r"\Events\Default Work Unit";
@@ -90,25 +95,83 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .expect("Failed to create temporary Event");
     let event_id = created_event.id.expect("Created Event missing id");
 
+    // Register listener and emitter game objects, set default listeners and 3D positions
+    let listener = GameObjectRef::game_object(1001);
+    let emitter = GameObjectRef::game_object(1002);
+
+    client
+        .soundengine()
+        .register_game_obj(SoundengineRegisterGameObjArgs::new(
+            listener,
+            "WaapiSeqListener".into(),
+        ))
+        .await
+        .expect("Failed to call ak.soundengine.registerGameObj for listener");
+    client
+        .soundengine()
+        .register_game_obj(SoundengineRegisterGameObjArgs::new(
+            emitter,
+            "WaapiSeqEmitter".into(),
+        ))
+        .await
+        .expect("Failed to call ak.soundengine.registerGameObj for emitter");
+
+    client
+        .soundengine()
+        .set_default_listeners(SoundengineSetDefaultListenersArgs::new(vec![listener]))
+        .await
+        .expect("Failed to call ak.soundengine.setDefaultListeners");
+
+    client
+        .soundengine()
+        .set_position(SoundengineSetPositionArgs::new(
+            listener,
+            Position::origin(),
+        ))
+        .await
+        .expect("Failed to call ak.soundengine.setPosition for listener");
+
+    let emitter_pos = Vector3::forward * -2.0 + Vector3::right * 2.0;
+    client
+        .soundengine()
+        .set_position(SoundengineSetPositionArgs::new(
+            emitter,
+            Position::new(emitter_pos),
+        ))
+        .await
+        .expect("Failed to call ak.soundengine.setPosition for emitter");
+
     // Set RTPC value via client.soundengine().set_rtpc_value
     client
         .soundengine()
-        .set_rtpc_value(SoundengineSetRtpcValueArgs::new(
-            RtpcRef::from(TEST_RTPC_NAME),
-            75.0,
-        ))
+        .set_rtpc_value(
+            SoundengineSetRtpcValueArgs::new(RtpcRef::from(TEST_RTPC_NAME), 75.0)
+                .game_object(emitter),
+        )
         .await
         .expect("Failed to call ak.soundengine.setRTPCValue");
 
     // Post Event via client.soundengine().post_event
     let post_resp = client
         .soundengine()
-        .post_event(SoundenginePostEventArgs::new(EventRef::from(
-            TEST_EVENT_NAME,
-        )))
+        .post_event(
+            SoundenginePostEventArgs::new(EventRef::from(TEST_EVENT_NAME)).game_object(emitter),
+        )
         .await
         .expect("Failed to call ak.soundengine.postEvent");
     let _ = post_resp.playing_id;
+
+    // Unregister emitter and listener game objects
+    client
+        .soundengine()
+        .unregister_game_obj(SoundengineUnregisterGameObjArgs::new(emitter))
+        .await
+        .expect("Failed to call ak.soundengine.unregisterGameObj for emitter");
+    client
+        .soundengine()
+        .unregister_game_obj(SoundengineUnregisterGameObjArgs::new(listener))
+        .await
+        .expect("Failed to call ak.soundengine.unregisterGameObj for listener");
 
     // 4. Test low-level escape hatch `client.call` + `waapi_client::json!` against the temporary GameParameter
     let raw_resp = client

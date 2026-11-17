@@ -4,11 +4,15 @@
 //! named `Play_EventTestSound` in the current project.
 
 use waapi_client::{
-    api::{ak::soundengine::{
-        SoundenginePostEventArgs, SoundengineRegisterGameObjArgs,
-        SoundengineSetDefaultListenersArgs, SoundengineSetPositionArgs,
-        SoundengineUnregisterGameObjArgs,
-    }, SoundEngineObjectRef}, GameObjectRef, Position, Vector3, WaapiClient
+    GameObjectRef, Position, Vector3, WaapiClient,
+    api::{
+        SoundEngineObjectRef,
+        ak::soundengine::{
+            SoundenginePostEventArgs, SoundengineRegisterGameObjArgs,
+            SoundengineSetDefaultListenersArgs, SoundengineSetPositionArgs,
+            SoundengineUnregisterGameObjArgs,
+        },
+    },
 };
 
 const LISTENER_ID: u64 = 1;

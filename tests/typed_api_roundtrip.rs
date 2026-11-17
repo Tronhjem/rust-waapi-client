@@ -1,6 +1,7 @@
 use serde_json::json;
 use waapi_client::api::generated::ak::soundengine::{
-    SoundenginePostEventArgs, SoundengineSetRtpcValueArgs,
+    SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetDefaultListenersArgs,
+    SoundengineSetPositionArgs, SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
 };
 use waapi_client::api::generated::ak::wwise::core::CoreGetInfoResponse;
 use waapi_client::api::generated::ak::wwise::core::audio::{
@@ -16,8 +17,8 @@ use waapi_client::api::generated::ak::wwise::ui::{
 };
 use waapi_client::api::generated::primitives::{
     ChildObject, GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery,
-    ObjectReturnField, ObjectType, OnNameConflict, PlatformRef, Property, PropertyValue, RtpcRef,
-    Transform, TransformSelect,
+    ObjectReturnField, ObjectType, OnNameConflict, PlatformRef, Position, Property, PropertyValue,
+    RtpcRef, Transform, TransformSelect, Vector3,
 };
 use waapi_client::api::primitives::ObjectRef;
 
@@ -135,6 +136,46 @@ fn soundengine_set_rtpc_value_args_serializes() {
     assert_eq!(value["rtpc"], "Volume");
     assert_eq!(value["value"], 0.75);
     assert_eq!(value["gameObject"], 100);
+}
+
+#[test]
+fn soundengine_register_position_and_listeners_serialize() {
+    let reg = serde_json::to_value(SoundengineRegisterGameObjArgs::new(
+        GameObjectRef::game_object(1),
+        "Listener".into(),
+    ))
+    .unwrap();
+    assert_eq!(reg, json!({ "gameObject": 1, "name": "Listener" }));
+
+    let listeners = serde_json::to_value(SoundengineSetDefaultListenersArgs::new(vec![
+        GameObjectRef::game_object(1),
+    ]))
+    .unwrap();
+    assert_eq!(listeners, json!({ "listeners": [1] }));
+
+    let pos_val = Vector3::forward * -2.0 + Vector3::right * 2.0;
+    let set_pos = serde_json::to_value(SoundengineSetPositionArgs::new(
+        GameObjectRef::game_object(2),
+        Position::new(pos_val),
+    ))
+    .unwrap();
+    assert_eq!(
+        set_pos,
+        json!({
+            "gameObject": 2,
+            "position": {
+                "orientationFront": { "x": 0.0, "y": 0.0, "z": 1.0 },
+                "orientationTop": { "x": 0.0, "y": 1.0, "z": 0.0 },
+                "position": { "x": 2.0, "y": 0.0, "z": -2.0 }
+            }
+        })
+    );
+
+    let unreg = serde_json::to_value(SoundengineUnregisterGameObjArgs::new(
+        GameObjectRef::game_object(2),
+    ))
+    .unwrap();
+    assert_eq!(unreg, json!({ "gameObject": 2 }));
 }
 
 #[test]
