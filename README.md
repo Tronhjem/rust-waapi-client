@@ -137,6 +137,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 ### 4. Shared `$ref` Definitions, Return Fields, and `@Property` Extensions
 
 - **`Definitions/*.json` `$ref` resolution**: Shared references across `common_definitions.json`, `waapi_definitions.json`, `waapi_ui_definitions.json`, and `wafm_definitions.json` map to shared primitives in `src/api/primitives.rs` and `src/api/generated/primitives.rs` (`ObjectRef`, `PlatformRef`, `SoundEngineObjectRef`, `GameObjectRef`, `LanguageRef`, `WwiseObject`, `WwiseObjectRef`, `OnNameConflict`, `ListMode`, `ImportOperation`, `LogSeverity`, `PropertyValue`, `ChildObject`).
+- **Endpoint-domain enums and structs**: Schemas with inline string enums or nested objects map to generated types in `src/api/generated/primitives.rs`, including `TransportAction` / `TransportState` / `TransportObject` (`transport.*`), `AttenuationCurveType` / `AttenuationCurveUse` / `CurvePoint2D` / `CurveShape` (`object.{get,set}AttenuationCurve`), `PasteMode` (`object.pasteProperties`), `SwitchContainerAssignment` (`switchContainer.getAssignments`), `ProjectMigrationAction` (`ui.project.open`), and `ProjectPlatformInfo` / `ProjectLanguageInfo` / `ProjectDirectoriesInfo` (`core.getProjectInfo`).
 - **Domain-specific return field enums**: Rather than untyped strings, `waapi_definitions.json` return expressions are generated as strongly-typed enums:
   - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` (and `From<&str>` / `From<String>`) for arbitrary dot-accessor queries.
   - `BusReturnField`, `AudioObjectReturnField`, and `VoiceReturnField` for profiler queries.
@@ -147,24 +148,58 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 
 ### 5. Currently Generated Typed Endpoints
 
-The following 14 endpoints currently have generated typed structs and chained methods under `waapi_client::api::generated`:
+The following 46 endpoints currently have generated typed structs and chained methods under `waapi_client::api::generated`:
 
-| WAAPI URI | Chained Method on `WaapiClient` | Module (`waapi_client::api::generated::*`) | `Args` Type | `Options` Type | `Response` Type |
-|---|---|---|---|---|---|
-| `ak.wwise.core.getInfo` | `client.wwise().core().get_info()` | `ak::wwise::core` | — | — | `CoreGetInfoResponse` |
-| `ak.wwise.core.object.get` | `client.wwise().core().object().get(args, options)` | `ak::wwise::core::object` | `CoreObjectGetArgs` | `CoreObjectGetOptions` (`ObjectReturnOptions`) | `CoreObjectGetResponse` |
-| `ak.wwise.core.object.set` | `client.wwise().core().object().set(args, options)` | `ak::wwise::core::object` | `CoreObjectSetArgs` + `CoreObjectSetItem` | `CoreObjectSetOptions` (`ObjectReturnOptions`) | `CoreObjectSetResponse` + `CoreObjectSetObject` |
-| `ak.wwise.core.object.create` | `client.wwise().core().object().create(args, options)` | `ak::wwise::core::object` | `CoreObjectCreateArgs` | `CoreObjectCreateOptions` (`ObjectReturnOptions`) | `CoreObjectCreateResponse` |
-| `ak.wwise.core.object.delete` | `client.wwise().core().object().delete(args)` | `ak::wwise::core::object` | `CoreObjectDeleteArgs` | — | `()` |
-| `ak.wwise.core.audio.import` | `client.wwise().core().audio().import(args, options)` | `ak::wwise::core::audio` | `CoreAudioImportArgs` (`ImportItem`, `ImportDefaults`) | `CoreAudioImportOptions` (`ObjectReturnOptions`) | `CoreAudioImportResponse` (`ImportLogEntry`) |
-| `ak.wwise.core.project.save` | `client.wwise().core().project().save(args)` | `ak::wwise::core::project` | `CoreProjectSaveArgs` | — | `()` |
-| `ak.wwise.ui.getSelectedObjects` | `client.wwise().ui().get_selected_objects(options)` | `ak::wwise::ui` | — | `UiGetSelectedObjectsOptions` (`ObjectReturnOptions`) | `UiGetSelectedObjectsResponse` |
-| `ak.soundengine.postEvent` | `client.soundengine().post_event(args)` | `ak::soundengine` | `SoundenginePostEventArgs` | — | `SoundenginePostEventResponse` |
-| `ak.soundengine.setRTPCValue` | `client.soundengine().set_rtpc_value(args)` | `ak::soundengine` | `SoundengineSetRtpcValueArgs` | — | `()` |
-| `ak.soundengine.registerGameObj` | `client.soundengine().register_game_obj(args)` | `ak::soundengine` | `SoundengineRegisterGameObjArgs` | — | `()` |
-| `ak.soundengine.unregisterGameObj` | `client.soundengine().unregister_game_obj(args)` | `ak::soundengine` | `SoundengineUnregisterGameObjArgs` | — | `()` |
-| `ak.soundengine.setPosition` | `client.soundengine().set_position(args)` | `ak::soundengine` | `SoundengineSetPositionArgs` (`Position`, `Vector3`) | — | `()` |
-| `ak.soundengine.setDefaultListeners` | `client.soundengine().set_default_listeners(args)` | `ak::soundengine` | `SoundengineSetDefaultListenersArgs` | — | `()` |
+| WAAPI URI | Chained Method on `WaapiClient` | `Args` Type | `Options` Type | `Response` Type |
+|---|---|---|---|---|
+| `ak.wwise.core.getInfo` | `client.wwise().core().get_info()` | — | — | `CoreGetInfoResponse` |
+| `ak.wwise.core.getProjectInfo` | `client.wwise().core().get_project_info()` | — | — | `CoreGetProjectInfoResponse` |
+| `ak.wwise.core.project.save` | `client.wwise().core().project().save(args)` | `CoreProjectSaveArgs` | — | `()` |
+| `ak.wwise.core.object.get` | `client.wwise().core().object().get(args, options)` | `CoreObjectGetArgs` | `CoreObjectGetOptions` | `CoreObjectGetResponse` |
+| `ak.wwise.core.object.set` | `client.wwise().core().object().set(args, options)` | `CoreObjectSetArgs` + `CoreObjectSetItem` | `CoreObjectSetOptions` | `CoreObjectSetResponse` + `CoreObjectSetObject` |
+| `ak.wwise.core.object.create` | `client.wwise().core().object().create(args, options)` | `CoreObjectCreateArgs` | `CoreObjectCreateOptions` | `CoreObjectCreateResponse` |
+| `ak.wwise.core.object.delete` | `client.wwise().core().object().delete(args)` | `CoreObjectDeleteArgs` | — | `()` |
+| `ak.wwise.core.object.move` | `client.wwise().core().object().move_(args)` | `CoreObjectMoveArgs` | — | `CoreObjectMoveResponse` (`WwiseObject`) |
+| `ak.wwise.core.object.copy` | `client.wwise().core().object().copy(args, options)` | `CoreObjectCopyArgs` | `CoreObjectCopyOptions` | `CoreObjectCopyResponse` (`WwiseObject`) |
+| `ak.wwise.core.object.setName` | `client.wwise().core().object().set_name(args)` | `CoreObjectSetNameArgs` | — | `()` |
+| `ak.wwise.core.object.setNotes` | `client.wwise().core().object().set_notes(args)` | `CoreObjectSetNotesArgs` | — | `()` |
+| `ak.wwise.core.object.setProperty` | `client.wwise().core().object().set_property(args)` | `CoreObjectSetPropertyArgs` | — | `()` |
+| `ak.wwise.core.object.setReference` | `client.wwise().core().object().set_reference(args)` | `CoreObjectSetReferenceArgs` | — | `()` |
+| `ak.wwise.core.object.setRandomizer` | `client.wwise().core().object().set_randomizer(args)` | `CoreObjectSetRandomizerArgs` | — | `()` |
+| `ak.wwise.core.object.getAttenuationCurve` | `client.wwise().core().object().get_attenuation_curve(args)` | `CoreObjectGetAttenuationCurveArgs` | — | `CoreObjectGetAttenuationCurveResponse` |
+| `ak.wwise.core.object.setAttenuationCurve` | `client.wwise().core().object().set_attenuation_curve(args)` | `CoreObjectSetAttenuationCurveArgs` | — | `()` |
+| `ak.wwise.core.object.diff` | `client.wwise().core().object().diff(args)` | `CoreObjectDiffArgs` | — | `CoreObjectDiffResponse` |
+| `ak.wwise.core.object.pasteProperties` | `client.wwise().core().object().paste_properties(args)` | `CoreObjectPastePropertiesArgs` | — | `()` |
+| `ak.wwise.core.switchContainer.addAssignment` | `client.wwise().core().switch_container().add_assignment(args)` | `CoreSwitchContainerAddAssignmentArgs` | — | `()` |
+| `ak.wwise.core.switchContainer.getAssignments` | `client.wwise().core().switch_container().get_assignments(args)` | `CoreSwitchContainerGetAssignmentsArgs` | — | `CoreSwitchContainerGetAssignmentsResponse` |
+| `ak.wwise.core.switchContainer.removeAssignment` | `client.wwise().core().switch_container().remove_assignment(args)` | `CoreSwitchContainerRemoveAssignmentArgs` | — | `()` |
+| `ak.wwise.core.audio.import` | `client.wwise().core().audio().import(args, options)` | `CoreAudioImportArgs` (`ImportItem`, `ImportDefaults`) | `CoreAudioImportOptions` | `CoreAudioImportResponse` (`ImportLogEntry`) |
+| `ak.wwise.core.transport.create` | `client.wwise().core().transport().create(args)` | `CoreTransportCreateArgs` | — | `CoreTransportCreateResponse` |
+| `ak.wwise.core.transport.destroy` | `client.wwise().core().transport().destroy(args)` | `CoreTransportDestroyArgs` | — | `()` |
+| `ak.wwise.core.transport.executeAction` | `client.wwise().core().transport().execute_action(args)` | `CoreTransportExecuteActionArgs` (`TransportAction`) | — | `()` |
+| `ak.wwise.core.transport.getState` | `client.wwise().core().transport().get_state(args)` | `CoreTransportGetStateArgs` | — | `CoreTransportGetStateResponse` (`TransportState`) |
+| `ak.wwise.core.transport.getList` | `client.wwise().core().transport().get_list()` | — | — | `CoreTransportGetListResponse` (`TransportObject`) |
+| `ak.wwise.core.transport.prepare` | `client.wwise().core().transport().prepare(args)` | `CoreTransportPrepareArgs` | — | `()` |
+| `ak.wwise.core.transport.useOriginals` | `client.wwise().core().transport().use_originals(args)` | `CoreTransportUseOriginalsArgs` | — | `()` |
+| `ak.wwise.core.undo.beginGroup` | `client.wwise().core().undo().begin_group()` | — | — | `()` |
+| `ak.wwise.core.undo.endGroup` | `client.wwise().core().undo().end_group(args)` | `CoreUndoEndGroupArgs` | — | `()` |
+| `ak.wwise.core.undo.cancelGroup` | `client.wwise().core().undo().cancel_group(args)` | `CoreUndoCancelGroupArgs` | — | `()` |
+| `ak.wwise.core.undo.undo` | `client.wwise().core().undo().undo()` | — | — | `()` |
+| `ak.wwise.core.undo.redo` | `client.wwise().core().undo().redo()` | — | — | `()` |
+| `ak.wwise.ui.getSelectedObjects` | `client.wwise().ui().get_selected_objects(options)` | — | `UiGetSelectedObjectsOptions` | `UiGetSelectedObjectsResponse` |
+| `ak.wwise.ui.bringToForeground` | `client.wwise().ui().bring_to_foreground()` | — | — | `()` |
+| `ak.wwise.ui.commands.execute` | `client.wwise().ui().commands().execute(args)` | `UiCommandsExecuteArgs` | — | `()` |
+| `ak.wwise.ui.commands.getCommands` | `client.wwise().ui().commands().get_commands()` | — | — | `UiCommandsGetCommandsResponse` |
+| `ak.wwise.ui.project.open` | `client.wwise().ui().project().open(args)` | `UiProjectOpenArgs` (`ProjectMigrationAction`) | — | `()` |
+| `ak.wwise.ui.project.close` | `client.wwise().ui().project().close(args)` | `UiProjectCloseArgs` | — | `UiProjectCloseResponse` |
+| `ak.soundengine.postEvent` | `client.soundengine().post_event(args)` | `SoundenginePostEventArgs` | — | `SoundenginePostEventResponse` |
+| `ak.soundengine.setRTPCValue` | `client.soundengine().set_rtpc_value(args)` | `SoundengineSetRtpcValueArgs` | — | `()` |
+| `ak.soundengine.registerGameObj` | `client.soundengine().register_game_obj(args)` | `SoundengineRegisterGameObjArgs` | — | `()` |
+| `ak.soundengine.unregisterGameObj` | `client.soundengine().unregister_game_obj(args)` | `SoundengineUnregisterGameObjArgs` | — | `()` |
+| `ak.soundengine.setPosition` | `client.soundengine().set_position(args)` | `SoundengineSetPositionArgs` (`Position`, `Vector3`) | — | `()` |
+| `ak.soundengine.setDefaultListeners` | `client.soundengine().set_default_listeners(args)` | `SoundengineSetDefaultListenersArgs` | — | `()` |
+
+All generated modules live under `waapi_client::api::generated::ak` (e.g. `ak::wwise::core::object`, `ak::wwise::core::transport`, `ak::wwise::core::undo`, `ak::wwise::core::switchContainer`, `ak::wwise::ui::commands`).
 
 For any of the 170 WAAPI functions or 34 topics not yet in the table above, use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 

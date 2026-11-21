@@ -6,7 +6,6 @@
 use crate::api::generated::primitives::*;
 
 /// Options for `ak.wwise.ui.getSelectedObjects`.
-
 pub type UiGetSelectedObjectsOptions = ObjectReturnOptions;
 
 /// Response from `ak.wwise.ui.getSelectedObjects`.

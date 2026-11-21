@@ -131,45 +131,51 @@ impl Vector3 {
     pub const up: Self = Self::new(0.0, 1.0, 0.0);
     /// (1, 0, 0)
     pub const right: Self = Self::new(1.0, 0.0, 0.0);
-
-    pub fn add(self, other: Self) -> Self {
-        Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-
-    pub fn sub(self, other: Self) -> Self {
-        Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-
-    pub fn scale(self, scalar: f64) -> Self {
-        Self::new(self.x * scalar, self.y * scalar, self.z * scalar)
-    }
 }
 
 impl std::ops::Add for Vector3 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
-        self.add(other)
+        Self::new(self.x + other.x, self.y + other.y, self.z + other.z)
+    }
+}
+
+impl std::ops::AddAssign for Vector3 {
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
     }
 }
 
 impl std::ops::Sub for Vector3 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
-        self.sub(other)
+        Self::new(self.x - other.x, self.y - other.y, self.z - other.z)
+    }
+}
+
+impl std::ops::SubAssign for Vector3 {
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other;
     }
 }
 
 impl std::ops::Mul<f64> for Vector3 {
     type Output = Self;
     fn mul(self, scalar: f64) -> Self {
-        self.scale(scalar)
+        Self::new(self.x * scalar, self.y * scalar, self.z * scalar)
     }
 }
 
 impl std::ops::Mul<Vector3> for f64 {
     type Output = Vector3;
     fn mul(self, v: Vector3) -> Vector3 {
-        v.scale(self)
+        v * self
+    }
+}
+
+impl std::ops::MulAssign<f64> for Vector3 {
+    fn mul_assign(&mut self, scalar: f64) {
+        *self = *self * scalar;
     }
 }
 
@@ -177,6 +183,19 @@ impl std::ops::Div<f64> for Vector3 {
     type Output = Self;
     fn div(self, scalar: f64) -> Self {
         Self::new(self.x / scalar, self.y / scalar, self.z / scalar)
+    }
+}
+
+impl std::ops::DivAssign<f64> for Vector3 {
+    fn div_assign(&mut self, scalar: f64) {
+        *self = *self / scalar;
+    }
+}
+
+impl std::ops::Neg for Vector3 {
+    type Output = Self;
+    fn neg(self) -> Self {
+        Self::new(-self.x, -self.y, -self.z)
     }
 }
 

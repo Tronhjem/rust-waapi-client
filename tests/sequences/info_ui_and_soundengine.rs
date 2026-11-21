@@ -1,4 +1,4 @@
-use super::connect_client;
+use super::{connect_client, sequence_lock};
 use waapi_client::api::ak::soundengine::{
     SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetDefaultListenersArgs,
     SoundengineSetPositionArgs, SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
@@ -17,6 +17,7 @@ const TEST_EVENT_NAME: &str = "WaapiSeqTestEvent";
 
 #[tokio::test]
 async fn info_ui_soundengine_and_raw_call_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");

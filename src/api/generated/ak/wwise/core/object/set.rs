@@ -171,7 +171,6 @@ impl CoreObjectSetArgs {
 }
 
 /// Options for `ak.wwise.core.object.set`.
-
 pub type CoreObjectSetOptions = ObjectReturnOptions;
 
 /// One object entry in the `object.set` response.

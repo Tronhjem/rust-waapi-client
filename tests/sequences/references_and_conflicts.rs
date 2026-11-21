@@ -1,4 +1,4 @@
-use super::connect_client;
+use super::{connect_client, sequence_lock};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
     CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetOptions,
@@ -15,6 +15,7 @@ const MASTER_AUDIO_BUS_PATH: &str = r"\Master-Mixer Hierarchy\Default Work Unit\
 
 #[tokio::test]
 async fn object_references_and_event_wiring_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
@@ -257,6 +258,7 @@ async fn object_references_and_event_wiring_sequence() {
 
 #[tokio::test]
 async fn conflict_strategies_and_list_modes_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");

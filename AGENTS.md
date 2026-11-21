@@ -22,7 +22,7 @@ RUST_LOG=info cargo run --example get_info
 - `src/types.rs` — Re-exports of `serde_json::Value`/`Map` for convenience.
 - `src/waapi_function_api.rs` / `src/waapi_topics_api.rs` — Auto-generated const strings (`ak::...`) and typed URI enums (`WaapiFunction` / `WaapiTopic`) for all WAAPI RPC endpoints and subscription topics.
 - `src/api/` — Hand-written helper types (`primitives.rs`) and generated typed bindings (`generated/`, including `ObjectType` and `Property` from `WObjects.xml`, shared `primitives.rs`, endpoint modules under `ak/`, and chained namespace clients in `clients.rs`).
-- `tests/wwise_sequences.rs` & `tests/sequences/` — End-to-end WAAPI command sequence tests against a live Wwise instance.
+- `tests/wwise_sequences.rs` & `tests/sequences/` — End-to-end WAAPI command sequence tests against a live Wwise instance. Every sequence test must start with `let _guard = sequence_lock().await;` (from `tests/sequences/mod.rs`): Wwise has a single global undo stack and transport list, so live tests are serialized through a shared `tokio::sync::Mutex`.
 
 ## Important patterns
 

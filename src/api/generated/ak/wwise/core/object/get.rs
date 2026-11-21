@@ -54,7 +54,6 @@ impl CoreObjectGetArgs {
 }
 
 /// Options for `ak.wwise.core.object.get`.
-
 pub type CoreObjectGetOptions = ObjectReturnOptions;
 
 /// Response from `ak.wwise.core.object.get`.

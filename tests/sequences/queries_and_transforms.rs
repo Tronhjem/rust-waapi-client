@@ -1,4 +1,4 @@
-use super::connect_client;
+use super::{connect_client, sequence_lock};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
 };
@@ -18,6 +18,7 @@ const SOUND_BETA_NAME: &str = "WaapiQuerySoundBeta";
 
 #[tokio::test]
 async fn object_get_queries_and_transforms_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");

@@ -12,20 +12,58 @@ use crate::api::generated::ak::soundengine::{
     SoundenginePostEventArgs, SoundenginePostEventResponse,
 };
 use crate::api::generated::ak::wwise::core::CoreGetInfoResponse;
+use crate::api::generated::ak::wwise::core::CoreGetProjectInfoResponse;
 use crate::api::generated::ak::wwise::core::audio::{
     CoreAudioImportArgs, CoreAudioImportOptions, CoreAudioImportResponse,
 };
 use crate::api::generated::ak::wwise::core::object::CoreObjectDeleteArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectPastePropertiesArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetAttenuationCurveArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetNameArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetNotesArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetPropertyArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetRandomizerArgs;
+use crate::api::generated::ak::wwise::core::object::CoreObjectSetReferenceArgs;
+use crate::api::generated::ak::wwise::core::object::{
+    CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCopyResponse,
+};
 use crate::api::generated::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectCreateResponse,
 };
+use crate::api::generated::ak::wwise::core::object::{CoreObjectDiffArgs, CoreObjectDiffResponse};
 use crate::api::generated::ak::wwise::core::object::{
     CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectGetResponse,
 };
 use crate::api::generated::ak::wwise::core::object::{
+    CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse,
+};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectMoveArgs, CoreObjectMoveResponse};
+use crate::api::generated::ak::wwise::core::object::{
     CoreObjectSetArgs, CoreObjectSetOptions, CoreObjectSetResponse,
 };
 use crate::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
+use crate::api::generated::ak::wwise::core::switchContainer::CoreSwitchContainerAddAssignmentArgs;
+use crate::api::generated::ak::wwise::core::switchContainer::CoreSwitchContainerRemoveAssignmentArgs;
+use crate::api::generated::ak::wwise::core::switchContainer::{
+    CoreSwitchContainerGetAssignmentsArgs, CoreSwitchContainerGetAssignmentsResponse,
+};
+use crate::api::generated::ak::wwise::core::transport::CoreTransportDestroyArgs;
+use crate::api::generated::ak::wwise::core::transport::CoreTransportExecuteActionArgs;
+use crate::api::generated::ak::wwise::core::transport::CoreTransportGetListResponse;
+use crate::api::generated::ak::wwise::core::transport::CoreTransportPrepareArgs;
+use crate::api::generated::ak::wwise::core::transport::CoreTransportUseOriginalsArgs;
+use crate::api::generated::ak::wwise::core::transport::{
+    CoreTransportCreateArgs, CoreTransportCreateResponse,
+};
+use crate::api::generated::ak::wwise::core::transport::{
+    CoreTransportGetStateArgs, CoreTransportGetStateResponse,
+};
+use crate::api::generated::ak::wwise::core::undo::CoreUndoCancelGroupArgs;
+use crate::api::generated::ak::wwise::core::undo::CoreUndoEndGroupArgs;
+use crate::api::generated::ak::wwise::ui::commands::UiCommandsExecuteArgs;
+use crate::api::generated::ak::wwise::ui::commands::UiCommandsGetCommandsResponse;
+use crate::api::generated::ak::wwise::ui::project::UiProjectOpenArgs;
+use crate::api::generated::ak::wwise::ui::project::{UiProjectCloseArgs, UiProjectCloseResponse};
 use crate::api::generated::ak::wwise::ui::{
     UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
@@ -148,8 +186,20 @@ pub struct WwiseCoreClient<'a> {
 }
 
 impl<'a> WwiseCoreClient<'a> {
+    pub fn project(self) -> WwiseCoreProjectClient<'a> {
+        WwiseCoreProjectClient {
+            client: self.client,
+        }
+    }
+
     pub fn object(self) -> WwiseCoreObjectClient<'a> {
         WwiseCoreObjectClient {
+            client: self.client,
+        }
+    }
+
+    pub fn switch_container(self) -> WwiseCoreSwitchContainerClient<'a> {
+        WwiseCoreSwitchContainerClient {
             client: self.client,
         }
     }
@@ -160,8 +210,14 @@ impl<'a> WwiseCoreClient<'a> {
         }
     }
 
-    pub fn project(self) -> WwiseCoreProjectClient<'a> {
-        WwiseCoreProjectClient {
+    pub fn transport(self) -> WwiseCoreTransportClient<'a> {
+        WwiseCoreTransportClient {
+            client: self.client,
+        }
+    }
+
+    pub fn undo(self) -> WwiseCoreUndoClient<'a> {
+        WwiseCoreUndoClient {
             client: self.client,
         }
     }
@@ -172,6 +228,13 @@ impl<'a> WwiseCoreClient<'a> {
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None)
             .await
     }
+
+    /// `ak.wwise.core.getProjectInfo`.
+    pub async fn get_project_info(&mut self) -> WaapiResult<CoreGetProjectInfoResponse> {
+        self.client
+            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getProjectInfo, None, None)
+            .await
+    }
 }
 
 pub struct WwiseUiClient<'a> {
@@ -179,6 +242,18 @@ pub struct WwiseUiClient<'a> {
 }
 
 impl<'a> WwiseUiClient<'a> {
+    pub fn commands(self) -> WwiseUiCommandsClient<'a> {
+        WwiseUiCommandsClient {
+            client: self.client,
+        }
+    }
+
+    pub fn project(self) -> WwiseUiProjectClient<'a> {
+        WwiseUiProjectClient {
+            client: self.client,
+        }
+    }
+
     /// `ak.wwise.ui.getSelectedObjects`.
     pub async fn get_selected_objects(
         &mut self,
@@ -191,6 +266,28 @@ impl<'a> WwiseUiClient<'a> {
                 Some(options),
             )
             .await
+    }
+
+    /// `ak.wwise.ui.bringToForeground`.
+    pub async fn bring_to_foreground(&mut self) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_ui_bringToForeground, None, None)
+            .await?;
+        Ok(())
+    }
+}
+
+pub struct WwiseCoreProjectClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseCoreProjectClient<'a> {
+    /// `ak.wwise.core.project.save`.
+    pub async fn save(&mut self, args: CoreProjectSaveArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
+            .await?;
+        Ok(())
     }
 }
 
@@ -246,6 +343,189 @@ impl<'a> WwiseCoreObjectClient<'a> {
             )
             .await
     }
+
+    /// `ak.wwise.core.object.move`.
+    pub async fn move_(&mut self, args: CoreObjectMoveArgs) -> WaapiResult<CoreObjectMoveResponse> {
+        self.client
+            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_move, Some(args), None)
+            .await
+    }
+
+    /// `ak.wwise.core.object.copy`.
+    pub async fn copy(
+        &mut self,
+        args: CoreObjectCopyArgs,
+        options: CoreObjectCopyOptions,
+    ) -> WaapiResult<CoreObjectCopyResponse> {
+        self.client
+            .call_typed(
+                WaapiFunction::ak_wwise_core_object_copy,
+                Some(args),
+                Some(options),
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.object.setName`.
+    pub async fn set_name(&mut self, args: CoreObjectSetNameArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setName,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.setNotes`.
+    pub async fn set_notes(&mut self, args: CoreObjectSetNotesArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setNotes,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.setProperty`.
+    pub async fn set_property(&mut self, args: CoreObjectSetPropertyArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setProperty,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.setReference`.
+    pub async fn set_reference(&mut self, args: CoreObjectSetReferenceArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setReference,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.setRandomizer`.
+    pub async fn set_randomizer(&mut self, args: CoreObjectSetRandomizerArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setRandomizer,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.getAttenuationCurve`.
+    pub async fn get_attenuation_curve(
+        &mut self,
+        args: CoreObjectGetAttenuationCurveArgs,
+    ) -> WaapiResult<CoreObjectGetAttenuationCurveResponse> {
+        self.client
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_object_getAttenuationCurve,
+                Some(args),
+                None,
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.object.setAttenuationCurve`.
+    pub async fn set_attenuation_curve(
+        &mut self,
+        args: CoreObjectSetAttenuationCurveArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_setAttenuationCurve,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.object.diff`.
+    pub async fn diff(&mut self, args: CoreObjectDiffArgs) -> WaapiResult<CoreObjectDiffResponse> {
+        self.client
+            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_diff, Some(args), None)
+            .await
+    }
+
+    /// `ak.wwise.core.object.pasteProperties`.
+    pub async fn paste_properties(
+        &mut self,
+        args: CoreObjectPastePropertiesArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_object_pasteProperties,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+}
+
+pub struct WwiseCoreSwitchContainerClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseCoreSwitchContainerClient<'a> {
+    /// `ak.wwise.core.switchContainer.addAssignment`.
+    pub async fn add_assignment(
+        &mut self,
+        args: CoreSwitchContainerAddAssignmentArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_switchContainer_addAssignment,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.switchContainer.getAssignments`.
+    pub async fn get_assignments(
+        &mut self,
+        args: CoreSwitchContainerGetAssignmentsArgs,
+    ) -> WaapiResult<CoreSwitchContainerGetAssignmentsResponse> {
+        self.client
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_switchContainer_getAssignments,
+                Some(args),
+                None,
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.switchContainer.removeAssignment`.
+    pub async fn remove_assignment(
+        &mut self,
+        args: CoreSwitchContainerRemoveAssignmentArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_switchContainer_removeAssignment,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
 }
 
 pub struct WwiseCoreAudioClient<'a> {
@@ -269,17 +549,191 @@ impl<'a> WwiseCoreAudioClient<'a> {
     }
 }
 
-pub struct WwiseCoreProjectClient<'a> {
+pub struct WwiseCoreTransportClient<'a> {
     client: &'a mut WaapiClient,
 }
 
-impl<'a> WwiseCoreProjectClient<'a> {
-    /// `ak.wwise.core.project.save`.
-    pub async fn save(&mut self, args: CoreProjectSaveArgs) -> WaapiResult<()> {
+impl<'a> WwiseCoreTransportClient<'a> {
+    /// `ak.wwise.core.transport.create`.
+    pub async fn create(
+        &mut self,
+        args: CoreTransportCreateArgs,
+    ) -> WaapiResult<CoreTransportCreateResponse> {
         self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_transport_create,
+                Some(args),
+                None,
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.transport.destroy`.
+    pub async fn destroy(&mut self, args: CoreTransportDestroyArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_transport_destroy,
+                Some(args),
+                None,
+            )
             .await?;
         Ok(())
+    }
+
+    /// `ak.wwise.core.transport.executeAction`.
+    pub async fn execute_action(
+        &mut self,
+        args: CoreTransportExecuteActionArgs,
+    ) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_transport_executeAction,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.transport.getState`.
+    pub async fn get_state(
+        &mut self,
+        args: CoreTransportGetStateArgs,
+    ) -> WaapiResult<CoreTransportGetStateResponse> {
+        self.client
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_transport_getState,
+                Some(args),
+                None,
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.transport.getList`.
+    pub async fn get_list(&mut self) -> WaapiResult<CoreTransportGetListResponse> {
+        self.client
+            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_transport_getList, None, None)
+            .await
+    }
+
+    /// `ak.wwise.core.transport.prepare`.
+    pub async fn prepare(&mut self, args: CoreTransportPrepareArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_transport_prepare,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.transport.useOriginals`.
+    pub async fn use_originals(&mut self, args: CoreTransportUseOriginalsArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_transport_useOriginals,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+}
+
+pub struct WwiseCoreUndoClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseCoreUndoClient<'a> {
+    /// `ak.wwise.core.undo.beginGroup`.
+    pub async fn begin_group(&mut self) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_beginGroup, None, None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.undo.endGroup`.
+    pub async fn end_group(&mut self, args: CoreUndoEndGroupArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_undo_endGroup, Some(args), None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.undo.cancelGroup`.
+    pub async fn cancel_group(&mut self, args: CoreUndoCancelGroupArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_undo_cancelGroup,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.undo.undo`.
+    pub async fn undo(&mut self) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_undo, None, None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.undo.redo`.
+    pub async fn redo(&mut self) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_redo, None, None)
+            .await?;
+        Ok(())
+    }
+}
+
+pub struct WwiseUiCommandsClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseUiCommandsClient<'a> {
+    /// `ak.wwise.ui.commands.execute`.
+    pub async fn execute(&mut self, args: UiCommandsExecuteArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_ui_commands_execute,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.ui.commands.getCommands`.
+    pub async fn get_commands(&mut self) -> WaapiResult<UiCommandsGetCommandsResponse> {
+        self.client
+            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_commands_getCommands, None, None)
+            .await
+    }
+}
+
+pub struct WwiseUiProjectClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseUiProjectClient<'a> {
+    /// `ak.wwise.ui.project.open`.
+    pub async fn open(&mut self, args: UiProjectOpenArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_project_open, Some(args), None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.ui.project.close`.
+    pub async fn close(&mut self, args: UiProjectCloseArgs) -> WaapiResult<UiProjectCloseResponse> {
+        self.client
+            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_ui_project_close, Some(args), None)
+            .await
     }
 }
 

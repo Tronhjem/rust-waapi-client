@@ -308,7 +308,7 @@ impl ObjectReturnOptions {
 }
 
 /// Return fields for `ak.wwise.core.profiler.getBusses`.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum BusReturnField {
     #[serde(rename = "pipelineID")]
     PipelineId,
@@ -337,7 +337,7 @@ pub enum BusReturnField {
 }
 
 /// Return fields for `ak.wwise.core.profiler.getAudioObjects`.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AudioObjectReturnField {
     #[serde(rename = "busName")]
     BusName,
@@ -390,7 +390,7 @@ pub enum AudioObjectReturnField {
 }
 
 /// Return fields for `ak.wwise.core.profiler.getVoices`.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum VoiceReturnField {
     #[serde(rename = "pipelineID")]
     PipelineId,
@@ -435,7 +435,7 @@ pub enum VoiceReturnField {
 }
 
 /// Determines how imported objects are created.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ImportOperation {
     #[serde(rename = "createNew")]
     CreateNew,
@@ -446,7 +446,7 @@ pub enum ImportOperation {
 }
 
 /// Severity level of an audio import log entry.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LogSeverity {
     #[serde(rename = "Message")]
     Message,
@@ -917,7 +917,7 @@ impl From<Vec<ObjectType>> for ObjectQuery {
 }
 
 /// Selector for an `object.get` select transformation.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TransformSelect {
     #[serde(rename = "parent")]
     Parent,
@@ -1061,6 +1061,64 @@ pub struct DirectoriesInfo {
     pub bin: String,
     /// The help directory.
     pub help: String,
+}
+
+/// Platform defined in the project, returned by `getProjectInfo`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ProjectPlatformInfo {
+    /// Platform unique id.
+    pub id: String,
+    /// Platform name defined in the Project.
+    pub name: String,
+    /// The name of the deployment platform used in file system.
+    #[serde(rename = "baseName")]
+    pub base_name: String,
+    /// The official name of the deployment platform
+    /// The name could contain special characters.
+    #[serde(rename = "baseDisplayName")]
+    pub base_display_name: String,
+    /// The path on which the SoundBank files are generated for this Platform.
+    #[serde(rename = "soundBankPath")]
+    pub sound_bank_path: String,
+    /// The path on which the SoundBank media files are copied for this Platform.
+    #[serde(rename = "copiedMediaPath")]
+    pub copied_media_path: String,
+}
+
+/// Language defined in the project, returned by `getProjectInfo`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ProjectLanguageInfo {
+    /// Language unique id.
+    pub id: String,
+    /// The short ID (32-bit) of the language.
+    #[serde(rename = "shortId")]
+    pub short_id: u32,
+    /// Language name.
+    pub name: String,
+}
+
+/// Collection of project directories returned by `getProjectInfo`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ProjectDirectoriesInfo {
+    /// The root directory of the project
+    /// Refer to for more information.
+    pub properties: String,
+    /// The Commands directory of the project
+    /// Refer to for more information.
+    pub commands: String,
+    /// The .cache directory of the project, as specified in the Project Settings
+    /// The .cache directory contains converted media files (WEM files).
+    pub cache: String,
+    /// The root directory of the project, where is located the wproj file.
+    pub root: String,
+    /// The Originals directory of the project, as specified in the Project Settings
+    /// The Originals directory contains the project's WAV files, separated by languages.
+    pub originals: String,
+    /// The SoundBank output root directory of the project, as specified in the Project Settings
+    /// This directory contains the Project's SoundBank C++ header, XML and JSON files
+    /// Refer to the 'platforms' section for Platform specific directories.
+    #[serde(rename = "soundBankOutputRoot")]
+    pub sound_bank_output_root: String,
 }
 
 /// One item in the `imports` array for `audio.import`.
@@ -1340,4 +1398,170 @@ pub struct ImportLogEntry {
     /// The index of the import command to which the log applies.
     #[serde(default)]
     pub index: Option<f64>,
+}
+
+/// Action to execute on a Wwise transport object.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum TransportAction {
+    #[serde(rename = "play")]
+    Play,
+    #[serde(rename = "stop")]
+    Stop,
+    #[serde(rename = "pause")]
+    Pause,
+    #[serde(rename = "playStop")]
+    PlayStop,
+    #[serde(rename = "playDirectly")]
+    PlayDirectly,
+}
+
+/// Playback state of a Wwise transport object.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum TransportState {
+    #[serde(rename = "playing")]
+    Playing,
+    #[serde(rename = "stopped")]
+    Stopped,
+    #[serde(rename = "paused")]
+    Paused,
+}
+
+/// A transport object entry returned by `transport.getList`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct TransportObject {
+    /// The ID (GUID) of the object controlled by the transport object.
+    pub object: String,
+    /// The game object used by the transport object.
+    #[serde(rename = "gameObject", default)]
+    pub game_object: Option<GameObjectRef>,
+    /// Transport object ID.
+    pub transport: u32,
+}
+
+/// Shape of a curve segment between two points.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum CurveShape {
+    #[serde(rename = "Constant")]
+    Constant,
+    #[serde(rename = "Linear")]
+    Linear,
+    #[serde(rename = "Log3")]
+    Log3,
+    #[serde(rename = "Log2")]
+    Log2,
+    #[serde(rename = "Log1")]
+    Log1,
+    #[serde(rename = "InvertedSCurve")]
+    InvertedSCurve,
+    #[serde(rename = "SCurve")]
+    SCurve,
+    #[serde(rename = "Exp1")]
+    Exp1,
+    #[serde(rename = "Exp2")]
+    Exp2,
+    #[serde(rename = "Exp3")]
+    Exp3,
+}
+
+/// A 2D point in an attenuation or RTPC curve (`pointsDefinition`).
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct CurvePoint2D {
+    /// X coordinate of the curve point.
+    pub x: f64,
+    /// Y coordinate of the curve point.
+    pub y: f64,
+    /// Shape of the curve segment between this point and the next.
+    pub shape: CurveShape,
+}
+
+impl CurvePoint2D {
+    pub const fn new(x: f64, y: f64, shape: CurveShape) -> Self {
+        Self { x, y, shape }
+    }
+}
+
+/// Type of an attenuation curve.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum AttenuationCurveType {
+    #[serde(rename = "VolumeDryUsage")]
+    VolumeDryUsage,
+    #[serde(rename = "VolumeWetGameUsage")]
+    VolumeWetGameUsage,
+    #[serde(rename = "VolumeWetUserUsage")]
+    VolumeWetUserUsage,
+    #[serde(rename = "LowPassFilterUsage")]
+    LowPassFilterUsage,
+    #[serde(rename = "HighPassFilterUsage")]
+    HighPassFilterUsage,
+    #[serde(rename = "SpreadUsage")]
+    SpreadUsage,
+    #[serde(rename = "FocusUsage")]
+    FocusUsage,
+    #[serde(rename = "ObstructionVolumeUsage")]
+    ObstructionVolumeUsage,
+    #[serde(rename = "ObstructionLPFUsage")]
+    ObstructionLpfUsage,
+    #[serde(rename = "ObstructionHPFUsage")]
+    ObstructionHpfUsage,
+    #[serde(rename = "OcclusionVolumeUsage")]
+    OcclusionVolumeUsage,
+    #[serde(rename = "OcclusionLPFUsage")]
+    OcclusionLpfUsage,
+    #[serde(rename = "OcclusionHPFUsage")]
+    OcclusionHpfUsage,
+    #[serde(rename = "DiffractionVolumeUsage")]
+    DiffractionVolumeUsage,
+    #[serde(rename = "DiffractionLPFUsage")]
+    DiffractionLpfUsage,
+    #[serde(rename = "DiffractionHPFUsage")]
+    DiffractionHpfUsage,
+    #[serde(rename = "TransmissionVolumeUsage")]
+    TransmissionVolumeUsage,
+    #[serde(rename = "TransmissionLPFUsage")]
+    TransmissionLpfUsage,
+    #[serde(rename = "TransmissionHPFUsage")]
+    TransmissionHpfUsage,
+}
+
+/// Usage mode of an attenuation curve.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum AttenuationCurveUse {
+    #[serde(rename = "None")]
+    None,
+    #[serde(rename = "Custom")]
+    Custom,
+    #[serde(rename = "UseVolumeDry")]
+    UseVolumeDry,
+    #[serde(rename = "UseProject")]
+    UseProject,
+}
+
+/// Paste mode for lists in `object.pasteProperties`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum PasteMode {
+    #[serde(rename = "replaceEntire")]
+    ReplaceEntire,
+    #[serde(rename = "addReplace")]
+    AddReplace,
+    #[serde(rename = "addKeep")]
+    AddKeep,
+}
+
+/// Assignment pairing a Switch Container child object with a State or Switch (`switchContainer.getAssignments`).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct SwitchContainerAssignment {
+    /// GUID of the child object assigned to a State or Switch.
+    pub child: String,
+    /// GUID of the State or Switch to which the child is assigned.
+    #[serde(rename = "stateOrSwitch")]
+    pub state_or_switch: String,
+}
+
+/// Action when opening a project that requires migration.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum ProjectMigrationAction {
+    #[serde(rename = "migrate")]
+    Migrate,
+    #[serde(rename = "fail")]
+    Fail,
 }

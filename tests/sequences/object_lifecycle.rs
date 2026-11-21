@@ -1,4 +1,4 @@
-use super::connect_client;
+use super::{connect_client, sequence_lock};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
     CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetOptions,
@@ -15,6 +15,7 @@ const RENAMED_CONTAINER_NAME: &str = "RanamedNewSound";
 
 #[tokio::test]
 async fn actor_mixer_and_container_lifecycle_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
@@ -230,6 +231,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
 
 #[tokio::test]
 async fn nested_hierarchy_and_batch_set_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");

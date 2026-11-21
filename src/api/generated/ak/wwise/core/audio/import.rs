@@ -71,7 +71,6 @@ impl CoreAudioImportArgs {
 }
 
 /// Options for `ak.wwise.core.audio.import`.
-
 pub type CoreAudioImportOptions = ObjectReturnOptions;
 
 /// Response from `ak.wwise.core.audio.import`.

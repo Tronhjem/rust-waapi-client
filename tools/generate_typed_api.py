@@ -20,14 +20,54 @@ SCHEMA_DIR = Path(__file__).resolve().parent / "waapi_schemas" / SCHEMA_VERSION
 OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "api" / "generated"
 
 PILOT_ENDPOINTS = [
+    # Core Info & Project
     "ak.wwise.core.getInfo",
+    "ak.wwise.core.getProjectInfo",
+    "ak.wwise.core.project.save",
+    # Core Object CRUD & Helpers
     "ak.wwise.core.object.get",
     "ak.wwise.core.object.create",
     "ak.wwise.core.object.delete",
     "ak.wwise.core.object.set",
+    "ak.wwise.core.object.move",
+    "ak.wwise.core.object.copy",
+    "ak.wwise.core.object.setName",
+    "ak.wwise.core.object.setNotes",
+    "ak.wwise.core.object.setProperty",
+    "ak.wwise.core.object.setReference",
+    "ak.wwise.core.object.setRandomizer",
+    "ak.wwise.core.object.getAttenuationCurve",
+    "ak.wwise.core.object.setAttenuationCurve",
+    "ak.wwise.core.object.diff",
+    "ak.wwise.core.object.pasteProperties",
+    # Switch Container
+    "ak.wwise.core.switchContainer.addAssignment",
+    "ak.wwise.core.switchContainer.getAssignments",
+    "ak.wwise.core.switchContainer.removeAssignment",
+    # Audio
     "ak.wwise.core.audio.import",
-    "ak.wwise.core.project.save",
+    # Transport
+    "ak.wwise.core.transport.create",
+    "ak.wwise.core.transport.destroy",
+    "ak.wwise.core.transport.executeAction",
+    "ak.wwise.core.transport.getState",
+    "ak.wwise.core.transport.getList",
+    "ak.wwise.core.transport.prepare",
+    "ak.wwise.core.transport.useOriginals",
+    # Undo
+    "ak.wwise.core.undo.beginGroup",
+    "ak.wwise.core.undo.endGroup",
+    "ak.wwise.core.undo.cancelGroup",
+    "ak.wwise.core.undo.undo",
+    "ak.wwise.core.undo.redo",
+    # UI
     "ak.wwise.ui.getSelectedObjects",
+    "ak.wwise.ui.bringToForeground",
+    "ak.wwise.ui.commands.execute",
+    "ak.wwise.ui.commands.getCommands",
+    "ak.wwise.ui.project.open",
+    "ak.wwise.ui.project.close",
+    # SoundEngine
     "ak.soundengine.postEvent",
     "ak.soundengine.setRTPCValue",
     "ak.soundengine.registerGameObj",
@@ -40,15 +80,24 @@ PILOT_ENDPOINTS = [
 # the established API.
 CTOR_ORDER = {
     "ak.wwise.core.object.create": ["parent", "type", "name"],
+    "ak.wwise.core.object.setRandomizer": ["object", "property"],
 }
 
 # Rust field names for result properties that would otherwise collide with
 # keywords or read poorly.
 RESULT_FIELD_NAMES = {
     ("ak.wwise.core.object.get", "return"): "objects",
+    ("ak.wwise.core.switchContainer.getAssignments", "return"): "assignments",
     ("ak.soundengine.postEvent", "return"): "playing_id",
 }
 
+# Response fields that Wwise always returns even when the JSON schema omits `required`.
+RESPONSE_REQUIRED_OVERRIDES = {
+    "ak.wwise.core.transport.create": ["transport"],
+    "ak.wwise.core.transport.getList": ["transport", "object"],
+    "ak.wwise.core.object.getAttenuationCurve": ["curveType", "use", "points"],
+    "ak.wwise.ui.project.close": ["hadProjectOpen"],
+}
 # Global wire-name -> Rust field name overrides.
 FIELD_NAME_OVERRIDES = {
     "type": "object_type",
@@ -62,10 +111,29 @@ PROP_TYPE_OVERRIDES = {
     ("ak.wwise.core.object.create", "onNameConflict"): "OnNameConflict",
     ("ak.wwise.core.object.set", "onNameConflict"): "OnNameConflict",
     ("ak.wwise.core.object.set", "listMode"): "ListMode",
+    ("ak.wwise.core.object.move", "onNameConflict"): "OnNameConflict",
+    ("ak.wwise.core.object.copy", "onNameConflict"): "OnNameConflict",
+    ("ak.wwise.core.object.setReference", "reference"): "Property",
+    ("ak.wwise.core.object.getAttenuationCurve", "curveType"): "AttenuationCurveType",
+    ("ak.wwise.core.object.getAttenuationCurve", "use"): "AttenuationCurveUse",
+    ("ak.wwise.core.object.setAttenuationCurve", "curveType"): "AttenuationCurveType",
+    ("ak.wwise.core.object.setAttenuationCurve", "use"): "AttenuationCurveUse",
+    ("ak.wwise.core.object.pasteProperties", "pasteMode"): "PasteMode",
+    ("ak.wwise.core.object.pasteProperties", "inclusion"): "Vec<Property>",
+    ("ak.wwise.core.object.pasteProperties", "exclusion"): "Vec<Property>",
+    ("ak.wwise.core.switchContainer.getAssignments", "response", "return"): "Vec<SwitchContainerAssignment>",
+    ("ak.wwise.core.transport.executeAction", "action"): "TransportAction",
+    ("ak.wwise.core.transport.getState", "state"): "TransportState",
+    ("ak.wwise.core.transport.getList", "list"): "Vec<TransportObject>",
     ("ak.wwise.core.getInfo", "version"): "VersionInfo",
     ("ak.wwise.core.getInfo", "directories"): "DirectoriesInfo",
+    ("ak.wwise.core.getProjectInfo", "platforms"): "Vec<ProjectPlatformInfo>",
+    ("ak.wwise.core.getProjectInfo", "languages"): "Vec<ProjectLanguageInfo>",
+    ("ak.wwise.core.getProjectInfo", "directories"): "ProjectDirectoriesInfo",
     ("ak.wwise.core.audio.import", "imports"): "Vec<ImportItem>",
     ("ak.wwise.core.audio.import", "default"): "ImportDefaults",
+    ("ak.wwise.ui.project.open", "onMigrationRequired"): "ProjectMigrationAction",
+    ("ak.wwise.ui.project.open", "onUpgrade"): "ProjectMigrationAction",
     ("ak.soundengine.setPosition", "args", "position"): "Position",
 }
 
@@ -83,6 +151,10 @@ REF_TYPES = {
     "common_definitions.json#/definitions/propertyValue": "PropertyValue",
     "waapi_definitions.json#/definitions/objectArg": "ObjectRef",
     "waapi_definitions.json#/definitions/platformArg": "PlatformRef",
+    "waapi_definitions.json#/definitions/languageArg": "LanguageRef",
+    "waapi_definitions.json#/definitions/propertyName": "Property",
+    "waapi_definitions.json#/definitions/pointsDefinition": "Vec<CurvePoint2D>",
+    "waapi_definitions.json#/definitions/curveShape": "CurveShape",
     "waapi_definitions.json#/definitions/soundEngineObjectArg": "SoundEngineObjectRef",
     "waapi_definitions.json#/definitions/gameObject": "GameObjectRef",
     "waapi_definitions.json#/definitions/objectReturn": "WwiseObject",
@@ -95,6 +167,7 @@ REF_TYPES = {
 }
 
 OBJECT_RETURN_OPTIONS_REF = "waapi_definitions.json#/definitions/objectReturnOptions"
+OBJECT_RETURN_REF = "waapi_definitions.json#/definitions/objectReturn"
 
 RUST_KEYWORDS = {
     "as", "break", "const", "continue", "crate", "else", "enum", "extern",
@@ -338,8 +411,25 @@ def field_name(uri, wire, kind):
     return snake_case(wire)
 
 
+def schema_required(schema):
+    req = schema.get("required")
+    if req:
+        return list(req)
+    branches = schema.get("anyOf") or schema.get("oneOf") or []
+    branch_reqs = [b.get("required") for b in branches if isinstance(b, dict) and b.get("required")]
+    if branch_reqs:
+        common = set(branch_reqs[0])
+        for r in branch_reqs[1:]:
+            common &= set(r)
+        return [k for k in branch_reqs[0] if k in common]
+    return []
+
+
 def collect_fields(ctx, schema, kind, struct_name):
     fields = []
+    req_set = set(schema_required(schema))
+    if kind == "response" and ctx.uri in RESPONSE_REQUIRED_OVERRIDES:
+        req_set |= set(RESPONSE_REQUIRED_OVERRIDES[ctx.uri])
     for wire, sub in (schema.get("properties") or {}).items():
         ty = PROP_TYPE_OVERRIDES.get((ctx.uri, kind, wire)) or PROP_TYPE_OVERRIDES.get((ctx.uri, wire))
         if ty is None:
@@ -347,7 +437,7 @@ def collect_fields(ctx, schema, kind, struct_name):
                 ty = "ObjectType"
             else:
                 ty = rust_type(sub, ctx, self_name=struct_name)
-        optional = wire not in (schema.get("required") or [])
+        optional = wire not in req_set
         fields.append(Field(wire, field_name(ctx.uri, wire, kind), ty, optional, sub.get("description", "")))
     return fields
 
@@ -438,7 +528,7 @@ def emit_enum(name, doc, values, derive_both=True):
     """Emit a simple string enum with explicit serde renames."""
     lines = doc_lines(doc)
     derives = "serde::Serialize, serde::Deserialize" if derive_both else "serde::Serialize"
-    lines.append(f"#[derive(Debug, Clone, Copy, {derives})]")
+    lines.append(f"#[derive(Debug, Clone, Copy, PartialEq, Eq, {derives})]")
     lines.append(f"pub enum {name} {{")
     for v, variant in unique_names(values, pascal_case, "Legacy").items():
         lines.append(f'    #[serde(rename = "{v}")]')
@@ -865,11 +955,112 @@ def gen_version_info(ctx):
     return out
 
 
+def gen_project_info_types(ctx):
+    result = ctx.doc["resultSchema"]
+    out = emit_struct(
+        "response",
+        "ProjectPlatformInfo",
+        "Platform defined in the project, returned by `getProjectInfo`.",
+        collect_fields(ctx, result["properties"]["platforms"]["items"], "response", "ProjectPlatformInfo"),
+        ctx,
+    )
+    out += "\n\n"
+    out += emit_struct(
+        "response",
+        "ProjectLanguageInfo",
+        "Language defined in the project, returned by `getProjectInfo`.",
+        collect_fields(ctx, result["properties"]["languages"]["items"], "response", "ProjectLanguageInfo"),
+        ctx,
+    )
+    out += "\n\n"
+    out += emit_struct(
+        "response",
+        "ProjectDirectoriesInfo",
+        "Collection of project directories returned by `getProjectInfo`.",
+        collect_fields(ctx, result["properties"]["directories"], "response", "ProjectDirectoriesInfo"),
+        ctx,
+    )
+    return out
+
+
+def gen_transport_types(exec_ctx, state_ctx, list_ctx):
+    action_vals = exec_ctx.doc["argsSchema"]["properties"]["action"]["enum"]
+    state_vals = state_ctx.doc["resultSchema"]["properties"]["state"]["enum"]
+    list_item_sch = list_ctx.doc["resultSchema"]["properties"]["list"]["items"]
+
+    parts = [
+        emit_enum("TransportAction", "Action to execute on a Wwise transport object.", action_vals),
+        emit_enum("TransportState", "Playback state of a Wwise transport object.", state_vals),
+        emit_struct(
+            "response",
+            "TransportObject",
+            "A transport object entry returned by `transport.getList`.",
+            collect_fields(list_ctx, list_item_sch, "response", "TransportObject"),
+            list_ctx,
+        ),
+    ]
+    return "\n\n".join(parts)
+
+
+def gen_attenuation_and_object_types(waapi_defs, atten_ctx, paste_ctx, switch_ctx, open_ctx):
+    curve_shape_vals = waapi_defs["definitions"]["curveShape"]["enum"]
+    curve_type_vals = atten_ctx.doc["argsSchema"]["properties"]["curveType"]["enum"]
+    curve_use_vals = atten_ctx.doc["resultSchema"]["properties"]["use"]["enum"]
+    paste_mode_vals = paste_ctx.doc["argsSchema"]["properties"]["pasteMode"]["enum"]
+    migration_vals = open_ctx.doc["argsSchema"]["properties"]["onMigrationRequired"]["enum"]
+
+    curve_point_rust = """/// A 2D point in an attenuation or RTPC curve (`pointsDefinition`).
+#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct CurvePoint2D {
+    /// X coordinate of the curve point.
+    pub x: f64,
+    /// Y coordinate of the curve point.
+    pub y: f64,
+    /// Shape of the curve segment between this point and the next.
+    pub shape: CurveShape,
+}
+
+impl CurvePoint2D {
+    pub const fn new(x: f64, y: f64, shape: CurveShape) -> Self {
+        Self { x, y, shape }
+    }
+}"""
+
+    switch_assignment_rust = """/// Assignment pairing a Switch Container child object with a State or Switch (`switchContainer.getAssignments`).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct SwitchContainerAssignment {
+    /// GUID of the child object assigned to a State or Switch.
+    pub child: String,
+    /// GUID of the State or Switch to which the child is assigned.
+    #[serde(rename = "stateOrSwitch")]
+    pub state_or_switch: String,
+}"""
+
+    parts = [
+        emit_enum("CurveShape", "Shape of a curve segment between two points.", curve_shape_vals),
+        curve_point_rust,
+        emit_enum("AttenuationCurveType", "Type of an attenuation curve.", curve_type_vals),
+        emit_enum("AttenuationCurveUse", "Usage mode of an attenuation curve.", curve_use_vals),
+        emit_enum("PasteMode", "Paste mode for lists in `object.pasteProperties`.", paste_mode_vals),
+        switch_assignment_rust,
+        emit_enum("ProjectMigrationAction", "Action when opening a project that requires migration.", migration_vals),
+    ]
+    return "\n\n".join(parts)
+
+
 def gen_primitives(schemas, endpoints_docs):
     waapi_defs = schemas.load_definitions("waapi_definitions.json")
     get_ctx = endpoints_docs["ak.wwise.core.object.get"]
     info_ctx = endpoints_docs["ak.wwise.core.getInfo"]
+    proj_info_ctx = endpoints_docs["ak.wwise.core.getProjectInfo"]
     import_ctx = endpoints_docs["ak.wwise.core.audio.import"]
+    exec_ctx = endpoints_docs["ak.wwise.core.transport.executeAction"]
+    state_ctx = endpoints_docs["ak.wwise.core.transport.getState"]
+    list_ctx = endpoints_docs["ak.wwise.core.transport.getList"]
+    atten_ctx = endpoints_docs["ak.wwise.core.object.getAttenuationCurve"]
+    paste_ctx = endpoints_docs["ak.wwise.core.object.pasteProperties"]
+    switch_ctx = endpoints_docs["ak.wwise.core.switchContainer.getAssignments"]
+    open_ctx = endpoints_docs["ak.wwise.ui.project.open"]
 
     import_operation_vals = [
         b["enum"][0] for b in waapi_defs["definitions"]["importOperationType"]["oneOf"]
@@ -903,7 +1094,10 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append(gen_transform_select(get_ctx))
     parts.append(STATIC_TRANSFORM)
     parts.append(gen_version_info(info_ctx))
+    parts.append(gen_project_info_types(proj_info_ctx))
     parts.append(gen_import_types(import_ctx))
+    parts.append(gen_transport_types(exec_ctx, state_ctx, list_ctx))
+    parts.append(gen_attenuation_and_object_types(waapi_defs, atten_ctx, paste_ctx, switch_ctx, open_ctx))
     return "\n\n".join(parts) + "\n"
 
 
@@ -1156,6 +1350,7 @@ def gen_endpoint_file(ctx):
     has_options = not is_empty_schema(options_schema)
     has_response = not is_empty_schema(result_schema)
     options_is_object_return = options_schema.get("$ref") == OBJECT_RETURN_OPTIONS_REF
+    result_is_object_return = result_schema.get("$ref") == OBJECT_RETURN_REF
 
     sections = [f"// Generated bindings for {ctx.uri}", "", "#![allow(unused_imports)]",
                 "#![allow(dead_code)]", "", "use crate::api::generated::primitives::*;", ""]
@@ -1177,14 +1372,13 @@ def gen_endpoint_file(ctx):
             extra_flatten = bool(args_schema.get("patternProperties"))
             sections.append(emit_struct("args", name, f"Arguments for `{ctx.uri}`.",
                                         fields, ctx, ctor_order=CTOR_ORDER.get(ctx.uri),
-                                        required_order=args_schema.get("required"),
+                                        required_order=schema_required(args_schema),
                                         extra_flatten=extra_flatten))
     if has_options:
         name = f"{base}Options"
         exports.append(name)
         if options_is_object_return:
-            sections.append(f"/// Options for `{ctx.uri}`.")
-            sections.append(f"pub type {name} = ObjectReturnOptions;")
+            sections.append(f"/// Options for `{ctx.uri}`.\npub type {name} = ObjectReturnOptions;")
         else:
             ctx.local_root = options_schema
             fields = collect_fields(ctx, options_schema, "options", name)
@@ -1193,7 +1387,9 @@ def gen_endpoint_file(ctx):
     if has_response:
         name = f"{base}Response"
         exports.append(name)
-        if ctx.uri == "ak.wwise.core.object.set":
+        if result_is_object_return:
+            sections.append(f"/// Response from `{ctx.uri}`.\npub type {name} = WwiseObject;")
+        elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Object"
             exports.append(item_name)
             sections.append(gen_object_set_response(ctx, name, item_name))
@@ -1333,15 +1529,20 @@ def emit_module_tree(tree, dir_path):
         child_dir = dir_path / name
         child_dir.mkdir(parents=True, exist_ok=True)
         emit_module_tree(tree[name], child_dir)
+        if not name.islower():
+            lines.append("#[allow(non_snake_case)]")
         lines.append(f"pub mod {name};")
     for uri, info in sorted(tree.get("__endpoints__", [])):
         stem = endpoint_file_stem(uri)
         (dir_path / f"{stem}.rs").write_text(info["content"])
+        if stem == dir_path.name:
+            lines.append("#[allow(clippy::module_inception)]")
         lines.append(f"mod {stem};")
-        lines.append(f"pub use {stem}::{{")
-        for e in info["exports"]:
-            lines.append(f"    {e},")
-        lines.append("};")
+        if info["exports"]:
+            lines.append(f"pub use {stem}::{{")
+            for e in info["exports"]:
+                lines.append(f"    {e},")
+            lines.append("};")
     (dir_path / "mod.rs").write_text("\n".join(lines) + "\n")
 
 
@@ -1434,7 +1635,8 @@ def gen_clients(endpoints):
             types.append(f"{info['base']}Options")
         if info["has_response"]:
             types.append(f"{info['base']}Response")
-        lines.append(use_path(uri, types))
+        if types:
+            lines.append(use_path(uri, types))
     lines.append("")
 
     by_prefix = {}

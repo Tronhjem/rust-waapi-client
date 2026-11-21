@@ -467,3 +467,395 @@ fn waapi_uri_enums_map_to_const_strings() {
         waapi_topics_api::ak::wwise::core::object::created
     );
 }
+
+#[test]
+fn undo_args_serialize() {
+    use waapi_client::api::generated::ak::wwise::core::undo::{
+        CoreUndoCancelGroupArgs, CoreUndoEndGroupArgs,
+    };
+
+    let end = CoreUndoEndGroupArgs::new("Batch Rename".to_string());
+    assert_eq!(
+        serde_json::to_value(end).unwrap(),
+        json!({"displayName": "Batch Rename"})
+    );
+
+    let cancel = CoreUndoCancelGroupArgs::new().undo(true);
+    assert_eq!(serde_json::to_value(cancel).unwrap(), json!({"undo": true}));
+}
+
+#[test]
+fn transport_args_and_responses_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::transport::{
+        CoreTransportCreateArgs, CoreTransportCreateResponse, CoreTransportDestroyArgs,
+        CoreTransportExecuteActionArgs, CoreTransportGetListResponse, CoreTransportGetStateArgs,
+        CoreTransportGetStateResponse, CoreTransportPrepareArgs, CoreTransportUseOriginalsArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        GameObjectRef, TransportAction, TransportState,
+    };
+
+    let create =
+        CoreTransportCreateArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-000000000001}"))
+            .game_object(GameObjectRef::game_object(100));
+    assert_eq!(
+        serde_json::to_value(create).unwrap(),
+        json!({
+            "object": "{00000000-0000-0000-0000-000000000001}",
+            "gameObject": 100
+        })
+    );
+
+    let create_resp: CoreTransportCreateResponse =
+        serde_json::from_value(json!({"transport": 42})).unwrap();
+    assert_eq!(create_resp.transport, 42);
+
+    let exec = CoreTransportExecuteActionArgs::new(TransportAction::Play).transport(42u32);
+    assert_eq!(
+        serde_json::to_value(exec).unwrap(),
+        json!({"action": "play", "transport": 42})
+    );
+
+    let get_state = CoreTransportGetStateArgs::new(42);
+    assert_eq!(
+        serde_json::to_value(get_state).unwrap(),
+        json!({"transport": 42})
+    );
+
+    let state_resp: CoreTransportGetStateResponse =
+        serde_json::from_value(json!({"state": "playing"})).unwrap();
+    assert_eq!(state_resp.state, TransportState::Playing);
+
+    let list_resp: CoreTransportGetListResponse = serde_json::from_value(json!({
+        "list": [
+            {
+                "transport": 42,
+                "object": "{00000000-0000-0000-0000-000000000001}",
+                "gameObject": 100
+            }
+        ]
+    }))
+    .unwrap();
+    assert_eq!(list_resp.list.len(), 1);
+    assert_eq!(list_resp.list[0].transport, 42);
+    assert_eq!(
+        list_resp.list[0].object,
+        "{00000000-0000-0000-0000-000000000001}"
+    );
+
+    let prep = CoreTransportPrepareArgs::new(ObjectRef::from("Sound:MySound"));
+    assert_eq!(
+        serde_json::to_value(prep).unwrap(),
+        json!({"object": "Sound:MySound"})
+    );
+
+    let orig = CoreTransportUseOriginalsArgs::new(true);
+    assert_eq!(serde_json::to_value(orig).unwrap(), json!({"enable": true}));
+
+    let destroy = CoreTransportDestroyArgs::new(42);
+    assert_eq!(
+        serde_json::to_value(destroy).unwrap(),
+        json!({"transport": 42})
+    );
+}
+
+#[test]
+fn object_helpers_and_attenuation_curve_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::object::{
+        CoreObjectCopyArgs, CoreObjectDiffArgs, CoreObjectDiffResponse,
+        CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse,
+        CoreObjectMoveArgs, CoreObjectPastePropertiesArgs, CoreObjectSetAttenuationCurveArgs,
+        CoreObjectSetNameArgs, CoreObjectSetNotesArgs, CoreObjectSetPropertyArgs,
+        CoreObjectSetRandomizerArgs, CoreObjectSetReferenceArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        AttenuationCurveType, AttenuationCurveUse, CurvePoint2D, CurveShape, OnNameConflict,
+        PasteMode, PropertyValue,
+    };
+
+    let mv = CoreObjectMoveArgs::new(ObjectRef::guid("{OBJ-1}"), ObjectRef::guid("{PARENT-2}"))
+        .on_name_conflict(OnNameConflict::Rename);
+    assert_eq!(
+        serde_json::to_value(mv).unwrap(),
+        json!({
+            "object": "{OBJ-1}",
+            "parent": "{PARENT-2}",
+            "onNameConflict": "rename"
+        })
+    );
+
+    let cp = CoreObjectCopyArgs::new(ObjectRef::guid("{OBJ-1}"), ObjectRef::guid("{PARENT-2}"))
+        .on_name_conflict(OnNameConflict::Replace);
+    assert_eq!(
+        serde_json::to_value(cp).unwrap(),
+        json!({
+            "object": "{OBJ-1}",
+            "parent": "{PARENT-2}",
+            "onNameConflict": "replace"
+        })
+    );
+
+    let set_name = CoreObjectSetNameArgs::new(ObjectRef::guid("{OBJ-1}"), "Renamed".to_string());
+    assert_eq!(
+        serde_json::to_value(set_name).unwrap(),
+        json!({"object": "{OBJ-1}", "value": "Renamed"})
+    );
+
+    let set_notes = CoreObjectSetNotesArgs::new(ObjectRef::guid("{OBJ-1}"), "Notes".to_string());
+    assert_eq!(
+        serde_json::to_value(set_notes).unwrap(),
+        json!({"object": "{OBJ-1}", "value": "Notes"})
+    );
+
+    let set_prop = CoreObjectSetPropertyArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        Property::Volume,
+        PropertyValue::from(-6.0),
+    );
+    assert_eq!(
+        serde_json::to_value(set_prop).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume", "value": -6.0})
+    );
+
+    let set_ref = CoreObjectSetReferenceArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        Property::OutputBus,
+        ObjectRef::path(r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus"),
+    );
+    assert_eq!(
+        serde_json::to_value(set_ref).unwrap(),
+        json!({
+            "object": "{OBJ-1}",
+            "reference": "OutputBus",
+            "value": r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus"
+        })
+    );
+
+    let rand_args = CoreObjectSetRandomizerArgs::new(ObjectRef::guid("{OBJ-1}"), Property::Volume)
+        .enabled(true)
+        .min(-3.0)
+        .max(3.0);
+    assert_eq!(
+        serde_json::to_value(rand_args).unwrap(),
+        json!({
+            "object": "{OBJ-1}",
+            "property": "Volume",
+            "enabled": true,
+            "min": -3.0,
+            "max": 3.0
+        })
+    );
+
+    let points = vec![
+        CurvePoint2D::new(0.0, 0.0, CurveShape::Linear),
+        CurvePoint2D::new(50.0, -6.0, CurveShape::Log2),
+        CurvePoint2D::new(100.0, -200.0, CurveShape::Constant),
+    ];
+    let set_curve = CoreObjectSetAttenuationCurveArgs::new(
+        ObjectRef::guid("{ATTEN-1}"),
+        AttenuationCurveType::VolumeDryUsage,
+        AttenuationCurveUse::Custom,
+        points.clone(),
+    );
+    let set_curve_json = serde_json::to_value(&set_curve).unwrap();
+    assert_eq!(set_curve_json["curveType"], "VolumeDryUsage");
+    assert_eq!(set_curve_json["use"], "Custom");
+    assert_eq!(set_curve_json["points"].as_array().unwrap().len(), 3);
+    assert_eq!(set_curve_json["points"][1]["shape"], "Log2");
+
+    let get_curve = CoreObjectGetAttenuationCurveArgs::new(
+        ObjectRef::guid("{ATTEN-1}"),
+        AttenuationCurveType::VolumeDryUsage,
+    );
+    assert_eq!(
+        serde_json::to_value(get_curve).unwrap(),
+        json!({"object": "{ATTEN-1}", "curveType": "VolumeDryUsage"})
+    );
+
+    let curve_resp: CoreObjectGetAttenuationCurveResponse = serde_json::from_value(json!({
+        "curveType": "VolumeDryUsage",
+        "use": "Custom",
+        "points": [
+            {"x": 0.0, "y": 0.0, "shape": "Linear"},
+            {"x": 50.0, "y": -6.0, "shape": "Log2"},
+            {"x": 100.0, "y": -200.0, "shape": "Constant"}
+        ]
+    }))
+    .unwrap();
+    assert_eq!(curve_resp.curve_type, AttenuationCurveType::VolumeDryUsage);
+    assert_eq!(curve_resp.use_, AttenuationCurveUse::Custom);
+    assert_eq!(curve_resp.points, points);
+
+    let diff = CoreObjectDiffArgs::new(ObjectRef::guid("{SRC}"), ObjectRef::guid("{DST}"));
+    assert_eq!(
+        serde_json::to_value(diff).unwrap(),
+        json!({"source": "{SRC}", "target": "{DST}"})
+    );
+    let diff_resp: CoreObjectDiffResponse = serde_json::from_value(json!({
+        "properties": ["Volume", "Pitch"],
+        "lists": []
+    }))
+    .unwrap();
+    assert_eq!(diff_resp.properties, vec!["Volume", "Pitch"]);
+    assert!(diff_resp.lists.is_empty());
+
+    let paste = CoreObjectPastePropertiesArgs::new(
+        ObjectRef::guid("{SRC}"),
+        vec![ObjectRef::guid("{DST}")],
+    )
+    .paste_mode(PasteMode::ReplaceEntire)
+    .inclusion(vec![Property::Volume, Property::Pitch]);
+    assert_eq!(
+        serde_json::to_value(paste).unwrap(),
+        json!({
+            "source": "{SRC}",
+            "targets": ["{DST}"],
+            "pasteMode": "replaceEntire",
+            "inclusion": ["Volume", "Pitch"]
+        })
+    );
+}
+
+#[test]
+fn switch_container_assignments_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::switchContainer::{
+        CoreSwitchContainerAddAssignmentArgs, CoreSwitchContainerGetAssignmentsArgs,
+        CoreSwitchContainerGetAssignmentsResponse, CoreSwitchContainerRemoveAssignmentArgs,
+    };
+    use waapi_client::api::generated::primitives::SwitchContainerAssignment;
+
+    let add = CoreSwitchContainerAddAssignmentArgs::new(
+        ObjectRef::guid("{CHILD-1}"),
+        ObjectRef::guid("{SWITCH-1}"),
+    );
+    assert_eq!(
+        serde_json::to_value(add).unwrap(),
+        json!({"child": "{CHILD-1}", "stateOrSwitch": "{SWITCH-1}"})
+    );
+
+    let rem = CoreSwitchContainerRemoveAssignmentArgs::new(
+        ObjectRef::guid("{CHILD-1}"),
+        ObjectRef::guid("{SWITCH-1}"),
+    );
+    assert_eq!(
+        serde_json::to_value(rem).unwrap(),
+        json!({"child": "{CHILD-1}", "stateOrSwitch": "{SWITCH-1}"})
+    );
+
+    let get = CoreSwitchContainerGetAssignmentsArgs::new(ObjectRef::guid("{CONTAINER-1}"));
+    assert_eq!(
+        serde_json::to_value(get).unwrap(),
+        json!({"id": "{CONTAINER-1}"})
+    );
+
+    let resp: CoreSwitchContainerGetAssignmentsResponse = serde_json::from_value(json!({
+        "return": [
+            {
+                "child": "{CHILD-1}",
+                "stateOrSwitch": "{SWITCH-1}"
+            }
+        ]
+    }))
+    .unwrap();
+    assert_eq!(
+        resp.assignments,
+        vec![SwitchContainerAssignment {
+            child: "{CHILD-1}".to_string(),
+            state_or_switch: "{SWITCH-1}".to_string(),
+        }]
+    );
+}
+
+#[test]
+fn project_info_and_ui_commands_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::CoreGetProjectInfoResponse;
+    use waapi_client::api::generated::ak::wwise::ui::commands::{
+        UiCommandsExecuteArgs, UiCommandsGetCommandsResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::ui::project::{
+        UiProjectCloseArgs, UiProjectCloseResponse, UiProjectOpenArgs,
+    };
+    use waapi_client::api::generated::primitives::ProjectMigrationAction;
+
+    let proj: CoreGetProjectInfoResponse = serde_json::from_value(json!({
+        "name": "WwiseProject",
+        "displayTitle": "WwiseProject*",
+        "path": "/Projects/WwiseProject/WwiseProject.wproj",
+        "id": "{PROJ-ID}",
+        "isDirty": true,
+        "currentLanguageId": "{LANG-1}",
+        "referenceLanguageId": "{LANG-1}",
+        "currentPlatformId": "{PLAT-1}",
+        "defaultConversion": {
+            "id": "{CONV-1}",
+            "name": "Default Conversion Settings"
+        },
+        "platforms": [
+            {
+                "id": "{PLAT-1}",
+                "name": "Mac",
+                "baseName": "Mac",
+                "baseDisplayName": "macOS",
+                "soundBankPath": "/Projects/WwiseProject/GeneratedSoundBanks/Mac",
+                "copiedMediaPath": "/Projects/WwiseProject/GeneratedSoundBanks/Mac"
+            }
+        ],
+        "languages": [
+            {
+                "id": "{LANG-1}",
+                "name": "English(US)",
+                "shortId": 684519430
+            }
+        ],
+        "directories": {
+            "root": "/Projects/WwiseProject",
+            "cache": "/Projects/WwiseProject/.cache",
+            "originals": "/Projects/WwiseProject/Originals",
+            "soundBankOutputRoot": "/Projects/WwiseProject/GeneratedSoundBanks",
+            "commands": "/Projects/WwiseProject/Commands",
+            "properties": "/Projects/WwiseProject/Properties"
+        }
+    }))
+    .unwrap();
+    assert_eq!(proj.name, "WwiseProject");
+    assert_eq!(proj.platforms[0].base_display_name, "macOS");
+    assert_eq!(proj.languages[0].short_id, 684519430);
+    assert_eq!(proj.directories.root, "/Projects/WwiseProject");
+
+    let exec = UiCommandsExecuteArgs::new("FindInProjectExplorerSyncGroup1".to_string())
+        .objects(vec![ObjectRef::guid("{OBJ-1}")]);
+    assert_eq!(
+        serde_json::to_value(exec).unwrap(),
+        json!({
+            "command": "FindInProjectExplorerSyncGroup1",
+            "objects": ["{OBJ-1}"]
+        })
+    );
+
+    let cmds: UiCommandsGetCommandsResponse = serde_json::from_value(json!({
+        "commands": ["Inspect", "FindInProjectExplorerSyncGroup1"]
+    }))
+    .unwrap();
+    assert_eq!(cmds.commands.len(), 2);
+
+    let open = UiProjectOpenArgs::new("/Projects/WwiseProject/WwiseProject.wproj".to_string())
+        .on_migration_required(ProjectMigrationAction::Migrate)
+        .bypass_save(true);
+    assert_eq!(
+        serde_json::to_value(open).unwrap(),
+        json!({
+            "path": "/Projects/WwiseProject/WwiseProject.wproj",
+            "onMigrationRequired": "migrate",
+            "bypassSave": true
+        })
+    );
+
+    let close = UiProjectCloseArgs::new().bypass_save(true);
+    assert_eq!(
+        serde_json::to_value(close).unwrap(),
+        json!({"bypassSave": true})
+    );
+    let close_resp: UiProjectCloseResponse =
+        serde_json::from_value(json!({"hadProjectOpen": true})).unwrap();
+    assert!(close_resp.had_project_open);
+}

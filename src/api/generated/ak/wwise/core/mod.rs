@@ -5,4 +5,10 @@ pub mod audio;
 mod get_info;
 pub mod object;
 pub mod project;
+#[allow(non_snake_case)]
+pub mod switchContainer;
+pub mod transport;
+pub mod undo;
 pub use get_info::CoreGetInfoResponse;
+mod get_project_info;
+pub use get_project_info::CoreGetProjectInfoResponse;

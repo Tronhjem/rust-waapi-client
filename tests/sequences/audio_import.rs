@@ -1,4 +1,4 @@
-use super::connect_client;
+use super::{connect_client, sequence_lock};
 use waapi_client::api::ak::wwise::core::audio::{CoreAudioImportArgs, CoreAudioImportOptions};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
@@ -68,6 +68,7 @@ fn minimal_wav_base64(filename: &str) -> String {
 
 #[tokio::test]
 async fn audio_import_base64_sequence() {
+    let _guard = sequence_lock().await;
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
