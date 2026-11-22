@@ -28,7 +28,7 @@ async fn main() -> WaapiResult<()> {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(r"\Actor-Mixer Hierarchy")),
+            CoreObjectGetArgs::new(ObjectQuery::from(r"\Containers")),
             CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,

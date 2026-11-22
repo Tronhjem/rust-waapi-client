@@ -1,4 +1,4 @@
-use super::{connect_client, sequence_lock};
+use super::{connect_client, master_audio_bus, sequence_lock};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
     CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetOptions,
@@ -11,7 +11,6 @@ use waapi_client::{ChildObject, ObjectRef, ObjectType, Property};
 const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const EVENTS_WORK_UNIT_PATH: &str = r"\Events\Default Work Unit";
 const ATTENUATIONS_WORK_UNIT_PATH: &str = r"\Attenuations\Default Work Unit";
-const MASTER_AUDIO_BUS_PATH: &str = r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus";
 
 #[tokio::test]
 async fn object_references_and_event_wiring_sequence() {
@@ -24,6 +23,9 @@ async fn object_references_and_event_wiring_sequence() {
     const REF_SOUND_NAME: &str = "WaapiRefTargetSound";
     const REF_ATTENUATION_NAME: &str = "WaapiRefTestAttenuation";
     const REF_EVENT_NAME: &str = "WaapiRefTestEvent";
+
+    // 0. Discover the master audio bus (name differs across Wwise versions).
+    let (master_bus_id, master_bus_name) = master_audio_bus(&mut client).await;
 
     // 1. Create a temporary ActorMixer and target Sound
     let created_mixer = client
@@ -71,7 +73,7 @@ async fn object_references_and_event_wiring_sequence() {
     let set_refs_args = CoreObjectSetArgs::new(vec![
         CoreObjectSetItem::new(ObjectRef::from(sound_id.as_str()))
             .property(Property::OverrideOutput, true)
-            .property(Property::OutputBus, MASTER_AUDIO_BUS_PATH)
+            .property(Property::OutputBus, master_bus_id.as_str())
             .property(Property::OverridePositioning, true)
             .property(Property::EnableAttenuation, true)
             .property(Property::Attenuation, attenuation_id.as_str()),
@@ -136,7 +138,7 @@ async fn object_references_and_event_wiring_sequence() {
         .expect("Missing @OutputBus on Sound");
     assert_eq!(
         output_bus_ref.get("name").and_then(|v| v.as_str()),
-        Some("Master Audio Bus")
+        Some(master_bus_name.as_str())
     );
 
     let attenuation_ref = sound_obj

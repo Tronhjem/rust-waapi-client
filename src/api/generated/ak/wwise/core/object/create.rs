@@ -11,11 +11,11 @@ pub struct CoreObjectCreateArgs {
     /// For internal use only! The ID (GUID) to assign to the newly created Object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    /// The type of the new object. Refer to for possible object types.
-    #[serde(rename = "type")]
-    pub object_type: ObjectType,
     /// The name of the new object.
     pub name: String,
+    /// The type of the new object. See for possible object types.
+    #[serde(rename = "type")]
+    pub object_type: ObjectType,
     /// The notes or comments of the new object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
@@ -35,7 +35,7 @@ pub struct CoreObjectCreateArgs {
         skip_serializing_if = "Option::is_none"
     )]
     pub auto_add_to_source_control: Option<bool>,
-    /// The action to take if "parent" already has a child with the same name. Default value is "fail". Refer to for more information.
+    /// The action to take if "parent" already has a child with the same name. Default value is "fail". See for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
     #[serde(flatten)]

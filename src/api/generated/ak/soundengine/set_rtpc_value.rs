@@ -8,12 +8,12 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.setRTPCValue`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetRtpcValueArgs {
+    /// Value to set for the specified Game Parameter.
+    pub value: f64,
     /// Associated game object ID. The default value is transport game object.
     #[serde(rename = "gameObject", skip_serializing_if = "Option::is_none")]
     pub game_object: Option<GameObjectRef>,
-    /// Value to set.
-    pub value: f64,
-    /// Either the ID (GUID), name, or Short ID of the real-time parameter control.
+    /// Either the ID (GUID), name, or Short ID of the Game Parameter.
     pub rtpc: SoundEngineObjectRef,
 }
 

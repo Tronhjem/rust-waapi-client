@@ -4,6 +4,9 @@
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example object_get_set
 //!
+//! Targets the Wwise 2025 hierarchy (`\Containers`). See
+//! `object_get_set_2024.rs` for the Wwise 2024 `\Actor-Mixer Hierarchy` variant.
+//!
 //! The example modifies whatever object is currently selected in the Wwise
 //! authoring UI (sets its notes and Volume), so select something first.
 
@@ -28,9 +31,7 @@ async fn main() -> WaapiResult<()> {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(
-                r"\Actor-Mixer Hierarchy\Default Work Unit",
-            )),
+            CoreObjectGetArgs::new(ObjectQuery::from(r"\Containers\Default Work Unit")),
             CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,

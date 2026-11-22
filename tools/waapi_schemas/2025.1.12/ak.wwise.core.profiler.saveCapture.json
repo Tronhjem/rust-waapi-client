@@ -1,0 +1,36 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "file": {
+        "type": "string",
+        "description": "File path to a .prof file."
+      }
+    },
+    "required": [
+      "file"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Saves profiler as a .prof file according to the given file path.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Saves the current profiler capture to the file \"capture.prof\".",
+      "title": "Saving a profiler capture",
+      "args": {
+        "file": "C:\\MyProject\\capture.prof"
+      }
+    }
+  ]
+}

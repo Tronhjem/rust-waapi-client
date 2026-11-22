@@ -8,10 +8,10 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.gameParameter.setRange`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreGameParameterSetRangeArgs {
-    /// The maximum value of the Game Parameter.
-    pub max: f64,
     /// The minimum value of the Game Parameter.
     pub min: f64,
+    /// The maximum value of the Game Parameter.
+    pub max: f64,
     /// The ID (GUID), name, or path of the Game Parameter.
     pub object: ObjectRef,
     /// Modifying the Min or Max value of a Game Parameter affects the RTPC curves and blend tracks that use that Game Parameter for their X axis. Two actions are possible: stretch: All items are kept but their X positions might change as the curve/blend track is stretched or compressed to match the new range in X. Values of Set Game Parameter actions are also scaled. preserve_x: Maintains the X position of all the items, but those that fall outside the new range are deleted. Values of Set Game Parameter actions are clamped.

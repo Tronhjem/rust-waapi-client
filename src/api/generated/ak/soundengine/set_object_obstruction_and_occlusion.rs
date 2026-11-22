@@ -8,7 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.setObjectObstructionAndOcclusion`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetObjectObstructionAndOcclusionArgs {
-    /// Listener game object ID
+    /// Listener game object ID.
     pub listener: GameObjectRef,
     /// Emitter game object ID.
     pub emitter: GameObjectRef,

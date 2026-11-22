@@ -84,3 +84,5 @@ mod set_state_groups;
 pub use set_state_groups::CoreObjectSetStateGroupsArgs;
 mod set_state_properties;
 pub use set_state_properties::CoreObjectSetStatePropertiesArgs;
+mod structure_changed;
+pub use structure_changed::{CoreObjectStructureChangedOptions, CoreObjectStructureChangedPayload};

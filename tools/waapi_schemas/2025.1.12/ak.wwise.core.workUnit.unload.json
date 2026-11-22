@@ -1,0 +1,36 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the Work Unit to unload.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Unload a Work Unit. No object contained in the Work Unit will be available after this call. If the Work Unit is modified and not saved, the function will return error. The Undo history will be cleared.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Unload a Work Unit.",
+      "title": "Unload a Work Unit.",
+      "args": {
+        "object": "\\Containers\\myWorkUnit"
+      }
+    }
+  ]
+}

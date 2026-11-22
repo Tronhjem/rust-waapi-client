@@ -1,4 +1,4 @@
-use super::{connect_client, sequence_lock};
+use super::{connect_client, master_audio_bus, sequence_lock};
 use waapi_client::api::ak::soundengine::{
     SoundengineExecuteActionOnEventArgs, SoundengineGetStateArgs, SoundengineGetSwitchArgs,
     SoundenginePostEventArgs, SoundenginePostMsgMonitorArgs, SoundenginePostTriggerArgs,
@@ -20,7 +20,6 @@ use waapi_client::{ObjectRef, ObjectType, Position, Vector3};
 
 const SWITCH_GROUPS_WU: &str = r"\Switches\Default Work Unit";
 const STATE_GROUPS_WU: &str = r"\States\Default Work Unit";
-const MASTER_MIXER_WU: &str = r"\Master-Mixer Hierarchy\Default Work Unit";
 const TRIGGERS_WU: &str = r"\Triggers\Default Work Unit";
 const GAME_PARAMS_WU: &str = r"\Game Parameters\Default Work Unit";
 const EVENTS_WU: &str = r"\Events\Default Work Unit";
@@ -31,6 +30,9 @@ async fn soundengine_extended_sequence() {
     let mut client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
+
+    // 0. Discover the master audio bus (name differs across Wwise versions).
+    let (master_bus_id, _) = master_audio_bus(&mut client).await;
 
     // Unique names per run avoid collisions with leftovers from prior failed runs
     // (setName/setState/setSwitch resolve by name and have no conflict handling).
@@ -135,7 +137,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(format!(r"{MASTER_MIXER_WU}\Master Audio Bus")),
+                ObjectRef::from(master_bus_id.as_str()),
                 ObjectType::AuxBus,
                 aux_bus_name.clone(),
             )
@@ -363,7 +365,7 @@ async fn soundengine_extended_sequence() {
 
     client
         .soundengine()
-        .stop_all(SoundengineStopAllArgs::new(emitter))
+        .stop_all(SoundengineStopAllArgs::new().game_object(emitter))
         .await
         .expect("stop all");
 

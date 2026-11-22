@@ -18,7 +18,7 @@ pub struct CoreObjectPastePropertiesArgs {
     /// Array of properties, references and lists to exclude from the paste operation. When not specified, no properties, references and lists are excluded.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exclusion: Option<Vec<Property>>,
-    /// Array of properties, references and lists to include in the paste operation. When not specified, all properties, references and lists are included, and the exclusion defines which ones to exclude
+    /// Array of properties, references and lists to include in the paste operation. When not specified, all properties, references and lists are included, and the exclusion defines which ones to exclude.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inclusion: Option<Vec<Property>>,
 }

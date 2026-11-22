@@ -13,7 +13,7 @@ pub struct SoundengineSetMultiplePositionsArgs {
     pub game_object: GameObjectRef,
     /// Array of positions to apply.
     pub positions: Vec<MultiPosition>,
-    /// Uses values from <tt>AK::SoundEngine::MultiPositionType</tt>.
+    /// Uses values from <tt>AkMultiPositionType</tt>.
     #[serde(rename = "multiPositionType")]
     pub multi_position_type: MultiPositionType,
 }

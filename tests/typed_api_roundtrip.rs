@@ -1108,7 +1108,7 @@ fn soundengine_positions_volume_and_listeners_roundtrip() {
         json!({"soundBank": "Init"})
     );
 
-    let stop_all = SoundengineStopAllArgs::new(GameObjectRef::game_object(1));
+    let stop_all = SoundengineStopAllArgs::new().game_object(GameObjectRef::game_object(1));
     assert_eq!(
         serde_json::to_value(stop_all).unwrap(),
         json!({"gameObject": 1})
@@ -1921,4 +1921,184 @@ fn remaining_topic_payloads_deserialize() {
         serde_json::from_value(json!({"handleID": "H2", "widgetID": "W2"})).unwrap();
     assert_eq!(toggle.handle_id, "H2");
     assert_eq!(toggle.widget_id, "W2");
+}
+
+#[test]
+fn object_type_union_preserves_renamed_variants() {
+    use waapi_client::ObjectType;
+
+    // ActorMixer (Wwise 2024) and PropertyContainer (Wwise 2025) are the same
+    // object type; the union keeps both names as distinct variants.
+    assert_eq!(ObjectType::ActorMixer.as_str(), "ActorMixer");
+    assert_eq!(ObjectType::PropertyContainer.as_str(), "PropertyContainer");
+    assert_ne!(ObjectType::ActorMixer, ObjectType::PropertyContainer);
+
+    // Both share the Wwise class ID (0x80010 = 524304).
+    assert_eq!(ObjectType::ActorMixer.class_id(), 524304);
+    assert_eq!(
+        ObjectType::ActorMixer.class_id(),
+        ObjectType::PropertyContainer.class_id()
+    );
+
+    // Reverse lookup resolves to the canonical (latest Wwise) name.
+    assert_eq!(
+        ObjectType::from_class_id(524304),
+        Some(ObjectType::PropertyContainer)
+    );
+
+    // Both names still parse/deserialize independently.
+    assert_eq!(
+        "ActorMixer".parse::<ObjectType>().unwrap(),
+        ObjectType::ActorMixer
+    );
+    assert_eq!(
+        "PropertyContainer".parse::<ObjectType>().unwrap(),
+        ObjectType::PropertyContainer
+    );
+}
+
+#[test]
+fn return_field_union_keeps_removed_variants() {
+    use waapi_client::api::generated::primitives::{
+        AudioObjectReturnField, ObjectReturnField, WwiseObject,
+    };
+
+    // Fields removed in Wwise 2025 but retained for 2024 compatibility.
+    assert_eq!(
+        serde_json::to_value(ObjectReturnField::TransitionObject).unwrap(),
+        json!("transitionObject")
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectReturnField::ColorRgb).unwrap(),
+        json!("colorRGB")
+    );
+    assert_eq!(
+        serde_json::to_value(AudioObjectReturnField::PrevGain).unwrap(),
+        json!("prevGain")
+    );
+    assert_eq!(
+        serde_json::to_value(AudioObjectReturnField::NextGain).unwrap(),
+        json!("nextGain")
+    );
+    let obj: WwiseObject =
+        serde_json::from_value(json!({"id": "{OBJ-1}", "transitionObject": {"id": "{TRANS-1}"}}))
+            .unwrap();
+    assert_eq!(obj.transition_object, Some(json!({"id": "{TRANS-1}"})));
+}
+
+#[test]
+fn new_2025_endpoints_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::mediaPool::{
+        CoreMediaPoolGetArgs, CoreMediaPoolGetFieldsResponse, CoreMediaPoolGetOptions,
+        CoreMediaPoolGetResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::core::object::CoreObjectStructureChangedPayload;
+    use waapi_client::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogSaveArgs;
+    use waapi_client::api::generated::ak::wwise::core::profiler::{
+        CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse, CoreProfilerSetCursorTimeArgs,
+        CoreProfilerSetCursorTimeResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::core::workUnit::{
+        CoreWorkUnitLoadArgs, CoreWorkUnitUnloadArgs,
+    };
+    use waapi_client::api::generated::ak::wwise::ui::UiGetSelectedFilesResponse;
+    use waapi_client::api::generated::ak::wwise::ui::layout::{
+        UiLayoutCloseViewArgs, UiLayoutResetLayoutsArgs,
+    };
+    use waapi_client::api::primitives::ObjectRef;
+
+    // mediaPool.get: args, options, and wrapped "return" response.
+    let media_get = CoreMediaPoolGetArgs::new()
+        .databases(vec![ObjectRef::guid("{DB-1}")])
+        .search_text("footsteps")
+        .max_results(10);
+    assert_eq!(
+        serde_json::to_value(media_get).unwrap(),
+        json!({
+            "databases": ["{DB-1}"],
+            "searchText": "footsteps",
+            "maxResults": 10
+        })
+    );
+    let media_opts = CoreMediaPoolGetOptions::new()
+        .return_(vec!["Path".to_string(), "WAV/Duration".to_string()]);
+    assert_eq!(
+        serde_json::to_value(media_opts).unwrap(),
+        json!({"return": ["Path", "WAV/Duration"]})
+    );
+    let media_resp: serde_json::Value = json!({"return": [{"Path": "a.wav"}]});
+    let parsed: CoreMediaPoolGetResponse = serde_json::from_value(media_resp).unwrap();
+    assert_eq!(parsed.return_, vec![json!({"Path": "a.wav"})]);
+
+    // mediaPool.getFields: no args, wrapped "return" string list.
+    let fields: CoreMediaPoolGetFieldsResponse =
+        serde_json::from_value(json!({"return": ["Path", "FileId"]})).unwrap();
+    assert_eq!(fields.return_, vec!["Path", "FileId"]);
+
+    // profiler.captureLog.save
+    let save = CoreProfilerCaptureLogSaveArgs::new("/tmp/capture.log".to_string());
+    assert_eq!(
+        serde_json::to_value(save).unwrap(),
+        json!({"file": "/tmp/capture.log"})
+    );
+
+    // profiler.moveCursor
+    let move_cursor = CoreProfilerMoveCursorArgs::new("next".to_string());
+    assert_eq!(
+        serde_json::to_value(move_cursor).unwrap(),
+        json!({"position": "next"})
+    );
+    let move_resp: CoreProfilerMoveCursorResponse =
+        serde_json::from_value(json!({"return": 500})).unwrap();
+    assert_eq!(move_resp.return_, 500);
+
+    // profiler.setCursorTime
+    let set_time = CoreProfilerSetCursorTimeArgs::new(1234);
+    assert_eq!(
+        serde_json::to_value(set_time).unwrap(),
+        json!({"time": 1234})
+    );
+    let set_resp: CoreProfilerSetCursorTimeResponse =
+        serde_json::from_value(json!({"return": 1234})).unwrap();
+    assert_eq!(set_resp.return_, 1234);
+
+    // workUnit.load / unload
+    let load = CoreWorkUnitLoadArgs::new(ObjectRef::guid("{WU-1}"));
+    assert_eq!(
+        serde_json::to_value(load).unwrap(),
+        json!({"object": "{WU-1}"})
+    );
+    let unload = CoreWorkUnitUnloadArgs::new(ObjectRef::guid("{WU-1}"));
+    assert_eq!(
+        serde_json::to_value(unload).unwrap(),
+        json!({"object": "{WU-1}"})
+    );
+
+    // ui.getSelectedFiles: no args, plain "files" response.
+    let files: UiGetSelectedFilesResponse =
+        serde_json::from_value(json!({"files": ["/a.wav", "/b.wav"]})).unwrap();
+    assert_eq!(files.files, vec!["/a.wav", "/b.wav"]);
+
+    // ui.layout.closeView
+    let close = UiLayoutCloseViewArgs::new("MyView".to_string());
+    assert_eq!(
+        serde_json::to_value(close).unwrap(),
+        json!({"viewID": "MyView"})
+    );
+
+    // ui.layout.resetLayouts
+    let reset = UiLayoutResetLayoutsArgs::new().layouts(vec!["Layout1".to_string()]);
+    assert_eq!(
+        serde_json::to_value(reset).unwrap(),
+        json!({"layouts": ["Layout1"]})
+    );
+
+    // object.structureChanged topic payload
+    let structure: CoreObjectStructureChangedPayload = serde_json::from_value(json!({
+        "objects": [{"object": {"id": "{OBJ-1}"}, "changes": []}],
+        "summary": "Paste"
+    }))
+    .unwrap();
+    assert_eq!(structure.summary, "Paste");
+    assert_eq!(structure.objects.len(), 1);
 }

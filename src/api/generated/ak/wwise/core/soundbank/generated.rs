@@ -15,15 +15,15 @@ pub struct CoreSoundbankGeneratedPayload {
     /// The language for which the SoundBank was generated. Only present when generating a SoundBank for a specific language.
     #[serde(default)]
     pub language: Option<serde_json::Value>,
-    /// SoundBank data object containing the actual data encoded in base64 and the size.
-    #[serde(rename = "bankData", default)]
-    pub bank_data: Option<serde_json::Value>,
-    /// PluginInfo file info
-    #[serde(rename = "pluginInfo", default)]
-    pub plugin_info: Option<serde_json::Value>,
     /// The error message, if an error occurred. Only present if an error occurred.
     #[serde(default)]
     pub error: Option<String>,
+    /// SoundBank data object containing the actual data encoded in base64 and the size.
+    #[serde(rename = "bankData", default)]
+    pub bank_data: Option<serde_json::Value>,
+    /// PluginInfo file info.
+    #[serde(rename = "pluginInfo", default)]
+    pub plugin_info: Option<serde_json::Value>,
     /// All the information for SoundBank.
     #[serde(rename = "bankInfo", default)]
     pub bank_info: Vec<serde_json::Value>,
@@ -32,7 +32,7 @@ pub struct CoreSoundbankGeneratedPayload {
 /// Subscription options for `ak.wwise.core.soundbank.generated`.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreSoundbankGeneratedOptions {
-    /// Data to be returned for the SoundBank generated. Refer to for more information on the properties available.
+    /// Data to be returned for the SoundBank generated. See for more information on the properties available.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
     pub return_: Option<Vec<ObjectReturnField>>,
     /// Embed the JSON SoundBank info file in the response.

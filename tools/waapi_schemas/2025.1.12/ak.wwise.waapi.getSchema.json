@@ -1,0 +1,70 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "uri": {
+        "type": "string",
+        "description": "Function or Topic URI. See \\ref ak_wwise_waapi_getfunctions and \\ref ak_wwise_waapi_gettopics to get the lists of functions and topics."
+      },
+      "includeExamples": {
+        "type": "boolean",
+        "description": "Include the examples provided in the schema. Default value is false."
+      }
+    },
+    "required": [
+      "uri"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "argsSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The argument schema. Only possible for functions.",
+        "additionalProperties": true
+      },
+      "optionsSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The option schema.",
+        "additionalProperties": true
+      },
+      "resultSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The result schema. Only possible for functions.",
+        "additionalProperties": true
+      },
+      "publishSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "The publish schema. Only possible for topics.",
+        "additionalProperties": true
+      },
+      "description": {
+        "type": "string",
+        "description": "The description of the function or topic."
+      },
+      "examples": {
+        "type": "array",
+        "description": "The examples provided in the schema.",
+        "items": {
+          "type": "object",
+          "properties": {},
+          "description": "The example.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "description": "Retrieves the JSON schema of a Waapi Function or Topic URI.",
+  "examples": []
+}

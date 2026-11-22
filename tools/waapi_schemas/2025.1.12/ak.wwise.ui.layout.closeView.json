@@ -1,0 +1,36 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "viewID": {
+        "description": "The unique id of the view to close.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "viewID"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Requests to close a view by its unique id. The view might not yet be closed when returning from this function.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Closes view using its GUID.",
+      "title": "Closing a view",
+      "args": {
+        "viewID": "{6609D1BA-0E47-48F4-B3B6-3DA1C345B66E}"
+      }
+    }
+  ]
+}

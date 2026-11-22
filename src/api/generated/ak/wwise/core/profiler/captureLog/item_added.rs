@@ -11,7 +11,7 @@ pub struct CoreProfilerCaptureLogItemAddedPayload {
     /// The entry type. Equivalent to the Type column in the Capture Log.
     #[serde(rename = "type")]
     pub object_type: String,
-    /// Normal: normal execution. Message: Shown in yellow in the capture log. Error: Shown in red in the capture log.
+    /// The severity level of the log entry.
     pub severity: String,
     /// The name of the object for the entry.
     #[serde(rename = "objectName", default)]

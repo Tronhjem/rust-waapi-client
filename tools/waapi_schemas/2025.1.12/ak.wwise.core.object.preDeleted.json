@@ -1,0 +1,30 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for every object prior to its deletion.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The object to be deleted.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "description": "Sent prior to an object's deletion. See \\ref ak_wwise_core_object_structurechanged to receive changes in batch."
+}

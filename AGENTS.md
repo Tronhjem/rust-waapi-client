@@ -45,4 +45,4 @@ python tools/generate_typed_api.py    # overwrites src/api/generated/
 cargo build && cargo test
 ```
 
-Both `generate_waapi_uri.py` and `generate_typed_api.py` read the versioned schemas in `tools/waapi_schemas/<version>/` offline (no running Wwise instance needed once schemas are fetched).
+Both `generate_waapi_uri.py` and `generate_typed_api.py` read the versioned schemas in `tools/waapi_schemas/<version>/` offline (no running Wwise instance needed once schemas are fetched). They generate a **union** across every version directory present (e.g. `2024.1.7/` + `2025.1.12/`), producing a single API that serves all versions: renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`), 2024-only return fields are retained, and the latest version's schema is canonical for field requiredness. To add a new version, fetch its schemas into a new `tools/waapi_schemas/<version>/` directory and re-run both generators.

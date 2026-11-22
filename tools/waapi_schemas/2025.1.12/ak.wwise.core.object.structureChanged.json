@@ -1,0 +1,159 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for the objects involved in the structure changes.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "includeLoadedAndUnloadedNestedObjects": {
+        "type": "boolean",
+        "description": "If true, all loaded or unloaded objects are provided when a Work Unit is loaded or unloaded. If false or not provided, only the Work Unit objects that are loaded or unloaded is provided. Note that several Work Unit objects could be provided in a single structure change operation since Work Unit objects can be children of other Work Unit objects."
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "objects": {
+        "type": "array",
+        "description": "The list of changed objects.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "description": "The changed object.",
+              "$ref": "waapi_definitions.json#/definitions/objectReturn"
+            },
+            "changes": {
+              "type": "array",
+              "description": "The list of changes.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "The type of change. Some types include additional information in the sub element of the same name.",
+                    "enum": [
+                      "create",
+                      "delete",
+                      "nameChange",
+                      "notesChange",
+                      "parentChange",
+                      "ownerChange",
+                      "load",
+                      "unload"
+                    ]
+                  },
+                  "parentChange": {
+                    "type": "object",
+                    "properties": {
+                      "oldParent": {
+                        "description": "The old parent. Might be an empty object when no previous parent is found.",
+                        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+                      },
+                      "newParent": {
+                        "description": "The new parent. Might be an empty object when no new parent is found.",
+                        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+                      }
+                    },
+                    "description": "The changed parent of an object. Sent when type='parentChange'.",
+                    "required": [
+                      "oldParent",
+                      "newParent"
+                    ],
+                    "additionalProperties": "false"
+                  },
+                  "ownerChange": {
+                    "type": "object",
+                    "properties": {
+                      "referenceName": {
+                        "type": "string",
+                        "description": "The name of the reference for which the owner changed."
+                      },
+                      "oldOwner": {
+                        "description": "The old owner. Might be an empty object when no previous owner is found.",
+                        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+                      },
+                      "newOwner": {
+                        "description": "The new owner. Might be an empty object when no new owner is found.",
+                        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+                      }
+                    },
+                    "description": "The changed owner of an object. Sent when type='ownerChange'.",
+                    "required": [
+                      "referenceName",
+                      "oldOwner",
+                      "newOwner"
+                    ],
+                    "additionalProperties": "false"
+                  },
+                  "nameChange": {
+                    "type": "object",
+                    "properties": {
+                      "newName": {
+                        "type": "string",
+                        "description": "The new name."
+                      },
+                      "oldName": {
+                        "type": "string",
+                        "description": "The old name."
+                      }
+                    },
+                    "description": "The changed name of an object. Sent when type='nameChange'.",
+                    "required": [
+                      "oldName",
+                      "newName"
+                    ],
+                    "additionalProperties": "false"
+                  },
+                  "notesChange": {
+                    "type": "object",
+                    "properties": {
+                      "newName": {
+                        "type": "string",
+                        "description": "The new notes."
+                      },
+                      "oldName": {
+                        "type": "string",
+                        "description": "The old notes."
+                      }
+                    },
+                    "description": "The changed notes of an object. Sent when type='notesChange'.",
+                    "required": [
+                      "oldNotes",
+                      "newNotes"
+                    ],
+                    "additionalProperties": "false"
+                  }
+                },
+                "description": "A change to the specified object.",
+                "required": [
+                  "type"
+                ],
+                "additionalProperties": "false"
+              }
+            }
+          },
+          "description": "The details of the changes made to an object.",
+          "required": [
+            "object",
+            "changes"
+          ],
+          "additionalProperties": "false"
+        }
+      },
+      "summary": {
+        "type": "string",
+        "description": "The operation that triggered the changes. Generally, the name of the top-level undo operation."
+      }
+    },
+    "required": [
+      "summary",
+      "objects"
+    ],
+    "additionalProperties": false
+  },
+  "description": "Sent when the project structure changes. Publishes a summary of the changes. The publication is sent after the undo stack is modified. The changes are grouped in batch and redundant changes are collapsed."
+}

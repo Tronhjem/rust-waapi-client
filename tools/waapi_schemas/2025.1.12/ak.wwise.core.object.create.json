@@ -1,0 +1,301 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "For internal use only! The ID (GUID) to assign to the newly created Object.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the new object."
+      },
+      "type": {
+        "type": "string",
+        "description": "The type of the new object. See \\ref wobjects_index for possible object types."
+      },
+      "notes": {
+        "type": "string",
+        "description": "The notes or comments of the new object."
+      },
+      "parent": {
+        "description": "The ID (GUID), name, or path of the parent of the new object.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      },
+      "list": {
+        "type": "string",
+        "description": "The name of the list in which to insert the object. If this argument is set, the object gets inserted in a list owned by the parent and not as a child."
+      },
+      "children": {
+        "$ref": "#/definitions/children"
+      },
+      "platform": {
+        "description": "The ID (GUID) or unique name of the platform used when setting properties via this command. Not specifying a platform sets the value for all linked platforms.",
+        "$ref": "waapi_definitions.json#/definitions/platformArg"
+      },
+      "autoAddToSourceControl": {
+        "type": "boolean",
+        "description": "Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true."
+      },
+      "onNameConflict": {
+        "type": "string",
+        "description": "The action to take if \"parent\" already has a child with the same name. Default value is \"fail\". See \\ref waapi_create_objects_modes for more information.",
+        "oneOf": [
+          {
+            "description": "The new object receives a unique name, which is the name of the existing object with numbers appended.",
+            "enum": [
+              "rename"
+            ]
+          },
+          {
+            "description": "The object at the destination is deleted (including its children), and a new object is created.",
+            "enum": [
+              "replace"
+            ]
+          },
+          {
+            "description": "No changes are made, and an error is returned. This is the default value.",
+            "enum": [
+              "fail"
+            ]
+          },
+          {
+            "description": "Merges the new or modified properties, references, and children into the object at the destination, and does not change any unmodified aspects of the existing object.",
+            "enum": [
+              "merge"
+            ]
+          }
+        ]
+      }
+    },
+    "required": [
+      "type",
+      "name",
+      "parent"
+    ],
+    "additionalProperties": false,
+    "patternProperties": {
+      "^@[:_a-zA-Z0-9]+$": {
+        "description": "Sets the value of property \\@propertyName. See \\ref wobjects_index for property names.",
+        "$ref": "common_definitions.json#/definitions/propertyValue"
+      }
+    },
+    "definitions": {
+      "children": {
+        "type": "array",
+        "description": "An array of child objects to be created.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "For internal use only! The ID (GUID) to assign to the newly created Object.",
+              "$ref": "common_definitions.json#/definitions/guid"
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the new object."
+            },
+            "type": {
+              "type": "string",
+              "description": "The type of the new object. See \\ref wobjects_index for possible object types or \\ref wobjectnodetypes for possible node types."
+            },
+            "notes": {
+              "type": "string",
+              "description": "The notes or comments of the new object."
+            },
+            "children": {
+              "description": "An array of child objects to be created (Recursive).",
+              "$ref": "#/definitions/children"
+            }
+          },
+          "description": "A child object to be created.",
+          "required": [
+            "type",
+            "name"
+          ],
+          "additionalProperties": false,
+          "patternProperties": {
+            "^@[:_a-zA-Z0-9]+$": {
+              "description": "Sets the value of property \\@propertyName. See \\ref wobjects_index for property names.",
+              "$ref": "common_definitions.json#/definitions/propertyValue"
+            }
+          }
+        }
+      }
+    }
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The ID (GUID) of the newly created Object.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the newly created Object."
+      },
+      "children": {
+        "type": "array",
+        "description": "The children of objects created.",
+        "items": {
+          "description": "An object created.",
+          "$ref": "#"
+        }
+      }
+    }
+  },
+  "description": "Creates an object of type 'type', as a child of 'parent'. See \\ref waapi_import for more information about creating objects. Also see \\ref ak_wwise_core_audio_import to import audio files to Wwise. To create Effect or Source plug-ins, use \\ref ak_wwise_core_object_set, and see \\ref wobjects_index for the classId.",
+  "examples": [
+    {
+      "result": {
+        "id": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "name": "Boom"
+      },
+      "description": "Creates a new Sound object called 'Boom' under the specified parent.",
+      "title": "Creating a Sound object",
+      "args": {
+        "name": "Boom",
+        "type": "Sound",
+        "parent": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"
+      }
+    },
+    {
+      "result": {
+        "id": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "name": "Foot Steps"
+      },
+      "description": "Creates a new virtual folder called 'Guns' under the default work unit. If a folder with the same name already exists, it automatically finds a unique name.",
+      "title": "Creating a Virtual Folder",
+      "args": {
+        "name": "Foot Steps",
+        "type": "Folder",
+        "parent": "\\Containers\\Default Work Unit",
+        "onNameConflict": "rename"
+      }
+    },
+    {
+      "result": {
+        "id": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "name": "My Property Container"
+      },
+      "description": "Creates a new virtual folder called 'Guns' under the default work unit. If a folder with the same name already exists, it automatically finds a unique name.",
+      "title": "Creating a Property Container",
+      "args": {
+        "name": "My Property Container",
+        "type": "PropertyContainer",
+        "parent": "{A9129D80-07E0-11E7-93AE-92361F002671}"
+      }
+    },
+    {
+      "result": {
+        "id": "{6114659F-9274-4031-B90E-F369568532E0}",
+        "name": "WAAPI",
+        "children": [
+          {
+            "id": "{F546017D-201A-49BD-8D4E-0A28F5DBB28D}",
+            "name": "Play_SFX",
+            "children": [
+              {
+                "id": "{400D0354-0FDB-48B4-B341-9DFA0B76078D}",
+                "name": ""
+              }
+            ]
+          }
+        ]
+      },
+      "description": "Creates an event called 'Play_SFX' under the virtual folder 'WAAPI', with Play action on the SFX sound object. See \\ref wwiseobject_action for the list of possible event properties and action types.",
+      "title": "Creating a Play Event on a Sound",
+      "args": {
+        "name": "WAAPI",
+        "type": "Folder",
+        "parent": "\\Events\\Default Work Unit",
+        "children": [
+          {
+            "name": "Play_SFX",
+            "type": "Event",
+            "children": [
+              {
+                "name": "",
+                "type": "Action",
+                "@ActionType": 1,
+                "@Target": "\\Containers\\Default Work Unit\\SFX"
+              }
+            ]
+          }
+        ],
+        "onNameConflict": "merge"
+      }
+    },
+    {
+      "result": {
+        "id": "{66666666-7777-8888-9999-AAAAAAAAAAAA}",
+        "name": "Boom",
+        "children": [
+          {
+            "id": "{46813545-2168-3547-8328-681AB678D6F5}",
+            "name": "A"
+          },
+          {
+            "id": "{68465134-2548-2377-3541-321354318ABD}",
+            "name": "B"
+          }
+        ]
+      },
+      "description": "Creates a Random Container called 'Boom' under the specified parent, with two Sound objects 'A' and 'B'.",
+      "title": "Creating a Random Container with two Sound objects",
+      "args": {
+        "name": "Boom",
+        "type": "RandomSequenceContainer",
+        "parent": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}",
+        "children": [
+          {
+            "name": "A",
+            "type": "Sound"
+          },
+          {
+            "name": "B",
+            "type": "Sound"
+          }
+        ],
+        "@RandomOrSequence": 1
+      }
+    },
+    {
+      "result": {
+        "id": "{1629938A-24F7-451F-B01F-49F448CED8FF}",
+        "name": "My Music Cue"
+      },
+      "description": "Creates a Custom Cue inside an existing Music Segment with the specified name and time in milliseconds.",
+      "title": "Adding a Custom Cue to an existing Music Segment",
+      "args": {
+        "name": "My Music Cue",
+        "type": "MusicCue",
+        "parent": "\\Containers\\Default Work Unit\\My Segment",
+        "list": "Cues",
+        "@TimeMs": 1200,
+        "@CueType": 2
+      }
+    },
+    {
+      "result": {
+        "id": "{8E795E58-95F9-42F1-BB24-1D36283362A2}",
+        "name": ""
+      },
+      "description": "Creates a Metadata entry in the Metadata object list inside an existing Sound SFX. The Metadata is a shareset with the specified GUID.",
+      "title": "Adding a Metadata shareset to an existing Sound SFX",
+      "args": {
+        "name": "",
+        "type": "MetadataSlot",
+        "parent": "\\Containers\\Default Work Unit\\MySound",
+        "list": "Metadata",
+        "@Metadata": "{F3FCCECA-170B-4958-9CDF-14CE25C58EBC}"
+      }
+    }
+  ]
+}

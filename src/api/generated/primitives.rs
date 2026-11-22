@@ -520,13 +520,13 @@ pub struct WwiseObject {
     /// The amount of space (in bytes) the meta-data of the object and all of its children take up in a SoundBank. This does not include media files. Note that SoundBanks need to be generated for this value to be accurate.
     #[serde(rename = "structureSize", default)]
     pub structure_size: Option<i64>,
-    /// (DEPRECATED) The transition root containing all other transitions recursively. Note, this is deprecated. The TransitionRoot reference should be used instead.
+    /// (DEPRECATED) The music transition root containing all other music transitions recursively. Note, this is deprecated. The TransitionRoot reference should be used instead.
     #[serde(rename = "musicTransitionRoot", default)]
     pub music_transition_root: Option<serde_json::Value>,
     /// (DEPRECATED) The music playlist root containing all other music playlist items recursively. This applies to Music Playlist Containers only. Note, this is deprecated. The PlaylistRoot reference should be used instead.
     #[serde(rename = "musicPlaylistRoot", default)]
     pub music_playlist_root: Option<serde_json::Value>,
-    /// (DEPRECATED) The transition segment.
+    /// The music transition segment.
     #[serde(rename = "musicTransitionObject", default)]
     pub music_transition_object: Option<serde_json::Value>,
     /// The transition segment.
@@ -571,109 +571,109 @@ pub struct WwiseObject {
     /// Language associated to the audio source. This only applies to Audio Source objects directly.
     #[serde(rename = "audioSourceLanguage", default)]
     pub audio_source_language: Option<WwiseObjectRef>,
-    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalTotalChannelCount", default)]
     pub original_total_channel_count: Option<f64>,
-    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalNormalChannelCount", default)]
     pub original_normal_channel_count: Option<f64>,
-    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalHeightChannelCount", default)]
     pub original_height_channel_count: Option<f64>,
-    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalLFEChannelCount", default)]
     pub original_lfe_channel_count: Option<f64>,
-    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalNonLFEChannelCount", default)]
     pub original_non_lfe_channel_count: Option<f64>,
-    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalAnonymousChannelCount", default)]
     pub original_anonymous_channel_count: Option<f64>,
-    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalAmbisonicsChannelCount", default)]
     pub original_ambisonics_channel_count: Option<f64>,
-    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalChannelConfig", default)]
     pub original_channel_config: Option<String>,
-    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalChannelMask", default)]
     pub original_channel_mask: Option<f64>,
-    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalSampleRate", default)]
     pub original_sample_rate: Option<f64>,
-    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalBitDepth", default)]
     pub original_bit_depth: Option<f64>,
-    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalFileSize", default)]
     pub original_file_size: Option<f64>,
-    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalDataSize", default)]
     pub original_data_size: Option<f64>,
-    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalSampleCount", default)]
     pub original_sample_count: Option<f64>,
-    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalDuration", default)]
     pub original_duration: Option<f64>,
-    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "originalCodec", default)]
     pub original_codec: Option<String>,
-    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedTotalChannelCount", default)]
     pub converted_total_channel_count: Option<f64>,
-    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedNormalChannelCount", default)]
     pub converted_normal_channel_count: Option<f64>,
-    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedHeightChannelCount", default)]
     pub converted_height_channel_count: Option<f64>,
-    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedLFEChannelCount", default)]
     pub converted_lfe_channel_count: Option<f64>,
-    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedNonLFEChannelCount", default)]
     pub converted_non_lfe_channel_count: Option<f64>,
-    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedAnonymousChannelCount", default)]
     pub converted_anonymous_channel_count: Option<f64>,
-    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedAmbisonicsChannelCount", default)]
     pub converted_ambisonics_channel_count: Option<f64>,
-    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedChannelConfig", default)]
     pub converted_channel_config: Option<String>,
-    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedChannelMask", default)]
     pub converted_channel_mask: Option<f64>,
-    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedSampleRate", default)]
     pub converted_sample_rate: Option<f64>,
-    /// The sample rate for the audio source, expressed as a string. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source, expressed as a string. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedSampleRateSetting", default)]
     pub converted_sample_rate_setting: Option<String>,
-    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedBitDepth", default)]
     pub converted_bit_depth: Option<f64>,
-    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedFileSize", default)]
     pub converted_file_size: Option<f64>,
-    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedDataSize", default)]
     pub converted_data_size: Option<f64>,
-    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedSampleCount", default)]
     pub converted_sample_count: Option<f64>,
-    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedDuration", default)]
     pub converted_duration: Option<f64>,
-    /// The duration (in seconds) of the trimmed audio source. Differs from generic Duration field because the original file does not include Trim Begind/End. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The duration (in seconds) of the trimmed audio source. Differs from generic Duration field because the original file does not include Trim Begind/End. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedTrimmedDuration", default)]
     pub converted_trimmed_duration: Option<f64>,
-    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "convertedCodec", default)]
     pub converted_codec: Option<String>,
-    /// The format specified in the Conversion Settings for the associated audio source. This differs from convertedCodec because the file does not have to be converted. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The format specified in the Conversion Settings for the associated audio source. This differs from convertedCodec because the file does not have to be converted. This accessor works for Sounds, Audio File Source, Plugin-Media and Music Clips.
     #[serde(rename = "conversionFormat", default)]
     pub conversion_format: Option<String>,
     /// True if the work unit is the default.
@@ -939,7 +939,7 @@ pub struct VersionInfo {
     pub display_name: String,
     /// Version year.
     pub year: i64,
-    /// Version's major number
+    /// Version's major number.
     pub major: i64,
     /// Version's minor number.
     pub minor: i64,
@@ -958,7 +958,7 @@ pub struct DirectoriesInfo {
     pub user: String,
     /// The root directory of Wwise. This is the installation directory.
     pub install: String,
-    /// The Wwise Authoring root directory
+    /// The Wwise Authoring root directory.
     pub authoring: String,
     /// The bin directory, where Wwise.exe is located.
     pub bin: String,
@@ -992,19 +992,19 @@ pub struct ProjectPlatformInfo {
 pub struct ProjectLanguageInfo {
     /// Language unique id.
     pub id: String,
+    /// Language name.
+    pub name: String,
     /// The short ID (32-bit) of the language.
     #[serde(rename = "shortId")]
     pub short_id: u32,
-    /// Language name.
-    pub name: String,
 }
 
 /// Collection of project directories returned by `getProjectInfo`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProjectDirectoriesInfo {
-    /// The root directory of the project. Refer to for more information.
+    /// The root directory of the project. See for more information.
     pub properties: String,
-    /// The Commands directory of the project. Refer to for more information.
+    /// The Commands directory of the project. See for more information.
     pub commands: String,
     /// The .cache directory of the project, as specified in the Project Settings. The .cache directory contains converted media files (WEM files).
     pub cache: String,
@@ -1012,7 +1012,7 @@ pub struct ProjectDirectoriesInfo {
     pub root: String,
     /// The Originals directory of the project, as specified in the Project Settings. The Originals directory contains the project's WAV files, separated by languages.
     pub originals: String,
-    /// The SoundBank output root directory of the project, as specified in the Project Settings. This directory contains the Project's SoundBank C++ header, XML and JSON files. Refer to the 'platforms' section for Platform specific directories.
+    /// The SoundBank output root directory of the project, as specified in the Project Settings. This directory contains the Project's SoundBank C++ header, XML and JSON files. See the 'platforms' section for Platform specific directories.
     #[serde(rename = "soundBankOutputRoot")]
     pub sound_bank_output_root: String,
 }
@@ -1148,7 +1148,7 @@ pub struct ImportDefaults {
     /// The "Notes" field of the created object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    /// Specifies the type of object to create when importing an audio file. This type can also be specified directly in the objectPath. Refer to for the available types.
+    /// Specifies the type of object to create when importing an audio file. This type can also be specified directly in the objectPath. See for the available types.
     #[serde(rename = "objectType", skip_serializing_if = "Option::is_none")]
     pub object_type: Option<ObjectType>,
     /// Imports the language for the audio file import (taken from the project's defined languages, found in the WPROJ file LanguageList).
@@ -1157,28 +1157,28 @@ pub struct ImportDefaults {
     /// Object ID (GUID), name, or path used as root relative object paths.
     #[serde(rename = "importLocation", skip_serializing_if = "Option::is_none")]
     pub import_location: Option<ObjectRef>,
-    /// Path to media file to import. This path must be accessible from Wwise. For using WAAPI on Mac, please refer to .
+    /// Path to media file to import. This path must be accessible from Wwise. For using WAAPI on Mac, please see .
     #[serde(rename = "audioFile", skip_serializing_if = "Option::is_none")]
     pub audio_file: Option<String>,
     /// Base64 encoded WAV audio file data to import with its target file path relative to the Originals folder, separated by a vertical bar. E.g. 'MySound.wav|UklGRu...'.
     #[serde(rename = "audioFileBase64", skip_serializing_if = "Option::is_none")]
     pub audio_file_base64: Option<String>,
-    /// The path and name of the object(s) to be created. The path uses backslashes and can either be absolute or relative. Object types can be specified before the name. For example: \verbatim \\Actor-Mixer Hierarchy\\Default Work Unit\\<Random Container>MyContainer\\<Sound>MySound. \endverbatim Refer to for the available types.
+    /// The path and name of the object(s) to be created. The path uses backslashes and can either be absolute or relative. Object types can be specified before the name. For example: \verbatim \\Containers\\Default Work Unit\\<Random Container>MyContainer\\<Sound>MySound. \endverbatim See for the available types.
     #[serde(rename = "objectPath", skip_serializing_if = "Option::is_none")]
     pub object_path: Option<String>,
     /// Specifies the 'originals' sub-folder in which to place the imported audio file. This folder is relative to the 'originals' folder in which the file would normally be imported. Example: if importing an SFX, then the audio file is imported to the folder Originals\\SFX\\originalsPath.
     #[serde(rename = "originalsSubFolder", skip_serializing_if = "Option::is_none")]
     pub originals_sub_folder: Option<String>,
-    /// Defines the path and name of an Event to be created for the imported object. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines the path and name of an Event to be created for the imported object. See Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event: Option<String>,
     /// The "Notes" field of the created audio source object.
     #[serde(rename = "audioSourceNotes", skip_serializing_if = "Option::is_none")]
     pub audio_source_notes: Option<String>,
-    /// Defines a Switch Group or State Group that is associated to a Switch Container, within the Actor-Mixer Hierarchy only. Also defines which Switch Container's child is assigned to which Switch or State from the associated group. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines a Switch Group or State Group that is associated to a Switch Container, within the Containers only. Also defines which Switch Container's child is assigned to which Switch or State from the associated group. See Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(rename = "switchAssignation", skip_serializing_if = "Option::is_none")]
     pub switch_assignation: Option<String>,
-    /// Defines the path and name of a Dialogue Event to be created for the imported object. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines the path and name of a Dialogue Event to be created for the imported object. See Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(rename = "dialogueEvent", skip_serializing_if = "Option::is_none")]
     pub dialogue_event: Option<String>,
     #[serde(flatten)]
@@ -1373,34 +1373,44 @@ pub enum AttenuationCurveType {
     LowPassFilterUsage,
     #[serde(rename = "HighPassFilterUsage")]
     HighPassFilterUsage,
+    #[serde(rename = "DualShelfUsage")]
+    DualShelfUsage,
     #[serde(rename = "SpreadUsage")]
     SpreadUsage,
     #[serde(rename = "FocusUsage")]
     FocusUsage,
     #[serde(rename = "ObstructionVolumeUsage")]
     ObstructionVolumeUsage,
-    #[serde(rename = "ObstructionLPFUsage")]
-    ObstructionLpfUsage,
     #[serde(rename = "ObstructionHPFUsage")]
     ObstructionHpfUsage,
+    #[serde(rename = "ObstructionLPFUsage")]
+    ObstructionLpfUsage,
+    #[serde(rename = "ObstructionDSFUsage")]
+    ObstructionDsfUsage,
     #[serde(rename = "OcclusionVolumeUsage")]
     OcclusionVolumeUsage,
-    #[serde(rename = "OcclusionLPFUsage")]
-    OcclusionLpfUsage,
     #[serde(rename = "OcclusionHPFUsage")]
     OcclusionHpfUsage,
+    #[serde(rename = "OcclusionLPFUsage")]
+    OcclusionLpfUsage,
+    #[serde(rename = "OcclusionDSFUsage")]
+    OcclusionDsfUsage,
     #[serde(rename = "DiffractionVolumeUsage")]
     DiffractionVolumeUsage,
-    #[serde(rename = "DiffractionLPFUsage")]
-    DiffractionLpfUsage,
     #[serde(rename = "DiffractionHPFUsage")]
     DiffractionHpfUsage,
+    #[serde(rename = "DiffractionLPFUsage")]
+    DiffractionLpfUsage,
+    #[serde(rename = "DiffractionDSFUsage")]
+    DiffractionDsfUsage,
     #[serde(rename = "TransmissionVolumeUsage")]
     TransmissionVolumeUsage,
-    #[serde(rename = "TransmissionLPFUsage")]
-    TransmissionLpfUsage,
     #[serde(rename = "TransmissionHPFUsage")]
     TransmissionHpfUsage,
+    #[serde(rename = "TransmissionLPFUsage")]
+    TransmissionLpfUsage,
+    #[serde(rename = "TransmissionDSFUsage")]
+    TransmissionDsfUsage,
 }
 
 /// Usage mode of an attenuation curve.

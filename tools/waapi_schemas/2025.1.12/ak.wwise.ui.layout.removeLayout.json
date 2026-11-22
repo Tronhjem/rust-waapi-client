@@ -1,0 +1,36 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The name of the layout to unregister."
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Unregisters a temporary layout, previously registered with \\ref ak_wwise_ui_layout_setlayout.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Unregisters a temporary layout, previously registered with \"setLayout\".",
+      "title": "Unregister a temporary layout",
+      "args": {
+        "name": "TemporaryLayout"
+      }
+    }
+  ]
+}

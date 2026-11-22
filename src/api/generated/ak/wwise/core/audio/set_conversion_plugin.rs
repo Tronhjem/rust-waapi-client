@@ -10,7 +10,7 @@ use crate::api::generated::primitives::*;
 pub struct CoreAudioSetConversionPluginArgs {
     /// The platform to which the settings apply. A platform is an ID (GUID) or a unique name.
     pub platform: PlatformRef,
-    /// Name of the plug-in to use for future conversions
+    /// Name of the plug-in to use for future conversions.
     pub plugin: String,
     /// The object used for conversion. An object is an ID (GUID).
     pub conversion: ObjectRef,

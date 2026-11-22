@@ -1,0 +1,68 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "An array of all Wwise object types.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the object."
+            },
+            "type": {
+              "type": "string",
+              "description": "The type of the object. See \\ref wobjects_index for more information on the types available."
+            },
+            "classId": {
+              "description": "The ID (class ID) of the object.",
+              "$ref": "common_definitions.json#/definitions/uint32"
+            }
+          },
+          "description": "A Wwise object type. See \\ref wobjects_index .",
+          "additionalProperties": false
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "description": "Retrieves the list of all object types registered in Wwise's object model. This function returns the equivalent of \\ref wobjects_index .",
+  "examples": [
+    {
+      "result": {
+        "return": [
+          {
+            "name": "AudioFileSource",
+            "type": "WObject",
+            "classId": 16
+          },
+          {
+            "name": "PCM",
+            "type": "Conversion",
+            "classId": 65537
+          },
+          {
+            "name": "Wwise Flanger",
+            "type": "Effect",
+            "classId": 8192003
+          }
+        ]
+      },
+      "description": "Retrieves the list of all object types.",
+      "title": "Getting the list of all object types",
+      "args": {}
+    }
+  ]
+}

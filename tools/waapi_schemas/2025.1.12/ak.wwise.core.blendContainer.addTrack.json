@@ -1,0 +1,65 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "For internal use only! The ID (GUID) to assign to the newly created Object.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the Blend Track."
+      },
+      "object": {
+        "description": "The ID (GUID), name, or path of the Blend Container.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object",
+      "name"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "description": "The ID (GUID) of the Blend Track.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the Blend Track."
+      },
+      "type": {
+        "type": "string",
+        "description": "The type of the object. See \\ref wobjects_index for more information on the types available."
+      },
+      "shortId": {
+        "type": "integer",
+        "description": "The Short ID of the object."
+      }
+    },
+    "additionalProperties": false
+  },
+  "description": "Adds a new Blend Track to a Blend Container. Equivalent to clicking New Blend Track in the Blend Track Editor. To get the list of Blend Tracks, use the function ak.wwise.core.object.get with {return = \"blendTracks\"}.",
+  "examples": [
+    {
+      "result": {
+        "id": "{D7126155-914E-4248-A8C1-4DABCCACA016}"
+      },
+      "description": "Equivalent to clicking New Blend Track in the Blend Track Editor.",
+      "title": "Adding a Blend Track to a Blend Container",
+      "args": {
+        "name": "newBlendTrack",
+        "object": "{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"
+      }
+    }
+  ]
+}

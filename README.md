@@ -51,7 +51,7 @@ use waapi_client::{WaapiFunction, json};
 
 let args = json!({
     "from": {
-        "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"]
+        "path": [r"\Containers\Default Work Unit"]
     }
 });
 
@@ -82,7 +82,7 @@ use waapi_client::api::generated::ak::wwise::core::object::{
 use waapi_client::api::generated::primitives::{ObjectQuery, ObjectReturnField};
 
 let args = CoreObjectGetArgs::new(ObjectQuery::from(
-    r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
+    r"\Containers\Default Work Unit\MySound",
 ));
 
 let options = CoreObjectGetOptions::new()
@@ -132,7 +132,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 | `argsSchema` | `<Base>Args` (`#[derive(Serialize)]`) | **Required properties** (`required` array) become positional parameters on `<Base>Args::new(...)`. **Optional properties** become `Option<T>` fields with `#[serde(skip_serializing_if = "Option::is_none")]` and chainable builder methods `.field(val)`. If `argsSchema` has no properties, no `<Base>Args` type is emitted and the client method takes no `args` parameter. |
 | `optionsSchema` | `<Base>Options` (`#[derive(Serialize)]`) | Generated with `::new()` (`Default`) and chainable builder methods. When `optionsSchema` is `{"$ref": "waapi_definitions.json#/definitions/objectReturnOptions"}`, `<Base>Options` is emitted as `pub type <Base>Options = ObjectReturnOptions;`. If `optionsSchema` is empty, no `<Base>Options` type is emitted and the client method takes no `options` parameter. |
 | `resultSchema` | `<Base>Response` (`#[derive(Serialize, Deserialize)]`) | Response fields are generated from `resultSchema.properties`. When present, the chained method calls `WaapiClient::call_typed` and returns `WaapiResult<<Base>Response>`. When `resultSchema` has no properties, no `<Base>Response` is emitted and the method calls `WaapiClient::call_typed_void`, returning `WaapiResult<()>`. |
-| `publishSchema` | `WaapiTopic` + topic event payload | Identifies the schema file as a **subscription topic** (34 topics) rather than an RPC function (170 functions). `tools/generate_waapi_uri.py` emits it into `WaapiTopic` (`src/waapi_topics_api.rs`). Subscriptions currently use `client.subscribe(WaapiTopic::..., ...)` or `client.subscribe_typed(WaapiTopic::..., Some(options))`, and `publishSchema` + `optionsSchema` define the schema for typed topic subscriptions. |
+| `publishSchema` | `WaapiTopic` + topic event payload | Identifies the schema file as a **subscription topic** (35 topics) rather than an RPC function (180 functions). `tools/generate_waapi_uri.py` emits it into `WaapiTopic` (`src/waapi_topics_api.rs`). Subscriptions currently use `client.subscribe(WaapiTopic::..., ...)` or `client.subscribe_typed(WaapiTopic::..., Some(options))`, and `publishSchema` + `optionsSchema` define the schema for typed topic subscriptions. |
 
 ### 4. Shared `$ref` Definitions, Return Fields, and `@Property` Extensions
 
@@ -141,14 +141,16 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 - **Domain-specific return field enums**: Rather than untyped strings, `waapi_definitions.json` return expressions are generated as strongly-typed enums:
   - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` (and `From<&str>` / `From<String>`) for arbitrary dot-accessor queries.
   - `BusReturnField`, `AudioObjectReturnField`, and `VoiceReturnField` for profiler queries.
-- **Generated `ObjectType` enum (`WObjects.xml`)**: `src/api/generated/object_types.rs` (re-exported as `waapi_client::ObjectType` and `waapi_client::api::ObjectType`) is generated from the `<WwiseObject>` definitions in `Definitions/WObjects.xml` and contains all 72 Wwise object types (e.g. `ObjectType::Sound`, `ObjectType::ActorMixer`, `ObjectType::Event`, `ObjectType::Folder`, `ObjectType::RandomSequenceContainer`). It is used in `CoreObjectCreateArgs`, `ChildObject`, `WwiseObject`, `ObjectQuery::OfType`, `ImportItem`, and `ImportDefaults`, and provides `as_str()`, `class_id()`, `from_class_id()`, `FromStr`, `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`.
+- **Generated `ObjectType` enum (`WObjects.xml`)**: `src/api/generated/object_types.rs` (re-exported as `waapi_client::ObjectType` and `waapi_client::api::ObjectType`) is generated from the `<WwiseObject>` definitions in `Definitions/WObjects.xml` and contains all Wwise object types (e.g. `ObjectType::Sound`, `ObjectType::ActorMixer`/`ObjectType::PropertyContainer`, `ObjectType::Event`, `ObjectType::Folder`, `ObjectType::RandomSequenceContainer`). It is used in `CoreObjectCreateArgs`, `ChildObject`, `WwiseObject`, `ObjectQuery::OfType`, `ImportItem`, and `ImportDefaults`, and provides `as_str()`, `class_id()`, `from_class_id()`, `FromStr`, `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`. The union of Wwise 2024 + 2025 `WObjects.xml` keeps `ActorMixer` (2024) and `PropertyContainer` (2025) as distinct variants sharing `class_id()` `524304`.
 - **Generated `Property` enum (`WObjects.xml`)**: `src/api/generated/properties.rs` (re-exported as `waapi_client::Property` and `waapi_client::api::Property`) is generated from `Definitions/WObjects.xml` and contains all 464 Wwise object properties, references, and object lists (e.g. `Property::Volume`, `Property::Pitch`, `Property::Lowpass`, `Property::OutputBus`, `Property::RTPC`). `Property::as_str()` returns the bare `&'static str` (`"Volume"`), `Property::as_at_str()` returns the `@`-prefixed `&'static str` (`"@Volume"`), and `Property` implements `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`.
 - **Dynamic `@Property` fields (`patternProperties`)**: Schemas that accept or return open-ended `@`-prefixed properties (such as `CoreObjectSetItem`, `CoreObjectCreateArgs`, `ImportItem`, `ImportDefaults`, `WwiseObject`, and `CoreObjectSetObject`) include `#[serde(flatten)] pub extra: HashMap<String, serde_json::Value>` along with `.property(Property::Volume, value)` / `.extra(key, value)` builder methods on request structs and `.property(Property::Volume) -> Option<&serde_json::Value>` lookup helpers on response structs.
 - **Field naming**: JSON `camelCase` wire names are converted to Rust `snake_case` with `#[serde(rename = "...")]` emitted automatically whenever the wire name differs (e.g. `type` → `object_type`, `return` → `objects` / `playing_id` / `return_fields`).
 
 ### 5. Currently Generated Typed Endpoints
 
-The following 93 functions and 34 topics currently have generated typed structs, chained call methods, and typed `subscribe_*` methods under `waapi_client::api::generated`:
+The following 103 functions and 35 topics currently have generated typed structs, chained call methods, and typed `subscribe_*` methods under `waapi_client::api::generated`:
+
+> **Multi-version union.** The bindings are generated from the *union* of all Wwise schema versions under `tools/waapi_schemas/` (currently 2024.1.7 and 2025.1.12), so a single API serves both. Renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`, with `PropertyContainer` as the canonical `from_class_id` result), and 2024-only return fields (`ObjectReturnField::ColorRgb`/`TransitionObject`, `AudioObjectReturnField::PrevGain`/`NextGain`) are retained. The latest version's schema is canonical for field requiredness.
 
 | WAAPI URI | Chained Method on `WaapiClient` | `Args` Type | `Options` Type | `Response` Type |
 |---|---|---|---|---|
@@ -245,6 +247,16 @@ The following 93 functions and 34 topics currently have generated typed structs,
 | `ak.wwise.core.audio.resetSolo` | `client.wwise().core().audio().reset_solo()` | — | — | `()` |
 | `ak.wwise.core.audio.setConversionPlugin` | `client.wwise().core().audio().set_conversion_plugin(args)` | `CoreAudioSetConversionPluginArgs` | — | `()` |
 | `ak.wwise.core.audio.solo` | `client.wwise().core().audio().solo(args)` | `CoreAudioSoloArgs` | — | `()` |
+| `ak.wwise.core.mediaPool.get` | `client.wwise().core().media_pool().get(args, options)` | `CoreMediaPoolGetArgs` | `CoreMediaPoolGetOptions` | `CoreMediaPoolGetResponse` |
+| `ak.wwise.core.mediaPool.getFields` | `client.wwise().core().media_pool().get_fields()` | — | — | `CoreMediaPoolGetFieldsResponse` |
+| `ak.wwise.core.profiler.captureLog.save` | `client.wwise().core().profiler().capture_log().save(args)` | `CoreProfilerCaptureLogSaveArgs` | — | `()` |
+| `ak.wwise.core.profiler.moveCursor` | `client.wwise().core().profiler().move_cursor(args)` | `CoreProfilerMoveCursorArgs` | — | `CoreProfilerMoveCursorResponse` |
+| `ak.wwise.core.profiler.setCursorTime` | `client.wwise().core().profiler().set_cursor_time(args)` | `CoreProfilerSetCursorTimeArgs` | — | `CoreProfilerSetCursorTimeResponse` |
+| `ak.wwise.core.workUnit.load` | `client.wwise().core().work_unit().load(args)` | `CoreWorkUnitLoadArgs` | — | `()` |
+| `ak.wwise.core.workUnit.unload` | `client.wwise().core().work_unit().unload(args)` | `CoreWorkUnitUnloadArgs` | — | `()` |
+| `ak.wwise.ui.getSelectedFiles` | `client.wwise().ui().get_selected_files()` | — | — | `UiGetSelectedFilesResponse` |
+| `ak.wwise.ui.layout.closeView` | `client.wwise().ui().layout().close_view(args)` | `UiLayoutCloseViewArgs` | — | `()` |
+| `ak.wwise.ui.layout.resetLayouts` | `client.wwise().ui().layout().reset_layouts(args)` | `UiLayoutResetLayoutsArgs` | — | `()` |
 
 All generated modules live under `waapi_client::api::generated::ak` (e.g. `ak::wwise::core::object`, `ak::wwise::core::transport`, `ak::wwise::core::undo`, `ak::wwise::core::switchContainer`, `ak::wwise::core::soundbank`, `ak::wwise::ui::commands`).
 
@@ -266,6 +278,7 @@ Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*`
 | `ak.wwise.core.object.curveChanged` | `client.wwise().core().object().subscribe_curve_changed(opts)` | `CoreObjectCurveChangedPayload` |
 | `ak.wwise.core.object.attenuationCurveChanged` | `client.wwise().core().object().subscribe_attenuation_curve_changed(opts)` | `CoreObjectAttenuationCurveChangedPayload` (`curveType`) |
 | `ak.wwise.core.object.attenuationCurveLinkChanged` | `client.wwise().core().object().subscribe_attenuation_curve_link_changed(opts)` | `CoreObjectAttenuationCurveLinkChangedPayload` (`curveType`) |
+| `ak.wwise.core.object.structureChanged` | `client.wwise().core().object().subscribe_structure_changed(opts)` | `CoreObjectStructureChangedPayload` (`objects`, `summary`) |
 | `ak.wwise.core.switchContainer.assignmentAdded` | `client.wwise().core().switch_container().subscribe_assignment_added(opts)` | `CoreSwitchContainerAssignmentAddedPayload` |
 | `ak.wwise.core.switchContainer.assignmentRemoved` | `client.wwise().core().switch_container().subscribe_assignment_removed(opts)` | `CoreSwitchContainerAssignmentRemovedPayload` |
 | `ak.wwise.core.transport.stateChanged` | `client.wwise().core().transport().subscribe_state_changed(opts)` | `CoreTransportStateChangedPayload` (`state`) |
@@ -291,7 +304,7 @@ Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*`
 
 Topic `opts` is `Option<XxxOptions>`; most options structs offer `.return_(Vec<ObjectReturnField>)` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
 
-For any of the 170 WAAPI functions not yet in the table above (the ~77 remaining raw-JSON endpoints, e.g. `ui.layout.*`, `debug.*`, `waapi.*`, `sourceControl.*`, `remote.*`, `profiler.*`, `audioSourcePeaks.*`, `log.*`), use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
+For any of the 180 WAAPI functions not yet in the table above (the ~77 remaining raw-JSON endpoints, e.g. `ui.layout.*`, `debug.*`, `waapi.*`, `sourceControl.*`, `remote.*`, `profiler.*`, `audioSourcePeaks.*`, `log.*`), use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 
 ### Specifying Return Fields
 
@@ -315,7 +328,7 @@ async fn main() -> WaapiResult<()> {
     let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
 
     let args = json!({
-        "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit"] }
+        "from": { "path": [r"\Containers\Default Work Unit"] }
     });
     let options = json!({
         "return": ["id", "name", "type"]
@@ -348,7 +361,7 @@ let mut client = WaapiClient::new(None).await?;
 
 let args = CoreObjectSetArgs::new(vec![
     CoreObjectSetItem::new(ObjectRef::path(
-        r"\Actor-Mixer Hierarchy\Default Work Unit\MySound",
+        r"\Containers\Default Work Unit\MySound",
     ))
     .name("MyRenamedSound")
     .property(Property::Volume, -6.0),
@@ -403,7 +416,7 @@ ak::wwise::ui::getSelectedObjects
 ak::wwise::ui::bringToForeground
 ```
 
-All 170+ WAAPI endpoints are available. See [`src/waapi_function_api.rs`](src/waapi_function_api.rs) for the complete list organized by module.
+All 180 WAAPI functions and 35 topics are available. See [`src/waapi_function_api.rs`](src/waapi_function_api.rs) and [`src/waapi_topics_api.rs`](src/waapi_topics_api.rs) for the complete list organized by module.
 
 ## Examples
 
@@ -417,6 +430,13 @@ cargo run --example object_set
 cargo run --example raw_call
 cargo run --example register_and_post_event
 cargo run --example subscribe
+```
+
+The object examples target Wwise 2025 (`\Containers` hierarchy). For Wwise 2024 (`\Actor-Mixer Hierarchy`), use the `_2024` variants:
+
+```bash
+cargo run --example object_get_set_2024
+cargo run --example object_set_2024
 ```
 
 See the [`examples/`](examples/) directory for more usage examples. Most examples require Wwise running with WAAPI enabled on `127.0.0.1:8080`.

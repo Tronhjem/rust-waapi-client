@@ -8,7 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.ui.project.open`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiProjectOpenArgs {
-    /// The path to the project WPROJ file. For using WAAPI on Mac, please refer to .
+    /// The path to the project WPROJ file. For using WAAPI on Mac, please see
     pub path: String,
     /// (DEPRECATED) The action to be executed when opening a project that needs to be upgraded. Note, this is deprecated. Please use onMigrationRequired instead.
     #[serde(rename = "onUpgrade", skip_serializing_if = "Option::is_none")]

@@ -1,0 +1,27 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "handleID": {
+        "description": "The ID of the handle.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "required": [
+      "handleID"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Destroys a frontend handle and its widgets.",
+  "examples": []
+}

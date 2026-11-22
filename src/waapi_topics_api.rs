@@ -25,6 +25,7 @@ pub mod ak {
                 pub const preDeleted: &str = "ak.wwise.core.object.preDeleted";
                 pub const propertyChanged: &str = "ak.wwise.core.object.propertyChanged";
                 pub const referenceChanged: &str = "ak.wwise.core.object.referenceChanged";
+                pub const structureChanged: &str = "ak.wwise.core.object.structureChanged";
             }
             pub mod profiler {
                 pub const gameObjectRegistered: &str =
@@ -108,6 +109,8 @@ pub enum WaapiTopic {
     ak_wwise_core_object_propertyChanged,
     /// `ak.wwise.core.object.referenceChanged`
     ak_wwise_core_object_referenceChanged,
+    /// `ak.wwise.core.object.structureChanged`
+    ak_wwise_core_object_structureChanged,
     /// `ak.wwise.core.profiler.captureLog.itemAdded`
     ak_wwise_core_profiler_captureLog_itemAdded,
     /// `ak.wwise.core.profiler.gameObjectRegistered`
@@ -172,6 +175,9 @@ impl WaapiTopic {
             Self::ak_wwise_core_object_propertyChanged => ak::wwise::core::object::propertyChanged,
             Self::ak_wwise_core_object_referenceChanged => {
                 ak::wwise::core::object::referenceChanged
+            }
+            Self::ak_wwise_core_object_structureChanged => {
+                ak::wwise::core::object::structureChanged
             }
             Self::ak_wwise_core_profiler_captureLog_itemAdded => {
                 ak::wwise::core::profiler::captureLog::itemAdded

@@ -23,13 +23,13 @@ pub struct CoreAudioImportTabDelimitedArgs {
     /// Imports language for audio file import (taken from the project's defined languages, found in the WPROJ file LanguageList).
     #[serde(rename = "importLanguage")]
     pub import_language: String,
-    /// Determines how import object creation is performed. For each object created: - createNew: creates a new object; the object is given the desired name if possible, otherwise a new unique name is used. - useExisting: uses the object if it exists, updating the specified properties; otherwise it creates a new object. This is the default value. - replaceExisting: creates a new object. If an existing object has the same name, the existing object is destroyed.
+    /// Determines how imported objects are created. For each object created: - createNew: creates a new object; the object is given the desired name if possible, otherwise a new unique name is used. - useExisting: uses the object if it exists, updating the specified properties; otherwise it creates a new object. This is the default value. - replaceExisting: creates a new object. If an existing object has the same name, the existing object is destroyed.
     #[serde(rename = "importOperation")]
     pub import_operation: String,
     /// Object ID (GUID), name, or path used as root relative object paths.
     #[serde(rename = "importLocation", skip_serializing_if = "Option::is_none")]
     pub import_location: Option<ObjectRef>,
-    /// Location of tab-delimited import file. For using WAAPI on Mac, please refer to .
+    /// Location of tab-delimited import file. For using WAAPI on Mac, please see .
     #[serde(rename = "importFile")]
     pub import_file: String,
 }

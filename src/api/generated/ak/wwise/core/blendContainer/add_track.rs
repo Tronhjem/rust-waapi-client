@@ -38,13 +38,13 @@ pub struct CoreBlendContainerAddTrackResponse {
     /// The ID (GUID) of the Blend Track.
     #[serde(default)]
     pub id: Option<String>,
-    /// The type of the object. Refer to for more information on the types available.
+    /// The name of the Blend Track.
+    #[serde(default)]
+    pub name: Option<String>,
+    /// The type of the object. See for more information on the types available.
     #[serde(rename = "type", default)]
     pub object_type: Option<ObjectType>,
     /// The Short ID of the object.
     #[serde(rename = "shortId", default)]
     pub short_id: Option<i64>,
-    /// The name of the Blend Track.
-    #[serde(default)]
-    pub name: Option<String>,
 }

@@ -1,0 +1,36 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The ID (GUID), name, or path of the Work Unit to load.",
+        "$ref": "waapi_definitions.json#/definitions/objectArg"
+      }
+    },
+    "required": [
+      "object"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Load a Work Unit that was previously unloaded. The Undo history will be cleared.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Load a Work Unit that was previously unloaded.",
+      "title": "Load a Work Unit.",
+      "args": {
+        "object": "\\Containers\\myWorkUnit"
+      }
+    }
+  ]
+}

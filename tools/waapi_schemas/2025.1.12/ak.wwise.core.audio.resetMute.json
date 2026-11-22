@@ -1,0 +1,27 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Unmute all muted objects.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Unmute all muted objects in Wwise.",
+      "title": "Unmute all objects",
+      "args": {}
+    }
+  ]
+}

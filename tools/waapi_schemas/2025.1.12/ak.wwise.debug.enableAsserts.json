@@ -1,0 +1,26 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "enable": {
+        "type": "boolean",
+        "description": "Indicates whether assertions should be enabled or disabled."
+      }
+    },
+    "required": [
+      "enable"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Enables debug assertions. Every call to enableAsserts with 'false' increments the ref count. Calling with true decrements the ref count. This is only available with Debug builds."
+}

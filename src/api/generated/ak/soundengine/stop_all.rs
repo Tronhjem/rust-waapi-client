@@ -6,15 +6,20 @@
 use crate::api::generated::primitives::*;
 
 /// Arguments for `ak.soundengine.stopAll`.
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct SoundengineStopAllArgs {
-    /// Specify a game object to stop only playback associated to the provided game object ID.
-    #[serde(rename = "gameObject")]
-    pub game_object: GameObjectRef,
+    /// The game object on which to stop playback. If not specified, stops all sounds.
+    #[serde(rename = "gameObject", skip_serializing_if = "Option::is_none")]
+    pub game_object: Option<GameObjectRef>,
 }
 
 impl SoundengineStopAllArgs {
-    pub fn new(game_object: GameObjectRef) -> Self {
-        Self { game_object }
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
+        self.game_object = Some(game_object.into());
+        self
     }
 }

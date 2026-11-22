@@ -1,0 +1,26 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Redoes the last operation in the Undo stack.",
+  "examples": [
+    {
+      "result": {},
+      "description": "Performs a redo.",
+      "title": "Performing a redo",
+      "args": {}
+    }
+  ]
+}

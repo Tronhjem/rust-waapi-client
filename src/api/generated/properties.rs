@@ -3,7 +3,7 @@
 
 /// Typed identifier for a Wwise object property, reference, or object list.
 ///
-/// Derived from `WObjects.xml` in the Wwise Authoring data.
+/// Derived from the union of `WObjects.xml` across all supported Wwise versions.
 /// Use [`Property::as_str`] for the bare name (e.g. `"Volume"`) or
 /// [`Property::as_at_str`] for the `@`-prefixed accessor (e.g. `"@Volume"`).
 #[allow(non_camel_case_types)]
@@ -41,16 +41,26 @@ pub enum Property {
     ApplyToDynamicSequence,
     /// `ApplyToStateTransition` (Property) [bool].
     ApplyToStateTransition,
+    /// `Argument` (Reference).
+    Argument,
     /// `Arguments` (ObjectList).
     Arguments,
     /// `Attenuation` (Property) [string].
     Attenuation,
     /// `AttenuationDistanceScaling` (Property) [Real32].
     AttenuationDistanceScaling,
+    /// `AudioDescription` (Property) [string].
+    AudioDescription,
     /// `AudioDevice` (Reference).
     AudioDevice,
     /// `AudioNode` (Reference).
     AudioNode,
+    /// `AudioSimilarityPath` (Property) [string].
+    AudioSimilarityPath,
+    /// `AudioSimilarityRegionEnd` (Property) [Real64].
+    AudioSimilarityRegionEnd,
+    /// `AudioSimilarityRegionStart` (Property) [Real64].
+    AudioSimilarityRegionStart,
     /// `AutoDetectFFTWindowSize` (Property) [int16].
     AutoDetectFFTWindowSize,
     /// `AutoDetectThresholdHigh` (Property) [Real64].
@@ -121,8 +131,12 @@ pub enum Property {
     Conversion,
     /// `ConvertExternalSources` (Property) [bool].
     ConvertExternalSources,
+    /// `CooldownTime` (Property) [Real32].
+    CooldownTime,
     /// `CopyLooseStreamedMedia` (Property) [bool].
     CopyLooseStreamedMedia,
+    /// `CriteriaType` (Property) [int32].
+    CriteriaType,
     /// `CrossfadeDuration` (Property) [Real64].
     CrossfadeDuration,
     /// `CrossfadeShape` (Property) [int16].
@@ -139,6 +153,8 @@ pub enum Property {
     CurveUsage,
     /// `CustomCueMatchName` (Property) [string].
     CustomCueMatchName,
+    /// `DSFEmphasis` (Property) [Real64].
+    DSFEmphasis,
     /// `DataFileName` (Property) [string].
     DataFileName,
     /// `DefaultLanguage` (Property) [string].
@@ -207,6 +223,8 @@ pub enum Property {
     Entries,
     /// `EntryPath` (ObjectList).
     EntryPath,
+    /// `EntryPathObject` (Reference).
+    EntryPathObject,
     /// `EnvelopeAttackCurve` (Property) [Real64].
     EnvelopeAttackCurve,
     /// `EnvelopeAttackTime` (Property) [Real64].
@@ -225,6 +243,10 @@ pub enum Property {
     EnvelopeSustainTime,
     /// `EnvelopeTriggerOn` (Property) [int32].
     EnvelopeTriggerOn,
+    /// `EnvironmentalCurves` (Reference).
+    EnvironmentalCurves,
+    /// `ErrorResult` (Property) [string].
+    ErrorResult,
     /// `EventActionNamePosition` (Property) [int16].
     EventActionNamePosition,
     /// `EventCreationSettingsOverride` (Property) [bool].
@@ -275,6 +297,8 @@ pub enum Property {
     FadeTime,
     /// `FadeType` (Property) [int16].
     FadeType,
+    /// `FieldName` (Property) [string].
+    FieldName,
     /// `Fill` (Property) [bool].
     Fill,
     /// `FilterBehavior` (Property) [int16].
@@ -283,10 +307,14 @@ pub enum Property {
     FilterTimeDown,
     /// `FilterTimeUp` (Property) [Real64].
     FilterTimeUp,
+    /// `Filters` (ObjectList).
+    Filters,
     /// `FirstOccurenceOnly` (Property) [bool].
     FirstOccurenceOnly,
     /// `Flags` (Property) [int32].
     Flags,
+    /// `GameAuxSendDSF` (Property) [Real64, Decibels].
+    GameAuxSendDSF,
     /// `GameAuxSendHPF` (Property) [int16].
     GameAuxSendHPF,
     /// `GameAuxSendLPF` (Property) [int16].
@@ -357,6 +385,8 @@ pub enum Property {
     HoldListenerOrientation,
     /// `IgnoreParentMaxSoundInstance` (Property) [bool].
     IgnoreParentMaxSoundInstance,
+    /// `IncludeFilter` (Property) [bool].
+    IncludeFilter,
     /// `Inclusion` (Property) [bool].
     Inclusion,
     /// `InitialDelay` (Property) [Real64].
@@ -373,6 +403,8 @@ pub enum Property {
     InsertToInsert,
     /// `InsertWhat` (Property) [int16].
     InsertWhat,
+    /// `InstanceLimit` (Property) [int16].
+    InstanceLimit,
     /// `IsChecked` (Property) [bool].
     IsChecked,
     /// `IsFolder` (Property) [bool].
@@ -427,6 +459,8 @@ pub enum Property {
     LfoWaveform,
     /// `LicenseKey` (Property) [string].
     LicenseKey,
+    /// `LimitScope` (Property) [int16].
+    LimitScope,
     /// `LineEnding` (Property) [Uint16].
     LineEnding,
     /// `LinearTime` (Property) [bool].
@@ -517,6 +551,8 @@ pub enum Property {
     ModulatorScope,
     /// `MusicSegment` (Property) [string].
     MusicSegment,
+    /// `MusicSyncType` (Property) [int32].
+    MusicSyncType,
     /// `MusicTrackType` (Property) [int16].
     MusicTrackType,
     /// `NewPathForEachSound` (Property) [bool].
@@ -533,8 +569,14 @@ pub enum Property {
     ObjectReferenced,
     /// `ObjectType` (Property) [int32].
     ObjectType,
+    /// `OperatorNumeric` (Property) [int32].
+    OperatorNumeric,
+    /// `OperatorText` (Property) [int32].
+    OperatorText,
     /// `OutputBus` (Property) [string].
     OutputBus,
+    /// `OutputBusDualshelf` (Property) [Real64, Decibels].
+    OutputBusDualshelf,
     /// `OutputBusHighpass` (Property) [int16].
     OutputBusHighpass,
     /// `OutputBusLowpass` (Property) [int16].
@@ -587,6 +629,10 @@ pub enum Property {
     PanY,
     /// `PanZ` (Property) [Real64].
     PanZ,
+    /// `Path` (Property) [string].
+    Path,
+    /// `Paths` (ObjectList).
+    Paths,
     /// `PauseDelayedResumeAction` (Property) [bool].
     PauseDelayedResumeAction,
     /// `Pitch` (Property) [int32, PitchCents].
@@ -635,6 +681,8 @@ pub enum Property {
     Playlist,
     /// `PlaylistItemType` (Property) [int16].
     PlaylistItemType,
+    /// `PlaylistObject` (Reference).
+    PlaylistObject,
     /// `PlaylistRoot` (Reference).
     PlaylistRoot,
     /// `PostEventTarget` (Reference).
@@ -735,6 +783,8 @@ pub enum Property {
     Sequences,
     /// `SettingsUserOverride` (Property) [bool].
     SettingsUserOverride,
+    /// `SidechainMixChannelConfig` (Property) [int32].
+    SidechainMixChannelConfig,
     /// `SimulationValue` (Property) [Real64].
     SimulationValue,
     /// `SlewRateDown` (Property) [Real64].
@@ -921,6 +971,12 @@ pub enum Property {
     UserString,
     /// `UsingOperator` (Property) [int16].
     UsingOperator,
+    /// `ValueDouble` (Property) [Real64].
+    ValueDouble,
+    /// `ValueInteger` (Property) [Uint64].
+    ValueInteger,
+    /// `ValueText` (Property) [string].
+    ValueText,
     /// `VirtualVoiceQueueBehavior` (Property) [int16].
     VirtualVoiceQueueBehavior,
     /// `Volume` (Property) [Real64, Decibels].
@@ -959,11 +1015,16 @@ impl Property {
             Self::ApplyOn => "ApplyOn",
             Self::ApplyToDynamicSequence => "ApplyToDynamicSequence",
             Self::ApplyToStateTransition => "ApplyToStateTransition",
+            Self::Argument => "Argument",
             Self::Arguments => "Arguments",
             Self::Attenuation => "Attenuation",
             Self::AttenuationDistanceScaling => "AttenuationDistanceScaling",
+            Self::AudioDescription => "AudioDescription",
             Self::AudioDevice => "AudioDevice",
             Self::AudioNode => "AudioNode",
+            Self::AudioSimilarityPath => "AudioSimilarityPath",
+            Self::AudioSimilarityRegionEnd => "AudioSimilarityRegionEnd",
+            Self::AudioSimilarityRegionStart => "AudioSimilarityRegionStart",
             Self::AutoDetectFFTWindowSize => "AutoDetectFFTWindowSize",
             Self::AutoDetectThresholdHigh => "AutoDetectThresholdHigh",
             Self::AutoDetectThresholdLow => "AutoDetectThresholdLow",
@@ -999,7 +1060,9 @@ impl Property {
             Self::ControlInput => "ControlInput",
             Self::Conversion => "Conversion",
             Self::ConvertExternalSources => "ConvertExternalSources",
+            Self::CooldownTime => "CooldownTime",
             Self::CopyLooseStreamedMedia => "CopyLooseStreamedMedia",
+            Self::CriteriaType => "CriteriaType",
             Self::CrossfadeDuration => "CrossfadeDuration",
             Self::CrossfadeShape => "CrossfadeShape",
             Self::CueType => "CueType",
@@ -1008,6 +1071,7 @@ impl Property {
             Self::CurveType => "CurveType",
             Self::CurveUsage => "CurveUsage",
             Self::CustomCueMatchName => "CustomCueMatchName",
+            Self::DSFEmphasis => "DSFEmphasis",
             Self::DataFileName => "DataFileName",
             Self::DefaultLanguage => "DefaultLanguage",
             Self::DefaultSoundVolume => "DefaultSoundVolume",
@@ -1042,6 +1106,7 @@ impl Property {
             Self::EndTrimOffset => "EndTrimOffset",
             Self::Entries => "Entries",
             Self::EntryPath => "EntryPath",
+            Self::EntryPathObject => "EntryPathObject",
             Self::EnvelopeAttackCurve => "EnvelopeAttackCurve",
             Self::EnvelopeAttackTime => "EnvelopeAttackTime",
             Self::EnvelopeAutoRelease => "EnvelopeAutoRelease",
@@ -1051,6 +1116,8 @@ impl Property {
             Self::EnvelopeSustainLevel => "EnvelopeSustainLevel",
             Self::EnvelopeSustainTime => "EnvelopeSustainTime",
             Self::EnvelopeTriggerOn => "EnvelopeTriggerOn",
+            Self::EnvironmentalCurves => "EnvironmentalCurves",
+            Self::ErrorResult => "ErrorResult",
             Self::EventActionNamePosition => "EventActionNamePosition",
             Self::EventCreationSettingsOverride => "EventCreationSettingsOverride",
             Self::EventNameCaseType => "EventNameCaseType",
@@ -1076,12 +1143,15 @@ impl Property {
             Self::FadeOutTime => "FadeOutTime",
             Self::FadeTime => "FadeTime",
             Self::FadeType => "FadeType",
+            Self::FieldName => "FieldName",
             Self::Fill => "Fill",
             Self::FilterBehavior => "FilterBehavior",
             Self::FilterTimeDown => "FilterTimeDown",
             Self::FilterTimeUp => "FilterTimeUp",
+            Self::Filters => "Filters",
             Self::FirstOccurenceOnly => "FirstOccurenceOnly",
             Self::Flags => "Flags",
+            Self::GameAuxSendDSF => "GameAuxSendDSF",
             Self::GameAuxSendHPF => "GameAuxSendHPF",
             Self::GameAuxSendLPF => "GameAuxSendLPF",
             Self::GameAuxSendVolume => "GameAuxSendVolume",
@@ -1117,6 +1187,7 @@ impl Property {
             Self::HoldEmitterPositionOrientation => "HoldEmitterPositionOrientation",
             Self::HoldListenerOrientation => "HoldListenerOrientation",
             Self::IgnoreParentMaxSoundInstance => "IgnoreParentMaxSoundInstance",
+            Self::IncludeFilter => "IncludeFilter",
             Self::Inclusion => "Inclusion",
             Self::InitialDelay => "InitialDelay",
             Self::InitialValue => "InitialValue",
@@ -1125,6 +1196,7 @@ impl Property {
             Self::InsertStartAt => "InsertStartAt",
             Self::InsertToInsert => "InsertToInsert",
             Self::InsertWhat => "InsertWhat",
+            Self::InstanceLimit => "InstanceLimit",
             Self::IsChecked => "IsChecked",
             Self::IsFolder => "IsFolder",
             Self::IsGlobalLimit => "IsGlobalLimit",
@@ -1152,6 +1224,7 @@ impl Property {
             Self::LfoSmoothing => "LfoSmoothing",
             Self::LfoWaveform => "LfoWaveform",
             Self::LicenseKey => "LicenseKey",
+            Self::LimitScope => "LimitScope",
             Self::LineEnding => "LineEnding",
             Self::LinearTime => "LinearTime",
             Self::ListenerRelativeRouting => "ListenerRelativeRouting",
@@ -1197,6 +1270,7 @@ impl Property {
             Self::Mode => "Mode",
             Self::ModulatorScope => "ModulatorScope",
             Self::MusicSegment => "MusicSegment",
+            Self::MusicSyncType => "MusicSyncType",
             Self::MusicTrackType => "MusicTrackType",
             Self::NewPathForEachSound => "NewPathForEachSound",
             Self::NormalOrShuffle => "NormalOrShuffle",
@@ -1205,7 +1279,10 @@ impl Property {
             Self::ObjectIndexInView => "ObjectIndexInView",
             Self::ObjectReferenced => "ObjectReferenced",
             Self::ObjectType => "ObjectType",
+            Self::OperatorNumeric => "OperatorNumeric",
+            Self::OperatorText => "OperatorText",
             Self::OutputBus => "OutputBus",
+            Self::OutputBusDualshelf => "OutputBusDualshelf",
             Self::OutputBusHighpass => "OutputBusHighpass",
             Self::OutputBusLowpass => "OutputBusLowpass",
             Self::OutputBusVolume => "OutputBusVolume",
@@ -1232,6 +1309,8 @@ impl Property {
             Self::PanX => "PanX",
             Self::PanY => "PanY",
             Self::PanZ => "PanZ",
+            Self::Path => "Path",
+            Self::Paths => "Paths",
             Self::PauseDelayedResumeAction => "PauseDelayedResumeAction",
             Self::Pitch => "Pitch",
             Self::Platform => "Platform",
@@ -1256,6 +1335,7 @@ impl Property {
             Self::PlaybackSpeed => "PlaybackSpeed",
             Self::Playlist => "Playlist",
             Self::PlaylistItemType => "PlaylistItemType",
+            Self::PlaylistObject => "PlaylistObject",
             Self::PlaylistRoot => "PlaylistRoot",
             Self::PostEventTarget => "PostEventTarget",
             Self::PostGenerateStepUserOverride => "PostGenerateStepUserOverride",
@@ -1306,6 +1386,7 @@ impl Property {
             Self::Segment => "Segment",
             Self::Sequences => "Sequences",
             Self::SettingsUserOverride => "SettingsUserOverride",
+            Self::SidechainMixChannelConfig => "SidechainMixChannelConfig",
             Self::SimulationValue => "SimulationValue",
             Self::SlewRateDown => "SlewRateDown",
             Self::SlewRateUp => "SlewRateUp",
@@ -1403,6 +1484,9 @@ impl Property {
             Self::UserAuxSendVolume3 => "UserAuxSendVolume3",
             Self::UserString => "UserString",
             Self::UsingOperator => "UsingOperator",
+            Self::ValueDouble => "ValueDouble",
+            Self::ValueInteger => "ValueInteger",
+            Self::ValueText => "ValueText",
             Self::VirtualVoiceQueueBehavior => "VirtualVoiceQueueBehavior",
             Self::Volume => "Volume",
             Self::VolumeOffset => "VolumeOffset",
@@ -1433,11 +1517,16 @@ impl Property {
             Self::ApplyOn => "@ApplyOn",
             Self::ApplyToDynamicSequence => "@ApplyToDynamicSequence",
             Self::ApplyToStateTransition => "@ApplyToStateTransition",
+            Self::Argument => "@Argument",
             Self::Arguments => "@Arguments",
             Self::Attenuation => "@Attenuation",
             Self::AttenuationDistanceScaling => "@AttenuationDistanceScaling",
+            Self::AudioDescription => "@AudioDescription",
             Self::AudioDevice => "@AudioDevice",
             Self::AudioNode => "@AudioNode",
+            Self::AudioSimilarityPath => "@AudioSimilarityPath",
+            Self::AudioSimilarityRegionEnd => "@AudioSimilarityRegionEnd",
+            Self::AudioSimilarityRegionStart => "@AudioSimilarityRegionStart",
             Self::AutoDetectFFTWindowSize => "@AutoDetectFFTWindowSize",
             Self::AutoDetectThresholdHigh => "@AutoDetectThresholdHigh",
             Self::AutoDetectThresholdLow => "@AutoDetectThresholdLow",
@@ -1473,7 +1562,9 @@ impl Property {
             Self::ControlInput => "@ControlInput",
             Self::Conversion => "@Conversion",
             Self::ConvertExternalSources => "@ConvertExternalSources",
+            Self::CooldownTime => "@CooldownTime",
             Self::CopyLooseStreamedMedia => "@CopyLooseStreamedMedia",
+            Self::CriteriaType => "@CriteriaType",
             Self::CrossfadeDuration => "@CrossfadeDuration",
             Self::CrossfadeShape => "@CrossfadeShape",
             Self::CueType => "@CueType",
@@ -1482,6 +1573,7 @@ impl Property {
             Self::CurveType => "@CurveType",
             Self::CurveUsage => "@CurveUsage",
             Self::CustomCueMatchName => "@CustomCueMatchName",
+            Self::DSFEmphasis => "@DSFEmphasis",
             Self::DataFileName => "@DataFileName",
             Self::DefaultLanguage => "@DefaultLanguage",
             Self::DefaultSoundVolume => "@DefaultSoundVolume",
@@ -1516,6 +1608,7 @@ impl Property {
             Self::EndTrimOffset => "@EndTrimOffset",
             Self::Entries => "@Entries",
             Self::EntryPath => "@EntryPath",
+            Self::EntryPathObject => "@EntryPathObject",
             Self::EnvelopeAttackCurve => "@EnvelopeAttackCurve",
             Self::EnvelopeAttackTime => "@EnvelopeAttackTime",
             Self::EnvelopeAutoRelease => "@EnvelopeAutoRelease",
@@ -1525,6 +1618,8 @@ impl Property {
             Self::EnvelopeSustainLevel => "@EnvelopeSustainLevel",
             Self::EnvelopeSustainTime => "@EnvelopeSustainTime",
             Self::EnvelopeTriggerOn => "@EnvelopeTriggerOn",
+            Self::EnvironmentalCurves => "@EnvironmentalCurves",
+            Self::ErrorResult => "@ErrorResult",
             Self::EventActionNamePosition => "@EventActionNamePosition",
             Self::EventCreationSettingsOverride => "@EventCreationSettingsOverride",
             Self::EventNameCaseType => "@EventNameCaseType",
@@ -1550,12 +1645,15 @@ impl Property {
             Self::FadeOutTime => "@FadeOutTime",
             Self::FadeTime => "@FadeTime",
             Self::FadeType => "@FadeType",
+            Self::FieldName => "@FieldName",
             Self::Fill => "@Fill",
             Self::FilterBehavior => "@FilterBehavior",
             Self::FilterTimeDown => "@FilterTimeDown",
             Self::FilterTimeUp => "@FilterTimeUp",
+            Self::Filters => "@Filters",
             Self::FirstOccurenceOnly => "@FirstOccurenceOnly",
             Self::Flags => "@Flags",
+            Self::GameAuxSendDSF => "@GameAuxSendDSF",
             Self::GameAuxSendHPF => "@GameAuxSendHPF",
             Self::GameAuxSendLPF => "@GameAuxSendLPF",
             Self::GameAuxSendVolume => "@GameAuxSendVolume",
@@ -1591,6 +1689,7 @@ impl Property {
             Self::HoldEmitterPositionOrientation => "@HoldEmitterPositionOrientation",
             Self::HoldListenerOrientation => "@HoldListenerOrientation",
             Self::IgnoreParentMaxSoundInstance => "@IgnoreParentMaxSoundInstance",
+            Self::IncludeFilter => "@IncludeFilter",
             Self::Inclusion => "@Inclusion",
             Self::InitialDelay => "@InitialDelay",
             Self::InitialValue => "@InitialValue",
@@ -1599,6 +1698,7 @@ impl Property {
             Self::InsertStartAt => "@InsertStartAt",
             Self::InsertToInsert => "@InsertToInsert",
             Self::InsertWhat => "@InsertWhat",
+            Self::InstanceLimit => "@InstanceLimit",
             Self::IsChecked => "@IsChecked",
             Self::IsFolder => "@IsFolder",
             Self::IsGlobalLimit => "@IsGlobalLimit",
@@ -1626,6 +1726,7 @@ impl Property {
             Self::LfoSmoothing => "@LfoSmoothing",
             Self::LfoWaveform => "@LfoWaveform",
             Self::LicenseKey => "@LicenseKey",
+            Self::LimitScope => "@LimitScope",
             Self::LineEnding => "@LineEnding",
             Self::LinearTime => "@LinearTime",
             Self::ListenerRelativeRouting => "@ListenerRelativeRouting",
@@ -1671,6 +1772,7 @@ impl Property {
             Self::Mode => "@Mode",
             Self::ModulatorScope => "@ModulatorScope",
             Self::MusicSegment => "@MusicSegment",
+            Self::MusicSyncType => "@MusicSyncType",
             Self::MusicTrackType => "@MusicTrackType",
             Self::NewPathForEachSound => "@NewPathForEachSound",
             Self::NormalOrShuffle => "@NormalOrShuffle",
@@ -1679,7 +1781,10 @@ impl Property {
             Self::ObjectIndexInView => "@ObjectIndexInView",
             Self::ObjectReferenced => "@ObjectReferenced",
             Self::ObjectType => "@ObjectType",
+            Self::OperatorNumeric => "@OperatorNumeric",
+            Self::OperatorText => "@OperatorText",
             Self::OutputBus => "@OutputBus",
+            Self::OutputBusDualshelf => "@OutputBusDualshelf",
             Self::OutputBusHighpass => "@OutputBusHighpass",
             Self::OutputBusLowpass => "@OutputBusLowpass",
             Self::OutputBusVolume => "@OutputBusVolume",
@@ -1706,6 +1811,8 @@ impl Property {
             Self::PanX => "@PanX",
             Self::PanY => "@PanY",
             Self::PanZ => "@PanZ",
+            Self::Path => "@Path",
+            Self::Paths => "@Paths",
             Self::PauseDelayedResumeAction => "@PauseDelayedResumeAction",
             Self::Pitch => "@Pitch",
             Self::Platform => "@Platform",
@@ -1730,6 +1837,7 @@ impl Property {
             Self::PlaybackSpeed => "@PlaybackSpeed",
             Self::Playlist => "@Playlist",
             Self::PlaylistItemType => "@PlaylistItemType",
+            Self::PlaylistObject => "@PlaylistObject",
             Self::PlaylistRoot => "@PlaylistRoot",
             Self::PostEventTarget => "@PostEventTarget",
             Self::PostGenerateStepUserOverride => "@PostGenerateStepUserOverride",
@@ -1780,6 +1888,7 @@ impl Property {
             Self::Segment => "@Segment",
             Self::Sequences => "@Sequences",
             Self::SettingsUserOverride => "@SettingsUserOverride",
+            Self::SidechainMixChannelConfig => "@SidechainMixChannelConfig",
             Self::SimulationValue => "@SimulationValue",
             Self::SlewRateDown => "@SlewRateDown",
             Self::SlewRateUp => "@SlewRateUp",
@@ -1877,6 +1986,9 @@ impl Property {
             Self::UserAuxSendVolume3 => "@UserAuxSendVolume3",
             Self::UserString => "@UserString",
             Self::UsingOperator => "@UsingOperator",
+            Self::ValueDouble => "@ValueDouble",
+            Self::ValueInteger => "@ValueInteger",
+            Self::ValueText => "@ValueText",
             Self::VirtualVoiceQueueBehavior => "@VirtualVoiceQueueBehavior",
             Self::Volume => "@Volume",
             Self::VolumeOffset => "@VolumeOffset",
@@ -1940,11 +2052,16 @@ impl<'de> serde::Deserialize<'de> for Property {
             "ApplyOn" => Ok(Self::ApplyOn),
             "ApplyToDynamicSequence" => Ok(Self::ApplyToDynamicSequence),
             "ApplyToStateTransition" => Ok(Self::ApplyToStateTransition),
+            "Argument" => Ok(Self::Argument),
             "Arguments" => Ok(Self::Arguments),
             "Attenuation" => Ok(Self::Attenuation),
             "AttenuationDistanceScaling" => Ok(Self::AttenuationDistanceScaling),
+            "AudioDescription" => Ok(Self::AudioDescription),
             "AudioDevice" => Ok(Self::AudioDevice),
             "AudioNode" => Ok(Self::AudioNode),
+            "AudioSimilarityPath" => Ok(Self::AudioSimilarityPath),
+            "AudioSimilarityRegionEnd" => Ok(Self::AudioSimilarityRegionEnd),
+            "AudioSimilarityRegionStart" => Ok(Self::AudioSimilarityRegionStart),
             "AutoDetectFFTWindowSize" => Ok(Self::AutoDetectFFTWindowSize),
             "AutoDetectThresholdHigh" => Ok(Self::AutoDetectThresholdHigh),
             "AutoDetectThresholdLow" => Ok(Self::AutoDetectThresholdLow),
@@ -1982,7 +2099,9 @@ impl<'de> serde::Deserialize<'de> for Property {
             "ControlInput" => Ok(Self::ControlInput),
             "Conversion" => Ok(Self::Conversion),
             "ConvertExternalSources" => Ok(Self::ConvertExternalSources),
+            "CooldownTime" => Ok(Self::CooldownTime),
             "CopyLooseStreamedMedia" => Ok(Self::CopyLooseStreamedMedia),
+            "CriteriaType" => Ok(Self::CriteriaType),
             "CrossfadeDuration" => Ok(Self::CrossfadeDuration),
             "CrossfadeShape" => Ok(Self::CrossfadeShape),
             "CueType" => Ok(Self::CueType),
@@ -1991,6 +2110,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "CurveType" => Ok(Self::CurveType),
             "CurveUsage" => Ok(Self::CurveUsage),
             "CustomCueMatchName" => Ok(Self::CustomCueMatchName),
+            "DSFEmphasis" => Ok(Self::DSFEmphasis),
             "DataFileName" => Ok(Self::DataFileName),
             "DefaultLanguage" => Ok(Self::DefaultLanguage),
             "DefaultSoundVolume" => Ok(Self::DefaultSoundVolume),
@@ -2025,6 +2145,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "EndTrimOffset" => Ok(Self::EndTrimOffset),
             "Entries" => Ok(Self::Entries),
             "EntryPath" => Ok(Self::EntryPath),
+            "EntryPathObject" => Ok(Self::EntryPathObject),
             "EnvelopeAttackCurve" => Ok(Self::EnvelopeAttackCurve),
             "EnvelopeAttackTime" => Ok(Self::EnvelopeAttackTime),
             "EnvelopeAutoRelease" => Ok(Self::EnvelopeAutoRelease),
@@ -2034,6 +2155,8 @@ impl<'de> serde::Deserialize<'de> for Property {
             "EnvelopeSustainLevel" => Ok(Self::EnvelopeSustainLevel),
             "EnvelopeSustainTime" => Ok(Self::EnvelopeSustainTime),
             "EnvelopeTriggerOn" => Ok(Self::EnvelopeTriggerOn),
+            "EnvironmentalCurves" => Ok(Self::EnvironmentalCurves),
+            "ErrorResult" => Ok(Self::ErrorResult),
             "EventActionNamePosition" => Ok(Self::EventActionNamePosition),
             "EventCreationSettingsOverride" => Ok(Self::EventCreationSettingsOverride),
             "EventNameCaseType" => Ok(Self::EventNameCaseType),
@@ -2059,12 +2182,15 @@ impl<'de> serde::Deserialize<'de> for Property {
             "FadeOutTime" => Ok(Self::FadeOutTime),
             "FadeTime" => Ok(Self::FadeTime),
             "FadeType" => Ok(Self::FadeType),
+            "FieldName" => Ok(Self::FieldName),
             "Fill" => Ok(Self::Fill),
             "FilterBehavior" => Ok(Self::FilterBehavior),
             "FilterTimeDown" => Ok(Self::FilterTimeDown),
             "FilterTimeUp" => Ok(Self::FilterTimeUp),
+            "Filters" => Ok(Self::Filters),
             "FirstOccurenceOnly" => Ok(Self::FirstOccurenceOnly),
             "Flags" => Ok(Self::Flags),
+            "GameAuxSendDSF" => Ok(Self::GameAuxSendDSF),
             "GameAuxSendHPF" => Ok(Self::GameAuxSendHPF),
             "GameAuxSendLPF" => Ok(Self::GameAuxSendLPF),
             "GameAuxSendVolume" => Ok(Self::GameAuxSendVolume),
@@ -2100,6 +2226,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "HoldEmitterPositionOrientation" => Ok(Self::HoldEmitterPositionOrientation),
             "HoldListenerOrientation" => Ok(Self::HoldListenerOrientation),
             "IgnoreParentMaxSoundInstance" => Ok(Self::IgnoreParentMaxSoundInstance),
+            "IncludeFilter" => Ok(Self::IncludeFilter),
             "Inclusion" => Ok(Self::Inclusion),
             "InitialDelay" => Ok(Self::InitialDelay),
             "InitialValue" => Ok(Self::InitialValue),
@@ -2108,6 +2235,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "InsertStartAt" => Ok(Self::InsertStartAt),
             "InsertToInsert" => Ok(Self::InsertToInsert),
             "InsertWhat" => Ok(Self::InsertWhat),
+            "InstanceLimit" => Ok(Self::InstanceLimit),
             "IsChecked" => Ok(Self::IsChecked),
             "IsFolder" => Ok(Self::IsFolder),
             "IsGlobalLimit" => Ok(Self::IsGlobalLimit),
@@ -2135,6 +2263,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "LfoSmoothing" => Ok(Self::LfoSmoothing),
             "LfoWaveform" => Ok(Self::LfoWaveform),
             "LicenseKey" => Ok(Self::LicenseKey),
+            "LimitScope" => Ok(Self::LimitScope),
             "LineEnding" => Ok(Self::LineEnding),
             "LinearTime" => Ok(Self::LinearTime),
             "ListenerRelativeRouting" => Ok(Self::ListenerRelativeRouting),
@@ -2180,6 +2309,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Mode" => Ok(Self::Mode),
             "ModulatorScope" => Ok(Self::ModulatorScope),
             "MusicSegment" => Ok(Self::MusicSegment),
+            "MusicSyncType" => Ok(Self::MusicSyncType),
             "MusicTrackType" => Ok(Self::MusicTrackType),
             "NewPathForEachSound" => Ok(Self::NewPathForEachSound),
             "NormalOrShuffle" => Ok(Self::NormalOrShuffle),
@@ -2188,7 +2318,10 @@ impl<'de> serde::Deserialize<'de> for Property {
             "ObjectIndexInView" => Ok(Self::ObjectIndexInView),
             "ObjectReferenced" => Ok(Self::ObjectReferenced),
             "ObjectType" => Ok(Self::ObjectType),
+            "OperatorNumeric" => Ok(Self::OperatorNumeric),
+            "OperatorText" => Ok(Self::OperatorText),
             "OutputBus" => Ok(Self::OutputBus),
+            "OutputBusDualshelf" => Ok(Self::OutputBusDualshelf),
             "OutputBusHighpass" => Ok(Self::OutputBusHighpass),
             "OutputBusLowpass" => Ok(Self::OutputBusLowpass),
             "OutputBusVolume" => Ok(Self::OutputBusVolume),
@@ -2215,6 +2348,8 @@ impl<'de> serde::Deserialize<'de> for Property {
             "PanX" => Ok(Self::PanX),
             "PanY" => Ok(Self::PanY),
             "PanZ" => Ok(Self::PanZ),
+            "Path" => Ok(Self::Path),
+            "Paths" => Ok(Self::Paths),
             "PauseDelayedResumeAction" => Ok(Self::PauseDelayedResumeAction),
             "Pitch" => Ok(Self::Pitch),
             "Platform" => Ok(Self::Platform),
@@ -2243,6 +2378,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "PlaybackSpeed" => Ok(Self::PlaybackSpeed),
             "Playlist" => Ok(Self::Playlist),
             "PlaylistItemType" => Ok(Self::PlaylistItemType),
+            "PlaylistObject" => Ok(Self::PlaylistObject),
             "PlaylistRoot" => Ok(Self::PlaylistRoot),
             "PostEventTarget" => Ok(Self::PostEventTarget),
             "PostGenerateStepUserOverride" => Ok(Self::PostGenerateStepUserOverride),
@@ -2293,6 +2429,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Segment" => Ok(Self::Segment),
             "Sequences" => Ok(Self::Sequences),
             "SettingsUserOverride" => Ok(Self::SettingsUserOverride),
+            "SidechainMixChannelConfig" => Ok(Self::SidechainMixChannelConfig),
             "SimulationValue" => Ok(Self::SimulationValue),
             "SlewRateDown" => Ok(Self::SlewRateDown),
             "SlewRateUp" => Ok(Self::SlewRateUp),
@@ -2392,6 +2529,9 @@ impl<'de> serde::Deserialize<'de> for Property {
             "UserAuxSendVolume3" => Ok(Self::UserAuxSendVolume3),
             "UserString" => Ok(Self::UserString),
             "UsingOperator" => Ok(Self::UsingOperator),
+            "ValueDouble" => Ok(Self::ValueDouble),
+            "ValueInteger" => Ok(Self::ValueInteger),
+            "ValueText" => Ok(Self::ValueText),
             "VirtualVoiceQueueBehavior" => Ok(Self::VirtualVoiceQueueBehavior),
             "Volume" => Ok(Self::Volume),
             "VolumeOffset" => Ok(Self::VolumeOffset),

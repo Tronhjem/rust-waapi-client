@@ -1,0 +1,40 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for every name change.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "object": {
+        "description": "The object that was renamed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "newName": {
+        "type": "string",
+        "description": "The new name of the object."
+      },
+      "oldName": {
+        "type": "string",
+        "description": "The previous name of the object."
+      }
+    },
+    "required": [
+      "object",
+      "newName",
+      "oldName"
+    ],
+    "additionalProperties": false
+  },
+  "description": "Sent when an object is renamed. Publishes the renamed object. See \\ref ak_wwise_core_object_structurechanged to receive changes in batch."
+}

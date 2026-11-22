@@ -1,0 +1,57 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "value": {
+        "type": "number",
+        "description": "Value to set for the specified Game Parameter."
+      },
+      "gameObject": {
+        "description": "Associated game object ID. The default value is transport game object.",
+        "$ref": "waapi_definitions.json#/definitions/gameObject"
+      },
+      "rtpc": {
+        "description": "Either the ID (GUID), name, or Short ID of the Game Parameter.",
+        "$ref": "waapi_definitions.json#/definitions/soundEngineObjectArg"
+      }
+    },
+    "required": [
+      "rtpc",
+      "value"
+    ],
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "description": "Sets the value of a Game Parameter for real-time parameter control. See <tt>AK::SoundEngine::SetRTPCValue</tt>.",
+  "examples": [
+    {
+      "return": {},
+      "description": "Sets the value of \"rtpc\", using its name, to \"value\" for \"gameObject\".",
+      "title": "Setting an RTPC value using its name",
+      "args": {
+        "value": 74,
+        "gameObject": 1122334,
+        "rtpc": "Rain_Intensity"
+      }
+    },
+    {
+      "return": {},
+      "description": "Sets the value of \"rtpc\", using its GUID, to \"value\" for \"gameObject\".",
+      "title": "Setting an RTPC value using its GUID",
+      "args": {
+        "value": 1853,
+        "gameObject": 22556677,
+        "rtpc": "{A076AA65-B71A-45BB-8841-5A20C52CE727}"
+      }
+    }
+  ]
+}

@@ -8,10 +8,10 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.object.setName`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetNameArgs {
-    /// The ID (GUID), name, or path of the object to rename.
-    pub object: ObjectRef,
     /// The new name of the object.
     pub value: String,
+    /// The ID (GUID), name, or path of the object to rename.
+    pub object: ObjectRef,
 }
 
 impl CoreObjectSetNameArgs {

@@ -74,6 +74,11 @@ pub mod ak {
                 pub const get: &str = "ak.wwise.core.log.get";
             }
 
+            pub mod mediaPool {
+                pub const get: &str = "ak.wwise.core.mediaPool.get";
+                pub const getFields: &str = "ak.wwise.core.mediaPool.getFields";
+            }
+
             pub mod object {
                 pub const copy: &str = "ak.wwise.core.object.copy";
                 pub const create: &str = "ak.wwise.core.object.create";
@@ -117,11 +122,17 @@ pub mod ak {
                 pub const getVoiceContributions: &str =
                     "ak.wwise.core.profiler.getVoiceContributions";
                 pub const getVoices: &str = "ak.wwise.core.profiler.getVoices";
+                pub const moveCursor: &str = "ak.wwise.core.profiler.moveCursor";
                 pub const registerMeter: &str = "ak.wwise.core.profiler.registerMeter";
                 pub const saveCapture: &str = "ak.wwise.core.profiler.saveCapture";
+                pub const setCursorTime: &str = "ak.wwise.core.profiler.setCursorTime";
                 pub const startCapture: &str = "ak.wwise.core.profiler.startCapture";
                 pub const stopCapture: &str = "ak.wwise.core.profiler.stopCapture";
                 pub const unregisterMeter: &str = "ak.wwise.core.profiler.unregisterMeter";
+
+                pub mod captureLog {
+                    pub const save: &str = "ak.wwise.core.profiler.captureLog.save";
+                }
             }
 
             pub mod project {
@@ -184,6 +195,11 @@ pub mod ak {
                 pub const redo: &str = "ak.wwise.core.undo.redo";
                 pub const undo: &str = "ak.wwise.core.undo.undo";
             }
+
+            pub mod workUnit {
+                pub const load: &str = "ak.wwise.core.workUnit.load";
+                pub const unload: &str = "ak.wwise.core.workUnit.unload";
+            }
         }
         pub mod debug {
             pub const enableAsserts: &str = "ak.wwise.debug.enableAsserts";
@@ -198,6 +214,7 @@ pub mod ak {
         pub mod ui {
             pub const bringToForeground: &str = "ak.wwise.ui.bringToForeground";
             pub const captureScreen: &str = "ak.wwise.ui.captureScreen";
+            pub const getSelectedFiles: &str = "ak.wwise.ui.getSelectedFiles";
             pub const getSelectedObjects: &str = "ak.wwise.ui.getSelectedObjects";
 
             pub mod cli {
@@ -213,6 +230,7 @@ pub mod ak {
             }
 
             pub mod layout {
+                pub const closeView: &str = "ak.wwise.ui.layout.closeView";
                 pub const dockView: &str = "ak.wwise.ui.layout.dockView";
                 pub const getCurrentLayoutName: &str = "ak.wwise.ui.layout.getCurrentLayoutName";
                 pub const getElementRectangle: &str = "ak.wwise.ui.layout.getElementRectangle";
@@ -224,6 +242,7 @@ pub mod ak {
                 pub const getViewTypes: &str = "ak.wwise.ui.layout.getViewTypes";
                 pub const moveSplitter: &str = "ak.wwise.ui.layout.moveSplitter";
                 pub const removeLayout: &str = "ak.wwise.ui.layout.removeLayout";
+                pub const resetLayouts: &str = "ak.wwise.ui.layout.resetLayouts";
                 pub const setLayout: &str = "ak.wwise.ui.layout.setLayout";
                 pub const switchLayout: &str = "ak.wwise.ui.layout.switchLayout";
                 pub const undockView: &str = "ak.wwise.ui.layout.undockView";
@@ -359,6 +378,10 @@ pub enum WaapiFunction {
     ak_wwise_core_log_clear,
     /// `ak.wwise.core.log.get`
     ak_wwise_core_log_get,
+    /// `ak.wwise.core.mediaPool.get`
+    ak_wwise_core_mediaPool_get,
+    /// `ak.wwise.core.mediaPool.getFields`
+    ak_wwise_core_mediaPool_getFields,
     /// `ak.wwise.core.object.copy`
     ak_wwise_core_object_copy,
     /// `ak.wwise.core.object.create`
@@ -407,6 +430,8 @@ pub enum WaapiFunction {
     ak_wwise_core_object_setStateProperties,
     /// `ak.wwise.core.ping`
     ak_wwise_core_ping,
+    /// `ak.wwise.core.profiler.captureLog.save`
+    ak_wwise_core_profiler_captureLog_save,
     /// `ak.wwise.core.profiler.enableProfilerData`
     ak_wwise_core_profiler_enableProfilerData,
     /// `ak.wwise.core.profiler.getAudioObjects`
@@ -433,10 +458,14 @@ pub enum WaapiFunction {
     ak_wwise_core_profiler_getVoiceContributions,
     /// `ak.wwise.core.profiler.getVoices`
     ak_wwise_core_profiler_getVoices,
+    /// `ak.wwise.core.profiler.moveCursor`
+    ak_wwise_core_profiler_moveCursor,
     /// `ak.wwise.core.profiler.registerMeter`
     ak_wwise_core_profiler_registerMeter,
     /// `ak.wwise.core.profiler.saveCapture`
     ak_wwise_core_profiler_saveCapture,
+    /// `ak.wwise.core.profiler.setCursorTime`
+    ak_wwise_core_profiler_setCursorTime,
     /// `ak.wwise.core.profiler.startCapture`
     ak_wwise_core_profiler_startCapture,
     /// `ak.wwise.core.profiler.stopCapture`
@@ -513,6 +542,10 @@ pub enum WaapiFunction {
     ak_wwise_core_undo_redo,
     /// `ak.wwise.core.undo.undo`
     ak_wwise_core_undo_undo,
+    /// `ak.wwise.core.workUnit.load`
+    ak_wwise_core_workUnit_load,
+    /// `ak.wwise.core.workUnit.unload`
+    ak_wwise_core_workUnit_unload,
     /// `ak.wwise.debug.enableAsserts`
     ak_wwise_debug_enableAsserts,
     /// `ak.wwise.debug.enableAutomationMode`
@@ -545,8 +578,12 @@ pub enum WaapiFunction {
     ak_wwise_ui_commands_register,
     /// `ak.wwise.ui.commands.unregister`
     ak_wwise_ui_commands_unregister,
+    /// `ak.wwise.ui.getSelectedFiles`
+    ak_wwise_ui_getSelectedFiles,
     /// `ak.wwise.ui.getSelectedObjects`
     ak_wwise_ui_getSelectedObjects,
+    /// `ak.wwise.ui.layout.closeView`
+    ak_wwise_ui_layout_closeView,
     /// `ak.wwise.ui.layout.dockView`
     ak_wwise_ui_layout_dockView,
     /// `ak.wwise.ui.layout.getCurrentLayoutName`
@@ -569,6 +606,8 @@ pub enum WaapiFunction {
     ak_wwise_ui_layout_moveSplitter,
     /// `ak.wwise.ui.layout.removeLayout`
     ak_wwise_ui_layout_removeLayout,
+    /// `ak.wwise.ui.layout.resetLayouts`
+    ak_wwise_ui_layout_resetLayouts,
     /// `ak.wwise.ui.layout.setLayout`
     ak_wwise_ui_layout_setLayout,
     /// `ak.wwise.ui.layout.switchLayout`
@@ -681,6 +720,8 @@ impl WaapiFunction {
             Self::ak_wwise_core_log_addItem => ak::wwise::core::log::addItem,
             Self::ak_wwise_core_log_clear => ak::wwise::core::log::clear,
             Self::ak_wwise_core_log_get => ak::wwise::core::log::get,
+            Self::ak_wwise_core_mediaPool_get => ak::wwise::core::mediaPool::get,
+            Self::ak_wwise_core_mediaPool_getFields => ak::wwise::core::mediaPool::getFields,
             Self::ak_wwise_core_object_copy => ak::wwise::core::object::copy,
             Self::ak_wwise_core_object_create => ak::wwise::core::object::create,
             Self::ak_wwise_core_object_delete => ak::wwise::core::object::delete,
@@ -715,6 +756,9 @@ impl WaapiFunction {
                 ak::wwise::core::object::setStateProperties
             }
             Self::ak_wwise_core_ping => ak::wwise::core::ping,
+            Self::ak_wwise_core_profiler_captureLog_save => {
+                ak::wwise::core::profiler::captureLog::save
+            }
             Self::ak_wwise_core_profiler_enableProfilerData => {
                 ak::wwise::core::profiler::enableProfilerData
             }
@@ -742,8 +786,10 @@ impl WaapiFunction {
                 ak::wwise::core::profiler::getVoiceContributions
             }
             Self::ak_wwise_core_profiler_getVoices => ak::wwise::core::profiler::getVoices,
+            Self::ak_wwise_core_profiler_moveCursor => ak::wwise::core::profiler::moveCursor,
             Self::ak_wwise_core_profiler_registerMeter => ak::wwise::core::profiler::registerMeter,
             Self::ak_wwise_core_profiler_saveCapture => ak::wwise::core::profiler::saveCapture,
+            Self::ak_wwise_core_profiler_setCursorTime => ak::wwise::core::profiler::setCursorTime,
             Self::ak_wwise_core_profiler_startCapture => ak::wwise::core::profiler::startCapture,
             Self::ak_wwise_core_profiler_stopCapture => ak::wwise::core::profiler::stopCapture,
             Self::ak_wwise_core_profiler_unregisterMeter => {
@@ -810,6 +856,8 @@ impl WaapiFunction {
             Self::ak_wwise_core_undo_endGroup => ak::wwise::core::undo::endGroup,
             Self::ak_wwise_core_undo_redo => ak::wwise::core::undo::redo,
             Self::ak_wwise_core_undo_undo => ak::wwise::core::undo::undo,
+            Self::ak_wwise_core_workUnit_load => ak::wwise::core::workUnit::load,
+            Self::ak_wwise_core_workUnit_unload => ak::wwise::core::workUnit::unload,
             Self::ak_wwise_debug_enableAsserts => ak::wwise::debug::enableAsserts,
             Self::ak_wwise_debug_enableAutomationMode => ak::wwise::debug::enableAutomationMode,
             Self::ak_wwise_debug_generateToneWAV => ak::wwise::debug::generateToneWAV,
@@ -826,7 +874,9 @@ impl WaapiFunction {
             Self::ak_wwise_ui_commands_getCommands => ak::wwise::ui::commands::getCommands,
             Self::ak_wwise_ui_commands_register => ak::wwise::ui::commands::register,
             Self::ak_wwise_ui_commands_unregister => ak::wwise::ui::commands::unregister,
+            Self::ak_wwise_ui_getSelectedFiles => ak::wwise::ui::getSelectedFiles,
             Self::ak_wwise_ui_getSelectedObjects => ak::wwise::ui::getSelectedObjects,
+            Self::ak_wwise_ui_layout_closeView => ak::wwise::ui::layout::closeView,
             Self::ak_wwise_ui_layout_dockView => ak::wwise::ui::layout::dockView,
             Self::ak_wwise_ui_layout_getCurrentLayoutName => {
                 ak::wwise::ui::layout::getCurrentLayoutName
@@ -842,6 +892,7 @@ impl WaapiFunction {
             Self::ak_wwise_ui_layout_getViewTypes => ak::wwise::ui::layout::getViewTypes,
             Self::ak_wwise_ui_layout_moveSplitter => ak::wwise::ui::layout::moveSplitter,
             Self::ak_wwise_ui_layout_removeLayout => ak::wwise::ui::layout::removeLayout,
+            Self::ak_wwise_ui_layout_resetLayouts => ak::wwise::ui::layout::resetLayouts,
             Self::ak_wwise_ui_layout_setLayout => ak::wwise::ui::layout::setLayout,
             Self::ak_wwise_ui_layout_switchLayout => ak::wwise::ui::layout::switchLayout,
             Self::ak_wwise_ui_layout_undockView => ak::wwise::ui::layout::undockView,

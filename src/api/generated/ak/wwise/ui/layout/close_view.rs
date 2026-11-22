@@ -1,0 +1,20 @@
+// Generated bindings for ak.wwise.ui.layout.closeView
+
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+use crate::api::generated::primitives::*;
+
+/// Arguments for `ak.wwise.ui.layout.closeView`.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct UiLayoutCloseViewArgs {
+    /// The unique id of the view to close.
+    #[serde(rename = "viewID")]
+    pub view_id: String,
+}
+
+impl UiLayoutCloseViewArgs {
+    pub fn new(view_id: String) -> Self {
+        Self { view_id }
+    }
+}

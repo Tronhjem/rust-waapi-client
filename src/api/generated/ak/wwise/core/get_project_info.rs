@@ -12,14 +12,14 @@ pub struct CoreGetProjectInfoResponse {
     pub id: String,
     /// The Project name. Note that the Project name can differ from the WPROJ file name, if the file was renamed after Project creation.
     pub name: String,
+    /// Collection of directories used by Wwise.
+    pub directories: ProjectDirectoriesInfo,
     /// The absolute path to the WPROJ file.
     pub path: String,
     /// Array of the Platforms defined in the project.
     pub platforms: Vec<ProjectPlatformInfo>,
     /// Array of the Languages defined in the project.
     pub languages: Vec<ProjectLanguageInfo>,
-    /// Collection of directories used by Wwise.
-    pub directories: ProjectDirectoriesInfo,
     /// The complete text from the Wwise titlebar.
     #[serde(rename = "displayTitle")]
     pub display_title: String,
@@ -38,4 +38,10 @@ pub struct CoreGetProjectInfoResponse {
     /// The default Conversion Settings object used in the Project.
     #[serde(rename = "defaultConversion")]
     pub default_conversion: WwiseObjectRef,
+    /// Default work units organized by category.
+    #[serde(rename = "defaultWorkUnits", default)]
+    pub default_work_units: Option<serde_json::Value>,
+    /// The default location to import WAV and MIDI files as sounds and music segments.
+    #[serde(rename = "defaultImportWorkUnit", default)]
+    pub default_import_work_unit: Option<WwiseObjectRef>,
 }

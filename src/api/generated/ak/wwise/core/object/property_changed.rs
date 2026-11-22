@@ -23,6 +23,9 @@ pub struct CoreObjectPropertyChangedPayload {
 /// Subscription options for `ak.wwise.core.object.propertyChanged`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectPropertyChangedOptions {
+    /// Data to be returned for every change on "property" of "object". See for more information on the properties available.
+    #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
+    pub return_: Option<Vec<ObjectReturnField>>,
     /// The ID (GUID), name, or path of the object to watch.
     pub object: ObjectRef,
     /// The property of the watched object to watch.
@@ -30,9 +33,6 @@ pub struct CoreObjectPropertyChangedOptions {
     /// The ID (GUID) of the platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<String>,
-    /// Data to be returned for every change on "property" of "object". Refer to for more information on the properties available.
-    #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<ObjectReturnField>>,
 }
 
 impl CoreObjectPropertyChangedOptions {
@@ -40,18 +40,18 @@ impl CoreObjectPropertyChangedOptions {
         Self {
             object,
             property,
-            platform: None,
             return_: None,
+            platform: None,
         }
-    }
-
-    pub fn platform(mut self, platform: impl Into<String>) -> Self {
-        self.platform = Some(platform.into());
-        self
     }
 
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
+        self
+    }
+
+    pub fn platform(mut self, platform: impl Into<String>) -> Self {
+        self.platform = Some(platform.into());
         self
     }
 }

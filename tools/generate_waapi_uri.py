@@ -12,8 +12,6 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-SCHEMA_VERSION = "2024.1.7"
-
 RUST_KEYWORDS = {'move', 'type', 'mod', 'use', 'fn', 'let', 'if', 'else', 'for', 
                  'while', 'loop', 'match', 'return', 'break', 'continue', 'const',
                  'static', 'struct', 'enum', 'trait', 'impl', 'self', 'super',
@@ -188,31 +186,56 @@ def generate_api_file(functions: List[str], output_path: Path, enum_name: str):
     print(f"Generated {output_path} with {len(functions)} entries ({enum_name})")
 
 
-def load_endpoints_from_schemas(schema_dir: Path) -> Tuple[List[str], List[str]]:
-    if not schema_dir.exists():
-        raise FileNotFoundError(
-            f"{schema_dir} not found! Run tools/get_waapi_definitions.py first."
-        )
+def _version_sort_key(path: Path) -> Tuple[int, ...]:
+    return tuple(int(p) for p in re.findall(r"\d+", path.name))
 
-    functions: List[str] = []
-    topics: List[str] = []
-    for path in sorted(schema_dir.glob("ak.*.json")):
-        uri = path.stem
-        data = json.loads(path.read_text(encoding="utf-8"))
-        if "publishSchema" in data:
-            topics.append(uri)
-        else:
-            functions.append(uri)
 
+def discover_schema_dirs(schemas_root: Path) -> List[Path]:
+    """Return all versioned schema dirs under `schemas_root`, oldest first.
+
+    Union generation parses every version so a superset of endpoints (and
+    any 2024-only URI that a future version drops) is preserved.
+    """
+    dirs = [
+        d for d in schemas_root.iterdir()
+        if d.is_dir() and re.match(r"\d", d.name)
+    ]
+    return sorted(dirs, key=_version_sort_key)
+
+
+def load_endpoints_from_schemas(schema_dirs: List[Path]) -> Tuple[List[str], List[str]]:
+    all_uris: List[str] = []
+    seen: set = set()
+    topic_uris: set = set()
+    for schema_dir in schema_dirs:
+        if not schema_dir.exists():
+            continue
+        for path in sorted(schema_dir.glob("ak.*.json")):
+            uri = path.stem
+            if uri not in seen:
+                seen.add(uri)
+                all_uris.append(uri)
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if "publishSchema" in data:
+                topic_uris.add(uri)
+    functions = [u for u in all_uris if u not in topic_uris]
+    topics = [u for u in all_uris if u in topic_uris]
     return functions, topics
 
 
 def main():
     script_dir = Path(__file__).resolve().parent
-    schema_dir = script_dir / "waapi_schemas" / SCHEMA_VERSION
+    schemas_root = script_dir / "waapi_schemas"
+    version_dirs = discover_schema_dirs(schemas_root)
+    if not version_dirs:
+        raise FileNotFoundError(
+            f"No versioned schema dirs under {schemas_root}. "
+            "Run tools/get_waapi_definitions.py first."
+        )
     src_dir = script_dir.parent / "src"
 
-    functions, topics = load_endpoints_from_schemas(schema_dir)
+    functions, topics = load_endpoints_from_schemas(version_dirs)
+    print(f"Union of {len(version_dirs)} version(s): {len(functions)} functions, {len(topics)} topics")
     generate_api_file(functions, src_dir / "waapi_function_api.rs", "WaapiFunction")
     generate_api_file(topics, src_dir / "waapi_topics_api.rs", "WaapiTopic")
 

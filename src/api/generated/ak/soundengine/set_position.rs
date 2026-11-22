@@ -8,11 +8,11 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.setPosition`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetPositionArgs {
+    /// The 3D position to set for the game object.
+    pub position: Position,
     /// Game Object identifier.
     #[serde(rename = "gameObject")]
     pub game_object: GameObjectRef,
-    /// The 3D position to set for the game object.
-    pub position: Position,
 }
 
 impl SoundengineSetPositionArgs {

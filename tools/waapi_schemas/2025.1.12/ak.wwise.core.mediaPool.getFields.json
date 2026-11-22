@@ -1,0 +1,47 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
+  "optionsSchema": {
+    "type": "object",
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "type": "array",
+        "description": "The list of fields available to use in Media Pool queries.",
+        "items": {
+          "description": "The field name.",
+          "$ref": "waapi_definitions.json#/definitions/mediaPoolField"
+        }
+      }
+    },
+    "additionalProperties": false
+  },
+  "description": "Retrieve all fields present in the Media Pool. You can then use the fields to query the Media Pool. The Media Pool discovers some fields when it scans audio files. Others, such as WAV fields, are always available.",
+  "examples": [
+    {
+      "result": {
+        "return": [
+          "Filename",
+          "WAV/Duration",
+          "WAV/Sample Rate",
+          "WAV/Bit Depth",
+          "WAV/Channels",
+          "WAV/Channel Configuration",
+          "WAV/Data Size",
+          "WAV/Loop Start",
+          "WAV/Loop End",
+          "WAV/Marker Count",
+          "WAV/Samples"
+        ]
+      },
+      "description": "Get all the fields available in the Media Pool.",
+      "title": "Getting all the fields from the Media Pool",
+      "args": {}
+    }
+  ]
+}

@@ -15,9 +15,26 @@ import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-SCHEMA_VERSION = "2024.1.7"
-SCHEMA_DIR = Path(__file__).resolve().parent / "waapi_schemas" / SCHEMA_VERSION
 OUT_DIR = Path(__file__).resolve().parent.parent / "src" / "api" / "generated"
+
+_SCHEMAS_ROOT = Path(__file__).resolve().parent / "waapi_schemas"
+
+
+def _version_sort_key(path):
+    return tuple(int(p) for p in re.findall(r"\d+", path.name))
+
+
+def discover_schema_dirs():
+    """All versioned schema dirs under tools/waapi_schemas, oldest first."""
+    dirs = [
+        d for d in _SCHEMAS_ROOT.iterdir()
+        if d.is_dir() and re.match(r"\d", d.name)
+    ]
+    return sorted(dirs, key=_version_sort_key)
+
+
+SCHEMA_DIRS = discover_schema_dirs()
+SCHEMA_DIR = SCHEMA_DIRS[-1]  # latest version is canonical for endpoint schemas
 
 PILOT_ENDPOINTS = [
     # Core Info & Project
@@ -126,6 +143,17 @@ PILOT_ENDPOINTS = [
     "ak.wwise.core.audio.resetSolo",
     "ak.wwise.core.audio.setConversionPlugin",
     "ak.wwise.core.audio.solo",
+    # Wwise 2025 additions
+    "ak.wwise.core.mediaPool.get",
+    "ak.wwise.core.mediaPool.getFields",
+    "ak.wwise.core.profiler.captureLog.save",
+    "ak.wwise.core.profiler.moveCursor",
+    "ak.wwise.core.profiler.setCursorTime",
+    "ak.wwise.core.workUnit.load",
+    "ak.wwise.core.workUnit.unload",
+    "ak.wwise.ui.getSelectedFiles",
+    "ak.wwise.ui.layout.closeView",
+    "ak.wwise.ui.layout.resetLayouts",
 ]
 
 # Subscription topics for which typed payload structs and `subscribe_*` chained
@@ -176,6 +204,8 @@ TOPIC_ENDPOINTS = [
     "ak.wwise.ui.commands.executed",
     "ak.wwise.ui.signal.click",
     "ak.wwise.ui.signal.toggle",
+    # Wwise 2025 additions
+    "ak.wwise.core.object.structureChanged",
 ]
 
 # Constructor parameter order where the schema's `required` list differs from
@@ -312,6 +342,22 @@ REF_TYPES = {
     "waapi_definitions.json#/definitions/blendTrackEdge": "BlendEdge",
     "waapi_definitions.json#/definitions/logCentralItem": "LogCentralItem",
     "waapi_definitions.json#/definitions/logCentralChannel": "LogChannel",
+    # Wwise 2025 additions
+    "common_definitions.json#/definitions/arrayOfString": "Vec<String>",
+    "common_definitions.json#/definitions/stringOrArrayOfString": "serde_json::Value",
+    "waapi_definitions.json#/definitions/cursorTime": "serde_json::Value",
+    "waapi_definitions.json#/definitions/arrayOfLogCentralItem": "Vec<LogCentralItem>",
+    "waapi_definitions.json#/definitions/pluginReferenceGroup": "serde_json::Value",
+    "waapi_definitions.json#/definitions/projectOptionCliArg": "String",
+    "waapi_definitions.json#/definitions/pipelineID": "f64",
+    "waapi_definitions.json#/definitions/mediaReference": "serde_json::Value",
+    "waapi_definitions.json#/definitions/mediaPoolField": "String",
+    "waapi_definitions.json#/definitions/mediaPoolReturnOption": "String",
+    "waapi_definitions.json#/definitions/importArg": "serde_json::Value",
+    "waapi_definitions.json#/definitions/externalSourceReference": "serde_json::Value",
+    "waapi_definitions.json#/definitions/curveObjectDefinition": "serde_json::Value",
+    "waapi_definitions.json#/definitions/auxBusReference": "serde_json::Value",
+    "waapi_ui_definitions.json#/definitions/widgetAttributeEntry": "serde_json::Value",
 }
 
 OBJECT_RETURN_OPTIONS_REF = "waapi_definitions.json#/definitions/objectReturnOptions"
@@ -399,19 +445,30 @@ def unique_names(values, name_fn, suffix):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class Schemas:
-    def __init__(self, root):
+    def __init__(self, root, fallback_roots=()):
         self.root = root
+        self.fallback_roots = list(fallback_roots)
         self._defs = {}
         self._endpoints = {}
 
+    def _find_file(self, rel_path):
+        primary = self.root / rel_path
+        if primary.exists():
+            return primary
+        for fb in reversed(self.fallback_roots):
+            candidate = fb / rel_path
+            if candidate.exists():
+                return candidate
+        return primary
+
     def load_definitions(self, fname):
         if fname not in self._defs:
-            self._defs[fname] = json.loads((self.root / "Definitions" / fname).read_text())
+            self._defs[fname] = json.loads(self._find_file(Path("Definitions") / fname).read_text())
         return self._defs[fname]
 
     def load_endpoint(self, uri):
         if uri not in self._endpoints:
-            self._endpoints[uri] = json.loads((self.root / f"{uri}.json").read_text())
+            self._endpoints[uri] = json.loads(self._find_file(f"{uri}.json").read_text())
         return self._endpoints[uri]
 
     @staticmethod
@@ -433,7 +490,7 @@ class Schemas:
             if fname.endswith("definitions.json"):
                 target = self.load_definitions(fname)
             else:
-                target = json.loads((self.root / fname).read_text())
+                target = json.loads(self._find_file(fname).read_text())
             return self._walk(target, pointer)
         node = self._walk(doc, pointer)
         if node is None and local_root is not None:
@@ -730,26 +787,47 @@ def emit_int_enum(name, doc, values):
 # object_types.rs and properties.rs (from WObjects.xml)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def gen_object_types(schema_dir: Path) -> str:
-    wobjects_path = schema_dir / "Definitions" / "WObjects.xml"
-    tree = ET.parse(wobjects_path)
-    root = tree.getroot()
+def load_object_type_entries(schema_dirs):
+    """Union of Wwise object types across all versions, keyed by class_id.
 
-    entries = {}
-    for el in root.findall("WwiseObject"):
-        name = el.attrib.get("Name")
-        if not name or name in entries:
+    A class_id that maps to multiple names across versions (a rename, e.g.
+    ActorMixer -> PropertyContainer) yields one entry per name; the name from
+    the latest version is marked canonical and drives `from_class_id`.
+    """
+    by_class_id = {}
+    for version_index, schema_dir in enumerate(schema_dirs):
+        wobjects_path = schema_dir / "Definitions" / "WObjects.xml"
+        if not wobjects_path.exists():
             continue
-        company_id = int(el.attrib.get("CompanyID", "1"))
-        plugin_id = int(el.attrib.get("PluginID", "0"))
-        class_id = (plugin_id << 16) | (company_id << 4)
-        entries[name] = {
-            "class_id": class_id,
-            "plugin_id": plugin_id,
-        }
+        tree = ET.parse(wobjects_path)
+        root = tree.getroot()
+        for el in root.findall("WwiseObject"):
+            name = el.attrib.get("Name")
+            if not name:
+                continue
+            company_id = int(el.attrib.get("CompanyID", "1"))
+            plugin_id = int(el.attrib.get("PluginID", "0"))
+            class_id = (plugin_id << 16) | (company_id << 4)
+            names = by_class_id.setdefault(class_id, {})
+            if name not in names:
+                names[name] = version_index
 
-    sorted_names = sorted(entries)
-    variants = [(name, property_variant_name(name), entries[name]) for name in sorted_names]
+    entries = []
+    for class_id, names in sorted(by_class_id.items()):
+        canonical_name = max(names, key=lambda n: names[n])
+        for name in sorted(names):
+            entries.append({
+                "name": name,
+                "class_id": class_id,
+                "canonical_name": canonical_name,
+                "canonical": name == canonical_name,
+            })
+    return entries
+
+
+def gen_object_types(schema_dirs) -> str:
+    entries = load_object_type_entries(schema_dirs)
+    variants = [(e["name"], property_variant_name(e["name"]), e) for e in entries]
 
     lines = [
         "// Auto-generated Wwise object types from WObjects.xml.",
@@ -757,18 +835,22 @@ def gen_object_types(schema_dir: Path) -> str:
         "",
         "/// Typed identifier for a Wwise object type (`\\ref wobjects_index`).",
         "///",
-        "/// Derived from `<WwiseObject>` definitions in `WObjects.xml`.",
+        "/// Derived from the union of `<WwiseObject>` definitions in `WObjects.xml`",
+        "/// across all supported Wwise versions.",
         "#[allow(non_camel_case_types)]",
         "#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]",
         "pub enum ObjectType {",
     ]
     for wire, variant, meta in variants:
-        lines.append(f"    /// `{wire}` (class ID `{meta['class_id']}`).")
+        doc = f"    /// `{wire}` (class ID `{meta['class_id']}`)."
+        if not meta["canonical"]:
+            doc += f" Wwise 2024 name; renamed to `{meta['canonical_name']}` in Wwise 2025."
+        lines.append(doc)
         lines.append(f"    {variant},")
     lines.append("}")
     lines.append("")
     lines.append("impl ObjectType {")
-    lines.append("    /// Returns the Wwise object type name (e.g. `\"Sound\"`, `\"ActorMixer\"`).")
+    lines.append("    /// Returns the Wwise object type name (e.g. `\"Sound\"`, `\"PropertyContainer\"`).")
     lines.append("    pub const fn as_str(self) -> &'static str {")
     lines.append("        match self {")
     for wire, variant, _ in variants:
@@ -785,10 +867,13 @@ def gen_object_types(schema_dir: Path) -> str:
     lines.append("    }")
     lines.append("")
     lines.append("    /// Looks up an [`ObjectType`] by its numeric Wwise class ID.")
+    lines.append("    /// Renamed types (e.g. `ActorMixer`/`PropertyContainer`) resolve to the")
+    lines.append("    /// canonical (latest Wwise) name.")
     lines.append("    pub const fn from_class_id(class_id: u32) -> Option<Self> {")
     lines.append("        match class_id {")
     for _, variant, meta in variants:
-        lines.append(f"            {meta['class_id']} => Some(Self::{variant}),")
+        if meta["canonical"]:
+            lines.append(f"            {meta['class_id']} => Some(Self::{variant}),")
     lines.append("            _ => None,")
     lines.append("        }")
     lines.append("    }")
@@ -854,29 +939,45 @@ def property_variant_name(wire: str) -> str:
     return variant
 
 
-def gen_properties(schema_dir: Path) -> str:
-    wobjects_path = schema_dir / "Definitions" / "WObjects.xml"
-    tree = ET.parse(wobjects_path)
-    root = tree.getroot()
+def load_property_entries(schema_dirs):
+    """Union of property/reference/list names across all versions.
 
+    Metadata (display name, type, meaning) is taken from the latest version
+    that defines each name.
+    """
     entries = {}
-    for tag, kind_label in (
-        ("Property", "Property"),
-        ("Reference", "Reference"),
-        ("ObjectList", "ObjectList"),
-    ):
-        for el in root.findall(f".//{tag}"):
-            name = el.attrib.get("Name")
-            if not name or name in entries:
-                continue
-            ui = el.find("UserInterface")
-            display = ui.attrib.get("DisplayName") if ui is not None else None
-            entries[name] = {
-                "kind": kind_label,
-                "type": el.attrib.get("Type"),
-                "meaning": el.attrib.get("DataMeaning"),
-                "display": display,
-            }
+    for version_index, schema_dir in enumerate(schema_dirs):
+        wobjects_path = schema_dir / "Definitions" / "WObjects.xml"
+        if not wobjects_path.exists():
+            continue
+        tree = ET.parse(wobjects_path)
+        root = tree.getroot()
+        for tag, kind_label in (
+            ("Property", "Property"),
+            ("Reference", "Reference"),
+            ("ObjectList", "ObjectList"),
+        ):
+            for el in root.findall(f".//{tag}"):
+                name = el.attrib.get("Name")
+                if not name:
+                    continue
+                ui = el.find("UserInterface")
+                display = ui.attrib.get("DisplayName") if ui is not None else None
+                entry = {
+                    "kind": kind_label,
+                    "type": el.attrib.get("Type"),
+                    "meaning": el.attrib.get("DataMeaning"),
+                    "display": display,
+                    "version": version_index,
+                }
+                existing = entries.get(name)
+                if existing is None or version_index > existing["version"]:
+                    entries[name] = entry
+    return entries
+
+
+def gen_properties(schema_dirs) -> str:
+    entries = load_property_entries(schema_dirs)
 
     sorted_names = sorted(entries)
     variants = [(name, property_variant_name(name), entries[name]) for name in sorted_names]
@@ -887,7 +988,7 @@ def gen_properties(schema_dir: Path) -> str:
         "",
         "/// Typed identifier for a Wwise object property, reference, or object list.",
         "///",
-        "/// Derived from `WObjects.xml` in the Wwise Authoring data.",
+        "/// Derived from the union of `WObjects.xml` across all supported Wwise versions.",
         "/// Use [`Property::as_str`] for the bare name (e.g. `\"Volume\"`) or",
         "/// [`Property::as_at_str`] for the `@`-prefixed accessor (e.g. `\"@Volume\"`).",
         "#[allow(non_camel_case_types)]",
@@ -971,8 +1072,39 @@ def gen_properties(schema_dir: Path) -> str:
 # primitives.rs
 # ─────────────────────────────────────────────────────────────────────────────
 
-def gen_object_return_field(waapi_defs):
-    enum_vals = waapi_defs["definitions"]["returnExpression"]["items"]["anyOf"][0]["enum"]
+def extract_enum_values(node):
+    """Recursively collect `enum` string values from a JSON-schema node."""
+    values = []
+    if isinstance(node, dict):
+        enum = node.get("enum")
+        if isinstance(enum, list):
+            values.extend(v for v in enum if isinstance(v, str))
+        for v in node.values():
+            values.extend(extract_enum_values(v))
+    elif isinstance(node, list):
+        for v in node:
+            values.extend(extract_enum_values(v))
+    return values
+
+
+def union_definition_enum_values(schema_dirs, definition_file, key):
+    """Union of `enum` string values under a definition key across all versions."""
+    seen = set()
+    ordered = []
+    for schema_dir in schema_dirs:
+        defs_path = schema_dir / "Definitions" / definition_file
+        if not defs_path.exists():
+            continue
+        defs = json.loads(defs_path.read_text(encoding="utf-8"))
+        node = defs.get("definitions", {}).get(key, {})
+        for v in extract_enum_values(node):
+            if v not in seen:
+                seen.add(v)
+                ordered.append(v)
+    return ordered
+
+
+def gen_object_return_field(enum_vals):
     lines = doc_lines("A field that can be requested in `return` options.")
     lines.append("#[derive(Debug, Clone)]")
     lines.append("pub enum ObjectReturnField {")
@@ -1009,9 +1141,15 @@ def gen_object_return_field(waapi_defs):
 
 
 def gen_wwise_object(ctx):
-    waapi_defs = ctx.schemas.load_definitions("waapi_definitions.json")
-    obj_return = waapi_defs["definitions"]["objectReturn"]
-    props = obj_return.get("properties", {})
+    props = {}
+    for sdir in SCHEMA_DIRS:
+        defs_path = sdir / "Definitions" / "waapi_definitions.json"
+        if not defs_path.exists():
+            continue
+        waapi_defs = json.loads(defs_path.read_text())
+        obj_return = waapi_defs.get("definitions", {}).get("objectReturn", {})
+        for wire, sub in obj_return.get("properties", {}).items():
+            props[wire] = sub
     names = unique_names(props.keys(), lambda w: field_name(ctx.uri, w, "response"), "_legacy")
     fields = []
     for wire, sub in props.items():
@@ -1465,6 +1603,16 @@ def gen_primitives(schemas, endpoints_docs):
     log_severity_vals = [
         b["enum"][0] for b in waapi_defs["definitions"]["logCentralSeverity"]["oneOf"]
     ]
+    # Union of return-field enums across versions so 2024-only variants remain
+    # usable (e.g. colorRGB, transitionObject, nextGain, prevGain).
+    return_field_vals = union_definition_enum_values(
+        SCHEMA_DIRS, "waapi_definitions.json", "returnExpression")
+    bus_return_vals = union_definition_enum_values(
+        SCHEMA_DIRS, "waapi_definitions.json", "busReturnOptions")
+    audio_return_vals = union_definition_enum_values(
+        SCHEMA_DIRS, "waapi_definitions.json", "audioObjectReturnOptions")
+    voice_return_vals = union_definition_enum_values(
+        SCHEMA_DIRS, "waapi_definitions.json", "voiceReturnOptions")
 
     parts = [HEADER]
     parts.append("pub use super::object_types::ObjectType;")
@@ -1475,14 +1623,14 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append("};")
     parts.append("")
     parts.append(STATIC_REFS)
-    parts.append(gen_object_return_field(waapi_defs))
+    parts.append(gen_object_return_field(return_field_vals))
     parts.append(STATIC_OBJECT_RETURN_OPTIONS)
     parts.append(emit_enum("BusReturnField", "Return fields for `ak.wwise.core.profiler.getBusses`.",
-                           waapi_defs["definitions"]["busReturnOptions"]["items"]["enum"]))
+                           bus_return_vals))
     parts.append(emit_enum("AudioObjectReturnField", "Return fields for `ak.wwise.core.profiler.getAudioObjects`.",
-                           waapi_defs["definitions"]["audioObjectReturnOptions"]["items"]["enum"]))
+                           audio_return_vals))
     parts.append(emit_enum("VoiceReturnField", "Return fields for `ak.wwise.core.profiler.getVoices`.",
-                           waapi_defs["definitions"]["voiceReturnOptions"]["items"]["enum"]))
+                           voice_return_vals))
     parts.append(emit_enum("ImportOperation", "Determines how imported objects are created.", import_operation_vals))
     parts.append(emit_enum("LogSeverity", "Severity level of an audio import log entry.", log_severity_vals))
     parts.append(gen_wwise_object(get_ctx))
@@ -2175,7 +2323,7 @@ def gen_clients(endpoints, topics):
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
-    schemas = Schemas(SCHEMA_DIR)
+    schemas = Schemas(SCHEMA_DIR, fallback_roots=SCHEMA_DIRS[:-1])
     endpoints = {}
     for uri in PILOT_ENDPOINTS:
         ctx = Ctx(schemas, uri)
@@ -2210,8 +2358,8 @@ def main():
     emit_module_tree(tree, OUT_DIR)
 
     ctxs = {uri: info["ctx"] for uri, info in endpoints.items()}
-    (OUT_DIR / "object_types.rs").write_text(gen_object_types(SCHEMA_DIR))
-    (OUT_DIR / "properties.rs").write_text(gen_properties(SCHEMA_DIR))
+    (OUT_DIR / "object_types.rs").write_text(gen_object_types(SCHEMA_DIRS))
+    (OUT_DIR / "properties.rs").write_text(gen_properties(SCHEMA_DIRS))
     (OUT_DIR / "primitives.rs").write_text(gen_primitives(schemas, ctxs))
     (OUT_DIR / "clients.rs").write_text(gen_clients(endpoints, topics))
     (OUT_DIR / "mod.rs").write_text(
@@ -2225,7 +2373,11 @@ def main():
         "pub use object_types::ObjectType;\n"
         "pub use properties::Property;\n"
     )
-    print(f"Generated {len(PILOT_ENDPOINTS)} endpoints and {len(TOPIC_ENDPOINTS)} topics into {OUT_DIR}")
+    print(
+        f"Generated {len(PILOT_ENDPOINTS)} endpoints and {len(TOPIC_ENDPOINTS)} topics "
+        f"(union of {len(SCHEMA_DIRS)} versions: {', '.join(d.name for d in SCHEMA_DIRS)}) "
+        f"into {OUT_DIR}"
+    )
 
 
 if __name__ == "__main__":

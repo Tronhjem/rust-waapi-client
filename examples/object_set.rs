@@ -2,6 +2,9 @@
 //!
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example object_set
+//!
+//! Targets the Wwise 2025 hierarchy (`\Containers`). See `object_set_2024.rs`
+//! for the Wwise 2024 `\Actor-Mixer Hierarchy` variant.
 
 use waapi_client::WaapiClient;
 use waapi_client::api::generated::ak::wwise::core::object::{
@@ -20,11 +23,9 @@ async fn main() {
 
     // Example: rename an object and set a property.
     let rename_and_set = CoreObjectSetArgs::new(vec![
-        CoreObjectSetItem::new(ObjectRef::path(
-            "\\Actor-Mixer Hierarchy\\Default Work Unit\\MySound",
-        ))
-        .name("MyRenamedSound")
-        .property(Property::Volume, -6.0),
+        CoreObjectSetItem::new(ObjectRef::path("\\Containers\\Default Work Unit\\MySound"))
+            .name("MyRenamedSound")
+            .property(Property::Volume, -6.0),
     ]);
 
     let options =

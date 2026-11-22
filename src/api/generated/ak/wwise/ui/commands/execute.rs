@@ -8,15 +8,18 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.ui.commands.execute`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiCommandsExecuteArgs {
-    /// A value to pass to the command. Some commands can take a value as an argument. Refer to the commands for more information.
+    /// A value to pass to the command. Some commands can take a value as an argument. See the commands for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<PropertyValue>,
-    /// An array of platform. Each platform is an ID (GUID) or a unique name. Some commands can take platforms as arguments. Refer to the commands for more information.
+    /// An array of files. Each object is an path to a file. Some commands can take files as arguments. See the commands for more information.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<Vec<String>>,
+    /// An array of platform. Each platform is an ID (GUID) or a unique name. Some commands can take platforms as arguments. See the commands for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platforms: Option<Vec<PlatformRef>>,
-    /// The ID of the command to execute. Refer to for the lists of commands.
+    /// The ID of the command to execute. See for the lists of commands.
     pub command: String,
-    /// An array of objects. Each object is an ID (GUID), name, or path of the object. Some commands can take objects as arguments. Refer to the commands for more information.
+    /// An array of objects. Each object is an ID (GUID), name, or path of the object. Some commands can take objects as arguments. See the commands for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub objects: Option<Vec<ObjectRef>>,
 }
@@ -26,6 +29,7 @@ impl UiCommandsExecuteArgs {
         Self {
             command,
             value: None,
+            files: None,
             platforms: None,
             objects: None,
         }
@@ -33,6 +37,11 @@ impl UiCommandsExecuteArgs {
 
     pub fn value(mut self, value: impl Into<PropertyValue>) -> Self {
         self.value = Some(value.into());
+        self
+    }
+
+    pub fn files(mut self, files: impl Into<Vec<String>>) -> Self {
+        self.files = Some(files.into());
         self
     }
 

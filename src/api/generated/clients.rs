@@ -67,6 +67,10 @@ use crate::api::generated::ak::wwise::core::blendContainer::{
 };
 use crate::api::generated::ak::wwise::core::gameParameter::CoreGameParameterSetRangeArgs;
 use crate::api::generated::ak::wwise::core::log::CoreLogItemAddedPayload;
+use crate::api::generated::ak::wwise::core::mediaPool::CoreMediaPoolGetFieldsResponse;
+use crate::api::generated::ak::wwise::core::mediaPool::{
+    CoreMediaPoolGetArgs, CoreMediaPoolGetOptions, CoreMediaPoolGetResponse,
+};
 use crate::api::generated::ak::wwise::core::object::CoreObjectDeleteArgs;
 use crate::api::generated::ak::wwise::core::object::CoreObjectGetTypesResponse;
 use crate::api::generated::ak::wwise::core::object::CoreObjectPastePropertiesArgs;
@@ -144,11 +148,21 @@ use crate::api::generated::ak::wwise::core::object::{
 use crate::api::generated::ak::wwise::core::object::{
     CoreObjectSetArgs, CoreObjectSetOptions, CoreObjectSetResponse,
 };
+use crate::api::generated::ak::wwise::core::object::{
+    CoreObjectStructureChangedOptions, CoreObjectStructureChangedPayload,
+};
 use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectRegisteredPayload;
 use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectResetPayload;
 use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectUnregisteredPayload;
+use crate::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogSaveArgs;
 use crate::api::generated::ak::wwise::core::profiler::captureLog::{
     CoreProfilerCaptureLogItemAddedOptions, CoreProfilerCaptureLogItemAddedPayload,
+};
+use crate::api::generated::ak::wwise::core::profiler::{
+    CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse,
+};
+use crate::api::generated::ak::wwise::core::profiler::{
+    CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse,
 };
 use crate::api::generated::ak::wwise::core::profiler::{
     CoreProfilerStateChangedOptions, CoreProfilerStateChangedPayload,
@@ -202,12 +216,17 @@ use crate::api::generated::ak::wwise::core::transport::{
 };
 use crate::api::generated::ak::wwise::core::undo::CoreUndoCancelGroupArgs;
 use crate::api::generated::ak::wwise::core::undo::CoreUndoEndGroupArgs;
+use crate::api::generated::ak::wwise::core::workUnit::CoreWorkUnitLoadArgs;
+use crate::api::generated::ak::wwise::core::workUnit::CoreWorkUnitUnloadArgs;
 use crate::api::generated::ak::wwise::debug::DebugAssertFailedPayload;
+use crate::api::generated::ak::wwise::ui::UiGetSelectedFilesResponse;
 use crate::api::generated::ak::wwise::ui::commands::UiCommandsExecuteArgs;
 use crate::api::generated::ak::wwise::ui::commands::UiCommandsGetCommandsResponse;
 use crate::api::generated::ak::wwise::ui::commands::{
     UiCommandsExecutedOptions, UiCommandsExecutedPayload,
 };
+use crate::api::generated::ak::wwise::ui::layout::UiLayoutCloseViewArgs;
+use crate::api::generated::ak::wwise::ui::layout::UiLayoutResetLayoutsArgs;
 use crate::api::generated::ak::wwise::ui::project::UiProjectOpenArgs;
 use crate::api::generated::ak::wwise::ui::project::{UiProjectCloseArgs, UiProjectCloseResponse};
 use crate::api::generated::ak::wwise::ui::signal::{UiSignalClickOptions, UiSignalClickPayload};
@@ -606,6 +625,12 @@ impl<'a> WwiseCoreClient<'a> {
         }
     }
 
+    pub fn media_pool(self) -> WwiseCoreMediaPoolClient<'a> {
+        WwiseCoreMediaPoolClient {
+            client: self.client,
+        }
+    }
+
     pub fn object(self) -> WwiseCoreObjectClient<'a> {
         WwiseCoreObjectClient {
             client: self.client,
@@ -650,6 +675,12 @@ impl<'a> WwiseCoreClient<'a> {
 
     pub fn undo(self) -> WwiseCoreUndoClient<'a> {
         WwiseCoreUndoClient {
+            client: self.client,
+        }
+    }
+
+    pub fn work_unit(self) -> WwiseCoreWorkUnitClient<'a> {
+        WwiseCoreWorkUnitClient {
             client: self.client,
         }
     }
@@ -702,6 +733,12 @@ impl<'a> WwiseUiClient<'a> {
         }
     }
 
+    pub fn layout(self) -> WwiseUiLayoutClient<'a> {
+        WwiseUiLayoutClient {
+            client: self.client,
+        }
+    }
+
     pub fn project(self) -> WwiseUiProjectClient<'a> {
         WwiseUiProjectClient {
             client: self.client,
@@ -734,6 +771,13 @@ impl<'a> WwiseUiClient<'a> {
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_ui_bringToForeground, None, None)
             .await?;
         Ok(())
+    }
+
+    /// `ak.wwise.ui.getSelectedFiles`.
+    pub async fn get_selected_files(&mut self) -> WaapiResult<UiGetSelectedFilesResponse> {
+        self.client
+            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_getSelectedFiles, None, None)
+            .await
     }
 
     /// Subscribe to `ak.wwise.ui.selectionChanged`.
@@ -942,6 +986,34 @@ impl<'a> WwiseCoreLogClient<'a> {
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreLogItemAddedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_log_itemAdded, None)
+            .await
+    }
+}
+
+pub struct WwiseCoreMediaPoolClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseCoreMediaPoolClient<'a> {
+    /// `ak.wwise.core.mediaPool.get`.
+    pub async fn get(
+        &mut self,
+        args: CoreMediaPoolGetArgs,
+        options: CoreMediaPoolGetOptions,
+    ) -> WaapiResult<CoreMediaPoolGetResponse> {
+        self.client
+            .call_typed(
+                WaapiFunction::ak_wwise_core_mediaPool_get,
+                Some(args),
+                Some(options),
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.mediaPool.getFields`.
+    pub async fn get_fields(&mut self) -> WaapiResult<CoreMediaPoolGetFieldsResponse> {
+        self.client
+            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_mediaPool_getFields, None, None)
             .await
     }
 }
@@ -1368,6 +1440,16 @@ impl<'a> WwiseCoreObjectClient<'a> {
             )
             .await
     }
+
+    /// Subscribe to `ak.wwise.core.object.structureChanged`.
+    pub async fn subscribe_structure_changed(
+        &mut self,
+        options: Option<CoreObjectStructureChangedOptions>,
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectStructureChangedPayload>)> {
+        self.client
+            .subscribe_payload(WaapiTopic::ak_wwise_core_object_structureChanged, options)
+            .await
+    }
 }
 
 pub struct WwiseCoreProfilerClient<'a> {
@@ -1379,6 +1461,34 @@ impl<'a> WwiseCoreProfilerClient<'a> {
         WwiseCoreProfilerCaptureLogClient {
             client: self.client,
         }
+    }
+
+    /// `ak.wwise.core.profiler.moveCursor`.
+    pub async fn move_cursor(
+        &mut self,
+        args: CoreProfilerMoveCursorArgs,
+    ) -> WaapiResult<CoreProfilerMoveCursorResponse> {
+        self.client
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_profiler_moveCursor,
+                Some(args),
+                None,
+            )
+            .await
+    }
+
+    /// `ak.wwise.core.profiler.setCursorTime`.
+    pub async fn set_cursor_time(
+        &mut self,
+        args: CoreProfilerSetCursorTimeArgs,
+    ) -> WaapiResult<CoreProfilerSetCursorTimeResponse> {
+        self.client
+            .call_typed::<_, (), _>(
+                WaapiFunction::ak_wwise_core_profiler_setCursorTime,
+                Some(args),
+                None,
+            )
+            .await
     }
 
     /// Subscribe to `ak.wwise.core.profiler.gameObjectRegistered`.
@@ -1844,6 +1954,32 @@ impl<'a> WwiseCoreUndoClient<'a> {
     }
 }
 
+pub struct WwiseCoreWorkUnitClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseCoreWorkUnitClient<'a> {
+    /// `ak.wwise.core.workUnit.load`.
+    pub async fn load(&mut self, args: CoreWorkUnitLoadArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_workUnit_load, Some(args), None)
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.core.workUnit.unload`.
+    pub async fn unload(&mut self, args: CoreWorkUnitUnloadArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_workUnit_unload,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+}
+
 pub struct WwiseUiCommandsClient<'a> {
     client: &'a mut WaapiClient,
 }
@@ -1876,6 +2012,36 @@ impl<'a> WwiseUiCommandsClient<'a> {
         self.client
             .subscribe_payload(WaapiTopic::ak_wwise_ui_commands_executed, options)
             .await
+    }
+}
+
+pub struct WwiseUiLayoutClient<'a> {
+    client: &'a mut WaapiClient,
+}
+
+impl<'a> WwiseUiLayoutClient<'a> {
+    /// `ak.wwise.ui.layout.closeView`.
+    pub async fn close_view(&mut self, args: UiLayoutCloseViewArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_ui_layout_closeView,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
+    /// `ak.wwise.ui.layout.resetLayouts`.
+    pub async fn reset_layouts(&mut self, args: UiLayoutResetLayoutsArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_ui_layout_resetLayouts,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
     }
 }
 
@@ -1931,6 +2097,18 @@ pub struct WwiseCoreProfilerCaptureLogClient<'a> {
 }
 
 impl<'a> WwiseCoreProfilerCaptureLogClient<'a> {
+    /// `ak.wwise.core.profiler.captureLog.save`.
+    pub async fn save(&mut self, args: CoreProfilerCaptureLogSaveArgs) -> WaapiResult<()> {
+        self.client
+            .call_typed_void::<_, ()>(
+                WaapiFunction::ak_wwise_core_profiler_captureLog_save,
+                Some(args),
+                None,
+            )
+            .await?;
+        Ok(())
+    }
+
     /// Subscribe to `ak.wwise.core.profiler.captureLog.itemAdded`.
     pub async fn subscribe_item_added(
         &mut self,

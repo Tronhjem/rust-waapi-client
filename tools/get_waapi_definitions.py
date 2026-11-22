@@ -29,20 +29,51 @@ DEFINITION_FILES = [
     ("Data/Schemas/Definitions/common_definitions.json", "common_definitions.json"),
     ("Data/Schemas/Definitions/waapi_definitions.json", "waapi_definitions.json"),
     ("Data/Schemas/Definitions/waapi_ui_definitions.json", "waapi_ui_definitions.json"),
+    ("Data/Schemas/Definitions/wafm_definitions.json", "wafm_definitions.json"),
     ("Data/WObjects/WObjects.xml", "WObjects.xml"),
 ]
 
 
-def normalize_version(info):
-    """Return a filesystem-safe version string like '2024.1.7'."""
+def parse_version(info):
+    """Return (short, full) version strings like ('2024.1.7', '2024.1.7.8863')."""
     version = info.get("version", {})
     name = version.get("displayName") or version.get("name") or "unknown"
     match = re.search(r"(\d+(?:\.\d+){1,3})", name)
     if match:
-        parts = match.group(1).split(".")
-        return ".".join(parts[:3])
+        full = match.group(1)
+        short = ".".join(full.split(".")[:3])
+        return short, full
     safe = re.sub(r"[^\w.\-]", "_", name)
-    return safe or "unknown"
+    return safe, safe
+
+
+def _version_sort_key(text):
+    return tuple(int(p) for p in re.findall(r"\d+", text))
+
+
+def resolve_authoring_dir(authoring, version_full):
+    """Resolve the Wwise Authoring directory, handling Windows-style paths.
+
+    When Wwise runs under CrossOver/Wine on macOS, getInfo returns a Windows
+    path (e.g. 'c:\\Program Files\\Audiokinetic\\Wwise 2025.1.12.9287\\Authoring\\')
+    that does not exist on disk. Fall back to the Audiokinetic app-support
+    symlink under ~/Library/Application Support/Audiokinetic.
+    """
+    if authoring and os.path.isdir(authoring):
+        return authoring
+
+    major = version_full.split(".")[0] if version_full else ""
+    audiokinetic = os.path.expanduser("~/Library/Application Support/Audiokinetic")
+    if os.path.isdir(audiokinetic):
+        for entry in sorted(os.listdir(audiokinetic), key=_version_sort_key, reverse=True):
+            if not entry.startswith("Wwise"):
+                continue
+            if major and major not in entry:
+                continue
+            candidate = os.path.join(audiokinetic, entry, "Authoring")
+            if os.path.isdir(candidate):
+                return candidate
+    return authoring
 
 
 def save_json(path, data):
@@ -88,7 +119,7 @@ def main():
     try:
         with WaapiClient() as client:
             info = client.call("ak.wwise.core.getInfo")
-            version = normalize_version(info)
+            version, version_full = parse_version(info)
             version_dir = os.path.join(OUTPUT_DIR, version)
 
             functions = client.call("ak.wwise.waapi.getFunctions").get("functions", [])
@@ -105,7 +136,8 @@ def main():
                 print("  WARNING: directories.authoring not returned by getInfo; skipping definitions copy")
                 definition_count = 0
             else:
-                definition_count = copy_definitions(authoring_dir, version_dir)
+                resolved_dir = resolve_authoring_dir(authoring_dir, version_full)
+                definition_count = copy_definitions(resolved_dir, version_dir)
 
             print(f"\nDone. {schema_count} schemas and {definition_count} definition files saved to '{version_dir}/'")
             return 0

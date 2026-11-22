@@ -41,12 +41,12 @@ impl CoreObjectGetPropertyInfoArgs {
 /// Response from `ak.wwise.core.object.getPropertyInfo`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectGetPropertyInfoResponse {
-    /// The type of the property. For more information, refer to the property list of Wwise Objects found in .
-    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
-    pub object_type: Option<String>,
     /// The name of the property.
     #[serde(default)]
     pub name: Option<String>,
+    /// The type of the property. For more information, refer to the property list of Wwise Objects found in .
+    #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
+    pub object_type: Option<String>,
     /// The default value of the property.
     #[serde(default)]
     pub default: Option<serde_json::Value>,

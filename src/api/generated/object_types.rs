@@ -3,388 +3,420 @@
 
 /// Typed identifier for a Wwise object type (`\ref wobjects_index`).
 ///
-/// Derived from `<WwiseObject>` definitions in `WObjects.xml`.
+/// Derived from the union of `<WwiseObject>` definitions in `WObjects.xml`
+/// across all supported Wwise versions.
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ObjectType {
-    /// `AcousticTexture` (class ID `4718608`).
-    AcousticTexture,
-    /// `Action` (class ID `327696`).
-    Action,
-    /// `ActionException` (class ID `4980752`).
-    ActionException,
-    /// `ActorMixer` (class ID `524304`).
-    ActorMixer,
-    /// `Attenuation` (class ID `2686992`).
-    Attenuation,
-    /// `AudioDevice` (class ID `4653072`).
-    AudioDevice,
     /// `AudioFileSource` (class ID `16`).
     AudioFileSource,
-    /// `AuxBus` (class ID `3997712`).
-    AuxBus,
-    /// `BlendContainer` (class ID `1900560`).
-    BlendContainer,
-    /// `BlendTrack` (class ID `1966096`).
-    BlendTrack,
-    /// `Bus` (class ID `1376272`).
-    Bus,
-    /// `ControlSurfaceBinding` (class ID `4390928`).
-    ControlSurfaceBinding,
-    /// `ControlSurfaceBindingGroup` (class ID `4456464`).
-    ControlSurfaceBindingGroup,
-    /// `ControlSurfaceSession` (class ID `4325392`).
-    ControlSurfaceSession,
-    /// `Conversion` (class ID `3604496`).
-    Conversion,
-    /// `Curve` (class ID `917520`).
-    Curve,
-    /// `CustomState` (class ID `5177360`).
-    CustomState,
-    /// `DialogueEvent` (class ID `3014672`).
-    DialogueEvent,
-    /// `Effect` (class ID `1114128`).
-    Effect,
-    /// `EffectSlot` (class ID `5505040`).
-    EffectSlot,
-    /// `Event` (class ID `262160`).
-    Event,
-    /// `ExternalSource` (class ID `3735568`).
-    ExternalSource,
-    /// `ExternalSourceFile` (class ID `3670032`).
-    ExternalSourceFile,
-    /// `Folder` (class ID `131088`).
-    Folder,
-    /// `GameParameter` (class ID `1507344`).
-    GameParameter,
-    /// `Language` (class ID `4915216`).
-    Language,
-    /// `Marker` (class ID `5373968`).
-    Marker,
-    /// `Metadata` (class ID `5308432`).
-    Metadata,
-    /// `MidiFileSource` (class ID `5242896`).
-    MidiFileSource,
-    /// `MidiParameter` (class ID `4128784`).
-    MidiParameter,
-    /// `MixingSession` (class ID `3473424`).
-    MixingSession,
-    /// `Modifier` (class ID `983056`).
-    Modifier,
-    /// `ModulatorEnvelope` (class ID `4259856`).
-    ModulatorEnvelope,
-    /// `ModulatorLfo` (class ID `4194320`).
-    ModulatorLfo,
-    /// `ModulatorTime` (class ID `5111824`).
-    ModulatorTime,
-    /// `MultiSwitchEntry` (class ID `5439504`).
-    MultiSwitchEntry,
-    /// `MusicClip` (class ID `3932176`).
-    MusicClip,
-    /// `MusicClipMidi` (class ID `4063248`).
-    MusicClipMidi,
-    /// `MusicCue` (class ID `3866640`).
-    MusicCue,
-    /// `MusicEventCue` (class ID `5046288`).
-    MusicEventCue,
-    /// `MusicFade` (class ID `2555920`).
-    MusicFade,
-    /// `MusicPlaylistContainer` (class ID `2228240`).
-    MusicPlaylistContainer,
-    /// `MusicPlaylistItem` (class ID `2359312`).
-    MusicPlaylistItem,
-    /// `MusicSegment` (class ID `1769488`).
-    MusicSegment,
-    /// `MusicStinger` (class ID `2490384`).
-    MusicStinger,
-    /// `MusicSwitchContainer` (class ID `2293776`).
-    MusicSwitchContainer,
-    /// `MusicTrack` (class ID `1835024`).
-    MusicTrack,
-    /// `MusicTrackSequence` (class ID `3801104`).
-    MusicTrackSequence,
-    /// `MusicTransition` (class ID `2424848`).
-    MusicTransition,
-    /// `ObjectSettingAssoc` (class ID `1572880`).
-    ObjectSettingAssoc,
-    /// `Panner` (class ID `2752528`).
-    Panner,
-    /// `Path2D` (class ID `720912`).
-    Path2D,
-    /// `Platform` (class ID `4522000`).
-    Platform,
-    /// `PluginDataSource` (class ID `3538960`).
-    PluginDataSource,
-    /// `Position` (class ID `786448`).
-    Position,
-    /// `Project` (class ID `196624`).
-    Project,
-    /// `Query` (class ID `2097168`).
-    Query,
-    /// `RTPC` (class ID `1441808`).
-    RTPC,
-    /// `RandomSequenceContainer` (class ID `589840`).
-    RandomSequenceContainer,
-    /// `SearchCriteria` (class ID `2162704`).
-    SearchCriteria,
     /// `Sound` (class ID `65552`).
     Sound,
-    /// `SoundBank` (class ID `1179664`).
-    SoundBank,
-    /// `SoundcasterSession` (class ID `1703952`).
-    SoundcasterSession,
-    /// `SourcePlugin` (class ID `1048592`).
-    SourcePlugin,
+    /// `Folder` (class ID `131088`).
+    Folder,
+    /// `Project` (class ID `196624`).
+    Project,
+    /// `Event` (class ID `262160`).
+    Event,
+    /// `Action` (class ID `327696`).
+    Action,
     /// `State` (class ID `393232`).
     State,
     /// `StateGroup` (class ID `458768`).
     StateGroup,
-    /// `Switch` (class ID `1310736`).
-    Switch,
+    /// `ActorMixer` (class ID `524304`). Wwise 2024 name; renamed to `PropertyContainer` in Wwise 2025.
+    ActorMixer,
+    /// `PropertyContainer` (class ID `524304`).
+    PropertyContainer,
+    /// `RandomSequenceContainer` (class ID `589840`).
+    RandomSequenceContainer,
     /// `SwitchContainer` (class ID `655376`).
     SwitchContainer,
+    /// `Path2D` (class ID `720912`).
+    Path2D,
+    /// `Position` (class ID `786448`).
+    Position,
+    /// `Curve` (class ID `917520`).
+    Curve,
+    /// `Modifier` (class ID `983056`).
+    Modifier,
+    /// `SourcePlugin` (class ID `1048592`).
+    SourcePlugin,
+    /// `Effect` (class ID `1114128`).
+    Effect,
+    /// `SoundBank` (class ID `1179664`).
+    SoundBank,
     /// `SwitchGroup` (class ID `1245200`).
     SwitchGroup,
-    /// `Trigger` (class ID `2621456`).
-    Trigger,
-    /// `UserProjectSettings` (class ID `3342352`).
-    UserProjectSettings,
+    /// `Switch` (class ID `1310736`).
+    Switch,
+    /// `Bus` (class ID `1376272`).
+    Bus,
+    /// `RTPC` (class ID `1441808`).
+    RTPC,
+    /// `GameParameter` (class ID `1507344`).
+    GameParameter,
+    /// `ObjectSettingAssoc` (class ID `1572880`).
+    ObjectSettingAssoc,
     /// `WorkUnit` (class ID `1638416`).
     WorkUnit,
+    /// `SoundcasterSession` (class ID `1703952`).
+    SoundcasterSession,
+    /// `MusicSegment` (class ID `1769488`).
+    MusicSegment,
+    /// `MusicTrack` (class ID `1835024`).
+    MusicTrack,
+    /// `BlendContainer` (class ID `1900560`).
+    BlendContainer,
+    /// `BlendTrack` (class ID `1966096`).
+    BlendTrack,
+    /// `Query` (class ID `2097168`).
+    Query,
+    /// `SearchCriteria` (class ID `2162704`).
+    SearchCriteria,
+    /// `MusicPlaylistContainer` (class ID `2228240`).
+    MusicPlaylistContainer,
+    /// `MusicSwitchContainer` (class ID `2293776`).
+    MusicSwitchContainer,
+    /// `MusicPlaylistItem` (class ID `2359312`).
+    MusicPlaylistItem,
+    /// `MusicTransition` (class ID `2424848`).
+    MusicTransition,
+    /// `MusicStinger` (class ID `2490384`).
+    MusicStinger,
+    /// `MusicFade` (class ID `2555920`).
+    MusicFade,
+    /// `Trigger` (class ID `2621456`).
+    Trigger,
+    /// `Attenuation` (class ID `2686992`).
+    Attenuation,
+    /// `Panner` (class ID `2752528`).
+    Panner,
+    /// `DialogueEvent` (class ID `3014672`).
+    DialogueEvent,
+    /// `UserProjectSettings` (class ID `3342352`).
+    UserProjectSettings,
+    /// `MixingSession` (class ID `3473424`).
+    MixingSession,
+    /// `PluginDataSource` (class ID `3538960`).
+    PluginDataSource,
+    /// `Conversion` (class ID `3604496`).
+    Conversion,
+    /// `ExternalSourceFile` (class ID `3670032`).
+    ExternalSourceFile,
+    /// `ExternalSource` (class ID `3735568`).
+    ExternalSource,
+    /// `MusicTrackSequence` (class ID `3801104`).
+    MusicTrackSequence,
+    /// `MusicCue` (class ID `3866640`).
+    MusicCue,
+    /// `MusicClip` (class ID `3932176`).
+    MusicClip,
+    /// `AuxBus` (class ID `3997712`).
+    AuxBus,
+    /// `MusicClipMidi` (class ID `4063248`).
+    MusicClipMidi,
+    /// `MidiParameter` (class ID `4128784`).
+    MidiParameter,
+    /// `ModulatorLfo` (class ID `4194320`).
+    ModulatorLfo,
+    /// `ModulatorEnvelope` (class ID `4259856`).
+    ModulatorEnvelope,
+    /// `ControlSurfaceSession` (class ID `4325392`).
+    ControlSurfaceSession,
+    /// `ControlSurfaceBinding` (class ID `4390928`).
+    ControlSurfaceBinding,
+    /// `ControlSurfaceBindingGroup` (class ID `4456464`).
+    ControlSurfaceBindingGroup,
+    /// `Platform` (class ID `4522000`).
+    Platform,
+    /// `AudioDevice` (class ID `4653072`).
+    AudioDevice,
+    /// `AcousticTexture` (class ID `4718608`).
+    AcousticTexture,
+    /// `Language` (class ID `4915216`).
+    Language,
+    /// `ActionException` (class ID `4980752`).
+    ActionException,
+    /// `MusicEventCue` (class ID `5046288`).
+    MusicEventCue,
+    /// `ModulatorTime` (class ID `5111824`).
+    ModulatorTime,
+    /// `CustomState` (class ID `5177360`).
+    CustomState,
+    /// `MidiFileSource` (class ID `5242896`).
+    MidiFileSource,
+    /// `Metadata` (class ID `5308432`).
+    Metadata,
+    /// `Marker` (class ID `5373968`).
+    Marker,
+    /// `MultiSwitchEntry` (class ID `5439504`).
+    MultiSwitchEntry,
+    /// `EffectSlot` (class ID `5505040`).
+    EffectSlot,
+    /// `StateGroupInfo` (class ID `5570576`).
+    StateGroupInfo,
+    /// `SidechainMix` (class ID `5636112`).
+    SidechainMix,
+    /// `MediaPoolQuery` (class ID `5701648`).
+    MediaPoolQuery,
+    /// `MediaPoolFilter` (class ID `5767184`).
+    MediaPoolFilter,
+    /// `MediaPoolDatabase` (class ID `5832720`).
+    MediaPoolDatabase,
 }
 
 impl ObjectType {
-    /// Returns the Wwise object type name (e.g. `"Sound"`, `"ActorMixer"`).
+    /// Returns the Wwise object type name (e.g. `"Sound"`, `"PropertyContainer"`).
     pub const fn as_str(self) -> &'static str {
         match self {
-            Self::AcousticTexture => "AcousticTexture",
-            Self::Action => "Action",
-            Self::ActionException => "ActionException",
-            Self::ActorMixer => "ActorMixer",
-            Self::Attenuation => "Attenuation",
-            Self::AudioDevice => "AudioDevice",
             Self::AudioFileSource => "AudioFileSource",
-            Self::AuxBus => "AuxBus",
-            Self::BlendContainer => "BlendContainer",
-            Self::BlendTrack => "BlendTrack",
-            Self::Bus => "Bus",
-            Self::ControlSurfaceBinding => "ControlSurfaceBinding",
-            Self::ControlSurfaceBindingGroup => "ControlSurfaceBindingGroup",
-            Self::ControlSurfaceSession => "ControlSurfaceSession",
-            Self::Conversion => "Conversion",
-            Self::Curve => "Curve",
-            Self::CustomState => "CustomState",
-            Self::DialogueEvent => "DialogueEvent",
-            Self::Effect => "Effect",
-            Self::EffectSlot => "EffectSlot",
-            Self::Event => "Event",
-            Self::ExternalSource => "ExternalSource",
-            Self::ExternalSourceFile => "ExternalSourceFile",
-            Self::Folder => "Folder",
-            Self::GameParameter => "GameParameter",
-            Self::Language => "Language",
-            Self::Marker => "Marker",
-            Self::Metadata => "Metadata",
-            Self::MidiFileSource => "MidiFileSource",
-            Self::MidiParameter => "MidiParameter",
-            Self::MixingSession => "MixingSession",
-            Self::Modifier => "Modifier",
-            Self::ModulatorEnvelope => "ModulatorEnvelope",
-            Self::ModulatorLfo => "ModulatorLfo",
-            Self::ModulatorTime => "ModulatorTime",
-            Self::MultiSwitchEntry => "MultiSwitchEntry",
-            Self::MusicClip => "MusicClip",
-            Self::MusicClipMidi => "MusicClipMidi",
-            Self::MusicCue => "MusicCue",
-            Self::MusicEventCue => "MusicEventCue",
-            Self::MusicFade => "MusicFade",
-            Self::MusicPlaylistContainer => "MusicPlaylistContainer",
-            Self::MusicPlaylistItem => "MusicPlaylistItem",
-            Self::MusicSegment => "MusicSegment",
-            Self::MusicStinger => "MusicStinger",
-            Self::MusicSwitchContainer => "MusicSwitchContainer",
-            Self::MusicTrack => "MusicTrack",
-            Self::MusicTrackSequence => "MusicTrackSequence",
-            Self::MusicTransition => "MusicTransition",
-            Self::ObjectSettingAssoc => "ObjectSettingAssoc",
-            Self::Panner => "Panner",
-            Self::Path2D => "Path2D",
-            Self::Platform => "Platform",
-            Self::PluginDataSource => "PluginDataSource",
-            Self::Position => "Position",
-            Self::Project => "Project",
-            Self::Query => "Query",
-            Self::RTPC => "RTPC",
-            Self::RandomSequenceContainer => "RandomSequenceContainer",
-            Self::SearchCriteria => "SearchCriteria",
             Self::Sound => "Sound",
-            Self::SoundBank => "SoundBank",
-            Self::SoundcasterSession => "SoundcasterSession",
-            Self::SourcePlugin => "SourcePlugin",
+            Self::Folder => "Folder",
+            Self::Project => "Project",
+            Self::Event => "Event",
+            Self::Action => "Action",
             Self::State => "State",
             Self::StateGroup => "StateGroup",
-            Self::Switch => "Switch",
+            Self::ActorMixer => "ActorMixer",
+            Self::PropertyContainer => "PropertyContainer",
+            Self::RandomSequenceContainer => "RandomSequenceContainer",
             Self::SwitchContainer => "SwitchContainer",
+            Self::Path2D => "Path2D",
+            Self::Position => "Position",
+            Self::Curve => "Curve",
+            Self::Modifier => "Modifier",
+            Self::SourcePlugin => "SourcePlugin",
+            Self::Effect => "Effect",
+            Self::SoundBank => "SoundBank",
             Self::SwitchGroup => "SwitchGroup",
-            Self::Trigger => "Trigger",
-            Self::UserProjectSettings => "UserProjectSettings",
+            Self::Switch => "Switch",
+            Self::Bus => "Bus",
+            Self::RTPC => "RTPC",
+            Self::GameParameter => "GameParameter",
+            Self::ObjectSettingAssoc => "ObjectSettingAssoc",
             Self::WorkUnit => "WorkUnit",
+            Self::SoundcasterSession => "SoundcasterSession",
+            Self::MusicSegment => "MusicSegment",
+            Self::MusicTrack => "MusicTrack",
+            Self::BlendContainer => "BlendContainer",
+            Self::BlendTrack => "BlendTrack",
+            Self::Query => "Query",
+            Self::SearchCriteria => "SearchCriteria",
+            Self::MusicPlaylistContainer => "MusicPlaylistContainer",
+            Self::MusicSwitchContainer => "MusicSwitchContainer",
+            Self::MusicPlaylistItem => "MusicPlaylistItem",
+            Self::MusicTransition => "MusicTransition",
+            Self::MusicStinger => "MusicStinger",
+            Self::MusicFade => "MusicFade",
+            Self::Trigger => "Trigger",
+            Self::Attenuation => "Attenuation",
+            Self::Panner => "Panner",
+            Self::DialogueEvent => "DialogueEvent",
+            Self::UserProjectSettings => "UserProjectSettings",
+            Self::MixingSession => "MixingSession",
+            Self::PluginDataSource => "PluginDataSource",
+            Self::Conversion => "Conversion",
+            Self::ExternalSourceFile => "ExternalSourceFile",
+            Self::ExternalSource => "ExternalSource",
+            Self::MusicTrackSequence => "MusicTrackSequence",
+            Self::MusicCue => "MusicCue",
+            Self::MusicClip => "MusicClip",
+            Self::AuxBus => "AuxBus",
+            Self::MusicClipMidi => "MusicClipMidi",
+            Self::MidiParameter => "MidiParameter",
+            Self::ModulatorLfo => "ModulatorLfo",
+            Self::ModulatorEnvelope => "ModulatorEnvelope",
+            Self::ControlSurfaceSession => "ControlSurfaceSession",
+            Self::ControlSurfaceBinding => "ControlSurfaceBinding",
+            Self::ControlSurfaceBindingGroup => "ControlSurfaceBindingGroup",
+            Self::Platform => "Platform",
+            Self::AudioDevice => "AudioDevice",
+            Self::AcousticTexture => "AcousticTexture",
+            Self::Language => "Language",
+            Self::ActionException => "ActionException",
+            Self::MusicEventCue => "MusicEventCue",
+            Self::ModulatorTime => "ModulatorTime",
+            Self::CustomState => "CustomState",
+            Self::MidiFileSource => "MidiFileSource",
+            Self::Metadata => "Metadata",
+            Self::Marker => "Marker",
+            Self::MultiSwitchEntry => "MultiSwitchEntry",
+            Self::EffectSlot => "EffectSlot",
+            Self::StateGroupInfo => "StateGroupInfo",
+            Self::SidechainMix => "SidechainMix",
+            Self::MediaPoolQuery => "MediaPoolQuery",
+            Self::MediaPoolFilter => "MediaPoolFilter",
+            Self::MediaPoolDatabase => "MediaPoolDatabase",
         }
     }
 
     /// Returns the numeric Wwise class ID for this object type.
     pub const fn class_id(self) -> u32 {
         match self {
-            Self::AcousticTexture => 4718608,
-            Self::Action => 327696,
-            Self::ActionException => 4980752,
-            Self::ActorMixer => 524304,
-            Self::Attenuation => 2686992,
-            Self::AudioDevice => 4653072,
             Self::AudioFileSource => 16,
-            Self::AuxBus => 3997712,
-            Self::BlendContainer => 1900560,
-            Self::BlendTrack => 1966096,
-            Self::Bus => 1376272,
-            Self::ControlSurfaceBinding => 4390928,
-            Self::ControlSurfaceBindingGroup => 4456464,
-            Self::ControlSurfaceSession => 4325392,
-            Self::Conversion => 3604496,
-            Self::Curve => 917520,
-            Self::CustomState => 5177360,
-            Self::DialogueEvent => 3014672,
-            Self::Effect => 1114128,
-            Self::EffectSlot => 5505040,
-            Self::Event => 262160,
-            Self::ExternalSource => 3735568,
-            Self::ExternalSourceFile => 3670032,
-            Self::Folder => 131088,
-            Self::GameParameter => 1507344,
-            Self::Language => 4915216,
-            Self::Marker => 5373968,
-            Self::Metadata => 5308432,
-            Self::MidiFileSource => 5242896,
-            Self::MidiParameter => 4128784,
-            Self::MixingSession => 3473424,
-            Self::Modifier => 983056,
-            Self::ModulatorEnvelope => 4259856,
-            Self::ModulatorLfo => 4194320,
-            Self::ModulatorTime => 5111824,
-            Self::MultiSwitchEntry => 5439504,
-            Self::MusicClip => 3932176,
-            Self::MusicClipMidi => 4063248,
-            Self::MusicCue => 3866640,
-            Self::MusicEventCue => 5046288,
-            Self::MusicFade => 2555920,
-            Self::MusicPlaylistContainer => 2228240,
-            Self::MusicPlaylistItem => 2359312,
-            Self::MusicSegment => 1769488,
-            Self::MusicStinger => 2490384,
-            Self::MusicSwitchContainer => 2293776,
-            Self::MusicTrack => 1835024,
-            Self::MusicTrackSequence => 3801104,
-            Self::MusicTransition => 2424848,
-            Self::ObjectSettingAssoc => 1572880,
-            Self::Panner => 2752528,
-            Self::Path2D => 720912,
-            Self::Platform => 4522000,
-            Self::PluginDataSource => 3538960,
-            Self::Position => 786448,
-            Self::Project => 196624,
-            Self::Query => 2097168,
-            Self::RTPC => 1441808,
-            Self::RandomSequenceContainer => 589840,
-            Self::SearchCriteria => 2162704,
             Self::Sound => 65552,
-            Self::SoundBank => 1179664,
-            Self::SoundcasterSession => 1703952,
-            Self::SourcePlugin => 1048592,
+            Self::Folder => 131088,
+            Self::Project => 196624,
+            Self::Event => 262160,
+            Self::Action => 327696,
             Self::State => 393232,
             Self::StateGroup => 458768,
-            Self::Switch => 1310736,
+            Self::ActorMixer => 524304,
+            Self::PropertyContainer => 524304,
+            Self::RandomSequenceContainer => 589840,
             Self::SwitchContainer => 655376,
+            Self::Path2D => 720912,
+            Self::Position => 786448,
+            Self::Curve => 917520,
+            Self::Modifier => 983056,
+            Self::SourcePlugin => 1048592,
+            Self::Effect => 1114128,
+            Self::SoundBank => 1179664,
             Self::SwitchGroup => 1245200,
-            Self::Trigger => 2621456,
-            Self::UserProjectSettings => 3342352,
+            Self::Switch => 1310736,
+            Self::Bus => 1376272,
+            Self::RTPC => 1441808,
+            Self::GameParameter => 1507344,
+            Self::ObjectSettingAssoc => 1572880,
             Self::WorkUnit => 1638416,
+            Self::SoundcasterSession => 1703952,
+            Self::MusicSegment => 1769488,
+            Self::MusicTrack => 1835024,
+            Self::BlendContainer => 1900560,
+            Self::BlendTrack => 1966096,
+            Self::Query => 2097168,
+            Self::SearchCriteria => 2162704,
+            Self::MusicPlaylistContainer => 2228240,
+            Self::MusicSwitchContainer => 2293776,
+            Self::MusicPlaylistItem => 2359312,
+            Self::MusicTransition => 2424848,
+            Self::MusicStinger => 2490384,
+            Self::MusicFade => 2555920,
+            Self::Trigger => 2621456,
+            Self::Attenuation => 2686992,
+            Self::Panner => 2752528,
+            Self::DialogueEvent => 3014672,
+            Self::UserProjectSettings => 3342352,
+            Self::MixingSession => 3473424,
+            Self::PluginDataSource => 3538960,
+            Self::Conversion => 3604496,
+            Self::ExternalSourceFile => 3670032,
+            Self::ExternalSource => 3735568,
+            Self::MusicTrackSequence => 3801104,
+            Self::MusicCue => 3866640,
+            Self::MusicClip => 3932176,
+            Self::AuxBus => 3997712,
+            Self::MusicClipMidi => 4063248,
+            Self::MidiParameter => 4128784,
+            Self::ModulatorLfo => 4194320,
+            Self::ModulatorEnvelope => 4259856,
+            Self::ControlSurfaceSession => 4325392,
+            Self::ControlSurfaceBinding => 4390928,
+            Self::ControlSurfaceBindingGroup => 4456464,
+            Self::Platform => 4522000,
+            Self::AudioDevice => 4653072,
+            Self::AcousticTexture => 4718608,
+            Self::Language => 4915216,
+            Self::ActionException => 4980752,
+            Self::MusicEventCue => 5046288,
+            Self::ModulatorTime => 5111824,
+            Self::CustomState => 5177360,
+            Self::MidiFileSource => 5242896,
+            Self::Metadata => 5308432,
+            Self::Marker => 5373968,
+            Self::MultiSwitchEntry => 5439504,
+            Self::EffectSlot => 5505040,
+            Self::StateGroupInfo => 5570576,
+            Self::SidechainMix => 5636112,
+            Self::MediaPoolQuery => 5701648,
+            Self::MediaPoolFilter => 5767184,
+            Self::MediaPoolDatabase => 5832720,
         }
     }
 
     /// Looks up an [`ObjectType`] by its numeric Wwise class ID.
+    /// Renamed types (e.g. `ActorMixer`/`PropertyContainer`) resolve to the
+    /// canonical (latest Wwise) name.
     pub const fn from_class_id(class_id: u32) -> Option<Self> {
         match class_id {
-            4718608 => Some(Self::AcousticTexture),
-            327696 => Some(Self::Action),
-            4980752 => Some(Self::ActionException),
-            524304 => Some(Self::ActorMixer),
-            2686992 => Some(Self::Attenuation),
-            4653072 => Some(Self::AudioDevice),
             16 => Some(Self::AudioFileSource),
-            3997712 => Some(Self::AuxBus),
-            1900560 => Some(Self::BlendContainer),
-            1966096 => Some(Self::BlendTrack),
-            1376272 => Some(Self::Bus),
-            4390928 => Some(Self::ControlSurfaceBinding),
-            4456464 => Some(Self::ControlSurfaceBindingGroup),
-            4325392 => Some(Self::ControlSurfaceSession),
-            3604496 => Some(Self::Conversion),
-            917520 => Some(Self::Curve),
-            5177360 => Some(Self::CustomState),
-            3014672 => Some(Self::DialogueEvent),
-            1114128 => Some(Self::Effect),
-            5505040 => Some(Self::EffectSlot),
-            262160 => Some(Self::Event),
-            3735568 => Some(Self::ExternalSource),
-            3670032 => Some(Self::ExternalSourceFile),
-            131088 => Some(Self::Folder),
-            1507344 => Some(Self::GameParameter),
-            4915216 => Some(Self::Language),
-            5373968 => Some(Self::Marker),
-            5308432 => Some(Self::Metadata),
-            5242896 => Some(Self::MidiFileSource),
-            4128784 => Some(Self::MidiParameter),
-            3473424 => Some(Self::MixingSession),
-            983056 => Some(Self::Modifier),
-            4259856 => Some(Self::ModulatorEnvelope),
-            4194320 => Some(Self::ModulatorLfo),
-            5111824 => Some(Self::ModulatorTime),
-            5439504 => Some(Self::MultiSwitchEntry),
-            3932176 => Some(Self::MusicClip),
-            4063248 => Some(Self::MusicClipMidi),
-            3866640 => Some(Self::MusicCue),
-            5046288 => Some(Self::MusicEventCue),
-            2555920 => Some(Self::MusicFade),
-            2228240 => Some(Self::MusicPlaylistContainer),
-            2359312 => Some(Self::MusicPlaylistItem),
-            1769488 => Some(Self::MusicSegment),
-            2490384 => Some(Self::MusicStinger),
-            2293776 => Some(Self::MusicSwitchContainer),
-            1835024 => Some(Self::MusicTrack),
-            3801104 => Some(Self::MusicTrackSequence),
-            2424848 => Some(Self::MusicTransition),
-            1572880 => Some(Self::ObjectSettingAssoc),
-            2752528 => Some(Self::Panner),
-            720912 => Some(Self::Path2D),
-            4522000 => Some(Self::Platform),
-            3538960 => Some(Self::PluginDataSource),
-            786448 => Some(Self::Position),
-            196624 => Some(Self::Project),
-            2097168 => Some(Self::Query),
-            1441808 => Some(Self::RTPC),
-            589840 => Some(Self::RandomSequenceContainer),
-            2162704 => Some(Self::SearchCriteria),
             65552 => Some(Self::Sound),
-            1179664 => Some(Self::SoundBank),
-            1703952 => Some(Self::SoundcasterSession),
-            1048592 => Some(Self::SourcePlugin),
+            131088 => Some(Self::Folder),
+            196624 => Some(Self::Project),
+            262160 => Some(Self::Event),
+            327696 => Some(Self::Action),
             393232 => Some(Self::State),
             458768 => Some(Self::StateGroup),
-            1310736 => Some(Self::Switch),
+            524304 => Some(Self::PropertyContainer),
+            589840 => Some(Self::RandomSequenceContainer),
             655376 => Some(Self::SwitchContainer),
+            720912 => Some(Self::Path2D),
+            786448 => Some(Self::Position),
+            917520 => Some(Self::Curve),
+            983056 => Some(Self::Modifier),
+            1048592 => Some(Self::SourcePlugin),
+            1114128 => Some(Self::Effect),
+            1179664 => Some(Self::SoundBank),
             1245200 => Some(Self::SwitchGroup),
-            2621456 => Some(Self::Trigger),
-            3342352 => Some(Self::UserProjectSettings),
+            1310736 => Some(Self::Switch),
+            1376272 => Some(Self::Bus),
+            1441808 => Some(Self::RTPC),
+            1507344 => Some(Self::GameParameter),
+            1572880 => Some(Self::ObjectSettingAssoc),
             1638416 => Some(Self::WorkUnit),
+            1703952 => Some(Self::SoundcasterSession),
+            1769488 => Some(Self::MusicSegment),
+            1835024 => Some(Self::MusicTrack),
+            1900560 => Some(Self::BlendContainer),
+            1966096 => Some(Self::BlendTrack),
+            2097168 => Some(Self::Query),
+            2162704 => Some(Self::SearchCriteria),
+            2228240 => Some(Self::MusicPlaylistContainer),
+            2293776 => Some(Self::MusicSwitchContainer),
+            2359312 => Some(Self::MusicPlaylistItem),
+            2424848 => Some(Self::MusicTransition),
+            2490384 => Some(Self::MusicStinger),
+            2555920 => Some(Self::MusicFade),
+            2621456 => Some(Self::Trigger),
+            2686992 => Some(Self::Attenuation),
+            2752528 => Some(Self::Panner),
+            3014672 => Some(Self::DialogueEvent),
+            3342352 => Some(Self::UserProjectSettings),
+            3473424 => Some(Self::MixingSession),
+            3538960 => Some(Self::PluginDataSource),
+            3604496 => Some(Self::Conversion),
+            3670032 => Some(Self::ExternalSourceFile),
+            3735568 => Some(Self::ExternalSource),
+            3801104 => Some(Self::MusicTrackSequence),
+            3866640 => Some(Self::MusicCue),
+            3932176 => Some(Self::MusicClip),
+            3997712 => Some(Self::AuxBus),
+            4063248 => Some(Self::MusicClipMidi),
+            4128784 => Some(Self::MidiParameter),
+            4194320 => Some(Self::ModulatorLfo),
+            4259856 => Some(Self::ModulatorEnvelope),
+            4325392 => Some(Self::ControlSurfaceSession),
+            4390928 => Some(Self::ControlSurfaceBinding),
+            4456464 => Some(Self::ControlSurfaceBindingGroup),
+            4522000 => Some(Self::Platform),
+            4653072 => Some(Self::AudioDevice),
+            4718608 => Some(Self::AcousticTexture),
+            4915216 => Some(Self::Language),
+            4980752 => Some(Self::ActionException),
+            5046288 => Some(Self::MusicEventCue),
+            5111824 => Some(Self::ModulatorTime),
+            5177360 => Some(Self::CustomState),
+            5242896 => Some(Self::MidiFileSource),
+            5308432 => Some(Self::Metadata),
+            5373968 => Some(Self::Marker),
+            5439504 => Some(Self::MultiSwitchEntry),
+            5505040 => Some(Self::EffectSlot),
+            5570576 => Some(Self::StateGroupInfo),
+            5636112 => Some(Self::SidechainMix),
+            5701648 => Some(Self::MediaPoolQuery),
+            5767184 => Some(Self::MediaPoolFilter),
+            5832720 => Some(Self::MediaPoolDatabase),
             _ => None,
         }
     }
@@ -407,78 +439,84 @@ impl std::str::FromStr for ObjectType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "AcousticTexture" => Ok(Self::AcousticTexture),
-            "Action" => Ok(Self::Action),
-            "ActionException" => Ok(Self::ActionException),
-            "ActorMixer" => Ok(Self::ActorMixer),
-            "Attenuation" => Ok(Self::Attenuation),
-            "AudioDevice" => Ok(Self::AudioDevice),
             "AudioFileSource" => Ok(Self::AudioFileSource),
-            "AuxBus" => Ok(Self::AuxBus),
-            "BlendContainer" => Ok(Self::BlendContainer),
-            "BlendTrack" => Ok(Self::BlendTrack),
-            "Bus" => Ok(Self::Bus),
-            "ControlSurfaceBinding" => Ok(Self::ControlSurfaceBinding),
-            "ControlSurfaceBindingGroup" => Ok(Self::ControlSurfaceBindingGroup),
-            "ControlSurfaceSession" => Ok(Self::ControlSurfaceSession),
-            "Conversion" => Ok(Self::Conversion),
-            "Curve" => Ok(Self::Curve),
-            "CustomState" => Ok(Self::CustomState),
-            "DialogueEvent" => Ok(Self::DialogueEvent),
-            "Effect" => Ok(Self::Effect),
-            "EffectSlot" => Ok(Self::EffectSlot),
-            "Event" => Ok(Self::Event),
-            "ExternalSource" => Ok(Self::ExternalSource),
-            "ExternalSourceFile" => Ok(Self::ExternalSourceFile),
-            "Folder" => Ok(Self::Folder),
-            "GameParameter" => Ok(Self::GameParameter),
-            "Language" => Ok(Self::Language),
-            "Marker" => Ok(Self::Marker),
-            "Metadata" => Ok(Self::Metadata),
-            "MidiFileSource" => Ok(Self::MidiFileSource),
-            "MidiParameter" => Ok(Self::MidiParameter),
-            "MixingSession" => Ok(Self::MixingSession),
-            "Modifier" => Ok(Self::Modifier),
-            "ModulatorEnvelope" => Ok(Self::ModulatorEnvelope),
-            "ModulatorLfo" => Ok(Self::ModulatorLfo),
-            "ModulatorTime" => Ok(Self::ModulatorTime),
-            "MultiSwitchEntry" => Ok(Self::MultiSwitchEntry),
-            "MusicClip" => Ok(Self::MusicClip),
-            "MusicClipMidi" => Ok(Self::MusicClipMidi),
-            "MusicCue" => Ok(Self::MusicCue),
-            "MusicEventCue" => Ok(Self::MusicEventCue),
-            "MusicFade" => Ok(Self::MusicFade),
-            "MusicPlaylistContainer" => Ok(Self::MusicPlaylistContainer),
-            "MusicPlaylistItem" => Ok(Self::MusicPlaylistItem),
-            "MusicSegment" => Ok(Self::MusicSegment),
-            "MusicStinger" => Ok(Self::MusicStinger),
-            "MusicSwitchContainer" => Ok(Self::MusicSwitchContainer),
-            "MusicTrack" => Ok(Self::MusicTrack),
-            "MusicTrackSequence" => Ok(Self::MusicTrackSequence),
-            "MusicTransition" => Ok(Self::MusicTransition),
-            "ObjectSettingAssoc" => Ok(Self::ObjectSettingAssoc),
-            "Panner" => Ok(Self::Panner),
-            "Path2D" => Ok(Self::Path2D),
-            "Platform" => Ok(Self::Platform),
-            "PluginDataSource" => Ok(Self::PluginDataSource),
-            "Position" => Ok(Self::Position),
-            "Project" => Ok(Self::Project),
-            "Query" => Ok(Self::Query),
-            "RTPC" => Ok(Self::RTPC),
-            "RandomSequenceContainer" => Ok(Self::RandomSequenceContainer),
-            "SearchCriteria" => Ok(Self::SearchCriteria),
             "Sound" => Ok(Self::Sound),
-            "SoundBank" => Ok(Self::SoundBank),
-            "SoundcasterSession" => Ok(Self::SoundcasterSession),
-            "SourcePlugin" => Ok(Self::SourcePlugin),
+            "Folder" => Ok(Self::Folder),
+            "Project" => Ok(Self::Project),
+            "Event" => Ok(Self::Event),
+            "Action" => Ok(Self::Action),
             "State" => Ok(Self::State),
             "StateGroup" => Ok(Self::StateGroup),
-            "Switch" => Ok(Self::Switch),
+            "ActorMixer" => Ok(Self::ActorMixer),
+            "PropertyContainer" => Ok(Self::PropertyContainer),
+            "RandomSequenceContainer" => Ok(Self::RandomSequenceContainer),
             "SwitchContainer" => Ok(Self::SwitchContainer),
+            "Path2D" => Ok(Self::Path2D),
+            "Position" => Ok(Self::Position),
+            "Curve" => Ok(Self::Curve),
+            "Modifier" => Ok(Self::Modifier),
+            "SourcePlugin" => Ok(Self::SourcePlugin),
+            "Effect" => Ok(Self::Effect),
+            "SoundBank" => Ok(Self::SoundBank),
             "SwitchGroup" => Ok(Self::SwitchGroup),
-            "Trigger" => Ok(Self::Trigger),
-            "UserProjectSettings" => Ok(Self::UserProjectSettings),
+            "Switch" => Ok(Self::Switch),
+            "Bus" => Ok(Self::Bus),
+            "RTPC" => Ok(Self::RTPC),
+            "GameParameter" => Ok(Self::GameParameter),
+            "ObjectSettingAssoc" => Ok(Self::ObjectSettingAssoc),
             "WorkUnit" => Ok(Self::WorkUnit),
+            "SoundcasterSession" => Ok(Self::SoundcasterSession),
+            "MusicSegment" => Ok(Self::MusicSegment),
+            "MusicTrack" => Ok(Self::MusicTrack),
+            "BlendContainer" => Ok(Self::BlendContainer),
+            "BlendTrack" => Ok(Self::BlendTrack),
+            "Query" => Ok(Self::Query),
+            "SearchCriteria" => Ok(Self::SearchCriteria),
+            "MusicPlaylistContainer" => Ok(Self::MusicPlaylistContainer),
+            "MusicSwitchContainer" => Ok(Self::MusicSwitchContainer),
+            "MusicPlaylistItem" => Ok(Self::MusicPlaylistItem),
+            "MusicTransition" => Ok(Self::MusicTransition),
+            "MusicStinger" => Ok(Self::MusicStinger),
+            "MusicFade" => Ok(Self::MusicFade),
+            "Trigger" => Ok(Self::Trigger),
+            "Attenuation" => Ok(Self::Attenuation),
+            "Panner" => Ok(Self::Panner),
+            "DialogueEvent" => Ok(Self::DialogueEvent),
+            "UserProjectSettings" => Ok(Self::UserProjectSettings),
+            "MixingSession" => Ok(Self::MixingSession),
+            "PluginDataSource" => Ok(Self::PluginDataSource),
+            "Conversion" => Ok(Self::Conversion),
+            "ExternalSourceFile" => Ok(Self::ExternalSourceFile),
+            "ExternalSource" => Ok(Self::ExternalSource),
+            "MusicTrackSequence" => Ok(Self::MusicTrackSequence),
+            "MusicCue" => Ok(Self::MusicCue),
+            "MusicClip" => Ok(Self::MusicClip),
+            "AuxBus" => Ok(Self::AuxBus),
+            "MusicClipMidi" => Ok(Self::MusicClipMidi),
+            "MidiParameter" => Ok(Self::MidiParameter),
+            "ModulatorLfo" => Ok(Self::ModulatorLfo),
+            "ModulatorEnvelope" => Ok(Self::ModulatorEnvelope),
+            "ControlSurfaceSession" => Ok(Self::ControlSurfaceSession),
+            "ControlSurfaceBinding" => Ok(Self::ControlSurfaceBinding),
+            "ControlSurfaceBindingGroup" => Ok(Self::ControlSurfaceBindingGroup),
+            "Platform" => Ok(Self::Platform),
+            "AudioDevice" => Ok(Self::AudioDevice),
+            "AcousticTexture" => Ok(Self::AcousticTexture),
+            "Language" => Ok(Self::Language),
+            "ActionException" => Ok(Self::ActionException),
+            "MusicEventCue" => Ok(Self::MusicEventCue),
+            "ModulatorTime" => Ok(Self::ModulatorTime),
+            "CustomState" => Ok(Self::CustomState),
+            "MidiFileSource" => Ok(Self::MidiFileSource),
+            "Metadata" => Ok(Self::Metadata),
+            "Marker" => Ok(Self::Marker),
+            "MultiSwitchEntry" => Ok(Self::MultiSwitchEntry),
+            "EffectSlot" => Ok(Self::EffectSlot),
+            "StateGroupInfo" => Ok(Self::StateGroupInfo),
+            "SidechainMix" => Ok(Self::SidechainMix),
+            "MediaPoolQuery" => Ok(Self::MediaPoolQuery),
+            "MediaPoolFilter" => Ok(Self::MediaPoolFilter),
+            "MediaPoolDatabase" => Ok(Self::MediaPoolDatabase),
             _ => Err(format!("unknown Wwise ObjectType: {s}")),
         }
     }

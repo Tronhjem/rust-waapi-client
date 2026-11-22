@@ -8,6 +8,8 @@ use crate::api::generated::primitives::*;
 /// Response from `ak.wwise.core.getInfo`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreGetInfoResponse {
+    /// Collection of directories used by Wwise.
+    pub directories: DirectoriesInfo,
     /// Wwise display name.
     #[serde(rename = "displayName")]
     pub display_name: String,
@@ -36,6 +38,4 @@ pub struct CoreGetInfoResponse {
     /// The process path of Wwise.
     #[serde(rename = "processPath")]
     pub process_path: String,
-    /// Collection of directories used by Wwise.
-    pub directories: DirectoriesInfo,
 }

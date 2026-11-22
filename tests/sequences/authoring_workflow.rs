@@ -1,4 +1,4 @@
-use super::{connect_client, sequence_lock};
+use super::{connect_client, master_audio_bus, sequence_lock};
 use waapi_client::api::ak::wwise::core::object::{
     CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCreateArgs, CoreObjectCreateResponse,
     CoreObjectDeleteArgs, CoreObjectDiffArgs, CoreObjectGetArgs, CoreObjectGetAttenuationCurveArgs,
@@ -26,7 +26,6 @@ use waapi_client::{ChildObject, ObjectRef, ObjectType, Property};
 const DEFAULT_ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const DEFAULT_ATTENUATIONS_WU: &str = r"\Attenuations\Default Work Unit";
 const DEFAULT_SWITCHES_WU: &str = r"\Switches\Default Work Unit";
-const MASTER_AUDIO_BUS_PATH: &str = r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus";
 
 /// End-to-end sequence testing `ak.wwise.core.object.{setName, setNotes, setProperty,
 /// setReference, setRandomizer, copy, move, diff, pasteProperties}` and
@@ -37,6 +36,9 @@ async fn undo_and_object_helpers_sequence() {
     let mut client = connect_client()
         .await
         .expect("Failed to connect to WAAPI on 127.0.0.1:8080; is Wwise open with a project?");
+
+    // 0. Discover the master audio bus (name differs across Wwise versions).
+    let (master_bus_id, _) = master_audio_bus(&mut client).await;
 
     // 1. Self-setup: create a temporary root ActorMixer with SourceSound, FolderA, and FolderB.
     let create_root = CoreObjectCreateArgs::new(
@@ -123,7 +125,7 @@ async fn undo_and_object_helpers_sequence() {
         .set_reference(CoreObjectSetReferenceArgs::new(
             source_id.clone().into(),
             Property::OutputBus,
-            MASTER_AUDIO_BUS_PATH.into(),
+            ObjectRef::from(master_bus_id.as_str()),
         ))
         .await
         .expect("set_reference OutputBus failed");

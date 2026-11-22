@@ -8,7 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.postEvent`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundenginePostEventArgs {
-    /// The unique ID of the game object.
+    /// The unique ID of the game object. When not specified, <tt>AK_INVALID_GAME_OBJECT</tt> is used.
     #[serde(rename = "gameObject", skip_serializing_if = "Option::is_none")]
     pub game_object: Option<GameObjectRef>,
     /// Either the ID (GUID), name, or Short ID of the Event.

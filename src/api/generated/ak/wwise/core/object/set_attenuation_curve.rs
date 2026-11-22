@@ -18,7 +18,7 @@ pub struct CoreObjectSetAttenuationCurveArgs {
     /// The type of attenuation curve.
     #[serde(rename = "curveType")]
     pub curve_type: AttenuationCurveType,
-    /// Defines if the curve has no points, has its own set of points, or uses those of the VolumeDryUsage curve.
+    /// Defines if the curve has no points, has its own set of points, uses those of the VolumeDryUsage curve, or uses the global curve defined in the Project Settings.
     #[serde(rename = "use")]
     pub use_: AttenuationCurveUse,
 }

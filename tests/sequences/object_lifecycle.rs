@@ -82,10 +82,12 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         got_am_resp.objects[0].id.as_deref(),
         Some(actor_mixer_id.as_str())
     );
-    assert_eq!(
+    // Wwise 2024 reports "ActorMixer"; Wwise 2025 renamed it to "PropertyContainer"
+    // (both share class ID 0x80010). Accept either name.
+    assert!(matches!(
         got_am_resp.objects[0].object_type,
-        Some(ObjectType::ActorMixer)
-    );
+        Some(ObjectType::ActorMixer) | Some(ObjectType::PropertyContainer)
+    ));
 
     // 3. Create a RandomSequenceContainer as a child of the Actor Mixer named "NewSound"
     let create_container_args = CoreObjectCreateArgs::new(

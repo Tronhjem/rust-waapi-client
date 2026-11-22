@@ -1,0 +1,25 @@
+{
+  "argsSchema": {
+    "type": "object",
+    "properties": {
+      "project": {
+        "description": "When no project is specified, a temporary project is loaded.",
+        "$ref": "waapi_definitions.json#/definitions/projectOptionCliArg"
+      }
+    },
+    "required": [],
+    "additionalProperties": true
+  },
+  "optionsSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "resultSchema": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "description": "Launch the main window of WwiseXP."
+}

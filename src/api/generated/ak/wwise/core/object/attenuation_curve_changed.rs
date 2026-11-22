@@ -18,12 +18,12 @@ pub struct CoreObjectAttenuationCurveChangedPayload {
 /// Subscription options for `ak.wwise.core.object.attenuationCurveChanged`.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreObjectAttenuationCurveChangedOptions {
-    /// The ID (GUID) of the platform.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub platform: Option<String>,
     /// Data to be returned for every attenuation curve change.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
     pub return_: Option<Vec<ObjectReturnField>>,
+    /// The ID (GUID) of the platform.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub platform: Option<String>,
 }
 
 impl CoreObjectAttenuationCurveChangedOptions {
@@ -31,13 +31,13 @@ impl CoreObjectAttenuationCurveChangedOptions {
         Self::default()
     }
 
-    pub fn platform(mut self, platform: impl Into<String>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_ = Some(return_.into());
         self
     }
 
-    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn platform(mut self, platform: impl Into<String>) -> Self {
+        self.platform = Some(platform.into());
         self
     }
 }

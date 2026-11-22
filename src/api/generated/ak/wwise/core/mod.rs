@@ -8,6 +8,8 @@ pub mod blendContainer;
 pub mod gameParameter;
 mod get_info;
 pub mod log;
+#[allow(non_snake_case)]
+pub mod mediaPool;
 pub mod object;
 pub mod profiler;
 pub mod project;
@@ -17,6 +19,8 @@ pub mod soundbank;
 pub mod switchContainer;
 pub mod transport;
 pub mod undo;
+#[allow(non_snake_case)]
+pub mod workUnit;
 pub use get_info::CoreGetInfoResponse;
 mod get_project_info;
 pub use get_project_info::CoreGetProjectInfoResponse;

@@ -1,0 +1,35 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for every child being removed.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "parent": {
+        "description": "The parent object from which the child object is removed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "child": {
+        "description": "The child object that is removed.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "child",
+      "parent"
+    ],
+    "additionalProperties": false
+  },
+  "description": "Sent when an object is removed from the children of another object. See \\ref ak_wwise_core_object_structurechanged to receive changes in batch."
+}

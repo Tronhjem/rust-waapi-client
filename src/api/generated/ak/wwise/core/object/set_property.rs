@@ -8,10 +8,10 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.object.setProperty`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetPropertyArgs {
-    /// The ID (GUID), name, or path of the object to set value.
-    pub object: ObjectRef,
     /// The value of the object.
     pub value: PropertyValue,
+    /// The ID (GUID), name, or path of the object to set value.
+    pub object: ObjectRef,
     /// The name of the property. For more information, refer to the property list of Wwise Objects listed in .
     pub property: Property,
     /// The ID (GUID) or unique name of the platform. This is used to set values for unlinked properties. This is an optional argument. When not specified, the current platform is used to set the property.

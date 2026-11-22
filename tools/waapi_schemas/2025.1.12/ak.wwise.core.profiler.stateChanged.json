@@ -1,0 +1,35 @@
+{
+  "optionsSchema": {
+    "type": "object",
+    "properties": {
+      "return": {
+        "description": "Data to be returned for every object.",
+        "$ref": "waapi_definitions.json#/definitions/returnExpression"
+      },
+      "platform": {
+        "description": "The ID (GUID) of the platform.",
+        "$ref": "common_definitions.json#/definitions/guid"
+      }
+    },
+    "additionalProperties": false
+  },
+  "publishSchema": {
+    "type": "object",
+    "properties": {
+      "state": {
+        "description": "The state object that changed. Default return is id and name.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      },
+      "stateGroup": {
+        "description": "The state group object that changed. Default return is id and name.",
+        "$ref": "waapi_definitions.json#/definitions/objectReturn"
+      }
+    },
+    "required": [
+      "stateGroup",
+      "state"
+    ],
+    "additionalProperties": false
+  },
+  "description": "Sent when a state group state has been changed. This subscription does not require the profiler capture log to be started."
+}

@@ -33,7 +33,7 @@ async fn main() {
     info!("Getting Objects:");
     // Any known WAAPI URI works via WaapiFunction; args and options are plain serde_json values.
     let args = json!({
-        "from": { "path": [r"\Actor-Mixer Hierarchy\Default Work Unit\Testing"] }
+        "from": { "path": [r"\Containers\Default Work Unit\Testing"] }
     });
     let options = json!({
         "return": ["id", "type", "name", "notes"]
