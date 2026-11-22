@@ -27,3 +27,6 @@ impl SoundengineStopAllArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`SoundengineStopAllArgs`].
+pub type StopAllArgs = SoundengineStopAllArgs;

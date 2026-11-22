@@ -1,4 +1,4 @@
-use waapi_client::{WaapiClient, WaapiResult};
+use wwise_waapi::{WaapiClient, WaapiResult};
 
 pub mod audio_import;
 pub mod authoring_workflow;
@@ -23,8 +23,8 @@ pub async fn connect_client() -> WaapiResult<WaapiClient> {
 /// hierarchy's default work unit). Wwise 2024 names it "Master Audio Bus";
 /// Wwise 2025 renames it to "Main Audio Bus". Returns `(id, name)`.
 pub async fn master_audio_bus(client: &mut WaapiClient) -> (String, String) {
-    use waapi_client::api::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions};
-    use waapi_client::api::{
+    use wwise_waapi::api::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions};
+    use wwise_waapi::api::{
         ObjectQuery, ObjectReturnField, ObjectType, Transform, TransformSelect,
     };
 

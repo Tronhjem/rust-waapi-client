@@ -17,7 +17,30 @@ pub struct UiWindowCloseArgs {
 
 impl UiWindowCloseArgs {
     /// Creates a new [`UiWindowCloseArgs`] with the required fields.
-    pub fn new(window_id: String) -> Self {
-        Self { window_id }
+    pub fn new(window_id: impl Into<String>) -> Self {
+        Self {
+            window_id: window_id.into(),
+        }
     }
 }
+
+impl From<String> for UiWindowCloseArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiWindowCloseArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiWindowCloseArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiWindowCloseArgs`].
+pub type CloseArgs = UiWindowCloseArgs;

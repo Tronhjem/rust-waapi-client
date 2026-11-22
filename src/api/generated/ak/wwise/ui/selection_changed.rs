@@ -18,3 +18,9 @@ pub struct UiSelectionChangedPayload {
 ///
 /// Specifies the return options for every returned object.
 pub type UiSelectionChangedOptions = ObjectReturnOptions;
+
+/// Module-scoped alias for [`UiSelectionChangedPayload`].
+pub type SelectionChangedPayload = UiSelectionChangedPayload;
+
+/// Module-scoped alias for [`UiSelectionChangedOptions`].
+pub type SelectionChangedOptions = UiSelectionChangedOptions;

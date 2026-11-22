@@ -11,7 +11,7 @@ def endpoint_call_shape(info):
     has_args, has_options, has_response = info["has_args"], info["has_options"], info["has_response"]
     params = []
     if has_args:
-        params.append(("args", f"{info['base']}Args"))
+        params.append(("args", f"impl Into<{info['base']}Args>"))
     if has_options:
         params.append(("options", f"{info['base']}Options"))
     return params, has_response
@@ -36,10 +36,11 @@ def emit_call_body(uri, info, target="self.client"):
     uri_variant = f"WaapiFunction::{uri.replace('.', '_')}"
     call = f"{target}.{method}{turbofish}({uri_variant}, {args_expr}, {options_expr}).await"
 
+    prefix = [f"let args: {info['base']}Args = args.into();"] if has_args else []
     if has_response:
-        return [call]
+        return [*prefix, call]
     else:
-        return [f"{call}?;", "Ok(())"]
+        return [*prefix, f"{call}?;", "Ok(())"]
 
 
 def use_path(uri, types):
@@ -189,6 +190,21 @@ def gen_clients(endpoints, topics):
     lines.append("    /// Shortcut for `client.ak().soundengine()`.")
     lines.append("    pub fn soundengine(&mut self) -> SoundengineClient<'_> {")
     lines.append("        SoundengineClient { client: self }")
+    lines.append("    }")
+    lines.append("")
+    lines.append("    /// Shortcut for `client.wwise().core()`.")
+    lines.append("    pub fn core(&mut self) -> WwiseCoreClient<'_> {")
+    lines.append("        WwiseCoreClient { client: self }")
+    lines.append("    }")
+    lines.append("")
+    lines.append("    /// Shortcut for `client.wwise().core().object()`.")
+    lines.append("    pub fn object(&mut self) -> WwiseCoreObjectClient<'_> {")
+    lines.append("        WwiseCoreObjectClient { client: self }")
+    lines.append("    }")
+    lines.append("")
+    lines.append("    /// Shortcut for `client.wwise().ui()`.")
+    lines.append("    pub fn ui(&mut self) -> WwiseUiClient<'_> {")
+    lines.append("        WwiseUiClient { client: self }")
     lines.append("    }")
     lines.append("}")
     return "\n".join(lines) + "\n"

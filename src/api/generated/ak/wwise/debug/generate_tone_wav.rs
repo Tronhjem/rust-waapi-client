@@ -55,9 +55,9 @@ pub struct DebugGenerateToneWavArgs {
 
 impl DebugGenerateToneWavArgs {
     /// Creates a new [`DebugGenerateToneWavArgs`] with the required fields.
-    pub fn new(path: String) -> Self {
+    pub fn new(path: impl Into<String>) -> Self {
         Self {
-            path,
+            path: path.into(),
             channel_config: None,
             bit_depth: None,
             sample_rate: None,
@@ -145,3 +145,24 @@ impl DebugGenerateToneWavArgs {
         self
     }
 }
+
+impl From<String> for DebugGenerateToneWavArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for DebugGenerateToneWavArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for DebugGenerateToneWavArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`DebugGenerateToneWavArgs`].
+pub type GenerateToneWavArgs = DebugGenerateToneWavArgs;

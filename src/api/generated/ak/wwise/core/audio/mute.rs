@@ -22,3 +22,12 @@ impl CoreAudioMuteArgs {
         Self { objects, value }
     }
 }
+
+impl<T0: Into<Vec<ObjectRef>>, T1: Into<bool>> From<(T0, T1)> for CoreAudioMuteArgs {
+    fn from((objects, value): (T0, T1)) -> Self {
+        Self::new(objects.into(), value.into())
+    }
+}
+
+/// Module-scoped alias for [`CoreAudioMuteArgs`].
+pub type MuteArgs = CoreAudioMuteArgs;

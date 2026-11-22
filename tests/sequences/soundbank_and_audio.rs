@@ -1,29 +1,29 @@
 use super::audio_import::minimal_wav_base64;
 use super::{connect_client, sequence_lock};
-use waapi_client::api::ak::wwise::core::audio::{
+use wwise_waapi::api::ak::wwise::core::audio::{
     CoreAudioImportArgs, CoreAudioImportOptions, CoreAudioMuteArgs, CoreAudioSoloArgs,
 };
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs,
 };
-use waapi_client::api::ak::wwise::core::soundbank::{
+use wwise_waapi::api::ak::wwise::core::soundbank::{
     CoreSoundbankGenerateArgs, CoreSoundbankGetInclusionsArgs, CoreSoundbankSetInclusionsArgs,
 };
-use waapi_client::api::{
+use wwise_waapi::api::{
     ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
     ObjectReturnOptions, OnNameConflict, SoundBankInclusion, SoundBankInclusionFilter,
     SoundBankInclusionOperation, SoundBankInfo,
 };
-use waapi_client::{ObjectRef, ObjectType};
+use wwise_waapi::{ObjectRef, ObjectType};
 
 const ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const SOUNDBANKS_WU: &str = r"\SoundBanks\Default Work Unit";
 
 async fn get_sound_fields(
-    client: &mut waapi_client::WaapiClient,
+    client: &mut wwise_waapi::WaapiClient,
     id: &str,
     fields: Vec<ObjectReturnField>,
-) -> waapi_client::api::WwiseObject {
+) -> wwise_waapi::api::WwiseObject {
     let resp = client
         .wwise()
         .core()
@@ -144,8 +144,8 @@ async fn soundbank_and_audio_sequence() {
     assert!(
         gen_resp.logs.is_empty()
             || gen_resp.logs.iter().all(|l| {
-                l.severity != waapi_client::api::LogSeverity::Error
-                    && l.severity != waapi_client::api::LogSeverity::FatalError
+                l.severity != wwise_waapi::api::LogSeverity::Error
+                    && l.severity != wwise_waapi::api::LogSeverity::FatalError
             })
     );
 

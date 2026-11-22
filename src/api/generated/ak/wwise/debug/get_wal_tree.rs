@@ -14,3 +14,6 @@ pub struct DebugGetWalTreeResponse {
     #[serde(rename = "return")]
     pub return_: serde_json::Value,
 }
+
+/// Module-scoped alias for [`DebugGetWalTreeResponse`].
+pub type GetWalTreeResponse = DebugGetWalTreeResponse;

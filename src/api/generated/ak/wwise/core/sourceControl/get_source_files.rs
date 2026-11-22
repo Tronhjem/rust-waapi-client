@@ -93,3 +93,12 @@ pub struct CoreSourceControlGetSourceFilesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlGetSourceFilesArgs`].
+pub type GetSourceFilesArgs = CoreSourceControlGetSourceFilesArgs;
+
+/// Module-scoped alias for [`CoreSourceControlGetSourceFilesOptions`].
+pub type GetSourceFilesOptions = CoreSourceControlGetSourceFilesOptions;
+
+/// Module-scoped alias for [`CoreSourceControlGetSourceFilesResponse`].
+pub type GetSourceFilesResponse = CoreSourceControlGetSourceFilesResponse;

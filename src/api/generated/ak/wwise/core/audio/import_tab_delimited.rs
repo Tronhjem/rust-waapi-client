@@ -41,11 +41,15 @@ pub struct CoreAudioImportTabDelimitedArgs {
 
 impl CoreAudioImportTabDelimitedArgs {
     /// Creates a new [`CoreAudioImportTabDelimitedArgs`] with the required fields.
-    pub fn new(import_language: String, import_operation: String, import_file: String) -> Self {
+    pub fn new(
+        import_language: impl Into<String>,
+        import_operation: impl Into<String>,
+        import_file: impl Into<String>,
+    ) -> Self {
         Self {
-            import_language,
-            import_operation,
-            import_file,
+            import_language: import_language.into(),
+            import_operation: import_operation.into(),
+            import_file: import_file.into(),
             auto_add_to_source_control: None,
             auto_check_out_to_source_control: None,
             import_location: None,
@@ -77,6 +81,14 @@ impl CoreAudioImportTabDelimitedArgs {
     }
 }
 
+impl<T0: Into<String>, T1: Into<String>, T2: Into<String>> From<(T0, T1, T2)>
+    for CoreAudioImportTabDelimitedArgs
+{
+    fn from((import_language, import_operation, import_file): (T0, T1, T2)) -> Self {
+        Self::new(import_language, import_operation, import_file)
+    }
+}
+
 /// Options for `ak.wwise.core.audio.importTabDelimited`.
 ///
 /// Specifies the return options for every object returned.
@@ -91,3 +103,12 @@ pub struct CoreAudioImportTabDelimitedResponse {
     #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
+
+/// Module-scoped alias for [`CoreAudioImportTabDelimitedArgs`].
+pub type ImportTabDelimitedArgs = CoreAudioImportTabDelimitedArgs;
+
+/// Module-scoped alias for [`CoreAudioImportTabDelimitedOptions`].
+pub type ImportTabDelimitedOptions = CoreAudioImportTabDelimitedOptions;
+
+/// Module-scoped alias for [`CoreAudioImportTabDelimitedResponse`].
+pub type ImportTabDelimitedResponse = CoreAudioImportTabDelimitedResponse;

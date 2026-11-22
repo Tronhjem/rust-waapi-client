@@ -32,9 +32,9 @@ pub struct UiCliExecuteLuaScriptArgs {
 
 impl UiCliExecuteLuaScriptArgs {
     /// Creates a new [`UiCliExecuteLuaScriptArgs`] with the required fields.
-    pub fn new(lua_script: String) -> Self {
+    pub fn new(lua_script: impl Into<String>) -> Self {
         Self {
-            lua_script,
+            lua_script: lua_script.into(),
             project: None,
             lua_path: None,
             require: None,
@@ -74,6 +74,24 @@ impl UiCliExecuteLuaScriptArgs {
     }
 }
 
+impl From<String> for UiCliExecuteLuaScriptArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiCliExecuteLuaScriptArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiCliExecuteLuaScriptArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.ui.cli.executeLuaScript`.
 ///
 /// Execute a Lua script. Optionally, specify additional Lua search paths, additional modules, and additional Lua scripts to load prior to the main script. The script can return a value. All arguments will be passed to the Lua script in the "wa_args" global variable.
@@ -82,3 +100,9 @@ pub struct UiCliExecuteLuaScriptResponse {
     /// Result returned by the Lua script.
     pub result: serde_json::Value,
 }
+
+/// Module-scoped alias for [`UiCliExecuteLuaScriptArgs`].
+pub type ExecuteLuaScriptArgs = UiCliExecuteLuaScriptArgs;
+
+/// Module-scoped alias for [`UiCliExecuteLuaScriptResponse`].
+pub type ExecuteLuaScriptResponse = UiCliExecuteLuaScriptResponse;

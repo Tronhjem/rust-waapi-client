@@ -21,10 +21,10 @@ pub struct CoreBlendContainerAddTrackArgs {
 
 impl CoreBlendContainerAddTrackArgs {
     /// Creates a new [`CoreBlendContainerAddTrackArgs`] with the required fields.
-    pub fn new(object: ObjectRef, name: String) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, name: impl Into<String>) -> Self {
         Self {
-            object,
-            name,
+            object: object.into(),
+            name: name.into(),
             id: None,
         }
     }
@@ -33,6 +33,12 @@ impl CoreBlendContainerAddTrackArgs {
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
+    }
+}
+
+impl<T0: Into<ObjectRef>, T1: Into<String>> From<(T0, T1)> for CoreBlendContainerAddTrackArgs {
+    fn from((object, name): (T0, T1)) -> Self {
+        Self::new(object, name)
     }
 }
 
@@ -54,3 +60,9 @@ pub struct CoreBlendContainerAddTrackResponse {
     #[serde(rename = "shortId", default)]
     pub short_id: Option<i64>,
 }
+
+/// Module-scoped alias for [`CoreBlendContainerAddTrackArgs`].
+pub type AddTrackArgs = CoreBlendContainerAddTrackArgs;
+
+/// Module-scoped alias for [`CoreBlendContainerAddTrackResponse`].
+pub type AddTrackResponse = CoreBlendContainerAddTrackResponse;

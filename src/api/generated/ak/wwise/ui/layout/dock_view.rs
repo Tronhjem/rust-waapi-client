@@ -24,12 +24,20 @@ pub struct UiLayoutDockViewArgs {
 
 impl UiLayoutDockViewArgs {
     /// Creates a new [`UiLayoutDockViewArgs`] with the required fields.
-    pub fn new(name: String, view_id: String, target_id: String, side: String) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        view_id: impl Into<String>,
+        target_id: impl Into<String>,
+        side: impl Into<String>,
+    ) -> Self {
         Self {
-            name,
-            view_id,
-            target_id,
-            side,
+            name: name.into(),
+            view_id: view_id.into(),
+            target_id: target_id.into(),
+            side: side.into(),
         }
     }
 }
+
+/// Module-scoped alias for [`UiLayoutDockViewArgs`].
+pub type DockViewArgs = UiLayoutDockViewArgs;

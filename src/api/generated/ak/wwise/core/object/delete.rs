@@ -22,9 +22,9 @@ pub struct CoreObjectDeleteArgs {
 
 impl CoreObjectDeleteArgs {
     /// Creates a new [`CoreObjectDeleteArgs`] with the required fields.
-    pub fn new(object: ObjectRef) -> Self {
+    pub fn new(object: impl Into<ObjectRef>) -> Self {
         Self {
-            object,
+            object: object.into(),
             auto_check_out_to_source_control: None,
         }
     }
@@ -38,3 +38,30 @@ impl CoreObjectDeleteArgs {
         self
     }
 }
+
+impl From<ObjectRef> for CoreObjectDeleteArgs {
+    fn from(value: ObjectRef) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreObjectDeleteArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<String> for CoreObjectDeleteArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreObjectDeleteArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreObjectDeleteArgs`].
+pub type DeleteArgs = CoreObjectDeleteArgs;

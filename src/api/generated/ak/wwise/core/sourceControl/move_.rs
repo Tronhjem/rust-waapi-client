@@ -24,6 +24,12 @@ impl CoreSourceControlMoveArgs {
     }
 }
 
+impl<T0: Into<Vec<String>>, T1: Into<Vec<String>>> From<(T0, T1)> for CoreSourceControlMoveArgs {
+    fn from((files, new_files): (T0, T1)) -> Self {
+        Self::new(files.into(), new_files.into())
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.move`.
 ///
 /// Move or rename files in source control. Always pass the same number of elements in files and newFiles. Equivalent to Move for Perforce.
@@ -32,3 +38,9 @@ pub struct CoreSourceControlMoveResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlMoveArgs`].
+pub type MoveArgs = CoreSourceControlMoveArgs;
+
+/// Module-scoped alias for [`CoreSourceControlMoveResponse`].
+pub type MoveResponse = CoreSourceControlMoveResponse;

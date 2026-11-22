@@ -47,3 +47,9 @@ impl CoreObjectChildAddedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectChildAddedPayload`].
+pub type ChildAddedPayload = CoreObjectChildAddedPayload;
+
+/// Module-scoped alias for [`CoreObjectChildAddedOptions`].
+pub type ChildAddedOptions = CoreObjectChildAddedOptions;

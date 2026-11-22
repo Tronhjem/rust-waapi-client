@@ -24,10 +24,10 @@ pub struct CoreBlendContainerAddAssignmentArgs {
 
 impl CoreBlendContainerAddAssignmentArgs {
     /// Creates a new [`CoreBlendContainerAddAssignmentArgs`] with the required fields.
-    pub fn new(object: String, child: ObjectRef) -> Self {
+    pub fn new(object: impl Into<String>, child: impl Into<ObjectRef>) -> Self {
         Self {
-            object,
-            child,
+            object: object.into(),
+            child: child.into(),
             index: None,
             edges: None,
         }
@@ -46,6 +46,12 @@ impl CoreBlendContainerAddAssignmentArgs {
     }
 }
 
+impl<T0: Into<String>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreBlendContainerAddAssignmentArgs {
+    fn from((object, child): (T0, T1)) -> Self {
+        Self::new(object, child)
+    }
+}
+
 /// Response from `ak.wwise.core.blendContainer.addAssignment`.
 ///
 /// Adds a new assignment to a Blend Track. Equivalent to performing a drag-and-drop operation in the Blend Tracks Editor.
@@ -61,3 +67,9 @@ pub struct CoreBlendContainerAddAssignmentResponse {
     #[serde(default)]
     pub edges: Vec<BlendEdge>,
 }
+
+/// Module-scoped alias for [`CoreBlendContainerAddAssignmentArgs`].
+pub type AddAssignmentArgs = CoreBlendContainerAddAssignmentArgs;
+
+/// Module-scoped alias for [`CoreBlendContainerAddAssignmentResponse`].
+pub type AddAssignmentResponse = CoreBlendContainerAddAssignmentResponse;

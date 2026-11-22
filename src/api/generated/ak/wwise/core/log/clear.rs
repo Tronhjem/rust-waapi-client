@@ -27,3 +27,6 @@ impl CoreLogClearArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreLogClearArgs`].
+pub type ClearArgs = CoreLogClearArgs;

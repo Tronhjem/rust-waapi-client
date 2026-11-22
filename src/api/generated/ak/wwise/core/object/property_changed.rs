@@ -41,9 +41,9 @@ pub struct CoreObjectPropertyChangedOptions {
 
 impl CoreObjectPropertyChangedOptions {
     /// Creates a new [`CoreObjectPropertyChangedOptions`] with the required fields.
-    pub fn new(object: ObjectRef, property: Property) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, property: Property) -> Self {
         Self {
-            object,
+            object: object.into(),
             property,
             return_: None,
             platform: None,
@@ -62,3 +62,9 @@ impl CoreObjectPropertyChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectPropertyChangedPayload`].
+pub type PropertyChangedPayload = CoreObjectPropertyChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectPropertyChangedOptions`].
+pub type PropertyChangedOptions = CoreObjectPropertyChangedOptions;

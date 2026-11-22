@@ -21,6 +21,12 @@ impl CoreSourceControlCheckOutArgs {
     }
 }
 
+impl From<Vec<String>> for CoreSourceControlCheckOutArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.checkOut`.
 ///
 /// Check out files from source control. Equivalent to Check Out for Perforce.
@@ -29,3 +35,9 @@ pub struct CoreSourceControlCheckOutResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlCheckOutArgs`].
+pub type CheckOutArgs = CoreSourceControlCheckOutArgs;
+
+/// Module-scoped alias for [`CoreSourceControlCheckOutResponse`].
+pub type CheckOutResponse = CoreSourceControlCheckOutResponse;

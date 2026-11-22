@@ -25,9 +25,9 @@ pub struct CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs {
 
 impl CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs {
     /// Creates a new [`CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs`] with the required fields.
-    pub fn new(object: ObjectRef, num_peaks: i64) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, num_peaks: i64) -> Self {
         Self {
-            object,
+            object: object.into(),
             num_peaks,
             get_cross_channel_peaks: None,
         }
@@ -37,6 +37,14 @@ impl CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs {
     pub fn get_cross_channel_peaks(mut self, get_cross_channel_peaks: impl Into<bool>) -> Self {
         self.get_cross_channel_peaks = Some(get_cross_channel_peaks.into());
         self
+    }
+}
+
+impl<T0: Into<ObjectRef>, T1: Into<i64>> From<(T0, T1)>
+    for CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs
+{
+    fn from((object, num_peaks): (T0, T1)) -> Self {
+        Self::new(object, num_peaks.into())
     }
 }
 
@@ -64,3 +72,10 @@ pub struct CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse {
     #[serde(rename = "channelConfig", default)]
     pub channel_config: Option<String>,
 }
+
+/// Module-scoped alias for [`CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs`].
+pub type GetMinMaxPeaksInTrimmedRegionArgs = CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs;
+
+/// Module-scoped alias for [`CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse`].
+pub type GetMinMaxPeaksInTrimmedRegionResponse =
+    CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse;

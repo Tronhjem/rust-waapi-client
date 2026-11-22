@@ -87,3 +87,12 @@ pub struct CoreMediaPoolGetResponse {
     #[serde(rename = "return", default)]
     pub return_: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreMediaPoolGetArgs`].
+pub type GetArgs = CoreMediaPoolGetArgs;
+
+/// Module-scoped alias for [`CoreMediaPoolGetOptions`].
+pub type GetOptions = CoreMediaPoolGetOptions;
+
+/// Module-scoped alias for [`CoreMediaPoolGetResponse`].
+pub type GetResponse = CoreMediaPoolGetResponse;

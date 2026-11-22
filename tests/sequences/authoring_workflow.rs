@@ -1,27 +1,27 @@
 use super::{connect_client, master_audio_bus, sequence_lock};
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCreateArgs, CoreObjectCreateResponse,
     CoreObjectDeleteArgs, CoreObjectDiffArgs, CoreObjectGetArgs, CoreObjectGetAttenuationCurveArgs,
     CoreObjectGetOptions, CoreObjectMoveArgs, CoreObjectPastePropertiesArgs,
     CoreObjectSetAttenuationCurveArgs, CoreObjectSetNameArgs, CoreObjectSetNotesArgs,
     CoreObjectSetPropertyArgs, CoreObjectSetRandomizerArgs, CoreObjectSetReferenceArgs,
 };
-use waapi_client::api::ak::wwise::core::switchContainer::{
+use wwise_waapi::api::ak::wwise::core::switchContainer::{
     CoreSwitchContainerAddAssignmentArgs, CoreSwitchContainerGetAssignmentsArgs,
     CoreSwitchContainerRemoveAssignmentArgs,
 };
-use waapi_client::api::ak::wwise::core::transport::{
+use wwise_waapi::api::ak::wwise::core::transport::{
     CoreTransportCreateArgs, CoreTransportDestroyArgs, CoreTransportExecuteActionArgs,
     CoreTransportGetStateArgs, CoreTransportPrepareArgs, CoreTransportUseOriginalsArgs,
 };
-use waapi_client::api::ak::wwise::core::undo::{CoreUndoCancelGroupArgs, CoreUndoEndGroupArgs};
-use waapi_client::api::ak::wwise::ui::commands::UiCommandsExecuteArgs;
-use waapi_client::api::{
+use wwise_waapi::api::ak::wwise::core::undo::{CoreUndoCancelGroupArgs, CoreUndoEndGroupArgs};
+use wwise_waapi::api::ak::wwise::ui::commands::UiCommandsExecuteArgs;
+use wwise_waapi::api::{
     AttenuationCurveType, AttenuationCurveUse, CurvePoint2D, CurveShape, ObjectQuery,
-    ObjectReturnField, OnNameConflict, PasteMode, PropertyValue, SwitchContainerAssignment,
-    TransportAction, TransportState,
+    ObjectReturnField, OnNameConflict, PasteMode, SwitchContainerAssignment, TransportAction,
+    TransportState,
 };
-use waapi_client::{ChildObject, ObjectRef, ObjectType, Property};
+use wwise_waapi::{ChildObject, ObjectRef, ObjectType, Property};
 
 const DEFAULT_ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const DEFAULT_ATTENUATIONS_WU: &str = r"\Attenuations\Default Work Unit";
@@ -42,9 +42,9 @@ async fn undo_and_object_helpers_sequence() {
 
     // 1. Self-setup: create a temporary root ActorMixer with SourceSound, FolderA, and FolderB.
     let create_root = CoreObjectCreateArgs::new(
-        DEFAULT_ACTOR_MIXER_WU.into(),
+        DEFAULT_ACTOR_MIXER_WU,
         ObjectType::ActorMixer,
-        "WaapiPack1WorkflowRoot".to_string(),
+        "WaapiPack1WorkflowRoot",
     )
     .on_name_conflict(OnNameConflict::Replace)
     .children(vec![
@@ -76,10 +76,7 @@ async fn undo_and_object_helpers_sequence() {
         .wwise()
         .core()
         .object()
-        .set_name(CoreObjectSetNameArgs::new(
-            source_id.clone().into(),
-            "ConfiguredSound".to_string(),
-        ))
+        .set_name(CoreObjectSetNameArgs::new(&source_id, "ConfiguredSound"))
         .await
         .expect("set_name failed");
 
@@ -88,8 +85,8 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_notes(CoreObjectSetNotesArgs::new(
-            source_id.clone().into(),
-            "Pack 1 helper notes".to_string(),
+            &source_id,
+            "Pack 1 helper notes",
         ))
         .await
         .expect("set_notes failed");
@@ -99,9 +96,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            source_id.clone().into(),
+            &source_id,
             Property::Volume,
-            PropertyValue::from(-9.0),
+            -9.0,
         ))
         .await
         .expect("set_property Volume failed");
@@ -111,9 +108,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            source_id.clone().into(),
+            &source_id,
             Property::Pitch,
-            PropertyValue::from(250),
+            250,
         ))
         .await
         .expect("set_property Pitch failed");
@@ -123,9 +120,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_reference(CoreObjectSetReferenceArgs::new(
-            source_id.clone().into(),
+            &source_id,
             Property::OutputBus,
-            ObjectRef::from(master_bus_id.as_str()),
+            &master_bus_id,
         ))
         .await
         .expect("set_reference OutputBus failed");
@@ -135,7 +132,7 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_randomizer(
-            CoreObjectSetRandomizerArgs::new(source_id.clone().into(), Property::Volume)
+            CoreObjectSetRandomizerArgs::new(&source_id, Property::Volume)
                 .enabled(true)
                 .min(-3.0)
                 .max(3.0),
@@ -180,7 +177,7 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .copy(
-            CoreObjectCopyArgs::new(source_id.clone().into(), folder_a_id.clone().into())
+            CoreObjectCopyArgs::new(&source_id, &folder_a_id)
                 .on_name_conflict(OnNameConflict::Rename),
             CoreObjectCopyOptions::new().return_fields([
                 ObjectReturnField::Id,
@@ -216,7 +213,7 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .move_(
-            CoreObjectMoveArgs::new(copied_id.clone().into(), folder_b_id.clone().into())
+            CoreObjectMoveArgs::new(&copied_id, &folder_b_id)
                 .on_name_conflict(OnNameConflict::Rename),
         )
         .await
@@ -246,10 +243,7 @@ async fn undo_and_object_helpers_sequence() {
         .wwise()
         .core()
         .object()
-        .diff(CoreObjectDiffArgs::new(
-            source_id.clone().into(),
-            target_id.clone().into(),
-        ))
+        .diff(CoreObjectDiffArgs::new(&source_id, &target_id))
         .await
         .expect("object.diff before paste failed");
     assert!(diff_before.properties.iter().any(|p| p == "Volume"));
@@ -260,12 +254,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .paste_properties(
-            CoreObjectPastePropertiesArgs::new(
-                source_id.clone().into(),
-                vec![target_id.clone().into()],
-            )
-            .paste_mode(PasteMode::ReplaceEntire)
-            .inclusion(vec![Property::Volume, Property::Pitch]),
+            CoreObjectPastePropertiesArgs::new(&source_id, vec![ObjectRef::from(&target_id)])
+                .paste_mode(PasteMode::ReplaceEntire)
+                .inclusion(vec![Property::Volume, Property::Pitch]),
         )
         .await
         .expect("object.paste_properties failed");
@@ -306,9 +297,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            target_id.clone().into(),
+            &target_id,
             Property::Volume,
-            PropertyValue::from(-18.0),
+            -18.0,
         ))
         .await
         .expect("set_property inside cancelled undo group failed");
@@ -350,9 +341,9 @@ async fn undo_and_object_helpers_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            target_id.clone().into(),
+            &target_id,
             Property::Volume,
-            PropertyValue::from(-15.0),
+            -15.0,
         ))
         .await
         .expect("set_property inside undo group failed");
@@ -360,9 +351,7 @@ async fn undo_and_object_helpers_sequence() {
         .wwise()
         .core()
         .undo()
-        .end_group(CoreUndoEndGroupArgs::new(
-            "WaapiPack1 Volume Change".to_string(),
-        ))
+        .end_group(CoreUndoEndGroupArgs::new("WaapiPack1 Volume Change"))
         .await
         .expect("undo.end_group failed");
 
@@ -421,7 +410,7 @@ async fn undo_and_object_helpers_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(root_id.into()))
+        .delete(CoreObjectDeleteArgs::new(root_id))
         .await
         .expect("delete WaapiPack1WorkflowRoot failed");
 
@@ -448,9 +437,9 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                DEFAULT_ATTENUATIONS_WU.into(),
+                DEFAULT_ATTENUATIONS_WU,
                 ObjectType::Attenuation,
-                "WaapiPack1Attenuation".to_string(),
+                "WaapiPack1Attenuation",
             )
             .on_name_conflict(OnNameConflict::Replace),
         )
@@ -464,9 +453,9 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                DEFAULT_SWITCHES_WU.into(),
+                DEFAULT_SWITCHES_WU,
                 ObjectType::SwitchGroup,
-                "WaapiPack1SwitchGroup".to_string(),
+                "WaapiPack1SwitchGroup",
             )
             .on_name_conflict(OnNameConflict::Replace)
             .children(vec![
@@ -492,9 +481,9 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                DEFAULT_ACTOR_MIXER_WU.into(),
+                DEFAULT_ACTOR_MIXER_WU,
                 ObjectType::ActorMixer,
-                "WaapiPack1SwitchRoot".to_string(),
+                "WaapiPack1SwitchRoot",
             )
             .on_name_conflict(OnNameConflict::Replace)
             .children(vec![
@@ -535,7 +524,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .object()
         .set_attenuation_curve(CoreObjectSetAttenuationCurveArgs::new(
-            atten_id.clone().into(),
+            &atten_id,
             AttenuationCurveType::VolumeDryUsage,
             AttenuationCurveUse::Custom,
             points.clone(),
@@ -548,7 +537,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .object()
         .get_attenuation_curve(CoreObjectGetAttenuationCurveArgs::new(
-            atten_id.clone().into(),
+            &atten_id,
             AttenuationCurveType::VolumeDryUsage,
         ))
         .await
@@ -563,9 +552,9 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .object()
         .set_reference(CoreObjectSetReferenceArgs::new(
-            switch_container_id.clone().into(),
+            &switch_container_id,
             Property::SwitchGroupOrStateGroup,
-            switch_group_id.clone().into(),
+            &switch_group_id,
         ))
         .await
         .expect("set_reference SwitchGroupOrStateGroup failed");
@@ -575,8 +564,8 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .switch_container()
         .add_assignment(CoreSwitchContainerAddAssignmentArgs::new(
-            sound_wood_id.clone().into(),
-            switch_wood_id.clone().into(),
+            &sound_wood_id,
+            &switch_wood_id,
         ))
         .await
         .expect("add_assignment wood failed");
@@ -586,8 +575,8 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .switch_container()
         .add_assignment(CoreSwitchContainerAddAssignmentArgs::new(
-            sound_stone_id.clone().into(),
-            switch_stone_id.clone().into(),
+            &sound_stone_id,
+            &switch_stone_id,
         ))
         .await
         .expect("add_assignment stone failed");
@@ -597,7 +586,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .switch_container()
         .get_assignments(CoreSwitchContainerGetAssignmentsArgs::new(
-            switch_container_id.clone().into(),
+            &switch_container_id,
         ))
         .await
         .expect("get_assignments failed");
@@ -624,8 +613,8 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .switch_container()
         .remove_assignment(CoreSwitchContainerRemoveAssignmentArgs::new(
-            sound_wood_id.clone().into(),
-            switch_wood_id.clone().into(),
+            &sound_wood_id,
+            &switch_wood_id,
         ))
         .await
         .expect("remove_assignment wood failed");
@@ -635,7 +624,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
         .core()
         .switch_container()
         .get_assignments(CoreSwitchContainerGetAssignmentsArgs::new(
-            switch_container_id.into(),
+            switch_container_id,
         ))
         .await
         .expect("get_assignments after remove failed");
@@ -653,7 +642,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
             .wwise()
             .core()
             .object()
-            .delete(CoreObjectDeleteArgs::new(id.into()))
+            .delete(CoreObjectDeleteArgs::new(id))
             .await
             .expect("cleanup delete failed");
     }
@@ -705,9 +694,9 @@ async fn transport_project_info_and_ui_commands_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                DEFAULT_ACTOR_MIXER_WU.into(),
+                DEFAULT_ACTOR_MIXER_WU,
                 ObjectType::Sound,
-                "WaapiPack1TransportSound".to_string(),
+                "WaapiPack1TransportSound",
             )
             .on_name_conflict(OnNameConflict::Replace),
         )
@@ -721,8 +710,8 @@ async fn transport_project_info_and_ui_commands_sequence() {
         .ui()
         .commands()
         .execute(
-            UiCommandsExecuteArgs::new("FindInProjectExplorerSyncGroup1".to_string())
-                .objects(vec![ObjectRef::from(sound_id.as_str())]),
+            UiCommandsExecuteArgs::new("FindInProjectExplorerSyncGroup1")
+                .objects(vec![ObjectRef::from(&sound_id)]),
         )
         .await
         .expect("ui.commands.execute failed");
@@ -740,7 +729,7 @@ async fn transport_project_info_and_ui_commands_sequence() {
         .wwise()
         .core()
         .transport()
-        .prepare(CoreTransportPrepareArgs::new(sound_id.clone().into()))
+        .prepare(CoreTransportPrepareArgs::new(&sound_id))
         .await
         .expect("transport.prepare failed");
 
@@ -748,7 +737,7 @@ async fn transport_project_info_and_ui_commands_sequence() {
         .wwise()
         .core()
         .transport()
-        .create(CoreTransportCreateArgs::new(sound_id.clone().into()))
+        .create(CoreTransportCreateArgs::new(&sound_id))
         .await
         .expect("transport.create failed");
     let transport_id = transport_created.transport;
@@ -817,7 +806,7 @@ async fn transport_project_info_and_ui_commands_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(sound_id.into()))
+        .delete(CoreObjectDeleteArgs::new(sound_id))
         .await
         .expect("delete WaapiPack1TransportSound failed");
 

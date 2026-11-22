@@ -1,6 +1,6 @@
 //! Rust client library for the Wwise Authoring API (WAAPI) over WAMP/WebSocket.
 //!
-//! `waapi-client` provides a compile-time typed, schema-driven Rust API for
+//! `wwise-waapi` provides a compile-time typed, schema-driven Rust API for
 //! Audiokinetic Wwise's Authoring API (supporting Wwise 2024 and Wwise 2025+
 //! via multi-version union generation), along with a raw JSON escape hatch.
 //!
@@ -12,28 +12,23 @@
 //! reused across multiple calls:
 //!
 //! ```no_run
-//! use waapi_client::api::ak::wwise::core::object::{
-//!     CoreObjectCreateArgs, CoreObjectGetArgs, CoreObjectGetOptions,
-//! };
-//! use waapi_client::api::{ObjectQuery, ObjectReturnField, OnNameConflict};
-//! use waapi_client::{ObjectRef, ObjectType, Property, WaapiClient};
+//! use wwise_waapi::api::ak::wwise::core::object::{CreateArgs, GetOptions};
+//! use wwise_waapi::prelude::*;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::new(None).await?;
+//!     let mut client = WaapiClient::connect().await?;
 //!
-//!     // Intermediate client handles can be stored and reused:
-//!     let mut wwise = client.wwise();
-//!     let info = wwise.core().get_info().await?;
+//!     // Top-level shortcuts (`client.core()`, `client.object()`, `client.ui()`, `client.soundengine()`):
+//!     let info = client.core().get_info().await?;
 //!     println!("Connected to {} {}", info.display_name, info.version.display_name);
 //!
-//!     // Query objects with typed return fields and properties:
-//!     let response = wwise
-//!         .core()
+//!     // Query objects directly by path, GUID, type, or ObjectQuery:
+//!     let response = client
 //!         .object()
 //!         .get(
-//!             CoreObjectGetArgs::new(ObjectQuery::from(r"\Containers\Default Work Unit")),
-//!             CoreObjectGetOptions::new().return_fields([
+//!             r"\Containers\Default Work Unit",
+//!             GetOptions::new().return_fields([
 //!                 ObjectReturnField::Id,
 //!                 ObjectReturnField::Name,
 //!                 ObjectReturnField::Type,
@@ -46,15 +41,14 @@
 //!         println!("{:?} ({:?}): {:?}", obj.name(), obj.object_type(), obj.id());
 //!     }
 //!
-//!     // Create a Sound object with typed ObjectType and Property:
-//!     let created = wwise
-//!         .core()
+//!     // Create a Sound object (`CreateArgs::new` accepts `&str`, `String`, or `ObjectRef`):
+//!     let created = client
 //!         .object()
 //!         .create(
-//!             CoreObjectCreateArgs::new(
-//!                 ObjectRef::path(r"\Containers\Default Work Unit"),
+//!             CreateArgs::new(
+//!                 r"\Containers\Default Work Unit",
 //!                 ObjectType::Sound,
-//!                 "MyNewSound".to_string(),
+//!                 "MyNewSound",
 //!             )
 //!             .on_name_conflict(OnNameConflict::Replace)
 //!             .property(Property::Volume, -6.0),
@@ -73,20 +67,17 @@
 //! `subscribe_*` method on its namespace client:
 //!
 //! ```no_run
-//! use waapi_client::api::ak::wwise::core::object::CoreObjectCreatedOptions;
-//! use waapi_client::api::ObjectReturnField;
-//! use waapi_client::WaapiClient;
+//! use wwise_waapi::api::ak::wwise::core::object::CreatedOptions;
+//! use wwise_waapi::prelude::*;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::new(None).await?;
+//!     let mut client = WaapiClient::connect().await?;
 //!
 //!     let (sub_id, mut rx) = client
-//!         .wwise()
-//!         .core()
 //!         .object()
 //!         .subscribe_created(Some(
-//!             CoreObjectCreatedOptions::new()
+//!             CreatedOptions::new()
 //!                 .return_(vec![ObjectReturnField::Id, ObjectReturnField::Name]),
 //!         ))
 //!         .await?;
@@ -107,11 +98,12 @@
 //! [`WaapiFunction`] and [`json!`]:
 //!
 //! ```no_run
-//! use waapi_client::{json, WaapiClient, WaapiFunction};
+//! use wwise_waapi::prelude::*;
+//! use wwise_waapi::json;
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::new(None).await?;
+//!     let mut client = WaapiClient::connect().await?;
 //!     let res = client
 //!         .call(
 //!             WaapiFunction::ak_wwise_core_object_get,
@@ -143,7 +135,7 @@ pub use waapi_client::{Event, WaapiClient, WaapiError, WaapiResult};
 
 /// Convenience wrapper around `serde_json::json!`.
 ///
-/// This macro is re-exported from `waapi_client` so applications can build
+/// This macro is re-exported from `wwise_waapi` so applications can build
 /// raw WAAPI kwargs/options without adding a direct `serde_json` dependency.
 #[macro_export]
 macro_rules! json {
@@ -154,3 +146,19 @@ macro_rules! json {
 pub use api::{ChildObject, GameObjectRef, ObjectRef, ObjectType, Position, Property, Vector3};
 pub use waapi_function_api::WaapiFunction;
 pub use waapi_topics_api::WaapiTopic;
+
+/// Convenience prelude re-exporting the most commonly used WAAPI client, query,
+/// object, property, and SoundEngine types.
+///
+/// ```no_run
+/// use wwise_waapi::prelude::*;
+/// ```
+pub mod prelude {
+    pub use crate::api::{
+        ChildObject, EventRef, GameObjectRef, LanguageRef, ListMode, ObjectQuery, ObjectRef,
+        ObjectReturnField, ObjectReturnOptions, ObjectType, OnNameConflict, PlatformRef, Position,
+        Property, PropertyValue, RtpcRef, SoundEngineObjectRef, Transform, TransformSelect,
+        Vector3, WwiseObject, WwiseObjectRef,
+    };
+    pub use crate::{Event, WaapiClient, WaapiError, WaapiFunction, WaapiResult, WaapiTopic};
+}

@@ -19,10 +19,21 @@ pub struct CoreObjectSetStatePropertiesArgs {
 
 impl CoreObjectSetStatePropertiesArgs {
     /// Creates a new [`CoreObjectSetStatePropertiesArgs`] with the required fields.
-    pub fn new(object: ObjectRef, state_properties: Vec<String>) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, state_properties: Vec<String>) -> Self {
         Self {
-            object,
+            object: object.into(),
             state_properties,
         }
     }
 }
+
+impl<T0: Into<ObjectRef>, T1: Into<Vec<String>>> From<(T0, T1)>
+    for CoreObjectSetStatePropertiesArgs
+{
+    fn from((object, state_properties): (T0, T1)) -> Self {
+        Self::new(object, state_properties.into())
+    }
+}
+
+/// Module-scoped alias for [`CoreObjectSetStatePropertiesArgs`].
+pub type SetStatePropertiesArgs = CoreObjectSetStatePropertiesArgs;

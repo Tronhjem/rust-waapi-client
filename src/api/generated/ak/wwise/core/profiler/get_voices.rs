@@ -33,6 +33,12 @@ impl CoreProfilerGetVoicesArgs {
     }
 }
 
+impl From<serde_json::Value> for CoreProfilerGetVoicesArgs {
+    fn from(value: serde_json::Value) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Options for `ak.wwise.core.profiler.getVoices`.
 ///
 /// Retrieves the voices at a specific profiler capture time.
@@ -65,3 +71,12 @@ pub struct CoreProfilerGetVoicesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetVoicesArgs`].
+pub type GetVoicesArgs = CoreProfilerGetVoicesArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetVoicesOptions`].
+pub type GetVoicesOptions = CoreProfilerGetVoicesOptions;
+
+/// Module-scoped alias for [`CoreProfilerGetVoicesResponse`].
+pub type GetVoicesResponse = CoreProfilerGetVoicesResponse;

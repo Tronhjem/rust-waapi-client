@@ -47,3 +47,9 @@ impl CoreObjectChildRemovedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectChildRemovedPayload`].
+pub type ChildRemovedPayload = CoreObjectChildRemovedPayload;
+
+/// Module-scoped alias for [`CoreObjectChildRemovedOptions`].
+pub type ChildRemovedOptions = CoreObjectChildRemovedOptions;

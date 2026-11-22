@@ -6,38 +6,25 @@
 //! Targets the Wwise 2025 hierarchy (`\Containers`). See `object_set_2024.rs`
 //! for the Wwise 2024 `\Actor-Mixer Hierarchy` variant.
 
-use waapi_client::WaapiClient;
-use waapi_client::api::generated::ak::wwise::core::object::{
-    CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetOptions,
-};
-use waapi_client::api::generated::primitives::ObjectReturnField;
-use waapi_client::api::{ObjectRef, Property};
+use wwise_waapi::api::ak::wwise::core::object::{SetItem, SetOptions};
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
 
-    let mut client = WaapiClient::new(None)
+    let mut client = WaapiClient::connect()
         .await
         .expect("Failed to connect to WAAPI");
 
     // Example: rename an object and set a property.
-    let rename_and_set = CoreObjectSetArgs::new(vec![
-        CoreObjectSetItem::new(ObjectRef::path("\\Containers\\Default Work Unit\\MySound"))
-            .name("MyRenamedSound")
-            .property(Property::Volume, -6.0),
-    ]);
+    let item = SetItem::new(r"\Containers\Default Work Unit\MySound")
+        .name("MyRenamedSound")
+        .property(Property::Volume, -6.0);
 
-    let options =
-        CoreObjectSetOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+    let options = SetOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
 
-    match client
-        .wwise()
-        .core()
-        .object()
-        .set(rename_and_set, options)
-        .await
-    {
+    match client.object().set(item, options).await {
         Ok(response) => {
             for obj in response.objects {
                 println!(

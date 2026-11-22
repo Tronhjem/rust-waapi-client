@@ -5,67 +5,103 @@
 #[allow(non_snake_case)]
 pub mod captureLog;
 mod enable_profiler_data;
-pub use enable_profiler_data::CoreProfilerEnableProfilerDataArgs;
+pub use enable_profiler_data::{CoreProfilerEnableProfilerDataArgs, EnableProfilerDataArgs};
 mod game_object_registered;
-pub use game_object_registered::CoreProfilerGameObjectRegisteredPayload;
+pub use game_object_registered::{
+    CoreProfilerGameObjectRegisteredPayload, GameObjectRegisteredPayload,
+};
 mod game_object_reset;
-pub use game_object_reset::CoreProfilerGameObjectResetPayload;
+pub use game_object_reset::{CoreProfilerGameObjectResetPayload, GameObjectResetPayload};
 mod game_object_unregistered;
-pub use game_object_unregistered::CoreProfilerGameObjectUnregisteredPayload;
+pub use game_object_unregistered::{
+    CoreProfilerGameObjectUnregisteredPayload, GameObjectUnregisteredPayload,
+};
 mod get_audio_objects;
 pub use get_audio_objects::{
     CoreProfilerGetAudioObjectsArgs, CoreProfilerGetAudioObjectsOptions,
-    CoreProfilerGetAudioObjectsResponse,
+    CoreProfilerGetAudioObjectsResponse, GetAudioObjectsArgs, GetAudioObjectsOptions,
+    GetAudioObjectsResponse,
 };
 mod get_busses;
 pub use get_busses::{
     CoreProfilerGetBussesArgs, CoreProfilerGetBussesOptions, CoreProfilerGetBussesResponse,
+    GetBussesArgs, GetBussesOptions, GetBussesResponse,
 };
 mod get_cpu_usage;
-pub use get_cpu_usage::{CoreProfilerGetCpuUsageArgs, CoreProfilerGetCpuUsageResponse};
+pub use get_cpu_usage::{
+    CoreProfilerGetCpuUsageArgs, CoreProfilerGetCpuUsageResponse, GetCpuUsageArgs,
+    GetCpuUsageResponse,
+};
 mod get_cursor_time;
-pub use get_cursor_time::{CoreProfilerGetCursorTimeArgs, CoreProfilerGetCursorTimeResponse};
+pub use get_cursor_time::{
+    CoreProfilerGetCursorTimeArgs, CoreProfilerGetCursorTimeResponse, GetCursorTimeArgs,
+    GetCursorTimeResponse,
+};
 mod get_game_objects;
-pub use get_game_objects::{CoreProfilerGetGameObjectsArgs, CoreProfilerGetGameObjectsResponse};
+pub use get_game_objects::{
+    CoreProfilerGetGameObjectsArgs, CoreProfilerGetGameObjectsResponse, GetGameObjectsArgs,
+    GetGameObjectsResponse,
+};
 mod get_loaded_media;
-pub use get_loaded_media::{CoreProfilerGetLoadedMediaArgs, CoreProfilerGetLoadedMediaResponse};
+pub use get_loaded_media::{
+    CoreProfilerGetLoadedMediaArgs, CoreProfilerGetLoadedMediaResponse, GetLoadedMediaArgs,
+    GetLoadedMediaResponse,
+};
 mod get_meters;
 pub use get_meters::{
     CoreProfilerGetMetersArgs, CoreProfilerGetMetersOptions, CoreProfilerGetMetersResponse,
+    GetMetersArgs, GetMetersOptions, GetMetersResponse,
 };
 mod get_performance_monitor;
 pub use get_performance_monitor::{
     CoreProfilerGetPerformanceMonitorArgs, CoreProfilerGetPerformanceMonitorResponse,
+    GetPerformanceMonitorArgs, GetPerformanceMonitorResponse,
 };
 mod get_rtp_cs;
-pub use get_rtp_cs::{CoreProfilerGetRtpCsArgs, CoreProfilerGetRtpCsResponse};
+pub use get_rtp_cs::{
+    CoreProfilerGetRtpCsArgs, CoreProfilerGetRtpCsResponse, GetRtpCsArgs, GetRtpCsResponse,
+};
 mod get_streamed_media;
 pub use get_streamed_media::{
-    CoreProfilerGetStreamedMediaArgs, CoreProfilerGetStreamedMediaResponse,
+    CoreProfilerGetStreamedMediaArgs, CoreProfilerGetStreamedMediaResponse, GetStreamedMediaArgs,
+    GetStreamedMediaResponse,
 };
 mod get_voice_contributions;
 pub use get_voice_contributions::{
     CoreProfilerGetVoiceContributionsArgs, CoreProfilerGetVoiceContributionsResponse,
+    GetVoiceContributionsArgs, GetVoiceContributionsResponse,
 };
 mod get_voices;
 pub use get_voices::{
     CoreProfilerGetVoicesArgs, CoreProfilerGetVoicesOptions, CoreProfilerGetVoicesResponse,
+    GetVoicesArgs, GetVoicesOptions, GetVoicesResponse,
 };
 mod move_cursor;
-pub use move_cursor::{CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse};
+pub use move_cursor::{
+    CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse, MoveCursorArgs, MoveCursorResponse,
+};
 mod register_meter;
-pub use register_meter::CoreProfilerRegisterMeterArgs;
+pub use register_meter::{CoreProfilerRegisterMeterArgs, RegisterMeterArgs};
 mod save_capture;
-pub use save_capture::CoreProfilerSaveCaptureArgs;
+pub use save_capture::{CoreProfilerSaveCaptureArgs, SaveCaptureArgs};
 mod set_cursor_time;
-pub use set_cursor_time::{CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse};
+pub use set_cursor_time::{
+    CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse, SetCursorTimeArgs,
+    SetCursorTimeResponse,
+};
 mod start_capture;
-pub use start_capture::CoreProfilerStartCaptureResponse;
+pub use start_capture::{CoreProfilerStartCaptureResponse, StartCaptureResponse};
 mod state_changed;
-pub use state_changed::{CoreProfilerStateChangedOptions, CoreProfilerStateChangedPayload};
+pub use state_changed::{
+    CoreProfilerStateChangedOptions, CoreProfilerStateChangedPayload, StateChangedOptions,
+    StateChangedPayload,
+};
 mod stop_capture;
-pub use stop_capture::CoreProfilerStopCaptureResponse;
+pub use stop_capture::{CoreProfilerStopCaptureResponse, StopCaptureResponse};
 mod switch_changed;
-pub use switch_changed::{CoreProfilerSwitchChangedOptions, CoreProfilerSwitchChangedPayload};
+pub use switch_changed::{
+    CoreProfilerSwitchChangedOptions, CoreProfilerSwitchChangedPayload, SwitchChangedOptions,
+    SwitchChangedPayload,
+};
 mod unregister_meter;
-pub use unregister_meter::CoreProfilerUnregisterMeterArgs;
+pub use unregister_meter::{CoreProfilerUnregisterMeterArgs, UnregisterMeterArgs};

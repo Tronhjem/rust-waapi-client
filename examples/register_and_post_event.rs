@@ -1,96 +1,50 @@
 //! Registers game objects, sets the emitter position to the origin, and posts a SoundEngine event.
 //!
 //! Requires Wwise to be running with WAAPI enabled on `ws://127.0.0.1:8080/waapi` and an event
-//! named `Play_EventTestSound` in the current project.
+//! named `Play_TestSound` in the current project.
 
-use waapi_client::{
-    GameObjectRef, Position, Vector3, WaapiClient,
-    api::{
-        SoundEngineObjectRef,
-        ak::soundengine::{
-            SoundenginePostEventArgs, SoundengineRegisterGameObjArgs,
-            SoundengineSetDefaultListenersArgs, SoundengineSetPositionArgs,
-            SoundengineUnregisterGameObjArgs,
-        },
-    },
-};
+use wwise_waapi::api::ak::soundengine::PostEventArgs;
+use wwise_waapi::prelude::*;
 
 const LISTENER_ID: u64 = 1;
 const EMITTER_ID: u64 = 2;
 const EVENT_NAME: &str = "Play_TestSound";
 
 #[tokio::main]
-async fn main() -> waapi_client::WaapiResult<()> {
+async fn main() -> WaapiResult<()> {
     env_logger::init();
 
-    let mut client = WaapiClient::new(Some("ws://127.0.0.1:8080/waapi")).await?;
+    let mut client = WaapiClient::connect().await?;
+    let mut se = client.soundengine();
 
     // Register a listener and an emitter game object.
-    client
-        .soundengine()
-        .register_game_obj(SoundengineRegisterGameObjArgs::new(
-            GameObjectRef::game_object(LISTENER_ID),
-            "WaapiExampleListener".into(),
-        ))
+    se.register_game_obj((LISTENER_ID, "WaapiExampleListener"))
         .await?;
-    client
-        .soundengine()
-        .register_game_obj(SoundengineRegisterGameObjArgs::new(
-            GameObjectRef::game_object(EMITTER_ID),
-            "WaapiExampleEmitter".into(),
-        ))
+    se.register_game_obj((EMITTER_ID, "WaapiExampleEmitter"))
         .await?;
 
     // Make the listener the default listener for all emitters.
-    client
-        .soundengine()
-        .set_default_listeners(SoundengineSetDefaultListenersArgs::new(vec![
-            GameObjectRef::game_object(LISTENER_ID),
-        ]))
-        .await?;
+    se.set_default_listeners(vec![LISTENER_ID.into()]).await?;
 
     // Place the listener at the origin with default forward/up orientation.
-    client
-        .soundengine()
-        .set_position(SoundengineSetPositionArgs::new(
-            GameObjectRef::game_object(LISTENER_ID),
-            Position::origin(),
-        ))
-        .await?;
+    se.set_position((LISTENER_ID, Position::origin())).await?;
 
     // Offset the emitter using Vector3 arithmetic: 2 units behind and 2 units right of the listener.
     let emitter_position = Vector3::forward * -2.0 + Vector3::right * 2.0;
-    client
-        .soundengine()
-        .set_position(SoundengineSetPositionArgs::new(
-            GameObjectRef::game_object(EMITTER_ID),
-            Position::new(emitter_position),
-        ))
+    se.set_position((EMITTER_ID, Position::new(emitter_position)))
         .await?;
 
     // Post the event on the emitter game object.
-    let event_name = SoundEngineObjectRef::Name(EVENT_NAME.to_string());
-    let response = client
-        .soundengine()
-        .post_event(SoundenginePostEventArgs::new(event_name).game_object(EMITTER_ID))
+    let response = se
+        .post_event(PostEventArgs::new(EVENT_NAME).game_object(EMITTER_ID))
         .await?;
 
     println!("Posted {EVENT_NAME} on game object {EMITTER_ID}");
     println!("Playing ID: {:?}", response.playing_id);
 
     // Clean up.
-    client
-        .soundengine()
-        .unregister_game_obj(SoundengineUnregisterGameObjArgs::new(
-            GameObjectRef::game_object(EMITTER_ID),
-        ))
-        .await?;
-    client
-        .soundengine()
-        .unregister_game_obj(SoundengineUnregisterGameObjArgs::new(
-            GameObjectRef::game_object(LISTENER_ID),
-        ))
-        .await?;
+    se.unregister_game_obj(EMITTER_ID).await?;
+    se.unregister_game_obj(LISTENER_ID).await?;
 
     client.shutdown().await?;
     Ok(())

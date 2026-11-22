@@ -18,11 +18,17 @@ pub struct UiModelCreateHandleArgs {
 
 impl UiModelCreateHandleArgs {
     /// Creates a new [`UiModelCreateHandleArgs`] with the required fields.
-    pub fn new(container: String, template: String) -> Self {
+    pub fn new(container: impl Into<String>, template: impl Into<String>) -> Self {
         Self {
-            container,
-            template,
+            container: container.into(),
+            template: template.into(),
         }
+    }
+}
+
+impl<T0: Into<String>, T1: Into<String>> From<(T0, T1)> for UiModelCreateHandleArgs {
+    fn from((container, template): (T0, T1)) -> Self {
+        Self::new(container, template)
     }
 }
 
@@ -35,3 +41,9 @@ pub struct UiModelCreateHandleResponse {
     #[serde(rename = "handleID", default)]
     pub handle_id: Option<String>,
 }
+
+/// Module-scoped alias for [`UiModelCreateHandleArgs`].
+pub type CreateHandleArgs = UiModelCreateHandleArgs;
+
+/// Module-scoped alias for [`UiModelCreateHandleResponse`].
+pub type CreateHandleResponse = UiModelCreateHandleResponse;

@@ -28,13 +28,13 @@ pub struct CoreObjectSetAttenuationCurveArgs {
 impl CoreObjectSetAttenuationCurveArgs {
     /// Creates a new [`CoreObjectSetAttenuationCurveArgs`] with the required fields.
     pub fn new(
-        object: ObjectRef,
+        object: impl Into<ObjectRef>,
         curve_type: AttenuationCurveType,
         use_: AttenuationCurveUse,
         points: Vec<CurvePoint2D>,
     ) -> Self {
         Self {
-            object,
+            object: object.into(),
             curve_type,
             use_,
             points,
@@ -48,3 +48,6 @@ impl CoreObjectSetAttenuationCurveArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectSetAttenuationCurveArgs`].
+pub type SetAttenuationCurveArgs = CoreObjectSetAttenuationCurveArgs;

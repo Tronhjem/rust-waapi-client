@@ -61,3 +61,9 @@ pub struct UiCaptureScreenResponse {
     #[serde(rename = "contentBase64", default)]
     pub content_base64: Option<String>,
 }
+
+/// Module-scoped alias for [`UiCaptureScreenArgs`].
+pub type CaptureScreenArgs = UiCaptureScreenArgs;
+
+/// Module-scoped alias for [`UiCaptureScreenResponse`].
+pub type CaptureScreenResponse = UiCaptureScreenResponse;

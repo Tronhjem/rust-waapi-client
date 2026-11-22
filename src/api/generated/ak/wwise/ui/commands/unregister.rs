@@ -20,3 +20,12 @@ impl UiCommandsUnregisterArgs {
         Self { commands }
     }
 }
+
+impl From<Vec<String>> for UiCommandsUnregisterArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiCommandsUnregisterArgs`].
+pub type UnregisterArgs = UiCommandsUnregisterArgs;

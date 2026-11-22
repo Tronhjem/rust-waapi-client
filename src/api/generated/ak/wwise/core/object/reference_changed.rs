@@ -54,3 +54,9 @@ impl CoreObjectReferenceChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectReferenceChangedPayload`].
+pub type ReferenceChangedPayload = CoreObjectReferenceChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectReferenceChangedOptions`].
+pub type ReferenceChangedOptions = CoreObjectReferenceChangedOptions;

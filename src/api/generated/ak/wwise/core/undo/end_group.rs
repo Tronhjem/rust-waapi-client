@@ -17,7 +17,30 @@ pub struct CoreUndoEndGroupArgs {
 
 impl CoreUndoEndGroupArgs {
     /// Creates a new [`CoreUndoEndGroupArgs`] with the required fields.
-    pub fn new(display_name: String) -> Self {
-        Self { display_name }
+    pub fn new(display_name: impl Into<String>) -> Self {
+        Self {
+            display_name: display_name.into(),
+        }
     }
 }
+
+impl From<String> for CoreUndoEndGroupArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreUndoEndGroupArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreUndoEndGroupArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreUndoEndGroupArgs`].
+pub type EndGroupArgs = CoreUndoEndGroupArgs;

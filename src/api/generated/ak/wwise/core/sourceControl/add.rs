@@ -21,6 +21,12 @@ impl CoreSourceControlAddArgs {
     }
 }
 
+impl From<Vec<String>> for CoreSourceControlAddArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.add`.
 ///
 /// Add files to source control. Equivalent to Mark for Add for Perforce.
@@ -29,3 +35,9 @@ pub struct CoreSourceControlAddResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlAddArgs`].
+pub type AddArgs = CoreSourceControlAddArgs;
+
+/// Module-scoped alias for [`CoreSourceControlAddResponse`].
+pub type AddResponse = CoreSourceControlAddResponse;

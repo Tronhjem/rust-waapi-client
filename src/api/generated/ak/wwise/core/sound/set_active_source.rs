@@ -21,10 +21,10 @@ pub struct CoreSoundSetActiveSourceArgs {
 
 impl CoreSoundSetActiveSourceArgs {
     /// Creates a new [`CoreSoundSetActiveSourceArgs`] with the required fields.
-    pub fn new(sound: ObjectRef, source: ObjectRef) -> Self {
+    pub fn new(sound: impl Into<ObjectRef>, source: impl Into<ObjectRef>) -> Self {
         Self {
-            sound,
-            source,
+            sound: sound.into(),
+            source: source.into(),
             platform: None,
         }
     }
@@ -35,3 +35,12 @@ impl CoreSoundSetActiveSourceArgs {
         self
     }
 }
+
+impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreSoundSetActiveSourceArgs {
+    fn from((sound, source): (T0, T1)) -> Self {
+        Self::new(sound, source)
+    }
+}
+
+/// Module-scoped alias for [`CoreSoundSetActiveSourceArgs`].
+pub type SetActiveSourceArgs = CoreSoundSetActiveSourceArgs;

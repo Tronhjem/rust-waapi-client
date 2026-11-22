@@ -14,3 +14,6 @@ pub struct UiLayoutGetCurrentLayoutNameResponse {
     #[serde(default)]
     pub name: Option<String>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetCurrentLayoutNameResponse`].
+pub type GetCurrentLayoutNameResponse = UiLayoutGetCurrentLayoutNameResponse;

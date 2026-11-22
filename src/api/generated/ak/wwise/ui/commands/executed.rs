@@ -22,3 +22,9 @@ pub struct UiCommandsExecutedPayload {
 ///
 /// Specifies the return options for every object returned.
 pub type UiCommandsExecutedOptions = ObjectReturnOptions;
+
+/// Module-scoped alias for [`UiCommandsExecutedPayload`].
+pub type ExecutedPayload = UiCommandsExecutedPayload;
+
+/// Module-scoped alias for [`UiCommandsExecutedOptions`].
+pub type ExecutedOptions = UiCommandsExecutedOptions;

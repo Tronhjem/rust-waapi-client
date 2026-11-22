@@ -21,3 +21,12 @@ impl CoreProfilerEnableProfilerDataArgs {
         Self { data_types }
     }
 }
+
+impl From<Vec<serde_json::Value>> for CoreProfilerEnableProfilerDataArgs {
+    fn from(value: Vec<serde_json::Value>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreProfilerEnableProfilerDataArgs`].
+pub type EnableProfilerDataArgs = CoreProfilerEnableProfilerDataArgs;

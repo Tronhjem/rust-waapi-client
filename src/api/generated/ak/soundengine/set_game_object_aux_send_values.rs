@@ -20,10 +20,21 @@ pub struct SoundengineSetGameObjectAuxSendValuesArgs {
 
 impl SoundengineSetGameObjectAuxSendValuesArgs {
     /// Creates a new [`SoundengineSetGameObjectAuxSendValuesArgs`] with the required fields.
-    pub fn new(game_object: GameObjectRef, aux_send_values: Vec<AuxSendValue>) -> Self {
+    pub fn new(game_object: impl Into<GameObjectRef>, aux_send_values: Vec<AuxSendValue>) -> Self {
         Self {
-            game_object,
+            game_object: game_object.into(),
             aux_send_values,
         }
     }
 }
+
+impl<T0: Into<GameObjectRef>, T1: Into<Vec<AuxSendValue>>> From<(T0, T1)>
+    for SoundengineSetGameObjectAuxSendValuesArgs
+{
+    fn from((game_object, aux_send_values): (T0, T1)) -> Self {
+        Self::new(game_object, aux_send_values.into())
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetGameObjectAuxSendValuesArgs`].
+pub type SetGameObjectAuxSendValuesArgs = SoundengineSetGameObjectAuxSendValuesArgs;

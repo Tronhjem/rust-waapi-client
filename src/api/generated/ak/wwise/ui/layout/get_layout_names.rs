@@ -14,3 +14,6 @@ pub struct UiLayoutGetLayoutNamesResponse {
     #[serde(default)]
     pub layouts: Vec<String>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetLayoutNamesResponse`].
+pub type GetLayoutNamesResponse = UiLayoutGetLayoutNamesResponse;

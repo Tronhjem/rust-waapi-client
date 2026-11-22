@@ -17,7 +17,30 @@ pub struct UiWindowPresentArgs {
 
 impl UiWindowPresentArgs {
     /// Creates a new [`UiWindowPresentArgs`] with the required fields.
-    pub fn new(window_id: String) -> Self {
-        Self { window_id }
+    pub fn new(window_id: impl Into<String>) -> Self {
+        Self {
+            window_id: window_id.into(),
+        }
     }
 }
+
+impl From<String> for UiWindowPresentArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiWindowPresentArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiWindowPresentArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiWindowPresentArgs`].
+pub type PresentArgs = UiWindowPresentArgs;

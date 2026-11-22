@@ -16,7 +16,30 @@ pub struct SoundenginePostMsgMonitorArgs {
 
 impl SoundenginePostMsgMonitorArgs {
     /// Creates a new [`SoundenginePostMsgMonitorArgs`] with the required fields.
-    pub fn new(message: String) -> Self {
-        Self { message }
+    pub fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
     }
 }
+
+impl From<String> for SoundenginePostMsgMonitorArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for SoundenginePostMsgMonitorArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for SoundenginePostMsgMonitorArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`SoundenginePostMsgMonitorArgs`].
+pub type PostMsgMonitorArgs = SoundenginePostMsgMonitorArgs;

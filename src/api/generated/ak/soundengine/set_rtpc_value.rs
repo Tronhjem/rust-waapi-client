@@ -21,9 +21,9 @@ pub struct SoundengineSetRtpcValueArgs {
 
 impl SoundengineSetRtpcValueArgs {
     /// Creates a new [`SoundengineSetRtpcValueArgs`] with the required fields.
-    pub fn new(rtpc: SoundEngineObjectRef, value: f64) -> Self {
+    pub fn new(rtpc: impl Into<SoundEngineObjectRef>, value: f64) -> Self {
         Self {
-            rtpc,
+            rtpc: rtpc.into(),
             value,
             game_object: None,
         }
@@ -35,3 +35,12 @@ impl SoundengineSetRtpcValueArgs {
         self
     }
 }
+
+impl<T0: Into<SoundEngineObjectRef>, T1: Into<f64>> From<(T0, T1)> for SoundengineSetRtpcValueArgs {
+    fn from((rtpc, value): (T0, T1)) -> Self {
+        Self::new(rtpc, value.into())
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetRtpcValueArgs`].
+pub type SetRtpcValueArgs = SoundengineSetRtpcValueArgs;

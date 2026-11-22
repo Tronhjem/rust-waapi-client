@@ -27,10 +27,10 @@ pub struct CoreObjectMoveArgs {
 
 impl CoreObjectMoveArgs {
     /// Creates a new [`CoreObjectMoveArgs`] with the required fields.
-    pub fn new(object: ObjectRef, parent: ObjectRef) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, parent: impl Into<ObjectRef>) -> Self {
         Self {
-            object,
-            parent,
+            object: object.into(),
+            parent: parent.into(),
             on_name_conflict: None,
             auto_check_out_to_source_control: None,
         }
@@ -52,7 +52,19 @@ impl CoreObjectMoveArgs {
     }
 }
 
+impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectMoveArgs {
+    fn from((object, parent): (T0, T1)) -> Self {
+        Self::new(object, parent)
+    }
+}
+
 /// Response from `ak.wwise.core.object.move`.
 ///
 /// The moved object.
 pub type CoreObjectMoveResponse = WwiseObject;
+
+/// Module-scoped alias for [`CoreObjectMoveArgs`].
+pub type MoveArgs = CoreObjectMoveArgs;
+
+/// Module-scoped alias for [`CoreObjectMoveResponse`].
+pub type MoveResponse = CoreObjectMoveResponse;

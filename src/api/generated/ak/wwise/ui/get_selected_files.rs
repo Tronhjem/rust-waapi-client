@@ -13,3 +13,6 @@ pub struct UiGetSelectedFilesResponse {
     /// The selected files. Can be empty if no file is selected.
     pub files: Vec<String>,
 }
+
+/// Module-scoped alias for [`UiGetSelectedFilesResponse`].
+pub type GetSelectedFilesResponse = UiGetSelectedFilesResponse;

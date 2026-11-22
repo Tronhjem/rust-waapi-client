@@ -18,7 +18,19 @@ pub struct UiLayoutMoveSplitterArgs {
 
 impl UiLayoutMoveSplitterArgs {
     /// Creates a new [`UiLayoutMoveSplitterArgs`] with the required fields.
-    pub fn new(id: String, delta: i64) -> Self {
-        Self { id, delta }
+    pub fn new(id: impl Into<String>, delta: i64) -> Self {
+        Self {
+            id: id.into(),
+            delta,
+        }
     }
 }
+
+impl<T0: Into<String>, T1: Into<i64>> From<(T0, T1)> for UiLayoutMoveSplitterArgs {
+    fn from((id, delta): (T0, T1)) -> Self {
+        Self::new(id, delta.into())
+    }
+}
+
+/// Module-scoped alias for [`UiLayoutMoveSplitterArgs`].
+pub type MoveSplitterArgs = UiLayoutMoveSplitterArgs;

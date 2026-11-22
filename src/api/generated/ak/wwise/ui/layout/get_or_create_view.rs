@@ -22,9 +22,9 @@ pub struct UiLayoutGetOrCreateViewArgs {
 
 impl UiLayoutGetOrCreateViewArgs {
     /// Creates a new [`UiLayoutGetOrCreateViewArgs`] with the required fields.
-    pub fn new(name: String) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Self {
-            name,
+            name: name.into(),
             pos_x: None,
             pos_y: None,
         }
@@ -43,6 +43,24 @@ impl UiLayoutGetOrCreateViewArgs {
     }
 }
 
+impl From<String> for UiLayoutGetOrCreateViewArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutGetOrCreateViewArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutGetOrCreateViewArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.ui.layout.getOrCreateView`.
 ///
 /// Gets a view, if it exists in the current layout, or creates a new one.
@@ -52,3 +70,9 @@ pub struct UiLayoutGetOrCreateViewResponse {
     #[serde(default)]
     pub id: Option<String>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetOrCreateViewArgs`].
+pub type GetOrCreateViewArgs = UiLayoutGetOrCreateViewArgs;
+
+/// Module-scoped alias for [`UiLayoutGetOrCreateViewResponse`].
+pub type GetOrCreateViewResponse = UiLayoutGetOrCreateViewResponse;

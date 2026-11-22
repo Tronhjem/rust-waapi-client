@@ -22,11 +22,24 @@ pub struct UiSignalEmitArgs {
 
 impl UiSignalEmitArgs {
     /// Creates a new [`UiSignalEmitArgs`] with the required fields.
-    pub fn new(handle_id: String, widget_id: String, signal: String) -> Self {
+    pub fn new(
+        handle_id: impl Into<String>,
+        widget_id: impl Into<String>,
+        signal: impl Into<String>,
+    ) -> Self {
         Self {
-            handle_id,
-            widget_id,
-            signal,
+            handle_id: handle_id.into(),
+            widget_id: widget_id.into(),
+            signal: signal.into(),
         }
     }
 }
+
+impl<T0: Into<String>, T1: Into<String>, T2: Into<String>> From<(T0, T1, T2)> for UiSignalEmitArgs {
+    fn from((handle_id, widget_id, signal): (T0, T1, T2)) -> Self {
+        Self::new(handle_id, widget_id, signal)
+    }
+}
+
+/// Module-scoped alias for [`UiSignalEmitArgs`].
+pub type EmitArgs = UiSignalEmitArgs;

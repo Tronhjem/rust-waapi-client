@@ -45,3 +45,9 @@ impl CoreObjectCreatedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectCreatedPayload`].
+pub type CreatedPayload = CoreObjectCreatedPayload;
+
+/// Module-scoped alias for [`CoreObjectCreatedOptions`].
+pub type CreatedOptions = CoreObjectCreatedOptions;

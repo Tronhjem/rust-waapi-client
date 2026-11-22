@@ -38,9 +38,9 @@ pub struct CoreObjectSetItem {
 
 impl CoreObjectSetItem {
     /// Creates a new [`CoreObjectSetItem`] with the required fields.
-    pub fn new(object: ObjectRef) -> Self {
+    pub fn new(object: impl Into<ObjectRef>) -> Self {
         Self {
-            object,
+            object: object.into(),
             name: None,
             notes: None,
             children: None,
@@ -113,6 +113,30 @@ impl CoreObjectSetItem {
     }
 }
 
+impl From<ObjectRef> for CoreObjectSetItem {
+    fn from(value: ObjectRef) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreObjectSetItem {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<String> for CoreObjectSetItem {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreObjectSetItem {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Arguments for `ak.wwise.core.object.set`.
 ///
 /// Allows for batch processing of the following operations: Object creation in a child hierarchy, Object creation in a list, Setting name, notes, properties and references. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise.
@@ -177,6 +201,18 @@ impl CoreObjectSetArgs {
     }
 }
 
+impl From<Vec<CoreObjectSetItem>> for CoreObjectSetArgs {
+    fn from(value: Vec<CoreObjectSetItem>) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<CoreObjectSetItem> for CoreObjectSetArgs {
+    fn from(item: CoreObjectSetItem) -> Self {
+        Self::new(vec![item])
+    }
+}
+
 /// Options for `ak.wwise.core.object.set`.
 ///
 /// Specifies the return options for every object created.
@@ -217,3 +253,18 @@ pub struct CoreObjectSetResponse {
     #[serde(default)]
     pub objects: Vec<CoreObjectSetObject>,
 }
+
+/// Module-scoped alias for [`CoreObjectSetArgs`].
+pub type SetArgs = CoreObjectSetArgs;
+
+/// Module-scoped alias for [`CoreObjectSetItem`].
+pub type SetItem = CoreObjectSetItem;
+
+/// Module-scoped alias for [`CoreObjectSetOptions`].
+pub type SetOptions = CoreObjectSetOptions;
+
+/// Module-scoped alias for [`CoreObjectSetResponse`].
+pub type SetResponse = CoreObjectSetResponse;
+
+/// Module-scoped alias for [`CoreObjectSetObject`].
+pub type SetObject = CoreObjectSetObject;

@@ -1,14 +1,14 @@
 use super::{connect_client, sequence_lock};
 use std::time::Duration;
 use tokio::time::timeout;
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectCreatedOptions, CoreObjectCreatedPayload, CoreObjectDeleteArgs,
     CoreObjectNameChangedOptions, CoreObjectNameChangedPayload, CoreObjectPreDeletedOptions,
     CoreObjectPreDeletedPayload, CoreObjectPropertyChangedOptions,
     CoreObjectPropertyChangedPayload, CoreObjectSetNameArgs, CoreObjectSetPropertyArgs,
 };
-use waapi_client::api::{ObjectReturnField, OnNameConflict};
-use waapi_client::{ObjectRef, ObjectType, Property};
+use wwise_waapi::api::{ObjectReturnField, OnNameConflict};
+use wwise_waapi::{ObjectRef, ObjectType, Property};
 
 const ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 
@@ -128,9 +128,9 @@ async fn typed_topic_payload_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            &mixer_id,
             Property::Volume,
-            (-3.0).into(),
+            -3.0,
         ))
         .await
         .expect("set property");

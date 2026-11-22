@@ -37,3 +37,9 @@ pub struct UiProjectCloseResponse {
     #[serde(rename = "hadProjectOpen")]
     pub had_project_open: bool,
 }
+
+/// Module-scoped alias for [`UiProjectCloseArgs`].
+pub type CloseArgs = UiProjectCloseArgs;
+
+/// Module-scoped alias for [`UiProjectCloseResponse`].
+pub type CloseResponse = UiProjectCloseResponse;

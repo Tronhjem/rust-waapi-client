@@ -16,7 +16,28 @@ pub struct UiLayoutSwitchLayoutArgs {
 
 impl UiLayoutSwitchLayoutArgs {
     /// Creates a new [`UiLayoutSwitchLayoutArgs`] with the required fields.
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: impl Into<String>) -> Self {
+        Self { name: name.into() }
     }
 }
+
+impl From<String> for UiLayoutSwitchLayoutArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutSwitchLayoutArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutSwitchLayoutArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiLayoutSwitchLayoutArgs`].
+pub type SwitchLayoutArgs = UiLayoutSwitchLayoutArgs;

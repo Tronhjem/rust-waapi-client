@@ -43,6 +43,12 @@ impl CoreObjectGetPropertyInfoArgs {
     }
 }
 
+impl From<Property> for CoreObjectGetPropertyInfoArgs {
+    fn from(value: Property) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.object.getPropertyInfo`.
 ///
 /// Retrieves information about an object property. Note that this function does not return the value of a property. To retrieve the value of a property, see `ak.wwise.core.object.get` and the WAAPI query return options documentation.
@@ -76,3 +82,9 @@ pub struct CoreObjectGetPropertyInfoResponse {
     #[serde(default)]
     pub ui: Option<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreObjectGetPropertyInfoArgs`].
+pub type GetPropertyInfoArgs = CoreObjectGetPropertyInfoArgs;
+
+/// Module-scoped alias for [`CoreObjectGetPropertyInfoResponse`].
+pub type GetPropertyInfoResponse = CoreObjectGetPropertyInfoResponse;

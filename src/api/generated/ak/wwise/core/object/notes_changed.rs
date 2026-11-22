@@ -51,3 +51,9 @@ impl CoreObjectNotesChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectNotesChangedPayload`].
+pub type NotesChangedPayload = CoreObjectNotesChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectNotesChangedOptions`].
+pub type NotesChangedOptions = CoreObjectNotesChangedOptions;

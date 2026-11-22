@@ -21,6 +21,12 @@ impl CoreSourceControlDeleteArgs {
     }
 }
 
+impl From<Vec<String>> for CoreSourceControlDeleteArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.delete`.
 ///
 /// Delete files from source control. Equivalent to Mark for Delete for Perforce.
@@ -29,3 +35,9 @@ pub struct CoreSourceControlDeleteResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlDeleteArgs`].
+pub type DeleteArgs = CoreSourceControlDeleteArgs;
+
+/// Module-scoped alias for [`CoreSourceControlDeleteResponse`].
+pub type DeleteResponse = CoreSourceControlDeleteResponse;

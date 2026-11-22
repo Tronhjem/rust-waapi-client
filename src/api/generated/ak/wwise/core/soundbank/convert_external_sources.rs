@@ -20,3 +20,12 @@ impl CoreSoundbankConvertExternalSourcesArgs {
         Self { sources }
     }
 }
+
+impl From<Vec<ExternalSourceInfo>> for CoreSoundbankConvertExternalSourcesArgs {
+    fn from(value: Vec<ExternalSourceInfo>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreSoundbankConvertExternalSourcesArgs`].
+pub type ConvertExternalSourcesArgs = CoreSoundbankConvertExternalSourcesArgs;

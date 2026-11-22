@@ -17,7 +17,30 @@ pub struct SoundengineUnregisterGameObjArgs {
 
 impl SoundengineUnregisterGameObjArgs {
     /// Creates a new [`SoundengineUnregisterGameObjArgs`] with the required fields.
-    pub fn new(game_object: GameObjectRef) -> Self {
-        Self { game_object }
+    pub fn new(game_object: impl Into<GameObjectRef>) -> Self {
+        Self {
+            game_object: game_object.into(),
+        }
     }
 }
+
+impl From<GameObjectRef> for SoundengineUnregisterGameObjArgs {
+    fn from(value: GameObjectRef) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<u64> for SoundengineUnregisterGameObjArgs {
+    fn from(value: u64) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<u32> for SoundengineUnregisterGameObjArgs {
+    fn from(value: u32) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`SoundengineUnregisterGameObjArgs`].
+pub type UnregisterGameObjArgs = SoundengineUnregisterGameObjArgs;

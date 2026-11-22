@@ -25,10 +25,10 @@ pub struct UiLayoutUndockViewArgs {
 
 impl UiLayoutUndockViewArgs {
     /// Creates a new [`UiLayoutUndockViewArgs`] with the required fields.
-    pub fn new(name: String, view_id: String) -> Self {
+    pub fn new(name: impl Into<String>, view_id: impl Into<String>) -> Self {
         Self {
-            name,
-            view_id,
+            name: name.into(),
+            view_id: view_id.into(),
             pos_x: None,
             pos_y: None,
         }
@@ -46,3 +46,12 @@ impl UiLayoutUndockViewArgs {
         self
     }
 }
+
+impl<T0: Into<String>, T1: Into<String>> From<(T0, T1)> for UiLayoutUndockViewArgs {
+    fn from((name, view_id): (T0, T1)) -> Self {
+        Self::new(name, view_id)
+    }
+}
+
+/// Module-scoped alias for [`UiLayoutUndockViewArgs`].
+pub type UndockViewArgs = UiLayoutUndockViewArgs;

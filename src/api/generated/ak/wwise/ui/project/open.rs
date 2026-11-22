@@ -34,9 +34,9 @@ pub struct UiProjectOpenArgs {
 
 impl UiProjectOpenArgs {
     /// Creates a new [`UiProjectOpenArgs`] with the required fields.
-    pub fn new(path: String) -> Self {
+    pub fn new(path: impl Into<String>) -> Self {
         Self {
-            path,
+            path: path.into(),
             on_upgrade: None,
             on_migration_required: None,
             bypass_save: None,
@@ -74,3 +74,24 @@ impl UiProjectOpenArgs {
         self
     }
 }
+
+impl From<String> for UiProjectOpenArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiProjectOpenArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiProjectOpenArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiProjectOpenArgs`].
+pub type OpenArgs = UiProjectOpenArgs;

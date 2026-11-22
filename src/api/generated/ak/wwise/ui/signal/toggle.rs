@@ -33,10 +33,16 @@ pub struct UiSignalToggleOptions {
 
 impl UiSignalToggleOptions {
     /// Creates a new [`UiSignalToggleOptions`] with the required fields.
-    pub fn new(handle_id: String, widget_id: String) -> Self {
+    pub fn new(handle_id: impl Into<String>, widget_id: impl Into<String>) -> Self {
         Self {
-            handle_id,
-            widget_id,
+            handle_id: handle_id.into(),
+            widget_id: widget_id.into(),
         }
     }
 }
+
+/// Module-scoped alias for [`UiSignalTogglePayload`].
+pub type TogglePayload = UiSignalTogglePayload;
+
+/// Module-scoped alias for [`UiSignalToggleOptions`].
+pub type ToggleOptions = UiSignalToggleOptions;

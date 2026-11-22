@@ -21,6 +21,12 @@ impl CoreProfilerGetMetersArgs {
     }
 }
 
+impl From<serde_json::Value> for CoreProfilerGetMetersArgs {
+    fn from(value: serde_json::Value) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Options for `ak.wwise.core.profiler.getMeters`.
 ///
 /// Specifies the return options for the meter object field. The defaults are name and ID.
@@ -34,3 +40,12 @@ pub struct CoreProfilerGetMetersResponse {
     /// Array of registered meters.
     pub meters: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetMetersArgs`].
+pub type GetMetersArgs = CoreProfilerGetMetersArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetMetersOptions`].
+pub type GetMetersOptions = CoreProfilerGetMetersOptions;
+
+/// Module-scoped alias for [`CoreProfilerGetMetersResponse`].
+pub type GetMetersResponse = CoreProfilerGetMetersResponse;

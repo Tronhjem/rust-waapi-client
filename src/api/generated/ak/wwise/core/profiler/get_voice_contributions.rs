@@ -37,6 +37,14 @@ impl CoreProfilerGetVoiceContributionsArgs {
     }
 }
 
+impl<T0: Into<f64>, T1: Into<serde_json::Value>> From<(T0, T1)>
+    for CoreProfilerGetVoiceContributionsArgs
+{
+    fn from((voice_pipeline_id, time): (T0, T1)) -> Self {
+        Self::new(voice_pipeline_id.into(), time.into())
+    }
+}
+
 /// Response from `ak.wwise.core.profiler.getVoiceContributions`.
 ///
 /// Retrieves all parameters affecting voice volume, highpass and lowpass for a voice path, resolved from pipeline IDs.
@@ -46,3 +54,9 @@ pub struct CoreProfilerGetVoiceContributionsResponse {
     #[serde(rename = "return", default)]
     pub return_: Option<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetVoiceContributionsArgs`].
+pub type GetVoiceContributionsArgs = CoreProfilerGetVoiceContributionsArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetVoiceContributionsResponse`].
+pub type GetVoiceContributionsResponse = CoreProfilerGetVoiceContributionsResponse;

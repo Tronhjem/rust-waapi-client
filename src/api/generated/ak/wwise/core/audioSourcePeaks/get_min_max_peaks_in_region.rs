@@ -31,9 +31,9 @@ pub struct CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs {
 
 impl CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs {
     /// Creates a new [`CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs`] with the required fields.
-    pub fn new(object: ObjectRef, time_from: f64, time_to: f64, num_peaks: i64) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, time_from: f64, time_to: f64, num_peaks: i64) -> Self {
         Self {
-            object,
+            object: object.into(),
             time_from,
             time_to,
             num_peaks,
@@ -72,3 +72,9 @@ pub struct CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse {
     #[serde(rename = "channelConfig", default)]
     pub channel_config: Option<String>,
 }
+
+/// Module-scoped alias for [`CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs`].
+pub type GetMinMaxPeaksInRegionArgs = CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs;
+
+/// Module-scoped alias for [`CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse`].
+pub type GetMinMaxPeaksInRegionResponse = CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse;

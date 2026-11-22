@@ -25,12 +25,20 @@ pub struct CoreGameParameterSetRangeArgs {
 
 impl CoreGameParameterSetRangeArgs {
     /// Creates a new [`CoreGameParameterSetRangeArgs`] with the required fields.
-    pub fn new(object: ObjectRef, min: f64, max: f64, on_curve_update: OnCurveUpdate) -> Self {
+    pub fn new(
+        object: impl Into<ObjectRef>,
+        min: f64,
+        max: f64,
+        on_curve_update: OnCurveUpdate,
+    ) -> Self {
         Self {
-            object,
+            object: object.into(),
             min,
             max,
             on_curve_update,
         }
     }
 }
+
+/// Module-scoped alias for [`CoreGameParameterSetRangeArgs`].
+pub type SetRangeArgs = CoreGameParameterSetRangeArgs;

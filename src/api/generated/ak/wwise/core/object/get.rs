@@ -22,10 +22,10 @@ pub struct CoreObjectGetArgs {
 
 impl CoreObjectGetArgs {
     /// Creates a new [`CoreObjectGetArgs`] starting from a `from` [`ObjectQuery`].
-    pub fn new(from: ObjectQuery) -> Self {
+    pub fn new(from: impl Into<ObjectQuery>) -> Self {
         Self {
             waql: None,
-            from: Some(from),
+            from: Some(from.into()),
             transform: None,
         }
     }
@@ -58,6 +58,48 @@ impl CoreObjectGetArgs {
     }
 }
 
+impl From<ObjectQuery> for CoreObjectGetArgs {
+    fn from(from: ObjectQuery) -> Self {
+        Self::new(from)
+    }
+}
+
+impl From<&str> for CoreObjectGetArgs {
+    fn from(s: &str) -> Self {
+        Self::new(s)
+    }
+}
+
+impl From<String> for CoreObjectGetArgs {
+    fn from(s: String) -> Self {
+        Self::new(s)
+    }
+}
+
+impl From<&String> for CoreObjectGetArgs {
+    fn from(s: &String) -> Self {
+        Self::new(s)
+    }
+}
+
+impl From<ObjectType> for CoreObjectGetArgs {
+    fn from(object_type: ObjectType) -> Self {
+        Self::new(object_type)
+    }
+}
+
+impl From<Vec<ObjectType>> for CoreObjectGetArgs {
+    fn from(object_types: Vec<ObjectType>) -> Self {
+        Self::new(object_types)
+    }
+}
+
+impl From<Vec<String>> for CoreObjectGetArgs {
+    fn from(ids: Vec<String>) -> Self {
+        Self::new(ids)
+    }
+}
+
 /// Options for `ak.wwise.core.object.get`.
 ///
 /// Specifies the return options for every object returned.
@@ -72,3 +114,12 @@ pub struct CoreObjectGetResponse {
     #[serde(rename = "return", default)]
     pub objects: Vec<WwiseObject>,
 }
+
+/// Module-scoped alias for [`CoreObjectGetArgs`].
+pub type GetArgs = CoreObjectGetArgs;
+
+/// Module-scoped alias for [`CoreObjectGetOptions`].
+pub type GetOptions = CoreObjectGetOptions;
+
+/// Module-scoped alias for [`CoreObjectGetResponse`].
+pub type GetResponse = CoreObjectGetResponse;

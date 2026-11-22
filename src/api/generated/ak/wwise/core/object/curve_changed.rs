@@ -49,3 +49,9 @@ impl CoreObjectCurveChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectCurveChangedPayload`].
+pub type CurveChangedPayload = CoreObjectCurveChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectCurveChangedOptions`].
+pub type CurveChangedOptions = CoreObjectCurveChangedOptions;

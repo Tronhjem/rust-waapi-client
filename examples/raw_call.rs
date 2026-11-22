@@ -5,13 +5,13 @@
 //! Run with: cargo run --example raw_call
 
 use log::{error, info};
-use waapi_client::{WaapiClient, WaapiFunction, json};
+use wwise_waapi::{WaapiClient, WaapiFunction, json};
 
 #[tokio::main]
 async fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(Some("127.0.0.1:8080"))
+    let mut client = WaapiClient::connect()
         .await
         .expect("Failed to connect to WAAPI");
 

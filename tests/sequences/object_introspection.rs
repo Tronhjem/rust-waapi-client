@@ -1,11 +1,11 @@
 use super::{connect_client, sequence_lock};
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetPropertyAndReferenceNamesArgs,
     CoreObjectGetPropertyInfoArgs, CoreObjectIsLinkedArgs, CoreObjectIsPropertyEnabledArgs,
     CoreObjectSetLinkedArgs, CoreObjectSetStateGroupsArgs, CoreObjectSetStatePropertiesArgs,
 };
-use waapi_client::api::{ObjectRef, PlatformRef};
-use waapi_client::{ObjectType, Property};
+use wwise_waapi::api::{ObjectRef, PlatformRef};
+use wwise_waapi::{ObjectType, Property};
 
 const ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const STATE_GROUPS_WU: &str = r"\States\Default Work Unit";
@@ -49,7 +49,7 @@ async fn object_introspection_sequence() {
                 ObjectType::ActorMixer,
                 "WaapiSeqIntrospectMixer".to_string(),
             )
-            .on_name_conflict(waapi_client::api::OnNameConflict::Replace),
+            .on_name_conflict(wwise_waapi::api::OnNameConflict::Replace),
         )
         .await
         .expect("create mixer");
@@ -136,7 +136,7 @@ async fn object_introspection_sequence() {
                 ObjectType::StateGroup,
                 "WaapiSeqIntrospectStateGroup".to_string(),
             )
-            .on_name_conflict(waapi_client::api::OnNameConflict::Replace),
+            .on_name_conflict(wwise_waapi::api::OnNameConflict::Replace),
         )
         .await
         .expect("create state group");

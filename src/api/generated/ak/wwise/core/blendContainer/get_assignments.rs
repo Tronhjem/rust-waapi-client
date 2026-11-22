@@ -16,8 +16,28 @@ pub struct CoreBlendContainerGetAssignmentsArgs {
 
 impl CoreBlendContainerGetAssignmentsArgs {
     /// Creates a new [`CoreBlendContainerGetAssignmentsArgs`] with the required fields.
-    pub fn new(object: String) -> Self {
-        Self { object }
+    pub fn new(object: impl Into<String>) -> Self {
+        Self {
+            object: object.into(),
+        }
+    }
+}
+
+impl From<String> for CoreBlendContainerGetAssignmentsArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreBlendContainerGetAssignmentsArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreBlendContainerGetAssignmentsArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +50,9 @@ pub struct CoreBlendContainerGetAssignmentsResponse {
     #[serde(rename = "return", default)]
     pub assignments: Vec<BlendTrackAssignment>,
 }
+
+/// Module-scoped alias for [`CoreBlendContainerGetAssignmentsArgs`].
+pub type GetAssignmentsArgs = CoreBlendContainerGetAssignmentsArgs;
+
+/// Module-scoped alias for [`CoreBlendContainerGetAssignmentsResponse`].
+pub type GetAssignmentsResponse = CoreBlendContainerGetAssignmentsResponse;

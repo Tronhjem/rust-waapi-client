@@ -23,11 +23,15 @@ pub struct CoreObjectSetReferenceArgs {
 
 impl CoreObjectSetReferenceArgs {
     /// Creates a new [`CoreObjectSetReferenceArgs`] with the required fields.
-    pub fn new(object: ObjectRef, reference: Property, value: ObjectRef) -> Self {
+    pub fn new(
+        object: impl Into<ObjectRef>,
+        reference: Property,
+        value: impl Into<ObjectRef>,
+    ) -> Self {
         Self {
-            object,
+            object: object.into(),
             reference,
-            value,
+            value: value.into(),
             platform: None,
         }
     }
@@ -38,3 +42,14 @@ impl CoreObjectSetReferenceArgs {
         self
     }
 }
+
+impl<T0: Into<ObjectRef>, T1: Into<Property>, T2: Into<ObjectRef>> From<(T0, T1, T2)>
+    for CoreObjectSetReferenceArgs
+{
+    fn from((object, reference, value): (T0, T1, T2)) -> Self {
+        Self::new(object, reference.into(), value)
+    }
+}
+
+/// Module-scoped alias for [`CoreObjectSetReferenceArgs`].
+pub type SetReferenceArgs = CoreObjectSetReferenceArgs;

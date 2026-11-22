@@ -20,3 +20,12 @@ impl UiCommandsRegisterArgs {
         Self { commands }
     }
 }
+
+impl From<Vec<serde_json::Value>> for UiCommandsRegisterArgs {
+    fn from(value: Vec<serde_json::Value>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiCommandsRegisterArgs`].
+pub type RegisterArgs = UiCommandsRegisterArgs;

@@ -18,7 +18,21 @@ pub struct SoundengineSetListenersArgs {
 
 impl SoundengineSetListenersArgs {
     /// Creates a new [`SoundengineSetListenersArgs`] with the required fields.
-    pub fn new(emitter: GameObjectRef, listeners: Vec<GameObjectRef>) -> Self {
-        Self { emitter, listeners }
+    pub fn new(emitter: impl Into<GameObjectRef>, listeners: Vec<GameObjectRef>) -> Self {
+        Self {
+            emitter: emitter.into(),
+            listeners,
+        }
     }
 }
+
+impl<T0: Into<GameObjectRef>, T1: Into<Vec<GameObjectRef>>> From<(T0, T1)>
+    for SoundengineSetListenersArgs
+{
+    fn from((emitter, listeners): (T0, T1)) -> Self {
+        Self::new(emitter, listeners.into())
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetListenersArgs`].
+pub type SetListenersArgs = SoundengineSetListenersArgs;

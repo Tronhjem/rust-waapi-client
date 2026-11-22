@@ -16,8 +16,26 @@ pub struct UiLayoutGetViewInstancesArgs {
 
 impl UiLayoutGetViewInstancesArgs {
     /// Creates a new [`UiLayoutGetViewInstancesArgs`] with the required fields.
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: impl Into<String>) -> Self {
+        Self { name: name.into() }
+    }
+}
+
+impl From<String> for UiLayoutGetViewInstancesArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutGetViewInstancesArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutGetViewInstancesArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +48,9 @@ pub struct UiLayoutGetViewInstancesResponse {
     #[serde(rename = "viewInstances", default)]
     pub view_instances: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetViewInstancesArgs`].
+pub type GetViewInstancesArgs = UiLayoutGetViewInstancesArgs;
+
+/// Module-scoped alias for [`UiLayoutGetViewInstancesResponse`].
+pub type GetViewInstancesResponse = UiLayoutGetViewInstancesResponse;

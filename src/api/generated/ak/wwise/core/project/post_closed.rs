@@ -10,3 +10,6 @@ use crate::api::generated::primitives::*;
 /// Sent when the after the project is completely closed.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct CoreProjectPostClosedPayload {}
+
+/// Module-scoped alias for [`CoreProjectPostClosedPayload`].
+pub type PostClosedPayload = CoreProjectPostClosedPayload;

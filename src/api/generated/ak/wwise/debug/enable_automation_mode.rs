@@ -20,3 +20,12 @@ impl DebugEnableAutomationModeArgs {
         Self { enable }
     }
 }
+
+impl From<bool> for DebugEnableAutomationModeArgs {
+    fn from(value: bool) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`DebugEnableAutomationModeArgs`].
+pub type EnableAutomationModeArgs = DebugEnableAutomationModeArgs;

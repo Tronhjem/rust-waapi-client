@@ -17,10 +17,18 @@ pub mod project;
 pub mod signal;
 /// Typed bindings for the `ak.wwise.ui.window` WAAPI namespace.
 pub mod window;
-pub use capture_screen::{UiCaptureScreenArgs, UiCaptureScreenResponse};
+pub use capture_screen::{
+    CaptureScreenArgs, CaptureScreenResponse, UiCaptureScreenArgs, UiCaptureScreenResponse,
+};
 mod get_selected_files;
-pub use get_selected_files::UiGetSelectedFilesResponse;
+pub use get_selected_files::{GetSelectedFilesResponse, UiGetSelectedFilesResponse};
 mod get_selected_objects;
-pub use get_selected_objects::{UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse};
+pub use get_selected_objects::{
+    GetSelectedObjectsOptions, GetSelectedObjectsResponse, UiGetSelectedObjectsOptions,
+    UiGetSelectedObjectsResponse,
+};
 mod selection_changed;
-pub use selection_changed::{UiSelectionChangedOptions, UiSelectionChangedPayload};
+pub use selection_changed::{
+    SelectionChangedOptions, SelectionChangedPayload, UiSelectionChangedOptions,
+    UiSelectionChangedPayload,
+};

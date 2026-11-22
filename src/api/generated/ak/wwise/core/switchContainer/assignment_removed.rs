@@ -42,3 +42,9 @@ impl CoreSwitchContainerAssignmentRemovedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreSwitchContainerAssignmentRemovedPayload`].
+pub type AssignmentRemovedPayload = CoreSwitchContainerAssignmentRemovedPayload;
+
+/// Module-scoped alias for [`CoreSwitchContainerAssignmentRemovedOptions`].
+pub type AssignmentRemovedOptions = CoreSwitchContainerAssignmentRemovedOptions;

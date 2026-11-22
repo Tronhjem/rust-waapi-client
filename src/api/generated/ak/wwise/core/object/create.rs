@@ -48,11 +48,15 @@ pub struct CoreObjectCreateArgs {
 
 impl CoreObjectCreateArgs {
     /// Creates a new [`CoreObjectCreateArgs`] with the required fields.
-    pub fn new(parent: ObjectRef, object_type: ObjectType, name: String) -> Self {
+    pub fn new(
+        parent: impl Into<ObjectRef>,
+        object_type: ObjectType,
+        name: impl Into<String>,
+    ) -> Self {
         Self {
-            parent,
+            parent: parent.into(),
             object_type,
-            name,
+            name: name.into(),
             id: None,
             notes: None,
             list: None,
@@ -128,6 +132,14 @@ impl CoreObjectCreateArgs {
     }
 }
 
+impl<T0: Into<ObjectRef>, T1: Into<ObjectType>, T2: Into<String>> From<(T0, T1, T2)>
+    for CoreObjectCreateArgs
+{
+    fn from((parent, object_type, name): (T0, T1, T2)) -> Self {
+        Self::new(parent, object_type.into(), name)
+    }
+}
+
 /// Response from `ak.wwise.core.object.create`.
 ///
 /// Creates an object of type 'type', as a child of 'parent'. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise. To create Effect or Source plug-ins, use `ak.wwise.core.object.set`, and see the Wwise Objects Reference for the classId.
@@ -143,3 +155,9 @@ pub struct CoreObjectCreateResponse {
     #[serde(default)]
     pub children: Vec<CoreObjectCreateResponse>,
 }
+
+/// Module-scoped alias for [`CoreObjectCreateArgs`].
+pub type CreateArgs = CoreObjectCreateArgs;
+
+/// Module-scoped alias for [`CoreObjectCreateResponse`].
+pub type CreateResponse = CoreObjectCreateResponse;

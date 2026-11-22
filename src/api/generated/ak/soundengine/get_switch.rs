@@ -20,9 +20,9 @@ pub struct SoundengineGetSwitchArgs {
 
 impl SoundengineGetSwitchArgs {
     /// Creates a new [`SoundengineGetSwitchArgs`] with the required fields.
-    pub fn new(switch_group: ObjectRef) -> Self {
+    pub fn new(switch_group: impl Into<ObjectRef>) -> Self {
         Self {
-            switch_group,
+            switch_group: switch_group.into(),
             game_object: None,
         }
     }
@@ -31,6 +31,30 @@ impl SoundengineGetSwitchArgs {
     pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
         self.game_object = Some(game_object.into());
         self
+    }
+}
+
+impl From<ObjectRef> for SoundengineGetSwitchArgs {
+    fn from(value: ObjectRef) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for SoundengineGetSwitchArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<String> for SoundengineGetSwitchArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for SoundengineGetSwitchArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -48,3 +72,12 @@ pub struct SoundengineGetSwitchResponse {
     #[serde(rename = "return")]
     pub switch: WwiseObject,
 }
+
+/// Module-scoped alias for [`SoundengineGetSwitchArgs`].
+pub type GetSwitchArgs = SoundengineGetSwitchArgs;
+
+/// Module-scoped alias for [`SoundengineGetSwitchOptions`].
+pub type GetSwitchOptions = SoundengineGetSwitchOptions;
+
+/// Module-scoped alias for [`SoundengineGetSwitchResponse`].
+pub type GetSwitchResponse = SoundengineGetSwitchResponse;

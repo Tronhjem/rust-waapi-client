@@ -41,3 +41,6 @@ pub struct CoreGetInfoResponse {
     #[serde(rename = "processPath")]
     pub process_path: String,
 }
+
+/// Module-scoped alias for [`CoreGetInfoResponse`].
+pub type GetInfoResponse = CoreGetInfoResponse;

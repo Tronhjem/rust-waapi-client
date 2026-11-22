@@ -64,3 +64,9 @@ impl CoreProfilerCaptureLogItemAddedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreProfilerCaptureLogItemAddedPayload`].
+pub type ItemAddedPayload = CoreProfilerCaptureLogItemAddedPayload;
+
+/// Module-scoped alias for [`CoreProfilerCaptureLogItemAddedOptions`].
+pub type ItemAddedOptions = CoreProfilerCaptureLogItemAddedOptions;

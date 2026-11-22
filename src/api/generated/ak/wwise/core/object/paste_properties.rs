@@ -27,9 +27,9 @@ pub struct CoreObjectPastePropertiesArgs {
 
 impl CoreObjectPastePropertiesArgs {
     /// Creates a new [`CoreObjectPastePropertiesArgs`] with the required fields.
-    pub fn new(source: ObjectRef, targets: Vec<ObjectRef>) -> Self {
+    pub fn new(source: impl Into<ObjectRef>, targets: Vec<ObjectRef>) -> Self {
         Self {
-            source,
+            source: source.into(),
             targets,
             paste_mode: None,
             exclusion: None,
@@ -55,3 +55,14 @@ impl CoreObjectPastePropertiesArgs {
         self
     }
 }
+
+impl<T0: Into<ObjectRef>, T1: Into<Vec<ObjectRef>>> From<(T0, T1)>
+    for CoreObjectPastePropertiesArgs
+{
+    fn from((source, targets): (T0, T1)) -> Self {
+        Self::new(source, targets.into())
+    }
+}
+
+/// Module-scoped alias for [`CoreObjectPastePropertiesArgs`].
+pub type PastePropertiesArgs = CoreObjectPastePropertiesArgs;

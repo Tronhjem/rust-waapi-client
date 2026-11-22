@@ -1,5 +1,5 @@
 use super::{connect_client, master_audio_bus, sequence_lock};
-use waapi_client::api::ak::soundengine::{
+use wwise_waapi::api::ak::soundengine::{
     SoundengineExecuteActionOnEventArgs, SoundengineGetStateArgs, SoundengineGetSwitchArgs,
     SoundenginePostEventArgs, SoundenginePostMsgMonitorArgs, SoundenginePostTriggerArgs,
     SoundengineRegisterGameObjArgs, SoundengineResetRtpcValueArgs,
@@ -10,13 +10,13 @@ use waapi_client::api::ak::soundengine::{
     SoundengineSetStateArgs, SoundengineSetSwitchArgs, SoundengineStopAllArgs,
     SoundengineStopPlayingIdArgs, SoundengineUnregisterGameObjArgs,
 };
-use waapi_client::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
-use waapi_client::api::{
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
+use wwise_waapi::api::{
     ActionOnEventType, AkCurveInterpolation, AuxSendValue, EventRef, GameObjectRef, MultiPosition,
     MultiPositionType, ObjectReturnField, ObjectReturnOptions, OnNameConflict,
     SoundEngineObjectRef,
 };
-use waapi_client::{ObjectRef, ObjectType, Position, Vector3};
+use wwise_waapi::{ObjectRef, ObjectType, Position, Vector3};
 
 const SWITCH_GROUPS_WU: &str = r"\Switches\Default Work Unit";
 const STATE_GROUPS_WU: &str = r"\States\Default Work Unit";
@@ -52,7 +52,7 @@ async fn soundengine_extended_sequence() {
         .soundengine()
         .register_game_obj(SoundengineRegisterGameObjArgs::new(
             listener,
-            "WaapiSeqListener".into(),
+            "WaapiSeqListener",
         ))
         .await
         .expect("register listener");
@@ -60,7 +60,7 @@ async fn soundengine_extended_sequence() {
         .soundengine()
         .register_game_obj(SoundengineRegisterGameObjArgs::new(
             emitter,
-            "WaapiSeqEmitter".into(),
+            "WaapiSeqEmitter",
         ))
         .await
         .expect("register emitter");
@@ -328,7 +328,7 @@ async fn soundengine_extended_sequence() {
     client
         .soundengine()
         .post_msg_monitor(SoundenginePostMsgMonitorArgs::new(
-            "hello from waapi-client sequence test".to_string(),
+            "hello from wwise-waapi sequence test".to_string(),
         ))
         .await
         .expect("post msg monitor");

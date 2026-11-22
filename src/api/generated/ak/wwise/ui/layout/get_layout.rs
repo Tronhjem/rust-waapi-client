@@ -16,8 +16,26 @@ pub struct UiLayoutGetLayoutArgs {
 
 impl UiLayoutGetLayoutArgs {
     /// Creates a new [`UiLayoutGetLayoutArgs`] with the required fields.
-    pub fn new(name: String) -> Self {
-        Self { name }
+    pub fn new(name: impl Into<String>) -> Self {
+        Self { name: name.into() }
+    }
+}
+
+impl From<String> for UiLayoutGetLayoutArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutGetLayoutArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutGetLayoutArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +48,9 @@ pub struct UiLayoutGetLayoutResponse {
     #[serde(rename = "Layout", default)]
     pub layout: Option<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetLayoutArgs`].
+pub type GetLayoutArgs = UiLayoutGetLayoutArgs;
+
+/// Module-scoped alias for [`UiLayoutGetLayoutResponse`].
+pub type GetLayoutResponse = UiLayoutGetLayoutResponse;

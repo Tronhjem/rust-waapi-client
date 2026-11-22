@@ -1,12 +1,12 @@
 use std::time::Duration;
 
 use super::{connect_client, sequence_lock};
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectSetArgs, CoreObjectSetItem,
     CoreObjectSetOptions,
 };
-use waapi_client::api::{ObjectReturnField, ObjectReturnOptions, OnNameConflict, WwiseObject};
-use waapi_client::{Event, ObjectRef, ObjectType, Property, WaapiTopic};
+use wwise_waapi::api::{ObjectReturnField, ObjectReturnOptions, OnNameConflict, WwiseObject};
+use wwise_waapi::{Event, ObjectRef, ObjectType, Property, WaapiTopic};
 
 const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const SUB_ACTOR_MIXER_NAME: &str = "WaapiSubTestActorMixer";
@@ -20,8 +20,7 @@ async fn recv_matching_object_event(
     tokio::time::timeout(Duration::from_secs(5), async {
         while let Some(event) = rx.recv().await {
             if let Some(obj_val) = event.kwargs.get("object")
-                && let Ok(obj) =
-                    waapi_client::serde_json::from_value::<WwiseObject>(obj_val.clone())
+                && let Ok(obj) = wwise_waapi::serde_json::from_value::<WwiseObject>(obj_val.clone())
                 && obj.id.as_deref() == Some(expected_id)
             {
                 return (obj, event);

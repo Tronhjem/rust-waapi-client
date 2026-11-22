@@ -20,3 +20,12 @@ impl SoundengineSetDefaultListenersArgs {
         Self { listeners }
     }
 }
+
+impl From<Vec<GameObjectRef>> for SoundengineSetDefaultListenersArgs {
+    fn from(value: Vec<GameObjectRef>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetDefaultListenersArgs`].
+pub type SetDefaultListenersArgs = SoundengineSetDefaultListenersArgs;

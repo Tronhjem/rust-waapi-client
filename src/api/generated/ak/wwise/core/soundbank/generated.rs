@@ -80,3 +80,9 @@ impl CoreSoundbankGeneratedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreSoundbankGeneratedPayload`].
+pub type GeneratedPayload = CoreSoundbankGeneratedPayload;
+
+/// Module-scoped alias for [`CoreSoundbankGeneratedOptions`].
+pub type GeneratedOptions = CoreSoundbankGeneratedOptions;

@@ -19,3 +19,6 @@ pub struct CoreProfilerGameObjectRegisteredPayload {
     #[serde(rename = "gameObjectName")]
     pub game_object_name: String,
 }
+
+/// Module-scoped alias for [`CoreProfilerGameObjectRegisteredPayload`].
+pub type GameObjectRegisteredPayload = CoreProfilerGameObjectRegisteredPayload;

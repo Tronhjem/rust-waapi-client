@@ -14,3 +14,6 @@ pub struct UiLayoutGetViewTypesResponse {
     #[serde(rename = "viewTypes", default)]
     pub view_types: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetViewTypesResponse`].
+pub type GetViewTypesResponse = UiLayoutGetViewTypesResponse;

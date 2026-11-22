@@ -24,3 +24,6 @@ pub struct DebugAssertFailedPayload {
     /// The callstack from the location of the assert.
     pub callstack: String,
 }
+
+/// Module-scoped alias for [`DebugAssertFailedPayload`].
+pub type AssertFailedPayload = DebugAssertFailedPayload;

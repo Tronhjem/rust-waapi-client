@@ -28,9 +28,9 @@ pub struct UiCommandsExecuteArgs {
 
 impl UiCommandsExecuteArgs {
     /// Creates a new [`UiCommandsExecuteArgs`] with the required fields.
-    pub fn new(command: String) -> Self {
+    pub fn new(command: impl Into<String>) -> Self {
         Self {
-            command,
+            command: command.into(),
             value: None,
             files: None,
             platforms: None,
@@ -62,3 +62,24 @@ impl UiCommandsExecuteArgs {
         self
     }
 }
+
+impl From<String> for UiCommandsExecuteArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiCommandsExecuteArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiCommandsExecuteArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiCommandsExecuteArgs`].
+pub type ExecuteArgs = UiCommandsExecuteArgs;

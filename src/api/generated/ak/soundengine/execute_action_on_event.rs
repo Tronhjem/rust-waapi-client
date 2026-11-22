@@ -29,18 +29,21 @@ pub struct SoundengineExecuteActionOnEventArgs {
 impl SoundengineExecuteActionOnEventArgs {
     /// Creates a new [`SoundengineExecuteActionOnEventArgs`] with the required fields.
     pub fn new(
-        event: SoundEngineObjectRef,
+        event: impl Into<SoundEngineObjectRef>,
         action_type: ActionOnEventType,
-        game_object: GameObjectRef,
+        game_object: impl Into<GameObjectRef>,
         transition_duration: i32,
         fade_curve: AkCurveInterpolation,
     ) -> Self {
         Self {
-            event,
+            event: event.into(),
             action_type,
-            game_object,
+            game_object: game_object.into(),
             transition_duration,
             fade_curve,
         }
     }
 }
+
+/// Module-scoped alias for [`SoundengineExecuteActionOnEventArgs`].
+pub type ExecuteActionOnEventArgs = SoundengineExecuteActionOnEventArgs;

@@ -34,9 +34,9 @@ pub struct CoreSourceControlSetProviderArgs {
 
 impl CoreSourceControlSetProviderArgs {
     /// Creates a new [`CoreSourceControlSetProviderArgs`] with the required fields.
-    pub fn new(provider: String) -> Self {
+    pub fn new(provider: impl Into<String>) -> Self {
         Self {
-            provider,
+            provider: provider.into(),
             server: None,
             port: None,
             username: None,
@@ -83,6 +83,24 @@ impl CoreSourceControlSetProviderArgs {
     }
 }
 
+impl From<String> for CoreSourceControlSetProviderArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreSourceControlSetProviderArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreSourceControlSetProviderArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.setProvider`.
 ///
 /// Change the source control provider and credentials. This is the same setting as the Source Control option in the Project Settings dialog in Wwise.
@@ -91,3 +109,9 @@ pub struct CoreSourceControlSetProviderResponse {
     /// The entries of the log.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlSetProviderArgs`].
+pub type SetProviderArgs = CoreSourceControlSetProviderArgs;
+
+/// Module-scoped alias for [`CoreSourceControlSetProviderResponse`].
+pub type SetProviderResponse = CoreSourceControlSetProviderResponse;

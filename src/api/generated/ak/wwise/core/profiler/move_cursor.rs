@@ -16,8 +16,28 @@ pub struct CoreProfilerMoveCursorArgs {
 
 impl CoreProfilerMoveCursorArgs {
     /// Creates a new [`CoreProfilerMoveCursorArgs`] with the required fields.
-    pub fn new(position: String) -> Self {
-        Self { position }
+    pub fn new(position: impl Into<String>) -> Self {
+        Self {
+            position: position.into(),
+        }
+    }
+}
+
+impl From<String> for CoreProfilerMoveCursorArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreProfilerMoveCursorArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreProfilerMoveCursorArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +50,9 @@ pub struct CoreProfilerMoveCursorResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
+
+/// Module-scoped alias for [`CoreProfilerMoveCursorArgs`].
+pub type MoveCursorArgs = CoreProfilerMoveCursorArgs;
+
+/// Module-scoped alias for [`CoreProfilerMoveCursorResponse`].
+pub type MoveCursorResponse = CoreProfilerMoveCursorResponse;

@@ -21,6 +21,12 @@ impl CoreProfilerSetCursorTimeArgs {
     }
 }
 
+impl From<i64> for CoreProfilerSetCursorTimeArgs {
+    fn from(value: i64) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.profiler.setCursorTime`.
 ///
 /// Sets the user time cursor of the profiler to the specified time, in milliseconds, and returns the new time. Use the time obtained from the other profiler functions. Note that the specified time will be snapped to a buffer interval (~10ms). This sets the cursor position in the profiler views. To synchronize the user time cursor to the latest capture time, use `ak.wwise.ui.commands.execute` with `ToggleFollowCapture`.
@@ -30,3 +36,9 @@ pub struct CoreProfilerSetCursorTimeResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
+
+/// Module-scoped alias for [`CoreProfilerSetCursorTimeArgs`].
+pub type SetCursorTimeArgs = CoreProfilerSetCursorTimeArgs;
+
+/// Module-scoped alias for [`CoreProfilerSetCursorTimeResponse`].
+pub type SetCursorTimeResponse = CoreProfilerSetCursorTimeResponse;

@@ -1,16 +1,19 @@
 [package]
-name = "waapi-client"
+name = "wwise-waapi"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
-authors = ["waapi-client contributors"]
-description = "A Rust library for the Wwise Authoring API (WAAPI)"
+authors = ["wwise-waapi contributors"]
+description = "Async, typed Rust client for the Wwise Authoring API (WAAPI)"
 repository = "https://github.com/Tronhjem/rust-waapi-client"
+readme = "README.md"
+documentation = "https://docs.rs/wwise-waapi"
 
 keywords = ["wwise", "waapi", "audio", "audiokinetic", "game-audio"]
 categories = ["api-bindings", "multimedia::audio"]
 include = [
     "/src/**/*.rs",
+    "/examples/**/*.rs",
     "/Cargo.toml",
     "/README.md",
     "/LICENSE*",

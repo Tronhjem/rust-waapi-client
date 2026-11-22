@@ -25,16 +25,19 @@ pub struct SoundengineSetObjectObstructionAndOcclusionArgs {
 impl SoundengineSetObjectObstructionAndOcclusionArgs {
     /// Creates a new [`SoundengineSetObjectObstructionAndOcclusionArgs`] with the required fields.
     pub fn new(
-        emitter: GameObjectRef,
-        listener: GameObjectRef,
+        emitter: impl Into<GameObjectRef>,
+        listener: impl Into<GameObjectRef>,
         obstruction_level: f64,
         occlusion_level: f64,
     ) -> Self {
         Self {
-            emitter,
-            listener,
+            emitter: emitter.into(),
+            listener: listener.into(),
             obstruction_level,
             occlusion_level,
         }
     }
 }
+
+/// Module-scoped alias for [`SoundengineSetObjectObstructionAndOcclusionArgs`].
+pub type SetObjectObstructionAndOcclusionArgs = SoundengineSetObjectObstructionAndOcclusionArgs;

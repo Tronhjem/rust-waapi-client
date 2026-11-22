@@ -22,9 +22,9 @@ pub struct UiProjectCreateArgs {
 
 impl UiProjectCreateArgs {
     /// Creates a new [`UiProjectCreateArgs`] with the required fields.
-    pub fn new(path: String) -> Self {
+    pub fn new(path: impl Into<String>) -> Self {
         Self {
-            path,
+            path: path.into(),
             platforms: None,
             languages: None,
         }
@@ -42,3 +42,24 @@ impl UiProjectCreateArgs {
         self
     }
 }
+
+impl From<String> for UiProjectCreateArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiProjectCreateArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiProjectCreateArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiProjectCreateArgs`].
+pub type CreateArgs = UiProjectCreateArgs;

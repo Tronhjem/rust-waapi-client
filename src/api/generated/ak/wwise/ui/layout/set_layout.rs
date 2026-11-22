@@ -18,7 +18,19 @@ pub struct UiLayoutSetLayoutArgs {
 
 impl UiLayoutSetLayoutArgs {
     /// Creates a new [`UiLayoutSetLayoutArgs`] with the required fields.
-    pub fn new(name: String, layout: serde_json::Value) -> Self {
-        Self { name, layout }
+    pub fn new(name: impl Into<String>, layout: serde_json::Value) -> Self {
+        Self {
+            name: name.into(),
+            layout,
+        }
     }
 }
+
+impl<T0: Into<String>, T1: Into<serde_json::Value>> From<(T0, T1)> for UiLayoutSetLayoutArgs {
+    fn from((name, layout): (T0, T1)) -> Self {
+        Self::new(name, layout.into())
+    }
+}
+
+/// Module-scoped alias for [`UiLayoutSetLayoutArgs`].
+pub type SetLayoutArgs = UiLayoutSetLayoutArgs;

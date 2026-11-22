@@ -21,6 +21,12 @@ impl CoreLogGetArgs {
     }
 }
 
+impl From<LogChannel> for CoreLogGetArgs {
+    fn from(value: LogChannel) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.log.get`.
 ///
 /// Retrieves the latest log for a specific channel. See `ak.wwise.core.log.itemAdded` to be notified when an item is added to the log. The log is empty when used in WwiseConsole.
@@ -29,3 +35,9 @@ pub struct CoreLogGetResponse {
     /// The entries of the log.
     pub items: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreLogGetArgs`].
+pub type GetArgs = CoreLogGetArgs;
+
+/// Module-scoped alias for [`CoreLogGetResponse`].
+pub type GetResponse = CoreLogGetResponse;

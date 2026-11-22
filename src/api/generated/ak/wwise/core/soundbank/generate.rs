@@ -106,3 +106,9 @@ pub struct CoreSoundbankGenerateResponse {
     #[serde(default)]
     pub logs: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSoundbankGenerateArgs`].
+pub type GenerateArgs = CoreSoundbankGenerateArgs;
+
+/// Module-scoped alias for [`CoreSoundbankGenerateResponse`].
+pub type GenerateResponse = CoreSoundbankGenerateResponse;

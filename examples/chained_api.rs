@@ -4,18 +4,15 @@
 //! Run with: cargo run --example chained_api
 
 use log::info;
-use waapi_client::api::generated::ak::wwise::core::object::{
-    CoreObjectGetArgs, CoreObjectGetOptions,
-};
-use waapi_client::api::generated::ak::wwise::ui::UiGetSelectedObjectsOptions;
-use waapi_client::api::generated::primitives::{ObjectQuery, ObjectReturnField};
-use waapi_client::{WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::wwise::core::object::GetOptions;
+use wwise_waapi::api::ak::wwise::ui::GetSelectedObjectsOptions;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
+    let mut client = WaapiClient::connect().await?;
 
     let info = client.ak().wwise().core().get_info().await?;
     info!(
@@ -24,12 +21,10 @@ async fn main() -> WaapiResult<()> {
     );
 
     let objects = client
-        .wwise()
-        .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(r"\Containers")),
-            CoreObjectGetOptions::new().return_fields([
+            r"\Containers",
+            GetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
                 ObjectReturnField::Type,
@@ -39,9 +34,11 @@ async fn main() -> WaapiResult<()> {
     info!("object.get returned {} objects", objects.objects.len());
 
     let selected = client
-        .wwise()
         .ui()
-        .get_selected_objects(UiGetSelectedObjectsOptions::new().return_fields(["name", "type"]))
+        .get_selected_objects(
+            GetSelectedObjectsOptions::new()
+                .return_fields([ObjectReturnField::Name, ObjectReturnField::Type]),
+        )
         .await?;
     info!("{} objects selected in the UI", selected.objects.len());
 

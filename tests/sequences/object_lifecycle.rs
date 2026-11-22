@@ -1,12 +1,12 @@
 use super::{connect_client, sequence_lock};
-use waapi_client::api::ak::wwise::core::object::{
+use wwise_waapi::api::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
     CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetOptions,
 };
-use waapi_client::api::{
+use wwise_waapi::api::{
     ObjectQuery, ObjectReturnField, OnNameConflict, Transform, TransformSelect,
 };
-use waapi_client::{ChildObject, ObjectRef, ObjectType, Property};
+use wwise_waapi::{ChildObject, ObjectRef, ObjectType, Property};
 
 const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 const ACTOR_MIXER_NAME: &str = "WaapiTestActorMixer";

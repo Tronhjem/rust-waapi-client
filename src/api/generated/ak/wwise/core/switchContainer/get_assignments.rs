@@ -16,8 +16,32 @@ pub struct CoreSwitchContainerGetAssignmentsArgs {
 
 impl CoreSwitchContainerGetAssignmentsArgs {
     /// Creates a new [`CoreSwitchContainerGetAssignmentsArgs`] with the required fields.
-    pub fn new(id: ObjectRef) -> Self {
-        Self { id }
+    pub fn new(id: impl Into<ObjectRef>) -> Self {
+        Self { id: id.into() }
+    }
+}
+
+impl From<ObjectRef> for CoreSwitchContainerGetAssignmentsArgs {
+    fn from(value: ObjectRef) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreSwitchContainerGetAssignmentsArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<String> for CoreSwitchContainerGetAssignmentsArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreSwitchContainerGetAssignmentsArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +54,9 @@ pub struct CoreSwitchContainerGetAssignmentsResponse {
     #[serde(rename = "return", default)]
     pub assignments: Vec<SwitchContainerAssignment>,
 }
+
+/// Module-scoped alias for [`CoreSwitchContainerGetAssignmentsArgs`].
+pub type GetAssignmentsArgs = CoreSwitchContainerGetAssignmentsArgs;
+
+/// Module-scoped alias for [`CoreSwitchContainerGetAssignmentsResponse`].
+pub type GetAssignmentsResponse = CoreSwitchContainerGetAssignmentsResponse;

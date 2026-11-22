@@ -36,3 +36,9 @@ impl CoreTransportStateChangedOptions {
         Self { transport }
     }
 }
+
+/// Module-scoped alias for [`CoreTransportStateChangedPayload`].
+pub type StateChangedPayload = CoreTransportStateChangedPayload;
+
+/// Module-scoped alias for [`CoreTransportStateChangedOptions`].
+pub type StateChangedOptions = CoreTransportStateChangedOptions;

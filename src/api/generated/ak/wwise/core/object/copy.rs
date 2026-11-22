@@ -33,10 +33,10 @@ pub struct CoreObjectCopyArgs {
 
 impl CoreObjectCopyArgs {
     /// Creates a new [`CoreObjectCopyArgs`] with the required fields.
-    pub fn new(object: ObjectRef, parent: ObjectRef) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, parent: impl Into<ObjectRef>) -> Self {
         Self {
-            object,
-            parent,
+            object: object.into(),
+            parent: parent.into(),
             auto_add_to_source_control: None,
             on_name_conflict: None,
             auto_check_out_to_source_control: None,
@@ -68,6 +68,12 @@ impl CoreObjectCopyArgs {
     }
 }
 
+impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectCopyArgs {
+    fn from((object, parent): (T0, T1)) -> Self {
+        Self::new(object, parent)
+    }
+}
+
 /// Options for `ak.wwise.core.object.copy`.
 ///
 /// Specifies the return options for every object created.
@@ -77,3 +83,12 @@ pub type CoreObjectCopyOptions = ObjectReturnOptions;
 ///
 /// The copied object.
 pub type CoreObjectCopyResponse = WwiseObject;
+
+/// Module-scoped alias for [`CoreObjectCopyArgs`].
+pub type CopyArgs = CoreObjectCopyArgs;
+
+/// Module-scoped alias for [`CoreObjectCopyOptions`].
+pub type CopyOptions = CoreObjectCopyOptions;
+
+/// Module-scoped alias for [`CoreObjectCopyResponse`].
+pub type CopyResponse = CoreObjectCopyResponse;

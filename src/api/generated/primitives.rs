@@ -31,6 +31,11 @@ impl From<String> for SoundEngineObjectRef {
         SoundEngineObjectRef::Name(s)
     }
 }
+impl From<&String> for SoundEngineObjectRef {
+    fn from(s: &String) -> Self {
+        SoundEngineObjectRef::Name(s.clone())
+    }
+}
 impl From<u32> for SoundEngineObjectRef {
     fn from(id: u32) -> Self {
         SoundEngineObjectRef::ShortId(id)
@@ -87,6 +92,11 @@ impl From<&str> for LanguageRef {
 impl From<String> for LanguageRef {
     fn from(s: String) -> Self {
         LanguageRef::Name(s)
+    }
+}
+impl From<&String> for LanguageRef {
+    fn from(s: &String) -> Self {
+        LanguageRef::Name(s.clone())
     }
 }
 
@@ -992,6 +1002,11 @@ impl From<&str> for ObjectQuery {
         Self::from(s.to_string())
     }
 }
+impl From<&String> for ObjectQuery {
+    fn from(s: &String) -> Self {
+        Self::from(s.as_str())
+    }
+}
 impl From<Vec<String>> for ObjectQuery {
     fn from(v: Vec<String>) -> Self {
         ObjectQuery::Id(v.into_iter().map(serde_json::Value::String).collect())
@@ -1263,9 +1278,9 @@ pub struct ImportItem {
 
 impl ImportItem {
     /// Creates a new [`ImportItem`] with the required fields.
-    pub fn new(object_path: String) -> Self {
+    pub fn new(object_path: impl Into<String>) -> Self {
         Self {
-            object_path,
+            object_path: object_path.into(),
             notes: None,
             object_type: None,
             import_language: None,
@@ -1363,6 +1378,24 @@ impl ImportItem {
     pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
         self.extra.insert(key.into(), value.into());
         self
+    }
+}
+
+impl From<String> for ImportItem {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for ImportItem {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for ImportItem {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 

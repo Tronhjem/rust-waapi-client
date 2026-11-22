@@ -16,8 +16,26 @@ pub struct UiLayoutGetElementRectangleArgs {
 
 impl UiLayoutGetElementRectangleArgs {
     /// Creates a new [`UiLayoutGetElementRectangleArgs`] with the required fields.
-    pub fn new(id: String) -> Self {
-        Self { id }
+    pub fn new(id: impl Into<String>) -> Self {
+        Self { id: id.into() }
+    }
+}
+
+impl From<String> for UiLayoutGetElementRectangleArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutGetElementRectangleArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutGetElementRectangleArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -39,3 +57,9 @@ pub struct UiLayoutGetElementRectangleResponse {
     #[serde(default)]
     pub bottom: Option<f64>,
 }
+
+/// Module-scoped alias for [`UiLayoutGetElementRectangleArgs`].
+pub type GetElementRectangleArgs = UiLayoutGetElementRectangleArgs;
+
+/// Module-scoped alias for [`UiLayoutGetElementRectangleResponse`].
+pub type GetElementRectangleResponse = UiLayoutGetElementRectangleResponse;

@@ -32,3 +32,12 @@ impl CoreTransportExecuteActionArgs {
         self
     }
 }
+
+impl From<TransportAction> for CoreTransportExecuteActionArgs {
+    fn from(value: TransportAction) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreTransportExecuteActionArgs`].
+pub type ExecuteActionArgs = CoreTransportExecuteActionArgs;

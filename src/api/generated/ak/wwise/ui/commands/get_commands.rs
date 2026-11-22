@@ -14,3 +14,6 @@ pub struct UiCommandsGetCommandsResponse {
     #[serde(default)]
     pub commands: Vec<String>,
 }
+
+/// Module-scoped alias for [`UiCommandsGetCommandsResponse`].
+pub type GetCommandsResponse = UiCommandsGetCommandsResponse;

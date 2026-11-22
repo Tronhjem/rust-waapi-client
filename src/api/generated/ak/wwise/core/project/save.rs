@@ -33,3 +33,6 @@ impl CoreProjectSaveArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreProjectSaveArgs`].
+pub type SaveArgs = CoreProjectSaveArgs;

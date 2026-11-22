@@ -45,3 +45,9 @@ impl CoreObjectPostDeletedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectPostDeletedPayload`].
+pub type PostDeletedPayload = CoreObjectPostDeletedPayload;
+
+/// Module-scoped alias for [`CoreObjectPostDeletedOptions`].
+pub type PostDeletedOptions = CoreObjectPostDeletedOptions;

@@ -52,6 +52,12 @@ impl From<&str> for ObjectRef {
     }
 }
 
+impl From<&String> for ObjectRef {
+    fn from(s: &String) -> Self {
+        Self::from(s.as_str())
+    }
+}
+
 impl Serialize for ObjectRef {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let s = match self {
@@ -91,6 +97,28 @@ impl PlatformRef {
     /// Creates a [`PlatformRef::Name`] from a platform name.
     pub fn name(s: impl Into<String>) -> Self {
         PlatformRef::Name(s.into())
+    }
+}
+
+impl From<String> for PlatformRef {
+    fn from(s: String) -> Self {
+        if s.starts_with('{') && s.ends_with('}') {
+            PlatformRef::Guid(s)
+        } else {
+            PlatformRef::Name(s)
+        }
+    }
+}
+
+impl From<&str> for PlatformRef {
+    fn from(s: &str) -> Self {
+        Self::from(s.to_string())
+    }
+}
+
+impl From<&String> for PlatformRef {
+    fn from(s: &String) -> Self {
+        Self::from(s.as_str())
     }
 }
 
@@ -415,8 +443,8 @@ impl ChildObject {
     }
 
     /// Sets the platform used when applying property values to the new object.
-    pub fn platform(mut self, platform: PlatformRef) -> Self {
-        self.platform = Some(platform);
+    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
+        self.platform = Some(platform.into());
         self
     }
 
@@ -497,6 +525,12 @@ impl From<String> for PropertyValue {
 impl From<&str> for PropertyValue {
     fn from(s: &str) -> Self {
         PropertyValue::String(s.to_string())
+    }
+}
+
+impl From<&String> for PropertyValue {
+    fn from(s: &String) -> Self {
+        PropertyValue::String(s.clone())
     }
 }
 

@@ -46,3 +46,9 @@ pub struct CoreObjectGetPropertyAndReferenceNamesResponse {
     #[serde(rename = "return", default)]
     pub names: Vec<String>,
 }
+
+/// Module-scoped alias for [`CoreObjectGetPropertyAndReferenceNamesArgs`].
+pub type GetPropertyAndReferenceNamesArgs = CoreObjectGetPropertyAndReferenceNamesArgs;
+
+/// Module-scoped alias for [`CoreObjectGetPropertyAndReferenceNamesResponse`].
+pub type GetPropertyAndReferenceNamesResponse = CoreObjectGetPropertyAndReferenceNamesResponse;

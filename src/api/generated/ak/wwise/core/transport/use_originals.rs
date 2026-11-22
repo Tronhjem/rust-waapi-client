@@ -20,3 +20,12 @@ impl CoreTransportUseOriginalsArgs {
         Self { enable }
     }
 }
+
+impl From<bool> for CoreTransportUseOriginalsArgs {
+    fn from(value: bool) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreTransportUseOriginalsArgs`].
+pub type UseOriginalsArgs = CoreTransportUseOriginalsArgs;

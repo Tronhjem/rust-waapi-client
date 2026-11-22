@@ -54,3 +54,9 @@ impl CoreObjectStructureChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectStructureChangedPayload`].
+pub type StructureChangedPayload = CoreObjectStructureChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectStructureChangedOptions`].
+pub type StructureChangedOptions = CoreObjectStructureChangedOptions;

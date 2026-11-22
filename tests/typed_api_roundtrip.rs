@@ -1,28 +1,28 @@
 use serde_json::json;
-use waapi_client::api::generated::ak::soundengine::{
+use wwise_waapi::api::generated::ak::soundengine::{
     SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetDefaultListenersArgs,
     SoundengineSetPositionArgs, SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
 };
-use waapi_client::api::generated::ak::wwise::core::CoreGetInfoResponse;
-use waapi_client::api::generated::ak::wwise::core::audio::{
+use wwise_waapi::api::generated::ak::wwise::core::CoreGetInfoResponse;
+use wwise_waapi::api::generated::ak::wwise::core::audio::{
     CoreAudioImportArgs, CoreAudioImportOptions,
 };
-use waapi_client::api::generated::ak::wwise::core::object::{
+use wwise_waapi::api::generated::ak::wwise::core::object::{
     CoreObjectCreateArgs, CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions,
     CoreObjectGetResponse, CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetResponse,
 };
-use waapi_client::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
-use waapi_client::api::generated::ak::wwise::ui::{
+use wwise_waapi::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
+use wwise_waapi::api::generated::ak::wwise::ui::{
     UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
-use waapi_client::api::generated::primitives::{
+use wwise_waapi::api::generated::primitives::{
     GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
     RtpcRef, Transform, TransformSelect,
 };
-use waapi_client::api::primitives::{
+use wwise_waapi::api::primitives::{
     ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
 };
-use waapi_client::{ObjectType, Property};
+use wwise_waapi::{ObjectType, Property};
 
 #[test]
 fn object_get_args_serializes_to_expected_shape() {
@@ -121,8 +121,7 @@ fn object_delete_args_serializes_object_ref() {
 
 #[test]
 fn soundengine_post_event_args_serializes() {
-    let args =
-        SoundenginePostEventArgs::new("Play_Test".into()).game_object(GameObjectRef::from(42u64));
+    let args = SoundenginePostEventArgs::new("Play_Test").game_object(42u64);
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["event"], "Play_Test");
@@ -131,8 +130,7 @@ fn soundengine_post_event_args_serializes() {
 
 #[test]
 fn soundengine_set_rtpc_value_args_serializes() {
-    let args = SoundengineSetRtpcValueArgs::new("Volume".into(), 0.75)
-        .game_object(GameObjectRef::from(100u32));
+    let args = SoundengineSetRtpcValueArgs::new("Volume", 0.75).game_object(100u32);
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["rtpc"], "Volume");
@@ -142,11 +140,7 @@ fn soundengine_set_rtpc_value_args_serializes() {
 
 #[test]
 fn soundengine_register_position_and_listeners_serialize() {
-    let reg = serde_json::to_value(SoundengineRegisterGameObjArgs::new(
-        GameObjectRef::game_object(1),
-        "Listener".into(),
-    ))
-    .unwrap();
+    let reg = serde_json::to_value(SoundengineRegisterGameObjArgs::new(1u64, "Listener")).unwrap();
     assert_eq!(reg, json!({ "gameObject": 1, "name": "Listener" }));
 
     let listeners = serde_json::to_value(SoundengineSetDefaultListenersArgs::new(vec![
@@ -334,18 +328,18 @@ fn rtpc_ref_serializes_name_guid_and_short_id() {
 
 #[test]
 fn object_ref_deserialization_roundtrip() {
-    let name: waapi_client::api::primitives::ObjectRef =
+    let name: wwise_waapi::api::primitives::ObjectRef =
         serde_json::from_value(json!("Play_Test")).unwrap();
     assert_eq!(serde_json::to_value(name).unwrap(), "Play_Test");
 
-    let guid: waapi_client::api::primitives::ObjectRef =
+    let guid: wwise_waapi::api::primitives::ObjectRef =
         serde_json::from_value(json!("{00000000-0000-0000-0000-000000000001}")).unwrap();
     assert_eq!(
         serde_json::to_value(guid).unwrap(),
         "{00000000-0000-0000-0000-000000000001}"
     );
 
-    let path: waapi_client::api::primitives::ObjectRef =
+    let path: wwise_waapi::api::primitives::ObjectRef =
         serde_json::from_value(json!(r"\Events\Default Work Unit\Play_Test")).unwrap();
     assert_eq!(
         serde_json::to_value(path).unwrap(),
@@ -454,7 +448,7 @@ fn object_type_enum_maps_to_names_class_ids_and_queries() {
 
 #[test]
 fn waapi_uri_enums_map_to_const_strings() {
-    use waapi_client::{WaapiFunction, WaapiTopic, waapi_function_api, waapi_topics_api};
+    use wwise_waapi::{WaapiFunction, WaapiTopic, waapi_function_api, waapi_topics_api};
 
     assert_eq!(
         WaapiFunction::ak_wwise_core_getInfo.as_str(),
@@ -472,7 +466,7 @@ fn waapi_uri_enums_map_to_const_strings() {
 
 #[test]
 fn undo_args_serialize() {
-    use waapi_client::api::generated::ak::wwise::core::undo::{
+    use wwise_waapi::api::generated::ak::wwise::core::undo::{
         CoreUndoCancelGroupArgs, CoreUndoEndGroupArgs,
     };
 
@@ -488,14 +482,12 @@ fn undo_args_serialize() {
 
 #[test]
 fn transport_args_and_responses_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::transport::{
+    use wwise_waapi::api::generated::ak::wwise::core::transport::{
         CoreTransportCreateArgs, CoreTransportCreateResponse, CoreTransportDestroyArgs,
         CoreTransportExecuteActionArgs, CoreTransportGetListResponse, CoreTransportGetStateArgs,
         CoreTransportGetStateResponse, CoreTransportPrepareArgs, CoreTransportUseOriginalsArgs,
     };
-    use waapi_client::api::generated::primitives::{
-        GameObjectRef, TransportAction, TransportState,
-    };
+    use wwise_waapi::api::generated::primitives::{GameObjectRef, TransportAction, TransportState};
 
     let create =
         CoreTransportCreateArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-000000000001}"))
@@ -563,14 +555,14 @@ fn transport_args_and_responses_roundtrip() {
 
 #[test]
 fn object_helpers_and_attenuation_curve_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::object::{
+    use wwise_waapi::api::generated::ak::wwise::core::object::{
         CoreObjectCopyArgs, CoreObjectDiffArgs, CoreObjectDiffResponse,
         CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse,
         CoreObjectMoveArgs, CoreObjectPastePropertiesArgs, CoreObjectSetAttenuationCurveArgs,
         CoreObjectSetNameArgs, CoreObjectSetNotesArgs, CoreObjectSetPropertyArgs,
         CoreObjectSetRandomizerArgs, CoreObjectSetReferenceArgs,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         AttenuationCurveType, AttenuationCurveUse, CurvePoint2D, CurveShape, OnNameConflict,
         PasteMode, PropertyValue,
     };
@@ -720,11 +712,11 @@ fn object_helpers_and_attenuation_curve_roundtrip() {
 
 #[test]
 fn switch_container_assignments_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::switchContainer::{
+    use wwise_waapi::api::generated::ak::wwise::core::switchContainer::{
         CoreSwitchContainerAddAssignmentArgs, CoreSwitchContainerGetAssignmentsArgs,
         CoreSwitchContainerGetAssignmentsResponse, CoreSwitchContainerRemoveAssignmentArgs,
     };
-    use waapi_client::api::generated::primitives::SwitchContainerAssignment;
+    use wwise_waapi::api::generated::primitives::SwitchContainerAssignment;
 
     let add = CoreSwitchContainerAddAssignmentArgs::new(
         ObjectRef::guid("{CHILD-1}"),
@@ -770,14 +762,14 @@ fn switch_container_assignments_roundtrip() {
 
 #[test]
 fn project_info_and_ui_commands_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::CoreGetProjectInfoResponse;
-    use waapi_client::api::generated::ak::wwise::ui::commands::{
+    use wwise_waapi::api::generated::ak::wwise::core::CoreGetProjectInfoResponse;
+    use wwise_waapi::api::generated::ak::wwise::ui::commands::{
         UiCommandsExecuteArgs, UiCommandsGetCommandsResponse,
     };
-    use waapi_client::api::generated::ak::wwise::ui::project::{
+    use wwise_waapi::api::generated::ak::wwise::ui::project::{
         UiProjectCloseArgs, UiProjectCloseResponse, UiProjectOpenArgs,
     };
-    use waapi_client::api::generated::primitives::ProjectMigrationAction;
+    use wwise_waapi::api::generated::primitives::ProjectMigrationAction;
 
     let proj: CoreGetProjectInfoResponse = serde_json::from_value(json!({
         "name": "WwiseProject",
@@ -864,7 +856,7 @@ fn project_info_and_ui_commands_roundtrip() {
 
 #[test]
 fn soundengine_int_enums_serialize_as_ints() {
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         ActionOnEventType, AkCurveInterpolation, MultiPositionType,
     };
 
@@ -902,20 +894,20 @@ fn soundengine_int_enums_serialize_as_ints() {
 
 #[test]
 fn soundengine_switch_and_state_roundtrip() {
-    use waapi_client::api::generated::ak::soundengine::{
+    use wwise_waapi::api::generated::ak::soundengine::{
         SoundengineGetStateArgs, SoundengineGetSwitchArgs, SoundengineSetStateArgs,
         SoundengineSetSwitchArgs,
     };
-    use waapi_client::api::generated::primitives::GameObjectRef;
+    use wwise_waapi::api::generated::primitives::GameObjectRef;
 
-    let set_switch = SoundengineSetSwitchArgs::new("MySwitchGroup".into(), "On".into())
+    let set_switch = SoundengineSetSwitchArgs::new("MySwitchGroup", "On")
         .game_object(GameObjectRef::game_object(7));
     assert_eq!(
         serde_json::to_value(set_switch).unwrap(),
         json!({"switchGroup": "MySwitchGroup", "switchState": "On", "gameObject": 7})
     );
 
-    let set_state = SoundengineSetStateArgs::new("MyStateGroup".into(), "Combat".into());
+    let set_state = SoundengineSetStateArgs::new("MyStateGroup", "Combat");
     assert_eq!(
         serde_json::to_value(set_state).unwrap(),
         json!({"stateGroup": "MyStateGroup", "state": "Combat"})
@@ -939,16 +931,16 @@ fn soundengine_switch_and_state_roundtrip() {
 
 #[test]
 fn soundengine_actions_seek_and_events_roundtrip() {
-    use waapi_client::api::generated::ak::soundengine::{
+    use wwise_waapi::api::generated::ak::soundengine::{
         SoundengineExecuteActionOnEventArgs, SoundenginePostTriggerArgs,
         SoundengineSeekOnEventArgs, SoundengineStopPlayingIdArgs,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         ActionOnEventType, AkCurveInterpolation, GameObjectRef,
     };
 
     let exec = SoundengineExecuteActionOnEventArgs::new(
-        "Play_Test".into(),
+        "Play_Test",
         ActionOnEventType::Stop,
         GameObjectRef::game_object(1),
         500,
@@ -971,14 +963,10 @@ fn soundengine_actions_seek_and_events_roundtrip() {
         json!({"playingId": 42, "transitionDuration": 100, "fadeCurve": 5})
     );
 
-    let seek = SoundengineSeekOnEventArgs::new(
-        "Play_Test".into(),
-        GameObjectRef::game_object(1),
-        true,
-        42,
-    )
-    .position(1000)
-    .percent(50.0);
+    let seek =
+        SoundengineSeekOnEventArgs::new("Play_Test", GameObjectRef::game_object(1), true, 42)
+            .position(1000)
+            .percent(50.0);
     assert_eq!(
         serde_json::to_value(seek).unwrap(),
         json!({
@@ -991,8 +979,8 @@ fn soundengine_actions_seek_and_events_roundtrip() {
         })
     );
 
-    let trigger = SoundenginePostTriggerArgs::new("MyTrigger".into())
-        .game_object(GameObjectRef::game_object(3));
+    let trigger =
+        SoundenginePostTriggerArgs::new("MyTrigger").game_object(GameObjectRef::game_object(3));
     assert_eq!(
         serde_json::to_value(trigger).unwrap(),
         json!({"trigger": "MyTrigger", "gameObject": 3})
@@ -1001,14 +989,14 @@ fn soundengine_actions_seek_and_events_roundtrip() {
 
 #[test]
 fn soundengine_positions_volume_and_listeners_roundtrip() {
-    use waapi_client::api::generated::ak::soundengine::{
+    use wwise_waapi::api::generated::ak::soundengine::{
         SoundengineLoadBankArgs, SoundenginePostMsgMonitorArgs, SoundengineResetRtpcValueArgs,
         SoundengineSetGameObjectAuxSendValuesArgs, SoundengineSetGameObjectOutputBusVolumeArgs,
         SoundengineSetListenerSpatializationArgs, SoundengineSetListenersArgs,
         SoundengineSetMultiplePositionsArgs, SoundengineSetObjectObstructionAndOcclusionArgs,
         SoundengineSetScalingFactorArgs, SoundengineStopAllArgs, SoundengineUnloadBankArgs,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         AuxSendValue, GameObjectRef, MultiPositionType, Position,
     };
 
@@ -1091,20 +1079,20 @@ fn soundengine_positions_volume_and_listeners_roundtrip() {
         json!({"emitter": 1, "listener": 2, "controlValue": -6.0})
     );
 
-    let reset = SoundengineResetRtpcValueArgs::new("Volume".into())
-        .game_object(GameObjectRef::game_object(1));
+    let reset =
+        SoundengineResetRtpcValueArgs::new("Volume").game_object(GameObjectRef::game_object(1));
     assert_eq!(
         serde_json::to_value(reset).unwrap(),
         json!({"rtpc": "Volume", "gameObject": 1})
     );
 
-    let load = SoundengineLoadBankArgs::new("Init".into());
+    let load = SoundengineLoadBankArgs::new("Init");
     assert_eq!(
         serde_json::to_value(load).unwrap(),
         json!({"soundBank": "Init"})
     );
 
-    let unload = SoundengineUnloadBankArgs::new("Init".into());
+    let unload = SoundengineUnloadBankArgs::new("Init");
     assert_eq!(
         serde_json::to_value(unload).unwrap(),
         json!({"soundBank": "Init"})
@@ -1125,15 +1113,15 @@ fn soundengine_positions_volume_and_listeners_roundtrip() {
 
 #[test]
 fn object_introspection_roundtrip() {
-    use waapi_client::Property;
-    use waapi_client::api::generated::ak::wwise::core::object::{
+    use wwise_waapi::Property;
+    use wwise_waapi::api::generated::ak::wwise::core::object::{
         CoreObjectGetPropertyAndReferenceNamesArgs, CoreObjectGetPropertyAndReferenceNamesResponse,
         CoreObjectGetPropertyInfoArgs, CoreObjectGetPropertyInfoResponse,
         CoreObjectGetTypesResponse, CoreObjectIsLinkedArgs, CoreObjectIsLinkedResponse,
         CoreObjectIsPropertyEnabledArgs, CoreObjectIsPropertyEnabledResponse,
         CoreObjectSetLinkedArgs, CoreObjectSetStateGroupsArgs, CoreObjectSetStatePropertiesArgs,
     };
-    use waapi_client::api::generated::primitives::RtpcSupportMode;
+    use wwise_waapi::api::generated::primitives::RtpcSupportMode;
 
     let types: CoreObjectGetTypesResponse = serde_json::from_value(json!({
         "return": [
@@ -1240,10 +1228,10 @@ fn object_introspection_roundtrip() {
 
 #[test]
 fn singles_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::CorePingResponse;
-    use waapi_client::api::generated::ak::wwise::core::gameParameter::CoreGameParameterSetRangeArgs;
-    use waapi_client::api::generated::ak::wwise::core::sound::CoreSoundSetActiveSourceArgs;
-    use waapi_client::api::generated::primitives::OnCurveUpdate;
+    use wwise_waapi::api::generated::ak::wwise::core::CorePingResponse;
+    use wwise_waapi::api::generated::ak::wwise::core::gameParameter::CoreGameParameterSetRangeArgs;
+    use wwise_waapi::api::generated::ak::wwise::core::sound::CoreSoundSetActiveSourceArgs;
+    use wwise_waapi::api::generated::primitives::OnCurveUpdate;
 
     let active = CoreSoundSetActiveSourceArgs::new(
         ObjectRef::guid("{SOUND-1}"),
@@ -1282,15 +1270,13 @@ fn singles_roundtrip() {
 
 #[test]
 fn blend_container_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::blendContainer::{
+    use wwise_waapi::api::generated::ak::wwise::core::blendContainer::{
         CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddAssignmentResponse,
         CoreBlendContainerAddTrackArgs, CoreBlendContainerAddTrackResponse,
         CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerGetAssignmentsResponse,
         CoreBlendContainerRemoveAssignmentArgs,
     };
-    use waapi_client::api::generated::primitives::{
-        BlendEdge, BlendFadeMode, BlendTrackAssignment,
-    };
+    use wwise_waapi::api::generated::primitives::{BlendEdge, BlendFadeMode, BlendTrackAssignment};
 
     let add = CoreBlendContainerAddAssignmentArgs::new(
         "{TRACK-1}".to_string(),
@@ -1299,7 +1285,7 @@ fn blend_container_roundtrip() {
     .index(0)
     .edges(vec![BlendEdge {
         fade_mode: BlendFadeMode::Manual,
-        fade_shape: waapi_client::api::generated::primitives::CurveShape::Linear,
+        fade_shape: wwise_waapi::api::generated::primitives::CurveShape::Linear,
         edge_position: 0.5,
         fade_position: Some(0.25),
     }]);
@@ -1368,13 +1354,13 @@ fn blend_container_roundtrip() {
 
 #[test]
 fn soundbank_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::soundbank::{
+    use wwise_waapi::api::generated::ak::wwise::core::soundbank::{
         CoreSoundbankConvertExternalSourcesArgs, CoreSoundbankGenerateArgs,
         CoreSoundbankGenerateResponse, CoreSoundbankGetInclusionsArgs,
         CoreSoundbankGetInclusionsResponse, CoreSoundbankProcessDefinitionFilesArgs,
         CoreSoundbankSetInclusionsArgs,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         ExternalSourceInfo, LogSeverity, SoundBankInclusion, SoundBankInclusionFilter,
         SoundBankInclusionOperation, SoundBankInclusionType, SoundBankInfo,
     };
@@ -1474,11 +1460,11 @@ fn soundbank_roundtrip() {
 
 #[test]
 fn audio_mute_convert_and_import_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::audio::{
+    use wwise_waapi::api::generated::ak::wwise::core::audio::{
         CoreAudioConvertArgs, CoreAudioConvertResponse, CoreAudioImportTabDelimitedArgs,
         CoreAudioMuteArgs, CoreAudioSetConversionPluginArgs, CoreAudioSoloArgs,
     };
-    use waapi_client::api::generated::primitives::LogSeverity;
+    use wwise_waapi::api::generated::primitives::LogSeverity;
 
     let mute = CoreAudioMuteArgs::new(vec![ObjectRef::guid("{OBJ-1}")], true);
     assert_eq!(
@@ -1539,11 +1525,11 @@ fn audio_mute_convert_and_import_roundtrip() {
 
 #[test]
 fn topic_payloads_deserialize() {
-    use waapi_client::api::generated::ak::wwise::core::object::{
+    use wwise_waapi::api::generated::ak::wwise::core::object::{
         CoreObjectCreatedPayload, CoreObjectNameChangedPayload, CoreObjectPropertyChangedPayload,
     };
-    use waapi_client::api::generated::ak::wwise::core::transport::CoreTransportStateChangedPayload;
-    use waapi_client::api::generated::primitives::TransportState;
+    use wwise_waapi::api::generated::ak::wwise::core::transport::CoreTransportStateChangedPayload;
+    use wwise_waapi::api::generated::primitives::TransportState;
 
     let created: CoreObjectCreatedPayload = serde_json::from_value(json!({
         "object": {"id": "{OBJ-1}", "name": "MySound", "type": "Sound"}
@@ -1569,7 +1555,7 @@ fn topic_payloads_deserialize() {
         "new": -6.0
     }))
     .unwrap();
-    assert_eq!(prop.property, waapi_client::Property::Volume);
+    assert_eq!(prop.property, wwise_waapi::Property::Volume);
     assert_eq!(prop.old, json!(-3.0));
     assert_eq!(prop.new, json!(-6.0));
 
@@ -1586,37 +1572,37 @@ fn topic_payloads_deserialize() {
 
 #[test]
 fn remaining_topic_payloads_deserialize() {
-    use waapi_client::api::generated::ak::wwise::core::audio::CoreAudioImportedPayload;
-    use waapi_client::api::generated::ak::wwise::core::log::CoreLogItemAddedPayload;
-    use waapi_client::api::generated::ak::wwise::core::object::{
+    use wwise_waapi::api::generated::ak::wwise::core::audio::CoreAudioImportedPayload;
+    use wwise_waapi::api::generated::ak::wwise::core::log::CoreLogItemAddedPayload;
+    use wwise_waapi::api::generated::ak::wwise::core::object::{
         CoreObjectAttenuationCurveChangedPayload, CoreObjectAttenuationCurveLinkChangedPayload,
         CoreObjectChildAddedPayload, CoreObjectChildRemovedPayload, CoreObjectCurveChangedPayload,
         CoreObjectNotesChangedPayload, CoreObjectPostDeletedPayload, CoreObjectPreDeletedPayload,
         CoreObjectReferenceChangedPayload,
     };
-    use waapi_client::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogItemAddedPayload;
-    use waapi_client::api::generated::ak::wwise::core::profiler::{
+    use wwise_waapi::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogItemAddedPayload;
+    use wwise_waapi::api::generated::ak::wwise::core::profiler::{
         CoreProfilerGameObjectRegisteredPayload, CoreProfilerGameObjectResetPayload,
         CoreProfilerGameObjectUnregisteredPayload, CoreProfilerStateChangedPayload,
         CoreProfilerSwitchChangedPayload,
     };
-    use waapi_client::api::generated::ak::wwise::core::project::{
+    use wwise_waapi::api::generated::ak::wwise::core::project::{
         CoreProjectLoadedPayload, CoreProjectPostClosedPayload, CoreProjectPreClosedPayload,
         CoreProjectSavedPayload,
     };
-    use waapi_client::api::generated::ak::wwise::core::soundbank::{
+    use wwise_waapi::api::generated::ak::wwise::core::soundbank::{
         CoreSoundbankGeneratedPayload, CoreSoundbankGenerationDonePayload,
     };
-    use waapi_client::api::generated::ak::wwise::core::switchContainer::{
+    use wwise_waapi::api::generated::ak::wwise::core::switchContainer::{
         CoreSwitchContainerAssignmentAddedPayload, CoreSwitchContainerAssignmentRemovedPayload,
     };
-    use waapi_client::api::generated::ak::wwise::debug::DebugAssertFailedPayload;
-    use waapi_client::api::generated::ak::wwise::ui::UiSelectionChangedPayload;
-    use waapi_client::api::generated::ak::wwise::ui::commands::UiCommandsExecutedPayload;
-    use waapi_client::api::generated::ak::wwise::ui::signal::{
+    use wwise_waapi::api::generated::ak::wwise::debug::DebugAssertFailedPayload;
+    use wwise_waapi::api::generated::ak::wwise::ui::UiSelectionChangedPayload;
+    use wwise_waapi::api::generated::ak::wwise::ui::commands::UiCommandsExecutedPayload;
+    use wwise_waapi::api::generated::ak::wwise::ui::signal::{
         UiSignalClickPayload, UiSignalTogglePayload,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         AttenuationCurveType, GameObjectRef, LogChannel, LogSeverity,
     };
 
@@ -1906,11 +1892,9 @@ fn remaining_topic_payloads_deserialize() {
     .unwrap();
     assert_eq!(commands.platforms.len(), 2);
     assert!(
-        matches!(&commands.platforms[0], waapi_client::api::PlatformRef::Guid(s) if s == "{GUID1}")
+        matches!(&commands.platforms[0], wwise_waapi::api::PlatformRef::Guid(s) if s == "{GUID1}")
     );
-    assert!(
-        matches!(&commands.platforms[1], waapi_client::api::PlatformRef::Name(s) if s == "Mac")
-    );
+    assert!(matches!(&commands.platforms[1], wwise_waapi::api::PlatformRef::Name(s) if s == "Mac"));
     assert_eq!(commands.command, "Run");
     assert_eq!(commands.objects[0].id.as_deref(), Some("{C}"));
 
@@ -1927,7 +1911,7 @@ fn remaining_topic_payloads_deserialize() {
 
 #[test]
 fn object_type_union_preserves_renamed_variants() {
-    use waapi_client::ObjectType;
+    use wwise_waapi::ObjectType;
 
     // ActorMixer (Wwise 2024) and PropertyContainer (Wwise 2025) are the same
     // object type; the union keeps both names as distinct variants.
@@ -1961,7 +1945,7 @@ fn object_type_union_preserves_renamed_variants() {
 
 #[test]
 fn return_field_union_keeps_removed_variants() {
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         AudioObjectReturnField, ObjectReturnField, WwiseObject,
     };
 
@@ -1990,24 +1974,24 @@ fn return_field_union_keeps_removed_variants() {
 
 #[test]
 fn new_2025_endpoints_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::mediaPool::{
+    use wwise_waapi::api::generated::ak::wwise::core::mediaPool::{
         CoreMediaPoolGetArgs, CoreMediaPoolGetFieldsResponse, CoreMediaPoolGetOptions,
         CoreMediaPoolGetResponse,
     };
-    use waapi_client::api::generated::ak::wwise::core::object::CoreObjectStructureChangedPayload;
-    use waapi_client::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogSaveArgs;
-    use waapi_client::api::generated::ak::wwise::core::profiler::{
+    use wwise_waapi::api::generated::ak::wwise::core::object::CoreObjectStructureChangedPayload;
+    use wwise_waapi::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogSaveArgs;
+    use wwise_waapi::api::generated::ak::wwise::core::profiler::{
         CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse, CoreProfilerSetCursorTimeArgs,
         CoreProfilerSetCursorTimeResponse,
     };
-    use waapi_client::api::generated::ak::wwise::core::workUnit::{
+    use wwise_waapi::api::generated::ak::wwise::core::workUnit::{
         CoreWorkUnitLoadArgs, CoreWorkUnitUnloadArgs,
     };
-    use waapi_client::api::generated::ak::wwise::ui::UiGetSelectedFilesResponse;
-    use waapi_client::api::generated::ak::wwise::ui::layout::{
+    use wwise_waapi::api::generated::ak::wwise::ui::UiGetSelectedFilesResponse;
+    use wwise_waapi::api::generated::ak::wwise::ui::layout::{
         UiLayoutCloseViewArgs, UiLayoutResetLayoutsArgs,
     };
-    use waapi_client::api::primitives::ObjectRef;
+    use wwise_waapi::api::primitives::ObjectRef;
 
     // mediaPool.get: args, options, and wrapped "return" response.
     let media_get = CoreMediaPoolGetArgs::new()
@@ -2107,7 +2091,7 @@ fn new_2025_endpoints_roundtrip() {
 
 #[test]
 fn wwise_object_convenience_accessors_roundtrip() {
-    use waapi_client::api::generated::primitives::WwiseObject;
+    use wwise_waapi::api::generated::primitives::WwiseObject;
 
     let obj: WwiseObject = serde_json::from_value(json!({
         "id": "{12345678-1234-1234-1234-123456789012}",
@@ -2132,26 +2116,26 @@ fn wwise_object_convenience_accessors_roundtrip() {
 
 #[test]
 fn schema_discovered_endpoints_roundtrip() {
-    use waapi_client::api::generated::ak::wwise::core::audioSourcePeaks::{
+    use wwise_waapi::api::generated::ak::wwise::core::audioSourcePeaks::{
         CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs,
         CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse,
     };
-    use waapi_client::api::generated::ak::wwise::core::log::{
+    use wwise_waapi::api::generated::ak::wwise::core::log::{
         CoreLogClearArgs, CoreLogGetArgs, CoreLogGetResponse,
     };
-    use waapi_client::api::generated::ak::wwise::core::profiler::{
+    use wwise_waapi::api::generated::ak::wwise::core::profiler::{
         CoreProfilerGetAudioObjectsArgs, CoreProfilerGetAudioObjectsOptions,
         CoreProfilerGetBussesArgs, CoreProfilerGetBussesOptions, CoreProfilerGetVoicesArgs,
         CoreProfilerGetVoicesOptions,
     };
-    use waapi_client::api::generated::ak::wwise::core::remote::{
+    use wwise_waapi::api::generated::ak::wwise::core::remote::{
         CoreRemoteGetAvailableConsolesResponse, CoreRemoteGetConnectionStatusResponse,
     };
-    use waapi_client::api::generated::ak::wwise::debug::DebugEnableAssertsArgs;
-    use waapi_client::api::generated::ak::wwise::waapi::{
+    use wwise_waapi::api::generated::ak::wwise::debug::DebugEnableAssertsArgs;
+    use wwise_waapi::api::generated::ak::wwise::waapi::{
         WaapiGetFunctionsResponse, WaapiGetSchemaArgs, WaapiGetTopicsResponse,
     };
-    use waapi_client::api::generated::primitives::{
+    use wwise_waapi::api::generated::primitives::{
         AudioObjectReturnField, BusReturnField, LogChannel, VoiceReturnField,
     };
 
@@ -2266,5 +2250,142 @@ fn schema_discovered_endpoints_roundtrip() {
     assert_eq!(
         serde_json::to_value(asserts).unwrap(),
         json!({"enable": true})
+    );
+}
+
+#[test]
+fn ergonomic_constructors_aliases_and_from_roundtrip() {
+    use wwise_waapi::api::ak::soundengine::{
+        PostEventArgs, RegisterGameObjArgs, SetPositionArgs, SetRtpcValueArgs,
+        UnregisterGameObjArgs,
+    };
+    use wwise_waapi::api::ak::wwise::core::object::{
+        CreateArgs, CreatedOptions, CreatedPayload, DeleteArgs, GetArgs, GetOptions, SetArgs,
+        SetItem, SetNameArgs, SetPropertyArgs,
+    };
+    use wwise_waapi::prelude::*;
+
+    // 1. Short aliases + impl Into<T> in Args::new(...)
+    let parent_guid = String::from("{11111111-1111-1111-1111-111111111111}");
+    let create = CreateArgs::new(&parent_guid, ObjectType::Sound, "Laser");
+    assert_eq!(
+        serde_json::to_value(create).unwrap(),
+        json!({
+            "parent": "{11111111-1111-1111-1111-111111111111}",
+            "type": "Sound",
+            "name": "Laser"
+        })
+    );
+
+    // 3-tuple From for CreateArgs
+    let create_tuple = CreateArgs::from((&parent_guid, ObjectType::Sound, "Plasma"));
+    assert_eq!(
+        serde_json::to_value(create_tuple).unwrap(),
+        json!({
+            "parent": "{11111111-1111-1111-1111-111111111111}",
+            "type": "Sound",
+            "name": "Plasma"
+        })
+    );
+
+    // 1-required-field From for DeleteArgs (&str and &String)
+    let delete_str = DeleteArgs::from(r"\Containers\Default Work Unit\Laser");
+    assert_eq!(
+        serde_json::to_value(delete_str).unwrap(),
+        json!({"object": r"\Containers\Default Work Unit\Laser"})
+    );
+    let delete_ref = DeleteArgs::from(&parent_guid);
+    assert_eq!(
+        serde_json::to_value(delete_ref).unwrap(),
+        json!({"object": "{11111111-1111-1111-1111-111111111111}"})
+    );
+
+    // 2-tuple From for SetNameArgs & 3-tuple From for SetPropertyArgs
+    let rename = SetNameArgs::from((&parent_guid, "LaserRenamed"));
+    assert_eq!(
+        serde_json::to_value(rename).unwrap(),
+        json!({
+            "object": "{11111111-1111-1111-1111-111111111111}",
+            "value": "LaserRenamed"
+        })
+    );
+    let set_prop = SetPropertyArgs::from((&parent_guid, Property::Volume, -4.5));
+    assert_eq!(
+        serde_json::to_value(set_prop).unwrap(),
+        json!({
+            "object": "{11111111-1111-1111-1111-111111111111}",
+            "property": "Volume",
+            "value": -4.5
+        })
+    );
+
+    // GetArgs From<&str>, From<&String>, From<ObjectType>, and GetArgs::new(impl Into<ObjectQuery>)
+    let get_path: GetArgs = r"\Containers\Default Work Unit".into();
+    assert_eq!(
+        serde_json::to_value(get_path).unwrap(),
+        json!({"from": {"path": [r"\Containers\Default Work Unit"]}})
+    );
+    let get_id = GetArgs::new(&parent_guid);
+    assert_eq!(
+        serde_json::to_value(get_id).unwrap(),
+        json!({"from": {"id": ["{11111111-1111-1111-1111-111111111111}"]}})
+    );
+    let get_type: GetArgs = ObjectType::Sound.into();
+    assert_eq!(
+        serde_json::to_value(get_type).unwrap(),
+        json!({"from": {"ofType": ["Sound"]}})
+    );
+    let _opts = GetOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+
+    // SetArgs::from(SetItem) and SetArgs::item(SetItem)
+    let item = SetItem::new(&parent_guid)
+        .name("LaserV2")
+        .property(Property::Volume, -6.0);
+    let set_from_item = SetArgs::from(item);
+    assert_eq!(
+        serde_json::to_value(set_from_item).unwrap(),
+        json!({
+            "objects": [{
+                "object": "{11111111-1111-1111-1111-111111111111}",
+                "name": "LaserV2",
+                "@Volume": -6.0
+            }]
+        })
+    );
+
+    // SoundEngine ergonomic constructors & From impls
+    let reg = RegisterGameObjArgs::from((1001u64, "Listener"));
+    assert_eq!(
+        serde_json::to_value(reg).unwrap(),
+        json!({"gameObject": 1001, "name": "Listener"})
+    );
+    let unreg = UnregisterGameObjArgs::from(1001u64);
+    assert_eq!(
+        serde_json::to_value(unreg).unwrap(),
+        json!({"gameObject": 1001})
+    );
+    let pos = SetPositionArgs::from((1001u64, Position::origin()));
+    assert_eq!(
+        serde_json::to_value(pos).unwrap()["gameObject"],
+        json!(1001)
+    );
+    let post = PostEventArgs::from("Play_Laser").game_object(1001u64);
+    assert_eq!(
+        serde_json::to_value(post).unwrap(),
+        json!({"event": "Play_Laser", "gameObject": 1001})
+    );
+    let rtpc = SetRtpcValueArgs::from(("PlayerSpeed", 75.0));
+    assert_eq!(
+        serde_json::to_value(rtpc).unwrap(),
+        json!({"rtpc": "PlayerSpeed", "value": 75.0})
+    );
+
+    // Short topic aliases
+    let _created_opts = CreatedOptions::new().return_(vec![ObjectReturnField::Id]);
+    let created_payload: CreatedPayload =
+        serde_json::from_value(json!({"object": {"id": parent_guid}})).unwrap();
+    assert_eq!(
+        created_payload.object.id(),
+        Some("{11111111-1111-1111-1111-111111111111}")
     );
 }

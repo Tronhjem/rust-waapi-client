@@ -27,3 +27,6 @@ impl UiLayoutResetLayoutsArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`UiLayoutResetLayoutsArgs`].
+pub type ResetLayoutsArgs = UiLayoutResetLayoutsArgs;

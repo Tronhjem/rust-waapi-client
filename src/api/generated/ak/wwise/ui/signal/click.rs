@@ -33,10 +33,16 @@ pub struct UiSignalClickOptions {
 
 impl UiSignalClickOptions {
     /// Creates a new [`UiSignalClickOptions`] with the required fields.
-    pub fn new(handle_id: String, widget_id: String) -> Self {
+    pub fn new(handle_id: impl Into<String>, widget_id: impl Into<String>) -> Self {
         Self {
-            handle_id,
-            widget_id,
+            handle_id: handle_id.into(),
+            widget_id: widget_id.into(),
         }
     }
 }
+
+/// Module-scoped alias for [`UiSignalClickPayload`].
+pub type ClickPayload = UiSignalClickPayload;
+
+/// Module-scoped alias for [`UiSignalClickOptions`].
+pub type ClickOptions = UiSignalClickOptions;

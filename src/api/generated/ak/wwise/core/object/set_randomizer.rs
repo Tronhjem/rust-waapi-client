@@ -30,9 +30,9 @@ pub struct CoreObjectSetRandomizerArgs {
 
 impl CoreObjectSetRandomizerArgs {
     /// Creates a new [`CoreObjectSetRandomizerArgs`] with the required fields.
-    pub fn new(object: ObjectRef, property: Property) -> Self {
+    pub fn new(object: impl Into<ObjectRef>, property: Property) -> Self {
         Self {
-            object,
+            object: object.into(),
             property,
             min: None,
             max: None,
@@ -65,3 +65,12 @@ impl CoreObjectSetRandomizerArgs {
         self
     }
 }
+
+impl<T0: Into<ObjectRef>, T1: Into<Property>> From<(T0, T1)> for CoreObjectSetRandomizerArgs {
+    fn from((object, property): (T0, T1)) -> Self {
+        Self::new(object, property.into())
+    }
+}
+
+/// Module-scoped alias for [`CoreObjectSetRandomizerArgs`].
+pub type SetRandomizerArgs = CoreObjectSetRandomizerArgs;

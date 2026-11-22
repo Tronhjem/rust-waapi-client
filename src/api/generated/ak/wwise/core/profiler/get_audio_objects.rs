@@ -33,6 +33,12 @@ impl CoreProfilerGetAudioObjectsArgs {
     }
 }
 
+impl From<serde_json::Value> for CoreProfilerGetAudioObjectsArgs {
+    fn from(value: serde_json::Value) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Options for `ak.wwise.core.profiler.getAudioObjects`.
 ///
 /// Retrieves the Audio Objects at a specific profiler capture time.
@@ -65,3 +71,12 @@ pub struct CoreProfilerGetAudioObjectsResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetAudioObjectsArgs`].
+pub type GetAudioObjectsArgs = CoreProfilerGetAudioObjectsArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetAudioObjectsOptions`].
+pub type GetAudioObjectsOptions = CoreProfilerGetAudioObjectsOptions;
+
+/// Module-scoped alias for [`CoreProfilerGetAudioObjectsResponse`].
+pub type GetAudioObjectsResponse = CoreProfilerGetAudioObjectsResponse;

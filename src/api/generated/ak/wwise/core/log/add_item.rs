@@ -22,9 +22,9 @@ pub struct CoreLogAddItemArgs {
 
 impl CoreLogAddItemArgs {
     /// Creates a new [`CoreLogAddItemArgs`] with the required fields.
-    pub fn new(message: String) -> Self {
+    pub fn new(message: impl Into<String>) -> Self {
         Self {
-            message,
+            message: message.into(),
             severity: None,
             channel: None,
         }
@@ -42,3 +42,24 @@ impl CoreLogAddItemArgs {
         self
     }
 }
+
+impl From<String> for CoreLogAddItemArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreLogAddItemArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreLogAddItemArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreLogAddItemArgs`].
+pub type AddItemArgs = CoreLogAddItemArgs;

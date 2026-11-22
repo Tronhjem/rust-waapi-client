@@ -1,12 +1,12 @@
 use super::{connect_client, sequence_lock};
-use waapi_client::api::ak::soundengine::{
+use wwise_waapi::api::ak::soundengine::{
     SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetDefaultListenersArgs,
     SoundengineSetPositionArgs, SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
 };
-use waapi_client::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
-use waapi_client::api::ak::wwise::ui::UiGetSelectedObjectsOptions;
-use waapi_client::api::{EventRef, ObjectReturnField, OnNameConflict, RtpcRef};
-use waapi_client::{
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
+use wwise_waapi::api::ak::wwise::ui::UiGetSelectedObjectsOptions;
+use wwise_waapi::api::{EventRef, ObjectReturnField, OnNameConflict, RtpcRef};
+use wwise_waapi::{
     GameObjectRef, ObjectRef, ObjectType, Position, Property, Vector3, WaapiFunction, json,
 };
 
@@ -104,7 +104,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .soundengine()
         .register_game_obj(SoundengineRegisterGameObjArgs::new(
             listener,
-            "WaapiSeqListener".into(),
+            "WaapiSeqListener",
         ))
         .await
         .expect("Failed to call ak.soundengine.registerGameObj for listener");
@@ -112,7 +112,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .soundengine()
         .register_game_obj(SoundengineRegisterGameObjArgs::new(
             emitter,
-            "WaapiSeqEmitter".into(),
+            "WaapiSeqEmitter",
         ))
         .await
         .expect("Failed to call ak.soundengine.registerGameObj for emitter");
@@ -174,7 +174,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .await
         .expect("Failed to call ak.soundengine.unregisterGameObj for listener");
 
-    // 4. Test low-level escape hatch `client.call` + `waapi_client::json!` against the temporary GameParameter
+    // 4. Test low-level escape hatch `client.call` + `wwise_waapi::json!` against the temporary GameParameter
     let raw_resp = client
         .call(
             WaapiFunction::ak_wwise_core_object_get,

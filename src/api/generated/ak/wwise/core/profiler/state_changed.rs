@@ -48,3 +48,9 @@ impl CoreProfilerStateChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreProfilerStateChangedPayload`].
+pub type StateChangedPayload = CoreProfilerStateChangedPayload;
+
+/// Module-scoped alias for [`CoreProfilerStateChangedOptions`].
+pub type StateChangedOptions = CoreProfilerStateChangedOptions;

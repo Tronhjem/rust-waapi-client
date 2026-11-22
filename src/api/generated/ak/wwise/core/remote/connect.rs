@@ -25,9 +25,9 @@ pub struct CoreRemoteConnectArgs {
 
 impl CoreRemoteConnectArgs {
     /// Creates a new [`CoreRemoteConnectArgs`] with the required fields.
-    pub fn new(host: String) -> Self {
+    pub fn new(host: impl Into<String>) -> Self {
         Self {
-            host,
+            host: host.into(),
             app_name: None,
             command_port: None,
             notification_port: None,
@@ -52,3 +52,24 @@ impl CoreRemoteConnectArgs {
         self
     }
 }
+
+impl From<String> for CoreRemoteConnectArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreRemoteConnectArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreRemoteConnectArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreRemoteConnectArgs`].
+pub type ConnectArgs = CoreRemoteConnectArgs;

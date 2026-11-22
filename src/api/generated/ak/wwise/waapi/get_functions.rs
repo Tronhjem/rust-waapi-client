@@ -14,3 +14,6 @@ pub struct WaapiGetFunctionsResponse {
     #[serde(default)]
     pub functions: Vec<String>,
 }
+
+/// Module-scoped alias for [`WaapiGetFunctionsResponse`].
+pub type GetFunctionsResponse = WaapiGetFunctionsResponse;

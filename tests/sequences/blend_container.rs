@@ -1,11 +1,11 @@
 use super::{connect_client, sequence_lock};
-use waapi_client::api::OnNameConflict;
-use waapi_client::api::ak::wwise::core::blendContainer::{
+use wwise_waapi::api::OnNameConflict;
+use wwise_waapi::api::ak::wwise::core::blendContainer::{
     CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddTrackArgs,
     CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerRemoveAssignmentArgs,
 };
-use waapi_client::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
-use waapi_client::{ObjectRef, ObjectType};
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectDeleteArgs};
+use wwise_waapi::{ObjectRef, ObjectType};
 
 const ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 

@@ -27,3 +27,6 @@ impl CoreUndoCancelGroupArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreUndoCancelGroupArgs`].
+pub type CancelGroupArgs = CoreUndoCancelGroupArgs;

@@ -21,11 +21,26 @@ pub struct SoundengineSetGameObjectOutputBusVolumeArgs {
 
 impl SoundengineSetGameObjectOutputBusVolumeArgs {
     /// Creates a new [`SoundengineSetGameObjectOutputBusVolumeArgs`] with the required fields.
-    pub fn new(emitter: GameObjectRef, listener: GameObjectRef, control_value: f64) -> Self {
+    pub fn new(
+        emitter: impl Into<GameObjectRef>,
+        listener: impl Into<GameObjectRef>,
+        control_value: f64,
+    ) -> Self {
         Self {
-            emitter,
-            listener,
+            emitter: emitter.into(),
+            listener: listener.into(),
             control_value,
         }
     }
 }
+
+impl<T0: Into<GameObjectRef>, T1: Into<GameObjectRef>, T2: Into<f64>> From<(T0, T1, T2)>
+    for SoundengineSetGameObjectOutputBusVolumeArgs
+{
+    fn from((emitter, listener, control_value): (T0, T1, T2)) -> Self {
+        Self::new(emitter, listener, control_value.into())
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetGameObjectOutputBusVolumeArgs`].
+pub type SetGameObjectOutputBusVolumeArgs = SoundengineSetGameObjectOutputBusVolumeArgs;

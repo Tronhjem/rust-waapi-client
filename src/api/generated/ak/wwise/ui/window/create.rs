@@ -18,8 +18,17 @@ pub struct UiWindowCreateArgs {
 
 impl UiWindowCreateArgs {
     /// Creates a new [`UiWindowCreateArgs`] with the required fields.
-    pub fn new(title: String, size: serde_json::Value) -> Self {
-        Self { title, size }
+    pub fn new(title: impl Into<String>, size: serde_json::Value) -> Self {
+        Self {
+            title: title.into(),
+            size,
+        }
+    }
+}
+
+impl<T0: Into<String>, T1: Into<serde_json::Value>> From<(T0, T1)> for UiWindowCreateArgs {
+    fn from((title, size): (T0, T1)) -> Self {
+        Self::new(title, size.into())
     }
 }
 
@@ -32,3 +41,9 @@ pub struct UiWindowCreateResponse {
     #[serde(rename = "windowID", default)]
     pub window_id: Option<String>,
 }
+
+/// Module-scoped alias for [`UiWindowCreateArgs`].
+pub type CreateArgs = UiWindowCreateArgs;
+
+/// Module-scoped alias for [`UiWindowCreateResponse`].
+pub type CreateResponse = UiWindowCreateResponse;

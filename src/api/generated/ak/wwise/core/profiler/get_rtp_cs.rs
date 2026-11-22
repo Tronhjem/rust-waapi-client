@@ -21,6 +21,12 @@ impl CoreProfilerGetRtpCsArgs {
     }
 }
 
+impl From<serde_json::Value> for CoreProfilerGetRtpCsArgs {
+    fn from(value: serde_json::Value) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.profiler.getRTPCs`.
 ///
 /// Retrieves active RTPCs at a specific profiler capture time.
@@ -30,3 +36,9 @@ pub struct CoreProfilerGetRtpCsResponse {
     #[serde(rename = "return")]
     pub return_: Vec<WwiseObjectRef>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetRtpCsArgs`].
+pub type GetRtpCsArgs = CoreProfilerGetRtpCsArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetRtpCsResponse`].
+pub type GetRtpCsResponse = CoreProfilerGetRtpCsResponse;

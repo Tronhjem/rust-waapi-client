@@ -21,6 +21,12 @@ impl CoreTransportGetStateArgs {
     }
 }
 
+impl From<u32> for CoreTransportGetStateArgs {
+    fn from(value: u32) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.transport.getState`.
 ///
 /// Gets the state of the given transport object.
@@ -29,3 +35,9 @@ pub struct CoreTransportGetStateResponse {
     /// The state of the transport object.
     pub state: TransportState,
 }
+
+/// Module-scoped alias for [`CoreTransportGetStateArgs`].
+pub type GetStateArgs = CoreTransportGetStateArgs;
+
+/// Module-scoped alias for [`CoreTransportGetStateResponse`].
+pub type GetStateResponse = CoreTransportGetStateResponse;

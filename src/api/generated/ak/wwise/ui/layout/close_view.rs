@@ -17,7 +17,30 @@ pub struct UiLayoutCloseViewArgs {
 
 impl UiLayoutCloseViewArgs {
     /// Creates a new [`UiLayoutCloseViewArgs`] with the required fields.
-    pub fn new(view_id: String) -> Self {
-        Self { view_id }
+    pub fn new(view_id: impl Into<String>) -> Self {
+        Self {
+            view_id: view_id.into(),
+        }
     }
 }
+
+impl From<String> for UiLayoutCloseViewArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for UiLayoutCloseViewArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for UiLayoutCloseViewArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`UiLayoutCloseViewArgs`].
+pub type CloseViewArgs = UiLayoutCloseViewArgs;

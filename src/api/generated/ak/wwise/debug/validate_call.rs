@@ -25,9 +25,9 @@ pub struct DebugValidateCallArgs {
 
 impl DebugValidateCallArgs {
     /// Creates a new [`DebugValidateCallArgs`] with the required fields.
-    pub fn new(id: String) -> Self {
+    pub fn new(id: impl Into<String>) -> Self {
         Self {
-            id,
+            id: id.into(),
             result: None,
             args: None,
             options: None,
@@ -52,3 +52,24 @@ impl DebugValidateCallArgs {
         self
     }
 }
+
+impl From<String> for DebugValidateCallArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for DebugValidateCallArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for DebugValidateCallArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`DebugValidateCallArgs`].
+pub type ValidateCallArgs = DebugValidateCallArgs;

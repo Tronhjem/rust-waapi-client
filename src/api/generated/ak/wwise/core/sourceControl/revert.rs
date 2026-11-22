@@ -21,6 +21,12 @@ impl CoreSourceControlRevertArgs {
     }
 }
 
+impl From<Vec<String>> for CoreSourceControlRevertArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.revert`.
 ///
 /// Revert changes to files in source control.
@@ -29,3 +35,9 @@ pub struct CoreSourceControlRevertResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlRevertArgs`].
+pub type RevertArgs = CoreSourceControlRevertArgs;
+
+/// Module-scoped alias for [`CoreSourceControlRevertResponse`].
+pub type RevertResponse = CoreSourceControlRevertResponse;

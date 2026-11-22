@@ -45,3 +45,9 @@ impl CoreObjectPreDeletedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectPreDeletedPayload`].
+pub type PreDeletedPayload = CoreObjectPreDeletedPayload;
+
+/// Module-scoped alias for [`CoreObjectPreDeletedOptions`].
+pub type PreDeletedOptions = CoreObjectPreDeletedOptions;

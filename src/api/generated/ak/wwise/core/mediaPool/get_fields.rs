@@ -14,3 +14,6 @@ pub struct CoreMediaPoolGetFieldsResponse {
     #[serde(rename = "return", default)]
     pub return_: Vec<String>,
 }
+
+/// Module-scoped alias for [`CoreMediaPoolGetFieldsResponse`].
+pub type GetFieldsResponse = CoreMediaPoolGetFieldsResponse;

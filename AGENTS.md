@@ -27,13 +27,14 @@ RUST_LOG=info cargo run --example get_info
 
 ## Important patterns
 
-- `WaapiClient::new` is async.
+- `WaapiClient::connect()` (default `ws://127.0.0.1:8080/waapi`), `WaapiClient::connect_to(url)`, and `WaapiClient::new(Option<&str>)` are async.
 - Always call `client.shutdown().await` before dropping; `Drop` prints a warning if you do not.
+- `wwise_waapi::prelude::*` re-exports common client, query, object, property, and SoundEngine types for single-line imports.
 - `client.call(WaapiFunction, Option<serde_json::Value>, Option<serde_json::Value>) -> WaapiResult<serde_json::Value>` and `client.subscribe(WaapiTopic, Option<serde_json::Value>)` take typed URI enums (whose `.as_str()` returns the `ak::...` `&str` constants). Use `call_raw` / `subscribe_raw` if a raw `&str` URI is needed.
-- The typed API exposes a chained namespace hierarchy on `WaapiClient` (`client.ak().wwise()...` plus `client.wwise()` and `client.soundengine()` shortcuts) that mirrors WAAPI URI dot-notation (e.g. `ak.wwise.core.object.get` → `client.wwise().core().object().get(...)` with types in `ak::wwise::core::object`). Each method delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed` using `WaapiFunction` / `WaapiTopic`, keeping `WaapiClient` as the single entry point for calls.
+- The typed API exposes a chained namespace hierarchy on `WaapiClient` (`client.ak().wwise()...` plus `client.wwise()`, `client.core()`, `client.object()`, `client.ui()`, and `client.soundengine()` shortcuts) that mirrors WAAPI URI dot-notation (e.g. `ak.wwise.core.object.get` → `client.object().get(...)` or `client.wwise().core().object().get(...)` with types in `api::ak::wwise::core::object`). Each module exports both canonical (`CoreObjectGetArgs`) and short module-scoped (`GetArgs`, `GetOptions`, `GetResponse`) type names, `Args::new(...)` accepts `impl Into<T>` for string/ref types, and client methods accept `impl Into<Args>` (including direct paths/GUIDs for 1-field `Args`, a single `SetItem` for `set`, and tuples for 2/3-field `Args`). Each method delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed` using `WaapiFunction` / `WaapiTopic`, keeping `WaapiClient` as the single entry point for calls.
 - Topics have generated payload structs (`<Base>Payload`) and `subscribe_*` chained methods returning `WaapiResult<(u64, UnboundedReceiver<Payload>)>`; these delegate to `WaapiClient::subscribe_payload<Options, Payload>`, which deserializes each `event.kwargs` into the payload (skipping malformed events with a warning).
-- `pub use serde_json;` is re-exported from the crate root, so `waapi_client::serde_json::json!` works without an explicit `serde_json` dependency.
-- `waapi_client::json!` is also exported directly for the same purpose (it delegates to `serde_json::json!`).
+- `pub use serde_json;` is re-exported from the crate root, so `wwise_waapi::serde_json::json!` works without an explicit `serde_json` dependency.
+- `wwise_waapi::json!` is also exported directly for the same purpose (it delegates to `serde_json::json!`).
 
 ## Regenerating the WAAPI bindings
 

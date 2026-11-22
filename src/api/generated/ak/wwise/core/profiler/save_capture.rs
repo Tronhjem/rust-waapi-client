@@ -16,7 +16,28 @@ pub struct CoreProfilerSaveCaptureArgs {
 
 impl CoreProfilerSaveCaptureArgs {
     /// Creates a new [`CoreProfilerSaveCaptureArgs`] with the required fields.
-    pub fn new(file: String) -> Self {
-        Self { file }
+    pub fn new(file: impl Into<String>) -> Self {
+        Self { file: file.into() }
     }
 }
+
+impl From<String> for CoreProfilerSaveCaptureArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreProfilerSaveCaptureArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreProfilerSaveCaptureArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreProfilerSaveCaptureArgs`].
+pub type SaveCaptureArgs = CoreProfilerSaveCaptureArgs;

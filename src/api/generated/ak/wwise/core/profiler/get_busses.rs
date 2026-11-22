@@ -33,6 +33,12 @@ impl CoreProfilerGetBussesArgs {
     }
 }
 
+impl From<serde_json::Value> for CoreProfilerGetBussesArgs {
+    fn from(value: serde_json::Value) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Options for `ak.wwise.core.profiler.getBusses`.
 ///
 /// Retrieves the busses at a specific profiler capture time.
@@ -65,3 +71,12 @@ pub struct CoreProfilerGetBussesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetBussesArgs`].
+pub type GetBussesArgs = CoreProfilerGetBussesArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetBussesOptions`].
+pub type GetBussesOptions = CoreProfilerGetBussesOptions;
+
+/// Module-scoped alias for [`CoreProfilerGetBussesResponse`].
+pub type GetBussesResponse = CoreProfilerGetBussesResponse;

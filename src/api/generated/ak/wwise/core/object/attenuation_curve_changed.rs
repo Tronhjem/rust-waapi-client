@@ -48,3 +48,9 @@ impl CoreObjectAttenuationCurveChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreObjectAttenuationCurveChangedPayload`].
+pub type AttenuationCurveChangedPayload = CoreObjectAttenuationCurveChangedPayload;
+
+/// Module-scoped alias for [`CoreObjectAttenuationCurveChangedOptions`].
+pub type AttenuationCurveChangedOptions = CoreObjectAttenuationCurveChangedOptions;

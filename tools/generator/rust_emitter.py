@@ -44,6 +44,20 @@ from .type_mapper import (
 )
 
 
+INTO_CTOR_TYPES = {
+    "String",
+    "ObjectRef",
+    "GameObjectRef",
+    "SoundEngineObjectRef",
+    "EventRef",
+    "RtpcRef",
+    "PlatformRef",
+    "LanguageRef",
+    "PropertyValue",
+    "ObjectQuery",
+}
+
+
 def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_order=None, extra_flatten=False):
     """Emit an Args/Options (Serialize) or Response (Serialize+Deserialize) struct."""
     lines = doc_lines(doc) or [f"/// `{ctx.uri}` {kind}."]
@@ -77,6 +91,7 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
             lines.append("}")
         return "\n".join(lines)
 
+    ctor_fields = []
     lines.append(f"impl {struct_name} {{")
     if required:
         order = ctor_order or required_order or [f.wire for f in required]
@@ -85,12 +100,18 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
         for f in required:
             if f not in ctor_fields:
                 ctor_fields.append(f)
-        params = ", ".join(f"{f.rust_name}: {f.ty}" for f in ctor_fields)
+        params = ", ".join(
+            f"{f.rust_name}: impl Into<{f.ty}>" if f.ty in INTO_CTOR_TYPES else f"{f.rust_name}: {f.ty}"
+            for f in ctor_fields
+        )
         lines.append(f"    /// Creates a new [`{struct_name}`] with the required fields.")
         lines.append(f"    pub fn new({params}) -> Self {{")
         lines.append("        Self {")
         for f in ctor_fields:
-            lines.append(f"            {f.rust_name},")
+            if f.ty in INTO_CTOR_TYPES:
+                lines.append(f"            {f.rust_name}: {f.rust_name}.into(),")
+            else:
+                lines.append(f"            {f.rust_name},")
         for f in optional:
             lines.append(f"            {f.rust_name}: None,")
         if extra_flatten:
@@ -130,6 +151,42 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
             lines.append("        self")
             lines.append("    }")
     lines.append("}")
+
+    if kind == "args" and len(ctor_fields) == 1:
+        f = ctor_fields[0]
+        from_types = []
+        if f.ty != struct_name:
+            from_types.append(f.ty)
+        if f.ty in {"ObjectRef", "SoundEngineObjectRef", "EventRef", "RtpcRef", "PlatformRef", "LanguageRef", "ObjectQuery"}:
+            from_types.extend(["&str", "String", "&String"])
+        elif f.ty == "String":
+            from_types.extend(["&str", "&String"])
+        if f.ty in {"SoundEngineObjectRef", "EventRef", "RtpcRef"}:
+            from_types.append("u32")
+        elif f.ty == "GameObjectRef":
+            from_types.extend(["u64", "u32"])
+        for src_ty in from_types:
+            lines.append("")
+            lines.append(f"impl From<{src_ty}> for {struct_name} {{")
+            lines.append(f"    fn from(value: {src_ty}) -> Self {{")
+            lines.append("        Self::new(value)")
+            lines.append("    }")
+            lines.append("}")
+    elif kind == "args" and len(ctor_fields) in (2, 3):
+        t_params = [f"T{i}: Into<{f.ty}>" for i, f in enumerate(ctor_fields)]
+        t_names = ", ".join(f"T{i}" for i in range(len(ctor_fields)))
+        f_names = ", ".join(f.rust_name for f in ctor_fields)
+        f_args = ", ".join(
+            f.rust_name if f.ty in INTO_CTOR_TYPES else f"{f.rust_name}.into()"
+            for f in ctor_fields
+        )
+        lines.append("")
+        lines.append(f"impl<{', '.join(t_params)}> From<({t_names})> for {struct_name} {{")
+        lines.append(f"    fn from(({f_names}): ({t_names})) -> Self {{")
+        lines.append(f"        Self::new({f_args})")
+        lines.append("    }")
+        lines.append("}")
+
     return "\n".join(lines)
 
 
@@ -669,6 +726,9 @@ def gen_object_query(ctx):
     lines.append("impl From<&str> for ObjectQuery {")
     lines.append("    fn from(s: &str) -> Self { Self::from(s.to_string()) }")
     lines.append("}")
+    lines.append("impl From<&String> for ObjectQuery {")
+    lines.append("    fn from(s: &String) -> Self { Self::from(s.as_str()) }")
+    lines.append("}")
     lines.append("impl From<Vec<String>> for ObjectQuery {")
     lines.append("    fn from(v: Vec<String>) -> Self {")
     lines.append("        ObjectQuery::Id(v.into_iter().map(serde_json::Value::String).collect())")
@@ -1166,6 +1226,9 @@ impl From<&str> for SoundEngineObjectRef {
 impl From<String> for SoundEngineObjectRef {
     fn from(s: String) -> Self { SoundEngineObjectRef::Name(s) }
 }
+impl From<&String> for SoundEngineObjectRef {
+    fn from(s: &String) -> Self { SoundEngineObjectRef::Name(s.clone()) }
+}
 impl From<u32> for SoundEngineObjectRef {
     fn from(id: u32) -> Self { SoundEngineObjectRef::ShortId(id) }
 }
@@ -1213,6 +1276,9 @@ impl From<&str> for LanguageRef {
 }
 impl From<String> for LanguageRef {
     fn from(s: String) -> Self { LanguageRef::Name(s) }
+}
+impl From<&String> for LanguageRef {
+    fn from(s: &String) -> Self { LanguageRef::Name(s.clone()) }
 }"""
 
 STATIC_OBJECT_RETURN_OPTIONS = """/// Options controlling which fields are returned for each object.
@@ -1415,6 +1481,7 @@ def _compose_struct_doc(header, desc):
 
 def gen_endpoint_file(ctx):
     base = endpoint_base_name(ctx.uri)
+    leaf = pascal_case(endpoint_segments(ctx.uri)[-1])
     endpoint_desc = clean_doc(ctx.doc.get("description", ""))
     args_schema = ctx.doc.get("argsSchema", {})
     options_schema = ctx.doc.get("optionsSchema", {})
@@ -1435,15 +1502,23 @@ def gen_endpoint_file(ctx):
     sections = [f"// Generated bindings for {ctx.uri}", "", "#![allow(unused_imports)]",
                 "#![allow(dead_code)]", "", "use crate::api::generated::primitives::*;", ""]
     exports = []
+    aliases = []
+
+    def add_alias(short_name, target_name, doc):
+        if short_name != target_name:
+            exports.append(short_name)
+            aliases.append(f"/// Module-scoped alias for [`{target_name}`].\npub type {short_name} = {target_name};")
 
     if has_args:
         name = f"{base}Args"
         exports.append(name)
+        add_alias(f"{leaf}Args", name, f"Arguments for `{ctx.uri}`.")
         if ctx.uri == "ak.wwise.core.object.get":
             sections.append(gen_object_get_args(ctx, name))
         elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Item"
             exports.append(item_name)
+            add_alias(f"{leaf}Item", item_name, f"Item for `{ctx.uri}`.")
             sections.append(gen_object_set_args(ctx, name, item_name))
         else:
             ctx.local_root = args_schema
@@ -1461,6 +1536,7 @@ def gen_endpoint_file(ctx):
     if has_options:
         name = f"{base}Options"
         exports.append(name)
+        add_alias(f"{leaf}Options", name, f"Options for `{ctx.uri}`.")
         opts_doc = _compose_struct_doc(
             f"Options for `{ctx.uri}`.",
             schema_description(ctx, options_schema) or endpoint_desc,
@@ -1475,6 +1551,7 @@ def gen_endpoint_file(ctx):
     if has_response:
         name = f"{base}Response"
         exports.append(name)
+        add_alias(f"{leaf}Response", name, f"Response from `{ctx.uri}`.")
         resp_doc = _compose_struct_doc(
             f"Response from `{ctx.uri}`.",
             schema_description(ctx, result_schema) or endpoint_desc,
@@ -1484,6 +1561,7 @@ def gen_endpoint_file(ctx):
         elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Object"
             exports.append(item_name)
+            add_alias(f"{leaf}Object", item_name, f"Object entry in `{ctx.uri}` response.")
             sections.append(gen_object_set_response(ctx, name, item_name))
         else:
             ctx.local_root = result_schema
@@ -1491,12 +1569,16 @@ def gen_endpoint_file(ctx):
             ctx.local_root = None
             sections.append(emit_struct("response", name, resp_doc, fields, ctx))
 
+    if aliases:
+        sections.append("\n\n".join(aliases))
+
     return "\n\n".join(sections) + "\n", exports, has_args, has_options, has_response
 
 
 def gen_topic_file(ctx):
     """Generate the payload struct and subscription options for a WAAPI topic."""
     base = endpoint_base_name(ctx.uri)
+    leaf = pascal_case(endpoint_segments(ctx.uri)[-1])
     topic_desc = clean_doc(ctx.doc.get("description", ""))
     options_schema = ctx.doc.get("optionsSchema", {})
     publish_schema = ctx.doc.get("publishSchema", {})
@@ -1509,9 +1591,16 @@ def gen_topic_file(ctx):
                 "#![allow(unused_imports)]", "#![allow(dead_code)]", "",
                 "use crate::api::generated::primitives::*;", ""]
     exports = []
+    aliases = []
+
+    def add_alias(short_name, target_name):
+        if short_name != target_name:
+            exports.append(short_name)
+            aliases.append(f"/// Module-scoped alias for [`{target_name}`].\npub type {short_name} = {target_name};")
 
     payload_name = f"{base}Payload"
     exports.append(payload_name)
+    add_alias(f"{leaf}Payload", payload_name)
     payload_doc = _compose_struct_doc(
         f"Payload for `{ctx.uri}`.",
         schema_description(ctx, publish_schema) or topic_desc,
@@ -1531,6 +1620,7 @@ def gen_topic_file(ctx):
     if has_options:
         name = f"{base}Options"
         exports.append(name)
+        add_alias(f"{leaf}Options", name)
         opts_doc = _compose_struct_doc(
             f"Subscription options for `{ctx.uri}`.",
             schema_description(ctx, options_schema) or topic_desc,
@@ -1542,6 +1632,9 @@ def gen_topic_file(ctx):
             fields = collect_fields(ctx, options_schema, "options", name)
             ctx.local_root = None
             sections.append(emit_struct("options", name, opts_doc, fields, ctx))
+
+    if aliases:
+        sections.append("\n\n".join(aliases))
 
     return "\n\n".join(sections) + "\n", exports, has_options
 
@@ -1564,10 +1657,10 @@ pub struct {name} {{
 
 impl {name} {{
     /// Creates a new [`{name}`] starting from a `from` [`ObjectQuery`].
-    pub fn new(from: ObjectQuery) -> Self {{
+    pub fn new(from: impl Into<ObjectQuery>) -> Self {{
         Self {{
             waql: None,
-            from: Some(from),
+            from: Some(from.into()),
             transform: None,
         }}
     }}
@@ -1597,6 +1690,48 @@ impl {name} {{
     pub fn transform(mut self, transform: impl Into<Vec<Transform>>) -> Self {{
         self.transform = Some(transform.into());
         self
+    }}
+}}
+
+impl From<ObjectQuery> for {name} {{
+    fn from(from: ObjectQuery) -> Self {{
+        Self::new(from)
+    }}
+}}
+
+impl From<&str> for {name} {{
+    fn from(s: &str) -> Self {{
+        Self::new(s)
+    }}
+}}
+
+impl From<String> for {name} {{
+    fn from(s: String) -> Self {{
+        Self::new(s)
+    }}
+}}
+
+impl From<&String> for {name} {{
+    fn from(s: &String) -> Self {{
+        Self::new(s)
+    }}
+}}
+
+impl From<ObjectType> for {name} {{
+    fn from(object_type: ObjectType) -> Self {{
+        Self::new(object_type)
+    }}
+}}
+
+impl From<Vec<ObjectType>> for {name} {{
+    fn from(object_types: Vec<ObjectType>) -> Self {{
+        Self::new(object_types)
+    }}
+}}
+
+impl From<Vec<String>> for {name} {{
+    fn from(ids: Vec<String>) -> Self {{
+        Self::new(ids)
     }}
 }}"""
 
@@ -1638,6 +1773,13 @@ def gen_object_set_args(ctx, args_name, item_name):
     )
     out += emit_struct("args", args_name, args_doc, fields, ctx,
                        required_order=args_schema.get("required"))
+    out += f"""
+
+impl From<{item_name}> for {args_name} {{
+    fn from(item: {item_name}) -> Self {{
+        Self::new(vec![item])
+    }}
+}}"""
     return out
 
 

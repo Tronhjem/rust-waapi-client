@@ -21,6 +21,12 @@ impl CoreSourceControlGetStatusArgs {
     }
 }
 
+impl From<Vec<String>> for CoreSourceControlGetStatusArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Response from `ak.wwise.core.sourceControl.getStatus`.
 ///
 /// Get the source control status of the specified files.
@@ -31,3 +37,9 @@ pub struct CoreSourceControlGetStatusResponse {
     /// Array of source control statuses.
     pub result: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`CoreSourceControlGetStatusArgs`].
+pub type GetStatusArgs = CoreSourceControlGetStatusArgs;
+
+/// Module-scoped alias for [`CoreSourceControlGetStatusResponse`].
+pub type GetStatusResponse = CoreSourceControlGetStatusResponse;

@@ -51,3 +51,9 @@ impl CoreProfilerSwitchChangedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreProfilerSwitchChangedPayload`].
+pub type SwitchChangedPayload = CoreProfilerSwitchChangedPayload;
+
+/// Module-scoped alias for [`CoreProfilerSwitchChangedOptions`].
+pub type SwitchChangedOptions = CoreProfilerSwitchChangedOptions;

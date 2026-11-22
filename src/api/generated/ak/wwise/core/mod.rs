@@ -43,10 +43,13 @@ pub mod undo;
 /// Typed bindings for the `ak.wwise.core.workUnit` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod workUnit;
-pub use execute_lua_script::{CoreExecuteLuaScriptArgs, CoreExecuteLuaScriptResponse};
+pub use execute_lua_script::{
+    CoreExecuteLuaScriptArgs, CoreExecuteLuaScriptResponse, ExecuteLuaScriptArgs,
+    ExecuteLuaScriptResponse,
+};
 mod get_info;
-pub use get_info::CoreGetInfoResponse;
+pub use get_info::{CoreGetInfoResponse, GetInfoResponse};
 mod get_project_info;
-pub use get_project_info::CoreGetProjectInfoResponse;
+pub use get_project_info::{CoreGetProjectInfoResponse, GetProjectInfoResponse};
 mod ping;
-pub use ping::CorePingResponse;
+pub use ping::{CorePingResponse, PingResponse};

@@ -16,8 +16,28 @@ pub struct CoreProfilerGetCursorTimeArgs {
 
 impl CoreProfilerGetCursorTimeArgs {
     /// Creates a new [`CoreProfilerGetCursorTimeArgs`] with the required fields.
-    pub fn new(cursor: String) -> Self {
-        Self { cursor }
+    pub fn new(cursor: impl Into<String>) -> Self {
+        Self {
+            cursor: cursor.into(),
+        }
+    }
+}
+
+impl From<String> for CoreProfilerGetCursorTimeArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for CoreProfilerGetCursorTimeArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for CoreProfilerGetCursorTimeArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -30,3 +50,9 @@ pub struct CoreProfilerGetCursorTimeResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
+
+/// Module-scoped alias for [`CoreProfilerGetCursorTimeArgs`].
+pub type GetCursorTimeArgs = CoreProfilerGetCursorTimeArgs;
+
+/// Module-scoped alias for [`CoreProfilerGetCursorTimeResponse`].
+pub type GetCursorTimeResponse = CoreProfilerGetCursorTimeResponse;

@@ -70,6 +70,16 @@ pub struct WaapiClient {
 }
 
 impl WaapiClient {
+    /// Connect to WAAPI on the default local endpoint (`ws://127.0.0.1:8080/waapi`).
+    pub async fn connect() -> WaapiResult<Self> {
+        Self::new(None).await
+    }
+
+    /// Connect to WAAPI at a custom WebSocket URL (`ws://host:port/waapi`) or `host:port`.
+    pub async fn connect_to(url: &str) -> WaapiResult<Self> {
+        Self::new(Some(url)).await
+    }
+
     /// Connect to WAAPI.
     ///
     /// `url` may be a full WebSocket URI (`ws://host:port/waapi`) or just

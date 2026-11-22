@@ -20,3 +20,12 @@ impl CoreSoundbankProcessDefinitionFilesArgs {
         Self { files }
     }
 }
+
+impl From<Vec<String>> for CoreSoundbankProcessDefinitionFilesArgs {
+    fn from(value: Vec<String>) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreSoundbankProcessDefinitionFilesArgs`].
+pub type ProcessDefinitionFilesArgs = CoreSoundbankProcessDefinitionFilesArgs;

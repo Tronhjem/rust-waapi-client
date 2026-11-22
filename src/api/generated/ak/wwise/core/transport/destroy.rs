@@ -20,3 +20,12 @@ impl CoreTransportDestroyArgs {
         Self { transport }
     }
 }
+
+impl From<u32> for CoreTransportDestroyArgs {
+    fn from(value: u32) -> Self {
+        Self::new(value)
+    }
+}
+
+/// Module-scoped alias for [`CoreTransportDestroyArgs`].
+pub type DestroyArgs = CoreTransportDestroyArgs;

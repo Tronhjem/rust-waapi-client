@@ -20,10 +20,19 @@ pub struct SoundengineSetScalingFactorArgs {
 
 impl SoundengineSetScalingFactorArgs {
     /// Creates a new [`SoundengineSetScalingFactorArgs`] with the required fields.
-    pub fn new(game_object: GameObjectRef, attenuation_scaling_factor: f64) -> Self {
+    pub fn new(game_object: impl Into<GameObjectRef>, attenuation_scaling_factor: f64) -> Self {
         Self {
-            game_object,
+            game_object: game_object.into(),
             attenuation_scaling_factor,
         }
     }
 }
+
+impl<T0: Into<GameObjectRef>, T1: Into<f64>> From<(T0, T1)> for SoundengineSetScalingFactorArgs {
+    fn from((game_object, attenuation_scaling_factor): (T0, T1)) -> Self {
+        Self::new(game_object, attenuation_scaling_factor.into())
+    }
+}
+
+/// Module-scoped alias for [`SoundengineSetScalingFactorArgs`].
+pub type SetScalingFactorArgs = SoundengineSetScalingFactorArgs;

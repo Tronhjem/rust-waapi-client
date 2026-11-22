@@ -75,6 +75,12 @@ impl CoreAudioImportArgs {
     }
 }
 
+impl From<Vec<ImportItem>> for CoreAudioImportArgs {
+    fn from(value: Vec<ImportItem>) -> Self {
+        Self::new(value)
+    }
+}
+
 /// Options for `ak.wwise.core.audio.import`.
 ///
 /// Specifies the return options for every object returned.
@@ -92,3 +98,12 @@ pub struct CoreAudioImportResponse {
     /// Array of objects.
     pub objects: Vec<WwiseObject>,
 }
+
+/// Module-scoped alias for [`CoreAudioImportArgs`].
+pub type ImportArgs = CoreAudioImportArgs;
+
+/// Module-scoped alias for [`CoreAudioImportOptions`].
+pub type ImportOptions = CoreAudioImportOptions;
+
+/// Module-scoped alias for [`CoreAudioImportResponse`].
+pub type ImportResponse = CoreAudioImportResponse;

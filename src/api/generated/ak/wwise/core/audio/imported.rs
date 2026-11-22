@@ -40,3 +40,9 @@ impl CoreAudioImportedOptions {
         self
     }
 }
+
+/// Module-scoped alias for [`CoreAudioImportedPayload`].
+pub type ImportedPayload = CoreAudioImportedPayload;
+
+/// Module-scoped alias for [`CoreAudioImportedOptions`].
+pub type ImportedOptions = CoreAudioImportedOptions;

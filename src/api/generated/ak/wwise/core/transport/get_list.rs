@@ -14,3 +14,6 @@ pub struct CoreTransportGetListResponse {
     #[serde(default)]
     pub list: Vec<TransportObject>,
 }
+
+/// Module-scoped alias for [`CoreTransportGetListResponse`].
+pub type GetListResponse = CoreTransportGetListResponse;

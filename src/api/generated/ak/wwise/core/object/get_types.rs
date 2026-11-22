@@ -14,3 +14,6 @@ pub struct CoreObjectGetTypesResponse {
     #[serde(rename = "return", default)]
     pub types: Vec<WwiseObjectTypeInfo>,
 }
+
+/// Module-scoped alias for [`CoreObjectGetTypesResponse`].
+pub type GetTypesResponse = CoreObjectGetTypesResponse;

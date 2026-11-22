@@ -4,16 +4,16 @@
 //! Run with: cargo run --example get_info
 
 use log::info;
-use waapi_client::{WaapiClient, WaapiResult};
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(Some("127.0.0.1:8080")).await?;
+    let mut client = WaapiClient::connect().await?;
     info!("Connected. Calling ak.wwise.core.getInfo...");
 
-    let info = client.wwise().core().get_info().await?;
+    let info = client.core().get_info().await?;
 
     info!("Wwise display name: {}", info.display_name);
     info!("Platform: {}", info.platform);

@@ -19,9 +19,9 @@ pub struct WaapiGetSchemaArgs {
 
 impl WaapiGetSchemaArgs {
     /// Creates a new [`WaapiGetSchemaArgs`] with the required fields.
-    pub fn new(uri: String) -> Self {
+    pub fn new(uri: impl Into<String>) -> Self {
         Self {
-            uri,
+            uri: uri.into(),
             include_examples: None,
         }
     }
@@ -30,6 +30,24 @@ impl WaapiGetSchemaArgs {
     pub fn include_examples(mut self, include_examples: impl Into<bool>) -> Self {
         self.include_examples = Some(include_examples.into());
         self
+    }
+}
+
+impl From<String> for WaapiGetSchemaArgs {
+    fn from(value: String) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&str> for WaapiGetSchemaArgs {
+    fn from(value: &str) -> Self {
+        Self::new(value)
+    }
+}
+
+impl From<&String> for WaapiGetSchemaArgs {
+    fn from(value: &String) -> Self {
+        Self::new(value)
     }
 }
 
@@ -57,3 +75,9 @@ pub struct WaapiGetSchemaResponse {
     #[serde(default)]
     pub examples: Vec<serde_json::Value>,
 }
+
+/// Module-scoped alias for [`WaapiGetSchemaArgs`].
+pub type GetSchemaArgs = WaapiGetSchemaArgs;
+
+/// Module-scoped alias for [`WaapiGetSchemaResponse`].
+pub type GetSchemaResponse = WaapiGetSchemaResponse;

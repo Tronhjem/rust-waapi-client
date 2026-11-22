@@ -32,14 +32,14 @@ pub struct SoundengineSeekOnEventArgs {
 impl SoundengineSeekOnEventArgs {
     /// Creates a new [`SoundengineSeekOnEventArgs`] with the required fields.
     pub fn new(
-        event: SoundEngineObjectRef,
-        game_object: GameObjectRef,
+        event: impl Into<SoundEngineObjectRef>,
+        game_object: impl Into<GameObjectRef>,
         seek_to_nearest_marker: bool,
         playing_id: u32,
     ) -> Self {
         Self {
-            event,
-            game_object,
+            event: event.into(),
+            game_object: game_object.into(),
             seek_to_nearest_marker,
             playing_id,
             position: None,
@@ -59,3 +59,6 @@ impl SoundengineSeekOnEventArgs {
         self
     }
 }
+
+/// Module-scoped alias for [`SoundengineSeekOnEventArgs`].
+pub type SeekOnEventArgs = SoundengineSeekOnEventArgs;
