@@ -472,22 +472,19 @@ pub struct WwiseObject {
     /// The notes of the object.
     #[serde(default)]
     pub notes: Option<String>,
-    /// The type of the object
-    /// Refer to for more information on the types available.
+    /// The type of the object. Refer to for more information on the types available.
     #[serde(rename = "type", default)]
     pub object_type: Option<ObjectType>,
     /// The name of the plug-in for Source, Effect, Mixer, Device and Metadata plug-in.
     #[serde(rename = "pluginName", default)]
     pub plugin_name: Option<String>,
-    /// The path of the object from the project root
-    /// Ex: '\\Containers\\Default Work Unit\\Sound1'
+    /// The path of the object from the project root. Ex: '\\Containers\\Default Work Unit\\Sound1'
     #[serde(default)]
     pub path: Option<String>,
     /// The parent of the object in the hierarchy.
     #[serde(default)]
     pub parent: Option<WwiseObjectRef>,
-    /// The owner of the object
-    /// This applies to objects being locally owned by other objects, such as custom effects, custom attenuations, etc.
+    /// The owner of the object. This applies to objects being locally owned by other objects, such as custom effects, custom attenuations, etc.
     #[serde(default)]
     pub owner: Option<WwiseObjectRef>,
     /// True if the object can be played in Transport.
@@ -499,52 +496,34 @@ pub struct WwiseObject {
     /// The class ID of the object.
     #[serde(rename = "classId", default)]
     pub class_id: Option<u32>,
-    /// The category of the object
-    /// Ex: 'Containers'
+    /// The category of the object. Ex: 'Containers'
     #[serde(default)]
     pub category: Option<String>,
-    /// The path to the file containing the object
-    /// The path can be a Work Unit file or a project file
-    /// For using WAAPI on Mac, please refer to .
+    /// The path to the file containing the object. The path can be a Work Unit file or a project file. For using WAAPI on Mac, please refer to .
     #[serde(rename = "filePath", default)]
     pub file_path: Option<String>,
-    /// The parent Work Unit containing the object
-    /// The 'id' and the 'name' is returned.
+    /// The parent Work Unit containing the object. The 'id' and the 'name' is returned.
     #[serde(default)]
     pub workunit: Option<WwiseObjectRef>,
-    /// The number of children for the object
-    /// Note, this is deprecated
-    /// The same result can be obtained with children.count().
+    /// The number of children for the object. Note, this is deprecated. The same result can be obtained with children.count().
     #[serde(rename = "childrenCount", default)]
     pub children_count: Option<f64>,
-    /// The amount of space (in bytes) this object and all of its children take up in a SoundBank
-    /// This does not include the objectSize
-    /// Note that SoundBanks need to be generated for this value to be accurate.
+    /// The amount of space (in bytes) this object and all of its children take up in a SoundBank. This does not include the objectSize. Note that SoundBanks need to be generated for this value to be accurate.
     #[serde(rename = "totalSize", default)]
     pub total_size: Option<i64>,
-    /// The total converted size (in bytes) of the media files of this object and all of its children
-    /// Note that SoundBanks need to be generated for this value to be accurate.
+    /// The total converted size (in bytes) of the media files of this object and all of its children. Note that SoundBanks need to be generated for this value to be accurate.
     #[serde(rename = "mediaSize", default)]
     pub media_size: Option<i64>,
-    /// The amount of space (in bytes) the meta-data of the object takes up in a SoundBank
-    /// This does not include media files
-    /// Note that SoundBanks need to be generated for this value to be accurate.
+    /// The amount of space (in bytes) the meta-data of the object takes up in a SoundBank. This does not include media files. Note that SoundBanks need to be generated for this value to be accurate.
     #[serde(rename = "objectSize", default)]
     pub object_size: Option<i64>,
-    /// The amount of space (in bytes) the meta-data of the object and all of its children take up in a SoundBank
-    /// This does not include media files
-    /// Note that SoundBanks need to be generated for this value to be accurate.
+    /// The amount of space (in bytes) the meta-data of the object and all of its children take up in a SoundBank. This does not include media files. Note that SoundBanks need to be generated for this value to be accurate.
     #[serde(rename = "structureSize", default)]
     pub structure_size: Option<i64>,
-    /// (DEPRECATED) The transition root containing all other transitions recursively
-    /// Note, this is deprecated
-    /// The TransitionRoot reference should be used instead.
+    /// (DEPRECATED) The transition root containing all other transitions recursively. Note, this is deprecated. The TransitionRoot reference should be used instead.
     #[serde(rename = "musicTransitionRoot", default)]
     pub music_transition_root: Option<serde_json::Value>,
-    /// (DEPRECATED) The music playlist root containing all other music playlist items recursively
-    /// This applies to Music Playlist Containers only
-    /// Note, this is deprecated
-    /// The PlaylistRoot reference should be used instead.
+    /// (DEPRECATED) The music playlist root containing all other music playlist items recursively. This applies to Music Playlist Containers only. Note, this is deprecated. The PlaylistRoot reference should be used instead.
     #[serde(rename = "musicPlaylistRoot", default)]
     pub music_playlist_root: Option<serde_json::Value>,
     /// (DEPRECATED) The transition segment.
@@ -553,255 +532,181 @@ pub struct WwiseObject {
     /// The transition segment.
     #[serde(rename = "transitionObject", default)]
     pub transition_object: Option<serde_json::Value>,
-    /// (DEPRECATED) Absolute path to the original wav file
-    /// Only valid for Sound and Audio Source objects
-    /// For using WAAPI on Mac, please refer to .
+    /// (DEPRECATED) Absolute path to the original wav file. Only valid for Sound and Audio Source objects. For using WAAPI on Mac, please refer to .
     #[serde(rename = "originalWavFilePath", default)]
     pub original_wav_file_path: Option<String>,
-    /// Absolute path to the original file
-    /// Only valid for Sound and Audio Source objects
-    /// For using WAAPI on Mac, please refer to .
+    /// Absolute path to the original file. Only valid for Sound and Audio Source objects. For using WAAPI on Mac, please refer to .
     #[serde(rename = "originalFilePath", default)]
     pub original_file_path: Option<String>,
-    /// Relative (from project's Originals Folder) path to the original file
-    /// Only valid for Sound and Audio Source objects
-    /// For using WAAPI on Mac, please refer to .
+    /// Relative (from project's Originals Folder) path to the original file. Only valid for Sound and Audio Source objects. For using WAAPI on Mac, please refer to .
     #[serde(rename = "originalRelativeFilePath", default)]
     pub original_relative_file_path: Option<String>,
     /// The active source of the sound object.
     #[serde(rename = "activeSource", default)]
     pub active_source: Option<WwiseObjectRef>,
-    /// (DEPRECATED) Absolute path to the converted wem file
-    /// Specify the platform in the options
-    /// Only valid for Sound and Audio Source objects
-    /// To use WAAPI on Mac, please refer to .
+    /// (DEPRECATED) Absolute path to the converted wem file. Specify the platform in the options. Only valid for Sound and Audio Source objects. To use WAAPI on Mac, please refer to .
     #[serde(rename = "convertedWemFilePath", default)]
     pub converted_wem_file_path: Option<String>,
-    /// Absolute path to the converted file
-    /// Specify the platform in the options
-    /// Only valid for Sound and Audio Source objects
-    /// To use WAAPI on Mac, please refer to .
+    /// Absolute path to the converted file. Specify the platform in the options. Only valid for Sound and Audio Source objects. To use WAAPI on Mac, please refer to .
     #[serde(rename = "convertedFilePath", default)]
     pub converted_file_path: Option<String>,
-    /// Absolute path to the generated SoundBank file associated with the SoundBank object
-    /// Only valid for SoundBank objects
-    /// To use WAAPI on Mac, please refer to .
+    /// Absolute path to the generated SoundBank file associated with the SoundBank object. Only valid for SoundBank objects. To use WAAPI on Mac, please refer to .
     #[serde(rename = "soundbankBnkFilePath", default)]
     pub soundbank_bnk_file_path: Option<String>,
-    /// The duration root that contains the min and max durations and duration type
-    /// Note, this is deprecated
-    /// The duration should be used instead
-    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    /// The duration root that contains the min and max durations and duration type. Note, this is deprecated. The duration should be used instead. This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
     #[serde(rename = "playbackDuration", default)]
     pub playback_duration: Option<serde_json::Value>,
-    /// The duration root that contains the min and max durations and duration type
-    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    /// The duration root that contains the min and max durations and duration type. This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
     #[serde(default)]
     pub duration: Option<serde_json::Value>,
-    /// Audio source with the longest duration
-    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    /// Audio source with the longest duration. This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
     #[serde(rename = "maxDurationSource", default)]
     pub max_duration_source: Option<serde_json::Value>,
     /// Range of time for which the audio source is trimmed.
     #[serde(rename = "audioSourceTrimValues", default)]
     pub audio_source_trim_values: Option<serde_json::Value>,
-    /// Attenuation with the largest radius
-    /// This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
+    /// Attenuation with the largest radius. This applies to all objects that can contain Audio Source objects, either directly as a source or indirectly through descendants.
     #[serde(rename = "maxRadiusAttenuation", default)]
     pub max_radius_attenuation: Option<serde_json::Value>,
-    /// Language associated to the audio source
-    /// This only applies to Audio Source objects directly.
+    /// Language associated to the audio source. This only applies to Audio Source objects directly.
     #[serde(rename = "audioSourceLanguage", default)]
     pub audio_source_language: Option<WwiseObjectRef>,
-    /// The total number of channels present in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalTotalChannelCount", default)]
     pub original_total_channel_count: Option<f64>,
-    /// The number of channels in the normal plane of the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalNormalChannelCount", default)]
     pub original_normal_channel_count: Option<f64>,
-    /// The number of channels in the height plane of the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalHeightChannelCount", default)]
     pub original_height_channel_count: Option<f64>,
-    /// The number of low frequency channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalLFEChannelCount", default)]
     pub original_lfe_channel_count: Option<f64>,
-    /// The number of normal and height channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalNonLFEChannelCount", default)]
     pub original_non_lfe_channel_count: Option<f64>,
-    /// The number of anonymous channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalAnonymousChannelCount", default)]
     pub original_anonymous_channel_count: Option<f64>,
-    /// The number of ambisonics channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalAmbisonicsChannelCount", default)]
     pub original_ambisonics_channel_count: Option<f64>,
-    /// The configuration of the channels in the audio source (Ex : 7.1.4)
-    /// For anonymous channels, returns Anonymous
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalChannelConfig", default)]
     pub original_channel_config: Option<String>,
-    /// The mask associated with the channel's configuration
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalChannelMask", default)]
     pub original_channel_mask: Option<f64>,
-    /// The sample rate for the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalSampleRate", default)]
     pub original_sample_rate: Option<f64>,
-    /// The sample rate for the audio source
-    /// Either 16 or 24
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalBitDepth", default)]
     pub original_bit_depth: Option<f64>,
-    /// The file size in bytes for the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalFileSize", default)]
     pub original_file_size: Option<f64>,
-    /// The data size for bytes the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalDataSize", default)]
     pub original_data_size: Option<f64>,
-    /// The number of samples in the audio file
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalSampleCount", default)]
     pub original_sample_count: Option<f64>,
-    /// The file duration in seconds
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalDuration", default)]
     pub original_duration: Option<f64>,
-    /// The audio file's codec
-    /// For original files, it will always be PCM
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "originalCodec", default)]
     pub original_codec: Option<String>,
-    /// The total number of channels present in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The total number of channels present in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedTotalChannelCount", default)]
     pub converted_total_channel_count: Option<f64>,
-    /// The number of channels in the normal plane of the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the normal plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedNormalChannelCount", default)]
     pub converted_normal_channel_count: Option<f64>,
-    /// The number of channels in the height plane of the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of channels in the height plane of the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedHeightChannelCount", default)]
     pub converted_height_channel_count: Option<f64>,
-    /// The number of low frequency channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of low frequency channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedLFEChannelCount", default)]
     pub converted_lfe_channel_count: Option<f64>,
-    /// The number of normal and height channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of normal and height channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedNonLFEChannelCount", default)]
     pub converted_non_lfe_channel_count: Option<f64>,
-    /// The number of anonymous channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of anonymous channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedAnonymousChannelCount", default)]
     pub converted_anonymous_channel_count: Option<f64>,
-    /// The number of ambisonics channels in the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of ambisonics channels in the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedAmbisonicsChannelCount", default)]
     pub converted_ambisonics_channel_count: Option<f64>,
-    /// The configuration of the channels in the audio source (Ex : 7.1.4)
-    /// For anonymous channels, returns Anonymous
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The configuration of the channels in the audio source (Ex : 7.1.4). For anonymous channels, returns Anonymous. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedChannelConfig", default)]
     pub converted_channel_config: Option<String>,
-    /// The mask associated with the channel's configuration
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The mask associated with the channel's configuration. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedChannelMask", default)]
     pub converted_channel_mask: Option<f64>,
-    /// The sample rate for the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedSampleRate", default)]
     pub converted_sample_rate: Option<f64>,
-    /// The sample rate for the audio source, expressed as a string
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source, expressed as a string. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedSampleRateSetting", default)]
     pub converted_sample_rate_setting: Option<String>,
-    /// The sample rate for the audio source
-    /// Either 16 or 24
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The sample rate for the audio source. Either 16 or 24. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedBitDepth", default)]
     pub converted_bit_depth: Option<f64>,
-    /// The file size in bytes for the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file size in bytes for the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedFileSize", default)]
     pub converted_file_size: Option<f64>,
-    /// The data size for bytes the audio source
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The data size for bytes the audio source. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedDataSize", default)]
     pub converted_data_size: Option<f64>,
-    /// The number of samples in the audio file
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The number of samples in the audio file. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedSampleCount", default)]
     pub converted_sample_count: Option<f64>,
-    /// The file duration in seconds
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The file duration in seconds. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedDuration", default)]
     pub converted_duration: Option<f64>,
-    /// The duration (in seconds) of the trimmed audio source
-    /// Differs from generic Duration field because the original file does not include Trim Begind/End
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The duration (in seconds) of the trimmed audio source. Differs from generic Duration field because the original file does not include Trim Begind/End. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedTrimmedDuration", default)]
     pub converted_trimmed_duration: Option<f64>,
-    /// The audio file's codec
-    /// For original files, it will always be PCM
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The audio file's codec. For original files, it will always be PCM. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "convertedCodec", default)]
     pub converted_codec: Option<String>,
-    /// The format specified in the Conversion Settings for the associated audio source
-    /// This differs from convertedCodec because the file does not have to be converted
-    /// This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
+    /// The format specified in the Conversion Settings for the associated audio source. This differs from convertedCodec because the file does not have to be converted. This accessor works for Sounds, Audio File Source, Plugin-Media and Audio Clips.
     #[serde(rename = "conversionFormat", default)]
     pub conversion_format: Option<String>,
     /// True if the work unit is the default.
     #[serde(rename = "workunitIsDefault", default)]
     pub workunit_is_default: Option<bool>,
-    /// The type of the Work Unit
-    /// Please note that, like Work Units, physical folders have the type "WorkUnit"
-    /// Physical folders have the workunitType "folder".
+    /// The type of the Work Unit. Please note that, like Work Units, physical folders have the type "WorkUnit". Physical folders have the workunitType "folder".
     #[serde(rename = "workunitType", default)]
     pub workunit_type: Option<String>,
     /// True if a Work Unit or a Project (wproj file) is dirty, meaning it was modified but not saved.
     #[serde(rename = "workunitIsDirty", default)]
     pub workunit_is_dirty: Option<bool>,
-    /// True if a Work Unit is currently loaded in the Project
-    /// False if it has been unloaded.
+    /// True if a Work Unit is currently loaded in the Project. False if it has been unloaded.
     #[serde(rename = "workunitIsLoaded", default)]
     pub workunit_is_loaded: Option<bool>,
-    /// The context object associated with the child of a Switch Container
-    /// This object holds the properties associated with the child that are context-dependent for the Switch Container (for example: the properties of the '1st only' checkbox).
+    /// The context object associated with the child of a Switch Container. This object holds the properties associated with the child that are context-dependent for the Switch Container (for example: the properties of the '1st only' checkbox).
     #[serde(rename = "switchContainerChildContext", default)]
     pub switch_container_child_context: Option<serde_json::Value>,
     /// The game parameter object associated with a Switch Group.
     #[serde(rename = "switchGroupGameParameter", default)]
     pub switch_group_game_parameter: Option<WwiseObjectRef>,
-    /// Whether or not the object has been muted explicitly
-    /// Explicitly muting an object implicitly mutes the descendant objects.
+    /// Whether or not the object has been muted explicitly. Explicitly muting an object implicitly mutes the descendant objects.
     #[serde(rename = "isExplicitMute", default)]
     pub is_explicit_mute: Option<bool>,
-    /// Whether or not the object has been soloed explicitly
-    /// Soloing an object silences all the other objects in the project except this one.
+    /// Whether or not the object has been soloed explicitly. Soloing an object silences all the other objects in the project except this one.
     #[serde(rename = "isExplicitSolo", default)]
     pub is_explicit_solo: Option<bool>,
-    /// Whether or not the object has been muted implicitly
-    /// Explicitly muting an object implicitly mutes the descendant objects.
+    /// Whether or not the object has been muted implicitly. Explicitly muting an object implicitly mutes the descendant objects.
     #[serde(rename = "isImplicitMute", default)]
     pub is_implicit_mute: Option<bool>,
-    /// Whether or not the object has been soloed implicitly
-    /// Soloing an object silences all the other objects in the project except this one.
+    /// Whether or not the object has been soloed implicitly. Soloing an object silences all the other objects in the project except this one.
     #[serde(rename = "isImplicitSolo", default)]
     pub is_implicit_solo: Option<bool>,
-    /// Whether or not the object is Included
-    /// Specify the platform in the options
-    /// This takes into consideration the Inclusion status of the object's ancestors.
+    /// Whether or not the object is Included. Specify the platform in the options. This takes into consideration the Inclusion status of the object's ancestors.
     #[serde(rename = "isIncluded", default)]
     pub is_included: Option<bool>,
     /// Whether or not the Audio Source object's language is included for the current platform.
@@ -818,8 +723,7 @@ pub struct WwiseObject {
     /// The Custom State objects associated with this object that have defined values.
     #[serde(rename = "customStates", default)]
     pub custom_states: Vec<WwiseObjectRef>,
-    /// The state associated with the custom state object
-    /// This applies to custom state objects which can be obtained using the 'customStates' return option.
+    /// The state associated with the custom state object. This applies to custom state objects which can be obtained using the 'customStates' return option.
     #[serde(rename = "originalState", default)]
     pub original_state: Option<WwiseObjectRef>,
     /// Whether or not the object supports the use of States on any of its properties.
@@ -1052,8 +956,7 @@ pub struct VersionInfo {
 pub struct DirectoriesInfo {
     /// The Wwise user data directory root.
     pub user: String,
-    /// The root directory of Wwise
-    /// This is the installation directory.
+    /// The root directory of Wwise. This is the installation directory.
     pub install: String,
     /// The Wwise Authoring root directory
     pub authoring: String,
@@ -1073,8 +976,7 @@ pub struct ProjectPlatformInfo {
     /// The name of the deployment platform used in file system.
     #[serde(rename = "baseName")]
     pub base_name: String,
-    /// The official name of the deployment platform
-    /// The name could contain special characters.
+    /// The official name of the deployment platform. The name could contain special characters.
     #[serde(rename = "baseDisplayName")]
     pub base_display_name: String,
     /// The path on which the SoundBank files are generated for this Platform.
@@ -1100,23 +1002,17 @@ pub struct ProjectLanguageInfo {
 /// Collection of project directories returned by `getProjectInfo`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProjectDirectoriesInfo {
-    /// The root directory of the project
-    /// Refer to for more information.
+    /// The root directory of the project. Refer to for more information.
     pub properties: String,
-    /// The Commands directory of the project
-    /// Refer to for more information.
+    /// The Commands directory of the project. Refer to for more information.
     pub commands: String,
-    /// The .cache directory of the project, as specified in the Project Settings
-    /// The .cache directory contains converted media files (WEM files).
+    /// The .cache directory of the project, as specified in the Project Settings. The .cache directory contains converted media files (WEM files).
     pub cache: String,
     /// The root directory of the project, where is located the wproj file.
     pub root: String,
-    /// The Originals directory of the project, as specified in the Project Settings
-    /// The Originals directory contains the project's WAV files, separated by languages.
+    /// The Originals directory of the project, as specified in the Project Settings. The Originals directory contains the project's WAV files, separated by languages.
     pub originals: String,
-    /// The SoundBank output root directory of the project, as specified in the Project Settings
-    /// This directory contains the Project's SoundBank C++ header, XML and JSON files
-    /// Refer to the 'platforms' section for Platform specific directories.
+    /// The SoundBank output root directory of the project, as specified in the Project Settings. This directory contains the Project's SoundBank C++ header, XML and JSON files. Refer to the 'platforms' section for Platform specific directories.
     #[serde(rename = "soundBankOutputRoot")]
     pub sound_bank_output_root: String,
 }
@@ -1252,9 +1148,7 @@ pub struct ImportDefaults {
     /// The "Notes" field of the created object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    /// Specifies the type of object to create when importing an audio file
-    /// This type can also be specified directly in the objectPath
-    /// Refer to for the available types.
+    /// Specifies the type of object to create when importing an audio file. This type can also be specified directly in the objectPath. Refer to for the available types.
     #[serde(rename = "objectType", skip_serializing_if = "Option::is_none")]
     pub object_type: Option<ObjectType>,
     /// Imports the language for the audio file import (taken from the project's defined languages, found in the WPROJ file LanguageList).
@@ -1263,42 +1157,28 @@ pub struct ImportDefaults {
     /// Object ID (GUID), name, or path used as root relative object paths.
     #[serde(rename = "importLocation", skip_serializing_if = "Option::is_none")]
     pub import_location: Option<ObjectRef>,
-    /// Path to media file to import
-    /// This path must be accessible from Wwise
-    /// For using WAAPI on Mac, please refer to .
+    /// Path to media file to import. This path must be accessible from Wwise. For using WAAPI on Mac, please refer to .
     #[serde(rename = "audioFile", skip_serializing_if = "Option::is_none")]
     pub audio_file: Option<String>,
-    /// Base64 encoded WAV audio file data to import with its target file path relative to the Originals folder, separated by a vertical bar
-    /// E.g
-    /// 'MySound.wav|UklGRu...'.
+    /// Base64 encoded WAV audio file data to import with its target file path relative to the Originals folder, separated by a vertical bar. E.g. 'MySound.wav|UklGRu...'.
     #[serde(rename = "audioFileBase64", skip_serializing_if = "Option::is_none")]
     pub audio_file_base64: Option<String>,
-    /// The path and name of the object(s) to be created
-    /// The path uses backslashes and can either be absolute or relative
-    /// Object types can be specified before the name
-    /// For example: \verbatim \\Actor-Mixer Hierarchy\\Default Work Unit\\<Random Container>MyContainer\\<Sound>MySound
-    /// \endverbatim Refer to for the available types.
+    /// The path and name of the object(s) to be created. The path uses backslashes and can either be absolute or relative. Object types can be specified before the name. For example: \verbatim \\Actor-Mixer Hierarchy\\Default Work Unit\\<Random Container>MyContainer\\<Sound>MySound. \endverbatim Refer to for the available types.
     #[serde(rename = "objectPath", skip_serializing_if = "Option::is_none")]
     pub object_path: Option<String>,
-    /// Specifies the 'originals' sub-folder in which to place the imported audio file
-    /// This folder is relative to the 'originals' folder in which the file would normally be imported
-    /// Example: if importing an SFX, then the audio file is imported to the folder Originals\\SFX\\originalsPath.
+    /// Specifies the 'originals' sub-folder in which to place the imported audio file. This folder is relative to the 'originals' folder in which the file would normally be imported. Example: if importing an SFX, then the audio file is imported to the folder Originals\\SFX\\originalsPath.
     #[serde(rename = "originalsSubFolder", skip_serializing_if = "Option::is_none")]
     pub originals_sub_folder: Option<String>,
-    /// Defines the path and name of an Event to be created for the imported object
-    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines the path and name of an Event to be created for the imported object. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event: Option<String>,
     /// The "Notes" field of the created audio source object.
     #[serde(rename = "audioSourceNotes", skip_serializing_if = "Option::is_none")]
     pub audio_source_notes: Option<String>,
-    /// Defines a Switch Group or State Group that is associated to a Switch Container, within the Actor-Mixer Hierarchy only
-    /// Also defines which Switch Container's child is assigned to which Switch or State from the associated group
-    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines a Switch Group or State Group that is associated to a Switch Container, within the Actor-Mixer Hierarchy only. Also defines which Switch Container's child is assigned to which Switch or State from the associated group. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(rename = "switchAssignation", skip_serializing_if = "Option::is_none")]
     pub switch_assignation: Option<String>,
-    /// Defines the path and name of a Dialogue Event to be created for the imported object
-    /// Refer to Tab Delimited Import in the Wwise Help documentation for more information.
+    /// Defines the path and name of a Dialogue Event to be created for the imported object. Refer to Tab Delimited Import in the Wwise Help documentation for more information.
     #[serde(rename = "dialogueEvent", skip_serializing_if = "Option::is_none")]
     pub dialogue_event: Option<String>,
     #[serde(flatten)]
@@ -1564,4 +1444,433 @@ pub enum ProjectMigrationAction {
     Migrate,
     #[serde(rename = "fail")]
     Fail,
+}
+
+/// Action to execute on an event via `soundengine.executeActionOnEvent`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum ActionOnEventType {
+    Stop = 0,
+    Pause = 1,
+    Resume = 2,
+    Break = 3,
+    ReleaseEnvelope = 4,
+}
+
+impl ActionOnEventType {
+    pub const fn as_u32(self) -> u32 {
+        self as u32
+    }
+    pub const fn from_u32(value: u32) -> Option<Self> {
+        match value {
+            0 => Some(ActionOnEventType::Stop),
+            1 => Some(ActionOnEventType::Pause),
+            2 => Some(ActionOnEventType::Resume),
+            3 => Some(ActionOnEventType::Break),
+            4 => Some(ActionOnEventType::ReleaseEnvelope),
+            _ => None,
+        }
+    }
+}
+
+impl serde::Serialize for ActionOnEventType {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_u32(self.as_u32())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ActionOnEventType {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = u32::deserialize(deserializer)?;
+        Self::from_u32(value).ok_or_else(|| {
+            serde::de::Error::custom(format!("invalid ActionOnEventType value: {}", value))
+        })
+    }
+}
+
+/// Interpolation curve for fades (`AkCurveInterpolation`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum AkCurveInterpolation {
+    Log3 = 0,
+    Sine = 1,
+    Log1 = 2,
+    InvSCurve = 3,
+    Linear = 4,
+    SCurve = 5,
+    Exp1 = 6,
+    SineRecip = 7,
+    Exp3 = 8,
+    Constant = 9,
+}
+
+impl AkCurveInterpolation {
+    pub const fn as_u32(self) -> u32 {
+        self as u32
+    }
+    pub const fn from_u32(value: u32) -> Option<Self> {
+        match value {
+            0 => Some(AkCurveInterpolation::Log3),
+            1 => Some(AkCurveInterpolation::Sine),
+            2 => Some(AkCurveInterpolation::Log1),
+            3 => Some(AkCurveInterpolation::InvSCurve),
+            4 => Some(AkCurveInterpolation::Linear),
+            5 => Some(AkCurveInterpolation::SCurve),
+            6 => Some(AkCurveInterpolation::Exp1),
+            7 => Some(AkCurveInterpolation::SineRecip),
+            8 => Some(AkCurveInterpolation::Exp3),
+            9 => Some(AkCurveInterpolation::Constant),
+            _ => None,
+        }
+    }
+}
+
+impl serde::Serialize for AkCurveInterpolation {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_u32(self.as_u32())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for AkCurveInterpolation {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = u32::deserialize(deserializer)?;
+        Self::from_u32(value).ok_or_else(|| {
+            serde::de::Error::custom(format!("invalid AkCurveInterpolation value: {}", value))
+        })
+    }
+}
+
+/// How multiple positions are combined (`soundengine.setMultiplePositions`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
+pub enum MultiPositionType {
+    SingleSource = 0,
+    MultiSources = 1,
+    MultiDirections = 2,
+}
+
+impl MultiPositionType {
+    pub const fn as_u32(self) -> u32 {
+        self as u32
+    }
+    pub const fn from_u32(value: u32) -> Option<Self> {
+        match value {
+            0 => Some(MultiPositionType::SingleSource),
+            1 => Some(MultiPositionType::MultiSources),
+            2 => Some(MultiPositionType::MultiDirections),
+            _ => None,
+        }
+    }
+}
+
+impl serde::Serialize for MultiPositionType {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_u32(self.as_u32())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for MultiPositionType {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let value = u32::deserialize(deserializer)?;
+        Self::from_u32(value).ok_or_else(|| {
+            serde::de::Error::custom(format!("invalid MultiPositionType value: {}", value))
+        })
+    }
+}
+
+/// Auxiliary send value for a game object (`soundengine.setGameObjectAuxSendValues`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct AuxSendValue {
+    /// Game object receiving the aux send.
+    pub listener: GameObjectRef,
+    /// Auxiliary bus to send to.
+    #[serde(rename = "auxBus")]
+    pub aux_bus: SoundEngineObjectRef,
+    /// Gain control value in dB.
+    #[serde(rename = "controlValue")]
+    pub control_value: f64,
+}
+
+impl AuxSendValue {
+    pub fn new(
+        listener: impl Into<GameObjectRef>,
+        aux_bus: impl Into<SoundEngineObjectRef>,
+        control_value: f64,
+    ) -> Self {
+        Self {
+            listener: listener.into(),
+            aux_bus: aux_bus.into(),
+            control_value,
+        }
+    }
+}
+
+/// A single position entry for `soundengine.setMultiplePositions`.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct MultiPosition {
+    pub position: Position,
+}
+
+impl MultiPosition {
+    pub fn new(position: Position) -> Self {
+        Self { position }
+    }
+}
+
+impl From<Position> for MultiPosition {
+    fn from(position: Position) -> Self {
+        Self { position }
+    }
+}
+
+/// A Wwise object type entry returned by `object.getTypes`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct WwiseObjectTypeInfo {
+    /// The object type name (e.g. `"Sound"`, `"ActorMixer"`).
+    #[serde(rename = "type")]
+    pub object_type: String,
+    /// The class ID of the object type.
+    #[serde(rename = "classId")]
+    pub class_id: u32,
+    /// The display name of the object type.
+    pub name: String,
+}
+
+/// How a property supports RTPC (`object.getPropertyInfo`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum RtpcSupportMode {
+    #[serde(rename = "None")]
+    None,
+    #[serde(rename = "Additive")]
+    Additive,
+    #[serde(rename = "Exclusive")]
+    Exclusive,
+    #[serde(rename = "Multiplicative")]
+    Multiplicative,
+}
+
+/// RTPC/randomizer/unlink support flags for a property (`object.getPropertyInfo`).
+#[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyInfoSupports {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rtpc: Option<RtpcSupportMode>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub randomizer: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unlink: Option<bool>,
+}
+
+/// Fade mode of a blend track edge.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum BlendFadeMode {
+    #[serde(rename = "None")]
+    None,
+    #[serde(rename = "Manual")]
+    Manual,
+    #[serde(rename = "Automatic")]
+    Automatic,
+}
+
+/// An edge of a blend track (`blendContainer.addAssignment` / `getAssignments`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct BlendEdge {
+    #[serde(rename = "fadeMode")]
+    pub fade_mode: BlendFadeMode,
+    #[serde(rename = "fadeShape")]
+    pub fade_shape: CurveShape,
+    #[serde(rename = "edgePosition")]
+    pub edge_position: f64,
+    #[serde(
+        default,
+        rename = "fadePosition",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub fade_position: Option<f64>,
+}
+
+/// A blend track assignment (`blendContainer.getAssignments`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct BlendTrackAssignment {
+    /// GUID of the assigned child.
+    pub child: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edges: Option<Vec<BlendEdge>>,
+}
+
+/// Action when a Game Parameter range is modified.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum OnCurveUpdate {
+    #[serde(rename = "stretch")]
+    Stretch,
+    #[serde(rename = "preserveX")]
+    PreserveX,
+}
+
+/// Inclusion type used by `soundbank.generate`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum SoundBankInclusionType {
+    #[serde(rename = "event")]
+    Event,
+    #[serde(rename = "structure")]
+    Structure,
+    #[serde(rename = "media")]
+    Media,
+}
+
+/// Inclusion relation used by `soundbank.get/setInclusions`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum SoundBankInclusionFilter {
+    #[serde(rename = "events")]
+    Events,
+    #[serde(rename = "structures")]
+    Structures,
+    #[serde(rename = "media")]
+    Media,
+}
+
+/// How `soundbank.setInclusions` modifies the inclusion list.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum SoundBankInclusionOperation {
+    #[serde(rename = "add")]
+    Add,
+    #[serde(rename = "remove")]
+    Remove,
+    #[serde(rename = "replace")]
+    Replace,
+}
+
+/// A SoundBank inclusion (`soundbank.get/setInclusions`).
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SoundBankInclusion {
+    pub object: ObjectRef,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub filter: Vec<SoundBankInclusionFilter>,
+}
+
+impl SoundBankInclusion {
+    pub fn new(object: impl Into<ObjectRef>) -> Self {
+        Self {
+            object: object.into(),
+            filter: Vec::new(),
+        }
+    }
+
+    pub fn filter(mut self, filter: SoundBankInclusionFilter) -> Self {
+        self.filter.push(filter);
+        self
+    }
+}
+
+/// A user-defined SoundBank to generate (`soundbank.generate`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SoundBankInfo {
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inclusions: Option<Vec<SoundBankInclusionType>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub events: Option<Vec<ObjectRef>>,
+    #[serde(default, rename = "auxBusses", skip_serializing_if = "Option::is_none")]
+    pub aux_busses: Option<Vec<ObjectRef>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rebuild: Option<bool>,
+}
+
+impl SoundBankInfo {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            inclusions: None,
+            events: None,
+            aux_busses: None,
+            rebuild: None,
+        }
+    }
+
+    pub fn inclusions(mut self, inclusions: Vec<SoundBankInclusionType>) -> Self {
+        self.inclusions = Some(inclusions);
+        self
+    }
+
+    pub fn events(mut self, events: Vec<ObjectRef>) -> Self {
+        self.events = Some(events);
+        self
+    }
+
+    pub fn aux_busses(mut self, aux_busses: Vec<ObjectRef>) -> Self {
+        self.aux_busses = Some(aux_busses);
+        self
+    }
+
+    pub fn rebuild(mut self, rebuild: bool) -> Self {
+        self.rebuild = Some(rebuild);
+        self
+    }
+}
+
+/// A central log entry (`logCentralItem`).
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct LogCentralItem {
+    pub severity: LogSeverity,
+    pub time: i64,
+    #[serde(rename = "messageId")]
+    pub message_id: String,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub platform: Option<WwiseObject>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}
+
+/// The Wwise log channel (`log.itemAdded`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum LogChannel {
+    #[serde(rename = "soundbankGenerate")]
+    SoundbankGenerate,
+    #[serde(rename = "conversion")]
+    Conversion,
+    #[serde(rename = "copyPlatformSettings")]
+    CopyPlatformSettings,
+    #[serde(rename = "waapi")]
+    Waapi,
+    #[serde(rename = "projectLoad")]
+    ProjectLoad,
+    #[serde(rename = "general")]
+    General,
+    #[serde(rename = "sourceControl")]
+    SourceControl,
+    #[serde(rename = "lua")]
+    Lua,
+}
+
+/// A source file to convert (`soundbank.convertExternalSources`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ExternalSourceInfo {
+    pub platform: PlatformRef,
+    pub input: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<String>,
+}
+
+impl ExternalSourceInfo {
+    pub fn new(platform: impl Into<PlatformRef>, input: impl Into<String>) -> Self {
+        Self {
+            platform: platform.into(),
+            input: input.into(),
+            output: None,
+        }
+    }
+
+    pub fn output(mut self, output: impl Into<String>) -> Self {
+        self.output = Some(output.into());
+        self
+    }
+}
+
+/// A logged error from `audio.convert`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct AudioConvertError {
+    pub severity: LogSeverity,
+    pub message: String,
 }

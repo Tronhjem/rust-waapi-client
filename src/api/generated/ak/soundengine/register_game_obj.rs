@@ -10,8 +10,7 @@ use crate::api::generated::primitives::*;
 pub struct SoundengineRegisterGameObjArgs {
     /// Name of the game object (for monitoring purpose).
     pub name: String,
-    /// ID of the game object to be registered
-    /// Valid range is [0, 0xFFFFFFFFFFFFFFDF].
+    /// ID of the game object to be registered. Valid range is [0, 0xFFFFFFFFFFFFFFDF].
     #[serde(rename = "gameObject")]
     pub game_object: GameObjectRef,
 }

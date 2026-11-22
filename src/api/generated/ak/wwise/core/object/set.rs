@@ -18,18 +18,13 @@ pub struct CoreObjectSetItem {
     pub object: ObjectRef,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<ChildObject>>,
-    /// The ID (GUID) or unique name of the platform used when setting properties and references via this operation
-    /// Not specifying a platform sets the value for all linked platforms.
+    /// The ID (GUID) or unique name of the platform used when setting properties and references via this operation. Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
-    /// The action to take if "object" already has a child with the same name
-    /// Default value is "fail"
-    /// Refer to for more information.
+    /// The action to take if "object" already has a child with the same name. Default value is "fail". Refer to for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
-    /// The action to take if "object" already has objects in a specified list
-    /// Default value is "append"
-    /// Refer to for more information.
+    /// The action to take if "object" already has objects in a specified list. Default value is "append". Refer to for more information.
     #[serde(rename = "listMode", skip_serializing_if = "Option::is_none")]
     pub list_mode: Option<ListMode>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -110,25 +105,19 @@ impl CoreObjectSetItem {
 /// Arguments for `ak.wwise.core.object.set`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetArgs {
-    /// Unless overriden by an individual "object", the ID (GUID) or unique name of the platform used when setting properties and references via this operation
-    /// Not specifying a platform sets the value for all linked platforms.
+    /// Unless overriden by an individual "object", the ID (GUID) or unique name of the platform used when setting properties and references via this operation. Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
-    /// Determines if Wwise automatically performs an Add source control operation for affected work units
-    /// Defaults to true.
+    /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
     #[serde(
         rename = "autoAddToSourceControl",
         skip_serializing_if = "Option::is_none"
     )]
     pub auto_add_to_source_control: Option<bool>,
-    /// Unless overriden by an individual "object", the action to take if "object" already has a child with the same name
-    /// Default value is "fail"
-    /// Refer to for more information.
+    /// Unless overriden by an individual "object", the action to take if "object" already has a child with the same name. Default value is "fail". Refer to for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
-    /// Unless overriden by an individual "object", the action to take if "object" already has objects in a specified list
-    /// Default value is "append"
-    /// Refer to for more information.
+    /// Unless overriden by an individual "object", the action to take if "object" already has objects in a specified list. Default value is "append". Refer to for more information.
     #[serde(rename = "listMode", skip_serializing_if = "Option::is_none")]
     pub list_mode: Option<ListMode>,
     /// An array of objects on which to set values and create child or list objects.

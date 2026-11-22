@@ -74,6 +74,108 @@ PILOT_ENDPOINTS = [
     "ak.soundengine.unregisterGameObj",
     "ak.soundengine.setPosition",
     "ak.soundengine.setDefaultListeners",
+    "ak.soundengine.setSwitch",
+    "ak.soundengine.setState",
+    "ak.soundengine.getSwitch",
+    "ak.soundengine.getState",
+    "ak.soundengine.loadBank",
+    "ak.soundengine.unloadBank",
+    "ak.soundengine.stopAll",
+    "ak.soundengine.stopPlayingID",
+    "ak.soundengine.seekOnEvent",
+    "ak.soundengine.setListeners",
+    "ak.soundengine.setListenerSpatialization",
+    "ak.soundengine.setMultiplePositions",
+    "ak.soundengine.setGameObjectAuxSendValues",
+    "ak.soundengine.setGameObjectOutputBusVolume",
+    "ak.soundengine.setObjectObstructionAndOcclusion",
+    "ak.soundengine.setScalingFactor",
+    "ak.soundengine.executeActionOnEvent",
+    "ak.soundengine.postTrigger",
+    "ak.soundengine.postMsgMonitor",
+    "ak.soundengine.resetRTPCValue",
+    # Object introspection
+    "ak.wwise.core.object.getPropertyAndReferenceNames",
+    "ak.wwise.core.object.getPropertyInfo",
+    "ak.wwise.core.object.getTypes",
+    "ak.wwise.core.object.isLinked",
+    "ak.wwise.core.object.isPropertyEnabled",
+    "ak.wwise.core.object.setLinked",
+    "ak.wwise.core.object.setStateGroups",
+    "ak.wwise.core.object.setStateProperties",
+    # Singles
+    "ak.wwise.core.sound.setActiveSource",
+    "ak.wwise.core.gameParameter.setRange",
+    "ak.wwise.core.ping",
+    # Blend Container
+    "ak.wwise.core.blendContainer.addAssignment",
+    "ak.wwise.core.blendContainer.addTrack",
+    "ak.wwise.core.blendContainer.getAssignments",
+    "ak.wwise.core.blendContainer.removeAssignment",
+    # SoundBank
+    "ak.wwise.core.soundbank.convertExternalSources",
+    "ak.wwise.core.soundbank.generate",
+    "ak.wwise.core.soundbank.getInclusions",
+    "ak.wwise.core.soundbank.processDefinitionFiles",
+    "ak.wwise.core.soundbank.setInclusions",
+    # Audio
+    "ak.wwise.core.audio.convert",
+    "ak.wwise.core.audio.importTabDelimited",
+    "ak.wwise.core.audio.mute",
+    "ak.wwise.core.audio.resetMute",
+    "ak.wwise.core.audio.resetSolo",
+    "ak.wwise.core.audio.setConversionPlugin",
+    "ak.wwise.core.audio.solo",
+]
+
+# Subscription topics for which typed payload structs and `subscribe_*` chained
+# methods are generated. Each topic schema has a `publishSchema` (the payload)
+# and an optional `optionsSchema` (subscription options).
+TOPIC_ENDPOINTS = [
+    # Object lifecycle and property topics
+    "ak.wwise.core.object.created",
+    "ak.wwise.core.object.preDeleted",
+    "ak.wwise.core.object.postDeleted",
+    "ak.wwise.core.object.childAdded",
+    "ak.wwise.core.object.childRemoved",
+    "ak.wwise.core.object.nameChanged",
+    "ak.wwise.core.object.notesChanged",
+    "ak.wwise.core.object.propertyChanged",
+    "ak.wwise.core.object.referenceChanged",
+    "ak.wwise.core.object.curveChanged",
+    "ak.wwise.core.object.attenuationCurveChanged",
+    "ak.wwise.core.object.attenuationCurveLinkChanged",
+    # Switch Container
+    "ak.wwise.core.switchContainer.assignmentAdded",
+    "ak.wwise.core.switchContainer.assignmentRemoved",
+    # Transport
+    "ak.wwise.core.transport.stateChanged",
+    # SoundBank
+    "ak.wwise.core.soundbank.generated",
+    "ak.wwise.core.soundbank.generationDone",
+    # Project
+    "ak.wwise.core.project.preClosed",
+    "ak.wwise.core.project.loaded",
+    "ak.wwise.core.project.postClosed",
+    "ak.wwise.core.project.saved",
+    # Audio
+    "ak.wwise.core.audio.imported",
+    # Log
+    "ak.wwise.core.log.itemAdded",
+    # Profiler
+    "ak.wwise.core.profiler.gameObjectRegistered",
+    "ak.wwise.core.profiler.gameObjectUnregistered",
+    "ak.wwise.core.profiler.gameObjectReset",
+    "ak.wwise.core.profiler.stateChanged",
+    "ak.wwise.core.profiler.switchChanged",
+    "ak.wwise.core.profiler.captureLog.itemAdded",
+    # Debug
+    "ak.wwise.debug.assertFailed",
+    # UI
+    "ak.wwise.ui.selectionChanged",
+    "ak.wwise.ui.commands.executed",
+    "ak.wwise.ui.signal.click",
+    "ak.wwise.ui.signal.toggle",
 ]
 
 # Constructor parameter order where the schema's `required` list differs from
@@ -88,7 +190,22 @@ CTOR_ORDER = {
 RESULT_FIELD_NAMES = {
     ("ak.wwise.core.object.get", "return"): "objects",
     ("ak.wwise.core.switchContainer.getAssignments", "return"): "assignments",
+    ("ak.wwise.core.blendContainer.getAssignments", "return"): "assignments",
+    ("ak.wwise.core.object.getTypes", "return"): "types",
+    ("ak.wwise.core.object.getPropertyAndReferenceNames", "return"): "names",
+    ("ak.wwise.core.object.isPropertyEnabled", "return"): "enabled",
     ("ak.soundengine.postEvent", "return"): "playing_id",
+    ("ak.soundengine.getSwitch", "return"): "switch",
+    ("ak.soundengine.getState", "return"): "state",
+}
+
+# Endpoints whose resultSchema is `$ref objectReturn` but whose actual WAAPI
+# response wraps the object under a top-level `"return"` key (e.g.
+# `{"return": {"id": ..., "name": ...}}`), unlike object.copy which returns a
+# bare objectReturn.
+RESULT_WRAPPED_OBJECT_RETURN = {
+    "ak.soundengine.getSwitch",
+    "ak.soundengine.getState",
 }
 
 # Response fields that Wwise always returns even when the JSON schema omits `required`.
@@ -135,6 +252,32 @@ PROP_TYPE_OVERRIDES = {
     ("ak.wwise.ui.project.open", "onMigrationRequired"): "ProjectMigrationAction",
     ("ak.wwise.ui.project.open", "onUpgrade"): "ProjectMigrationAction",
     ("ak.soundengine.setPosition", "args", "position"): "Position",
+    ("ak.soundengine.executeActionOnEvent", "args", "actionType"): "ActionOnEventType",
+    ("ak.soundengine.executeActionOnEvent", "args", "fadeCurve"): "AkCurveInterpolation",
+    ("ak.soundengine.stopPlayingID", "args", "fadeCurve"): "AkCurveInterpolation",
+    ("ak.soundengine.setMultiplePositions", "args", "positions"): "Vec<MultiPosition>",
+    ("ak.soundengine.setMultiplePositions", "args", "multiPositionType"): "MultiPositionType",
+    ("ak.soundengine.setGameObjectAuxSendValues", "args", "auxSendValues"): "Vec<AuxSendValue>",
+    ("ak.wwise.core.object.getPropertyInfo", "response", "supports"): "PropertyInfoSupports",
+    ("ak.wwise.core.object.getPropertyInfo", "response", "default"): "serde_json::Value",
+    ("ak.wwise.core.object.getPropertyInfo", "response", "type"): "Option<String>",
+    ("ak.wwise.core.object.isLinked", "args", "property"): "Property",
+    ("ak.wwise.core.object.getTypes", "response", "return"): "Vec<WwiseObjectTypeInfo>",
+    ("ak.wwise.core.gameParameter.setRange", "args", "onCurveUpdate"): "OnCurveUpdate",
+    ("ak.wwise.core.blendContainer.addAssignment", "args", "edges"): "Vec<BlendEdge>",
+    ("ak.wwise.core.blendContainer.getAssignments", "response", "return"): "Vec<BlendTrackAssignment>",
+    ("ak.wwise.core.soundbank.generate", "args", "soundbanks"): "Vec<SoundBankInfo>",
+    ("ak.wwise.core.soundbank.generate", "response", "logs"): "Vec<LogCentralItem>",
+    ("ak.wwise.core.soundbank.getInclusions", "response", "inclusions"): "Vec<SoundBankInclusion>",
+    ("ak.wwise.core.soundbank.setInclusions", "args", "operation"): "SoundBankInclusionOperation",
+    ("ak.wwise.core.soundbank.setInclusions", "args", "inclusions"): "Vec<SoundBankInclusion>",
+    ("ak.wwise.core.soundbank.convertExternalSources", "args", "sources"): "Vec<ExternalSourceInfo>",
+    ("ak.wwise.core.audio.convert", "response", "errors"): "Vec<AudioConvertError>",
+    ("ak.wwise.core.transport.stateChanged", "response", "state"): "TransportState",
+    ("ak.wwise.core.object.attenuationCurveChanged", "response", "curveType"): "AttenuationCurveType",
+    ("ak.wwise.core.object.attenuationCurveLinkChanged", "response", "curveType"): "AttenuationCurveType",
+    ("ak.wwise.core.object.propertyChanged", "response", "old"): "serde_json::Value",
+    ("ak.wwise.core.object.propertyChanged", "response", "new"): "serde_json::Value",
 }
 
 # Well-known $ref targets mapped to Rust types. Hand-written types live in
@@ -164,6 +307,11 @@ REF_TYPES = {
     "waapi_definitions.json#/definitions/uniqueQualifiedName": "String",
     "waapi_definitions.json#/definitions/objectPathArg": "String",
     "waapi_definitions.json#/definitions/shortId": "u32",
+    "waapi_definitions.json#/definitions/statePropertiesArg": "Vec<String>",
+    "waapi_definitions.json#/definitions/returnExpression": "Vec<ObjectReturnField>",
+    "waapi_definitions.json#/definitions/blendTrackEdge": "BlendEdge",
+    "waapi_definitions.json#/definitions/logCentralItem": "LogCentralItem",
+    "waapi_definitions.json#/definitions/logCentralChannel": "LogChannel",
 }
 
 OBJECT_RETURN_OPTIONS_REF = "waapi_definitions.json#/definitions/objectReturnOptions"
@@ -362,7 +510,7 @@ def doc_lines(text, prefix=""):
     text = clean_doc(text)
     if not text:
         return []
-    return [f"{prefix}/// {line}" for line in text.split(". ") if line]
+    return [f"{prefix}/// {text}"]
 
 
 class Field:
@@ -533,6 +681,47 @@ def emit_enum(name, doc, values, derive_both=True):
     for v, variant in unique_names(values, pascal_case, "Legacy").items():
         lines.append(f'    #[serde(rename = "{v}")]')
         lines.append(f"    {variant},")
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def emit_int_enum(name, doc, values):
+    """Emit an integer enum (serializes as a bare number) with explicit discriminants.
+
+    `values` is a list of ``(VariantName, int_value)`` tuples.
+    """
+    lines = doc_lines(doc)
+    lines.append("#[derive(Debug, Clone, Copy, PartialEq, Eq)]")
+    lines.append("#[repr(u32)]")
+    lines.append(f"pub enum {name} {{")
+    for variant, value in values:
+        lines.append(f"    {variant} = {value},")
+    lines.append("}")
+    lines.append("")
+    lines.append(f"impl {name} {{")
+    lines.append(f"    pub const fn as_u32(self) -> u32 {{ self as u32 }}")
+    lines.append("    pub const fn from_u32(value: u32) -> Option<Self> {")
+    lines.append("        match value {")
+    for variant, value in values:
+        lines.append(f"            {value} => Some({name}::{variant}),")
+    lines.append("            _ => None,")
+    lines.append("        }")
+    lines.append("    }")
+    lines.append("}")
+    lines.append("")
+    lines.append(f"impl serde::Serialize for {name} {{")
+    lines.append("    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {")
+    lines.append("        serializer.serialize_u32(self.as_u32())")
+    lines.append("    }")
+    lines.append("}")
+    lines.append("")
+    lines.append(f"impl<'de> serde::Deserialize<'de> for {name} {{")
+    lines.append("    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {")
+    lines.append("        let value = u32::deserialize(deserializer)?;")
+    lines.append("        Self::from_u32(value).ok_or_else(|| serde::de::Error::custom(format!(")
+    lines.append(f"            \"invalid {name} value: {{}}\", value")
+    lines.append("        )))")
+    lines.append("    }")
     lines.append("}")
     return "\n".join(lines)
 
@@ -1048,6 +1237,214 @@ pub struct SwitchContainerAssignment {
     return "\n\n".join(parts)
 
 
+def gen_soundengine_and_misc_types():
+    """Shared types for the SoundEngine runtime surface, object introspection,
+    blend containers, soundbanks, and audio conversion."""
+    parts = [
+        emit_int_enum(
+            "ActionOnEventType",
+            "Action to execute on an event via `soundengine.executeActionOnEvent`.",
+            [("Stop", 0), ("Pause", 1), ("Resume", 2), ("Break", 3), ("ReleaseEnvelope", 4)],
+        ),
+        emit_int_enum(
+            "AkCurveInterpolation",
+            "Interpolation curve for fades (`AkCurveInterpolation`).",
+            [("Log3", 0), ("Sine", 1), ("Log1", 2), ("InvSCurve", 3), ("Linear", 4),
+             ("SCurve", 5), ("Exp1", 6), ("SineRecip", 7), ("Exp3", 8), ("Constant", 9)],
+        ),
+        emit_int_enum(
+            "MultiPositionType",
+            "How multiple positions are combined (`soundengine.setMultiplePositions`).",
+            [("SingleSource", 0), ("MultiSources", 1), ("MultiDirections", 2)],
+        ),
+        """/// Auxiliary send value for a game object (`soundengine.setGameObjectAuxSendValues`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct AuxSendValue {
+    /// Game object receiving the aux send.
+    pub listener: GameObjectRef,
+    /// Auxiliary bus to send to.
+    #[serde(rename = "auxBus")]
+    pub aux_bus: SoundEngineObjectRef,
+    /// Gain control value in dB.
+    #[serde(rename = "controlValue")]
+    pub control_value: f64,
+}
+
+impl AuxSendValue {
+    pub fn new(listener: impl Into<GameObjectRef>, aux_bus: impl Into<SoundEngineObjectRef>, control_value: f64) -> Self {
+        Self { listener: listener.into(), aux_bus: aux_bus.into(), control_value }
+    }
+}""",
+        """/// A single position entry for `soundengine.setMultiplePositions`.
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct MultiPosition {
+    pub position: Position,
+}
+
+impl MultiPosition {
+    pub fn new(position: Position) -> Self {
+        Self { position }
+    }
+}
+
+impl From<Position> for MultiPosition {
+    fn from(position: Position) -> Self {
+        Self { position }
+    }
+}""",
+        """/// A Wwise object type entry returned by `object.getTypes`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct WwiseObjectTypeInfo {
+    /// The object type name (e.g. `"Sound"`, `"ActorMixer"`).
+    #[serde(rename = "type")]
+    pub object_type: String,
+    /// The class ID of the object type.
+    #[serde(rename = "classId")]
+    pub class_id: u32,
+    /// The display name of the object type.
+    pub name: String,
+}""",
+        emit_enum("RtpcSupportMode", "How a property supports RTPC (`object.getPropertyInfo`).",
+                  ["None", "Additive", "Exclusive", "Multiplicative"]),
+        """/// RTPC/randomizer/unlink support flags for a property (`object.getPropertyInfo`).
+#[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyInfoSupports {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rtpc: Option<RtpcSupportMode>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub randomizer: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unlink: Option<bool>,
+}""",
+        emit_enum("BlendFadeMode", "Fade mode of a blend track edge.", ["None", "Manual", "Automatic"]),
+        """/// An edge of a blend track (`blendContainer.addAssignment` / `getAssignments`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct BlendEdge {
+    #[serde(rename = "fadeMode")]
+    pub fade_mode: BlendFadeMode,
+    #[serde(rename = "fadeShape")]
+    pub fade_shape: CurveShape,
+    #[serde(rename = "edgePosition")]
+    pub edge_position: f64,
+    #[serde(default, rename = "fadePosition", skip_serializing_if = "Option::is_none")]
+    pub fade_position: Option<f64>,
+}""",
+        """/// A blend track assignment (`blendContainer.getAssignments`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct BlendTrackAssignment {
+    /// GUID of the assigned child.
+    pub child: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edges: Option<Vec<BlendEdge>>,
+}""",
+        emit_enum("OnCurveUpdate", "Action when a Game Parameter range is modified.", ["stretch", "preserveX"]),
+        emit_enum("SoundBankInclusionType", "Inclusion type used by `soundbank.generate`.", ["event", "structure", "media"]),
+        emit_enum("SoundBankInclusionFilter", "Inclusion relation used by `soundbank.get/setInclusions`.", ["events", "structures", "media"]),
+        emit_enum("SoundBankInclusionOperation", "How `soundbank.setInclusions` modifies the inclusion list.", ["add", "remove", "replace"]),
+        """/// A SoundBank inclusion (`soundbank.get/setInclusions`).
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SoundBankInclusion {
+    pub object: ObjectRef,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub filter: Vec<SoundBankInclusionFilter>,
+}
+
+impl SoundBankInclusion {
+    pub fn new(object: impl Into<ObjectRef>) -> Self {
+        Self { object: object.into(), filter: Vec::new() }
+    }
+
+    pub fn filter(mut self, filter: SoundBankInclusionFilter) -> Self {
+        self.filter.push(filter);
+        self
+    }
+}""",
+        """/// A user-defined SoundBank to generate (`soundbank.generate`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct SoundBankInfo {
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub inclusions: Option<Vec<SoundBankInclusionType>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub events: Option<Vec<ObjectRef>>,
+    #[serde(default, rename = "auxBusses", skip_serializing_if = "Option::is_none")]
+    pub aux_busses: Option<Vec<ObjectRef>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rebuild: Option<bool>,
+}
+
+impl SoundBankInfo {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self { name: name.into(), inclusions: None, events: None, aux_busses: None, rebuild: None }
+    }
+
+    pub fn inclusions(mut self, inclusions: Vec<SoundBankInclusionType>) -> Self {
+        self.inclusions = Some(inclusions);
+        self
+    }
+
+    pub fn events(mut self, events: Vec<ObjectRef>) -> Self {
+        self.events = Some(events);
+        self
+    }
+
+    pub fn aux_busses(mut self, aux_busses: Vec<ObjectRef>) -> Self {
+        self.aux_busses = Some(aux_busses);
+        self
+    }
+
+    pub fn rebuild(mut self, rebuild: bool) -> Self {
+        self.rebuild = Some(rebuild);
+        self
+    }
+}""",
+        """/// A central log entry (`logCentralItem`).
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct LogCentralItem {
+    pub severity: LogSeverity,
+    pub time: i64,
+    #[serde(rename = "messageId")]
+    pub message_id: String,
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub platform: Option<WwiseObject>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}""",
+        emit_enum("LogChannel", "The Wwise log channel (`log.itemAdded`).",
+                  ["soundbankGenerate", "conversion", "copyPlatformSettings", "waapi",
+                   "projectLoad", "general", "sourceControl", "lua"]),
+        """/// A source file to convert (`soundbank.convertExternalSources`).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ExternalSourceInfo {
+    pub platform: PlatformRef,
+    pub input: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output: Option<String>,
+}
+
+impl ExternalSourceInfo {
+    pub fn new(platform: impl Into<PlatformRef>, input: impl Into<String>) -> Self {
+        Self { platform: platform.into(), input: input.into(), output: None }
+    }
+
+    pub fn output(mut self, output: impl Into<String>) -> Self {
+        self.output = Some(output.into());
+        self
+    }
+}""",
+        """/// A logged error from `audio.convert`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct AudioConvertError {
+    pub severity: LogSeverity,
+    pub message: String,
+}""",
+    ]
+    return "\n\n".join(parts)
+
+
 def gen_primitives(schemas, endpoints_docs):
     waapi_defs = schemas.load_definitions("waapi_definitions.json")
     get_ctx = endpoints_docs["ak.wwise.core.object.get"]
@@ -1098,6 +1495,7 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append(gen_import_types(import_ctx))
     parts.append(gen_transport_types(exec_ctx, state_ctx, list_ctx))
     parts.append(gen_attenuation_and_object_types(waapi_defs, atten_ctx, paste_ctx, switch_ctx, open_ctx))
+    parts.append(gen_soundengine_and_misc_types())
     return "\n\n".join(parts) + "\n"
 
 
@@ -1345,6 +1743,12 @@ def gen_endpoint_file(ctx):
     args_schema = ctx.doc.get("argsSchema", {})
     options_schema = ctx.doc.get("optionsSchema", {})
     result_schema = ctx.doc.get("resultSchema", {})
+    if ctx.uri in RESULT_WRAPPED_OBJECT_RETURN:
+        result_schema = {
+            "type": "object",
+            "properties": {"return": {"$ref": OBJECT_RETURN_REF}},
+            "required": ["return"],
+        }
 
     has_args = not is_empty_schema(args_schema)
     has_options = not is_empty_schema(options_schema)
@@ -1400,6 +1804,47 @@ def gen_endpoint_file(ctx):
             sections.append(emit_struct("response", name, f"Response from `{ctx.uri}`.", fields, ctx))
 
     return "\n\n".join(sections) + "\n", exports, has_args, has_options, has_response
+
+
+def gen_topic_file(ctx):
+    """Generate the payload struct and subscription options for a WAAPI topic."""
+    base = endpoint_base_name(ctx.uri)
+    options_schema = ctx.doc.get("optionsSchema", {})
+    publish_schema = ctx.doc.get("publishSchema", {})
+
+    has_options = not is_empty_schema(options_schema)
+    options_is_object_return = options_schema.get("$ref") == OBJECT_RETURN_OPTIONS_REF
+    publish_is_empty = is_empty_schema(publish_schema)
+
+    sections = [f"// Generated bindings for topic {ctx.uri}", "",
+                "#![allow(unused_imports)]", "#![allow(dead_code)]", "",
+                "use crate::api::generated::primitives::*;", ""]
+    exports = []
+
+    payload_name = f"{base}Payload"
+    exports.append(payload_name)
+    if publish_is_empty:
+        sections.append(f"/// Payload for `{ctx.uri}` (no data).\n"
+                        "#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]\n"
+                        f"pub struct {payload_name} {{}}")
+    else:
+        ctx.local_root = publish_schema
+        fields = collect_fields(ctx, publish_schema, "response", payload_name)
+        ctx.local_root = None
+        sections.append(emit_struct("response", payload_name, f"Payload for `{ctx.uri}`.", fields, ctx))
+
+    if has_options:
+        name = f"{base}Options"
+        exports.append(name)
+        if options_is_object_return:
+            sections.append(f"/// Subscription options for `{ctx.uri}`.\npub type {name} = ObjectReturnOptions;")
+        else:
+            ctx.local_root = options_schema
+            fields = collect_fields(ctx, options_schema, "options", name)
+            ctx.local_root = None
+            sections.append(emit_struct("options", name, f"Subscription options for `{ctx.uri}`.", fields, ctx))
+
+    return "\n\n".join(sections) + "\n", exports, has_options
 
 
 def gen_object_get_args(ctx, name):
@@ -1623,10 +2068,11 @@ def build_chain_tree(uris):
     ]
 
 
-def gen_clients(endpoints):
+def gen_clients(endpoints, topics):
     lines = ["// Auto-generated chained namespace clients.",
              "// This file is generated by tools/generate_typed_api.py; do not edit by hand.",
-             "", "use crate::{WaapiClient, WaapiFunction, WaapiResult};",
+             "", "use crate::{WaapiClient, WaapiFunction, WaapiResult, WaapiTopic};",
+             "use tokio::sync::mpsc::UnboundedReceiver;",
              ""]
     for uri in sorted(endpoints):
         info = endpoints[uri]
@@ -1637,14 +2083,25 @@ def gen_clients(endpoints):
             types.append(f"{info['base']}Response")
         if types:
             lines.append(use_path(uri, types))
+    for uri in sorted(topics):
+        info = topics[uri]
+        types = [f"{info['base']}Payload"]
+        if info["has_options"]:
+            types.append(f"{info['base']}Options")
+        lines.append(use_path(uri, types))
     lines.append("")
 
+    all_uris = sorted(set(PILOT_ENDPOINTS) | set(TOPIC_ENDPOINTS))
     by_prefix = {}
     for uri in PILOT_ENDPOINTS:
         prefix = ".".join(endpoint_module_path(uri))
         by_prefix.setdefault(prefix, []).append(uri)
+    topic_by_prefix = {}
+    for uri in TOPIC_ENDPOINTS:
+        prefix = ".".join(endpoint_module_path(uri))
+        topic_by_prefix.setdefault(prefix, []).append(uri)
 
-    for struct_name, prefix, children in build_chain_tree(PILOT_ENDPOINTS):
+    for struct_name, prefix, children in build_chain_tree(all_uris):
         lines.append(f"pub struct {struct_name}<'a> {{")
         lines.append("    client: &'a mut WaapiClient,")
         lines.append("}")
@@ -1668,6 +2125,26 @@ def gen_clients(endpoints):
             body = emit_call_body(uri, info)
             lines += [f"        {b}" for b in body]
             lines.append("    }")
+            lines.append("")
+        for uri in topic_by_prefix.get(prefix or "", []):
+            info = topics[uri]
+            payload = f"{info['base']}Payload"
+            method = f"subscribe_{method_name(uri)}"
+            lines.append(f"    /// Subscribe to `{uri}`.")
+            if info["has_options"]:
+                opts = f"{info['base']}Options"
+                lines.append(f"    pub async fn {method}(")
+                lines.append(f"        &mut self,")
+                lines.append(f"        options: Option<{opts}>,")
+                lines.append(f"    ) -> WaapiResult<(u64, UnboundedReceiver<{payload}>)> {{")
+                lines.append(f"        self.client.subscribe_payload(WaapiTopic::{uri.replace('.', '_')}, options).await")
+                lines.append("    }")
+            else:
+                lines.append(f"    pub async fn {method}(")
+                lines.append(f"        &mut self,")
+                lines.append(f"    ) -> WaapiResult<(u64, UnboundedReceiver<{payload}>)> {{")
+                lines.append(f"        self.client.subscribe_payload::<(), _>(WaapiTopic::{uri.replace('.', '_')}, None).await")
+                lines.append("    }")
             lines.append("")
         if lines[-1] == "":
             lines.pop()
@@ -1713,18 +2190,30 @@ def main():
             "ctx": ctx,
         }
 
+    topics = {}
+    for uri in TOPIC_ENDPOINTS:
+        ctx = Ctx(schemas, uri)
+        content, exports, has_options = gen_topic_file(ctx)
+        topics[uri] = {
+            "content": content,
+            "exports": exports,
+            "has_options": has_options,
+            "base": endpoint_base_name(uri),
+            "ctx": ctx,
+        }
+
     if OUT_DIR.exists():
         shutil.rmtree(OUT_DIR)
     OUT_DIR.mkdir(parents=True)
 
-    tree = build_module_tree(endpoints)
+    tree = build_module_tree({**endpoints, **topics})
     emit_module_tree(tree, OUT_DIR)
 
     ctxs = {uri: info["ctx"] for uri, info in endpoints.items()}
     (OUT_DIR / "object_types.rs").write_text(gen_object_types(SCHEMA_DIR))
     (OUT_DIR / "properties.rs").write_text(gen_properties(SCHEMA_DIR))
     (OUT_DIR / "primitives.rs").write_text(gen_primitives(schemas, ctxs))
-    (OUT_DIR / "clients.rs").write_text(gen_clients(endpoints))
+    (OUT_DIR / "clients.rs").write_text(gen_clients(endpoints, topics))
     (OUT_DIR / "mod.rs").write_text(
         "// Auto-generated typed WAAPI bindings.\n"
         "// This file is generated by tools/generate_typed_api.py; do not edit by hand.\n\n"
@@ -1736,7 +2225,7 @@ def main():
         "pub use object_types::ObjectType;\n"
         "pub use properties::Property;\n"
     )
-    print(f"Generated {len(PILOT_ENDPOINTS)} endpoints into {OUT_DIR}")
+    print(f"Generated {len(PILOT_ENDPOINTS)} endpoints and {len(TOPIC_ENDPOINTS)} topics into {OUT_DIR}")
 
 
 if __name__ == "__main__":

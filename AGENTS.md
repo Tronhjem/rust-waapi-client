@@ -30,6 +30,7 @@ RUST_LOG=info cargo run --example get_info
 - Always call `client.shutdown().await` before dropping; `Drop` prints a warning if you do not.
 - `client.call(WaapiFunction, Option<serde_json::Value>, Option<serde_json::Value>) -> WaapiResult<serde_json::Value>` and `client.subscribe(WaapiTopic, Option<serde_json::Value>)` take typed URI enums (whose `.as_str()` returns the `ak::...` `&str` constants). Use `call_raw` / `subscribe_raw` if a raw `&str` URI is needed.
 - The typed API exposes a chained namespace hierarchy on `WaapiClient` (`client.ak().wwise()...` plus `client.wwise()` and `client.soundengine()` shortcuts) that mirrors WAAPI URI dot-notation (e.g. `ak.wwise.core.object.get` → `client.wwise().core().object().get(...)` with types in `ak::wwise::core::object`). Each method delegates to `WaapiClient::call_typed` / `call_typed_void` / `subscribe_typed` using `WaapiFunction` / `WaapiTopic`, keeping `WaapiClient` as the single entry point for calls.
+- Topics have generated payload structs (`<Base>Payload`) and `subscribe_*` chained methods returning `WaapiResult<(u64, UnboundedReceiver<Payload>)>`; these delegate to `WaapiClient::subscribe_payload<Options, Payload>`, which deserializes each `event.kwargs` into the payload (skipping malformed events with a warning).
 - `pub use serde_json;` is re-exported from the crate root, so `waapi_client::serde_json::json!` works without an explicit `serde_json` dependency.
 - `waapi_client::json!` is also exported directly for the same purpose (it delegates to `serde_json::json!`).
 

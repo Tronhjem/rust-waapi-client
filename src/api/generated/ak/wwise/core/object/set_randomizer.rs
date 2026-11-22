@@ -16,8 +16,7 @@ pub struct CoreObjectSetRandomizerArgs {
     pub min: Option<f64>,
     /// The ID (GUID), name, or path of the object owning the property.
     pub object: ObjectRef,
-    /// The name of the property
-    /// For more information, refer to the property list of Wwise Objects listed in .
+    /// The name of the property. For more information, refer to the property list of Wwise Objects listed in .
     pub property: Property,
     /// The ID (GUID) or unique name of the platform.
     #[serde(skip_serializing_if = "Option::is_none")]

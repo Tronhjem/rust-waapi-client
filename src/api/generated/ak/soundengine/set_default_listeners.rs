@@ -8,8 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.setDefaultListeners`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetDefaultListenersArgs {
-    /// Array of listener game object IDs
-    /// Game objects must have been previously registered.
+    /// Array of listener game object IDs. Game objects must have been previously registered.
     pub listeners: Vec<GameObjectRef>,
 }
 

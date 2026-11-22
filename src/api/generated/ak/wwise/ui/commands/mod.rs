@@ -3,5 +3,7 @@
 
 mod execute;
 pub use execute::UiCommandsExecuteArgs;
+mod executed;
+pub use executed::{UiCommandsExecutedOptions, UiCommandsExecutedPayload};
 mod get_commands;
 pub use get_commands::UiCommandsGetCommandsResponse;

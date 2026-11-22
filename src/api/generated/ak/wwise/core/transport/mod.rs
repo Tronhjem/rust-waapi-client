@@ -13,5 +13,7 @@ mod get_state;
 pub use get_state::{CoreTransportGetStateArgs, CoreTransportGetStateResponse};
 mod prepare;
 pub use prepare::CoreTransportPrepareArgs;
+mod state_changed;
+pub use state_changed::{CoreTransportStateChangedOptions, CoreTransportStateChangedPayload};
 mod use_originals;
 pub use use_originals::CoreTransportUseOriginalsArgs;

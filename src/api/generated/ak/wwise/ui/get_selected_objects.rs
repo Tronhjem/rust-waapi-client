@@ -11,7 +11,6 @@ pub type UiGetSelectedObjectsOptions = ObjectReturnOptions;
 /// Response from `ak.wwise.ui.getSelectedObjects`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiGetSelectedObjectsResponse {
-    /// The selected objects, in the format specified in the options
-    /// Can be empty if no object is selected.
+    /// The selected objects, in the format specified in the options. Can be empty if no object is selected.
     pub objects: Vec<WwiseObject>,
 }

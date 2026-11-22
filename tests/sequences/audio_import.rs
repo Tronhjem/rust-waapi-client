@@ -13,7 +13,7 @@ const DEFAULT_WORK_UNIT_PATH: &str = r"\Actor-Mixer Hierarchy\Default Work Unit"
 const IMPORT_MIXER_NAME: &str = "WaapiImportTestMixer";
 const IMPORTED_SOUND_NAME: &str = "WaapiImportedSound";
 
-fn encode_base64(input: &[u8]) -> String {
+pub fn encode_base64(input: &[u8]) -> String {
     const TABLE: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = String::with_capacity(input.len().div_ceil(3) * 4);
     for chunk in input.chunks(3) {
@@ -38,7 +38,7 @@ fn encode_base64(input: &[u8]) -> String {
     out
 }
 
-fn minimal_wav_base64(filename: &str) -> String {
+pub fn minimal_wav_base64(filename: &str) -> String {
     let sample_rate: u32 = 8000;
     let num_samples: u32 = 400; // 50 ms mono 16-bit PCM
     let data_size: u32 = num_samples * 2;

@@ -10,8 +10,7 @@ use crate::api::generated::primitives::*;
 pub struct CoreObjectGetAttenuationCurveArgs {
     /// The ID (GUID), name, or path of attenuation object.
     pub object: ObjectRef,
-    /// The ID (GUID) or unique name of the platform to get curves
-    /// Set to null-guid for unlinked reference.
+    /// The ID (GUID) or unique name of the platform to get curves. Set to null-guid for unlinked reference.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
     /// Type of attenuation curve.

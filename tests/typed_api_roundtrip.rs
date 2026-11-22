@@ -859,3 +859,1066 @@ fn project_info_and_ui_commands_roundtrip() {
         serde_json::from_value(json!({"hadProjectOpen": true})).unwrap();
     assert!(close_resp.had_project_open);
 }
+
+#[test]
+fn soundengine_int_enums_serialize_as_ints() {
+    use waapi_client::api::generated::primitives::{
+        ActionOnEventType, AkCurveInterpolation, MultiPositionType,
+    };
+
+    assert_eq!(ActionOnEventType::Stop.as_u32(), 0);
+    assert_eq!(ActionOnEventType::ReleaseEnvelope.as_u32(), 4);
+    assert_eq!(
+        ActionOnEventType::from_u32(2),
+        Some(ActionOnEventType::Resume)
+    );
+    assert_eq!(ActionOnEventType::from_u32(99), None);
+    assert_eq!(serde_json::to_value(ActionOnEventType::Pause).unwrap(), 1);
+    assert_eq!(
+        serde_json::from_value::<ActionOnEventType>(json!(3)).unwrap(),
+        ActionOnEventType::Break
+    );
+
+    assert_eq!(AkCurveInterpolation::Linear.as_u32(), 4);
+    assert_eq!(AkCurveInterpolation::Constant.as_u32(), 9);
+    assert_eq!(
+        AkCurveInterpolation::from_u32(1),
+        Some(AkCurveInterpolation::Sine)
+    );
+    assert_eq!(
+        serde_json::to_value(AkCurveInterpolation::SCurve).unwrap(),
+        5
+    );
+
+    assert_eq!(MultiPositionType::SingleSource.as_u32(), 0);
+    assert_eq!(MultiPositionType::MultiDirections.as_u32(), 2);
+    assert_eq!(
+        serde_json::to_value(MultiPositionType::MultiSources).unwrap(),
+        1
+    );
+}
+
+#[test]
+fn soundengine_switch_and_state_roundtrip() {
+    use waapi_client::api::generated::ak::soundengine::{
+        SoundengineGetStateArgs, SoundengineGetSwitchArgs, SoundengineSetStateArgs,
+        SoundengineSetSwitchArgs,
+    };
+    use waapi_client::api::generated::primitives::GameObjectRef;
+
+    let set_switch = SoundengineSetSwitchArgs::new("MySwitchGroup".into(), "On".into())
+        .game_object(GameObjectRef::game_object(7));
+    assert_eq!(
+        serde_json::to_value(set_switch).unwrap(),
+        json!({"switchGroup": "MySwitchGroup", "switchState": "On", "gameObject": 7})
+    );
+
+    let set_state = SoundengineSetStateArgs::new("MyStateGroup".into(), "Combat".into());
+    assert_eq!(
+        serde_json::to_value(set_state).unwrap(),
+        json!({"stateGroup": "MyStateGroup", "state": "Combat"})
+    );
+
+    let get_switch =
+        SoundengineGetSwitchArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-0000000000AA}"))
+            .game_object(GameObjectRef::game_object(7));
+    assert_eq!(
+        serde_json::to_value(get_switch).unwrap(),
+        json!({"switchGroup": "{00000000-0000-0000-0000-0000000000AA}", "gameObject": 7})
+    );
+
+    let get_state =
+        SoundengineGetStateArgs::new(ObjectRef::guid("{00000000-0000-0000-0000-0000000000BB}"));
+    assert_eq!(
+        serde_json::to_value(get_state).unwrap(),
+        json!({"stateGroup": "{00000000-0000-0000-0000-0000000000BB}"})
+    );
+}
+
+#[test]
+fn soundengine_actions_seek_and_events_roundtrip() {
+    use waapi_client::api::generated::ak::soundengine::{
+        SoundengineExecuteActionOnEventArgs, SoundenginePostTriggerArgs,
+        SoundengineSeekOnEventArgs, SoundengineStopPlayingIdArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        ActionOnEventType, AkCurveInterpolation, GameObjectRef,
+    };
+
+    let exec = SoundengineExecuteActionOnEventArgs::new(
+        "Play_Test".into(),
+        ActionOnEventType::Stop,
+        GameObjectRef::game_object(1),
+        500,
+        AkCurveInterpolation::Linear,
+    );
+    assert_eq!(
+        serde_json::to_value(exec).unwrap(),
+        json!({
+            "event": "Play_Test",
+            "actionType": 0,
+            "gameObject": 1,
+            "transitionDuration": 500,
+            "fadeCurve": 4
+        })
+    );
+
+    let stop = SoundengineStopPlayingIdArgs::new(42, 100, AkCurveInterpolation::SCurve);
+    assert_eq!(
+        serde_json::to_value(stop).unwrap(),
+        json!({"playingId": 42, "transitionDuration": 100, "fadeCurve": 5})
+    );
+
+    let seek = SoundengineSeekOnEventArgs::new(
+        "Play_Test".into(),
+        GameObjectRef::game_object(1),
+        true,
+        42,
+    )
+    .position(1000)
+    .percent(50.0);
+    assert_eq!(
+        serde_json::to_value(seek).unwrap(),
+        json!({
+            "event": "Play_Test",
+            "gameObject": 1,
+            "seekToNearestMarker": true,
+            "playingId": 42,
+            "position": 1000,
+            "percent": 50.0
+        })
+    );
+
+    let trigger = SoundenginePostTriggerArgs::new("MyTrigger".into())
+        .game_object(GameObjectRef::game_object(3));
+    assert_eq!(
+        serde_json::to_value(trigger).unwrap(),
+        json!({"trigger": "MyTrigger", "gameObject": 3})
+    );
+}
+
+#[test]
+fn soundengine_positions_volume_and_listeners_roundtrip() {
+    use waapi_client::api::generated::ak::soundengine::{
+        SoundengineLoadBankArgs, SoundenginePostMsgMonitorArgs, SoundengineResetRtpcValueArgs,
+        SoundengineSetGameObjectAuxSendValuesArgs, SoundengineSetGameObjectOutputBusVolumeArgs,
+        SoundengineSetListenerSpatializationArgs, SoundengineSetListenersArgs,
+        SoundengineSetMultiplePositionsArgs, SoundengineSetObjectObstructionAndOcclusionArgs,
+        SoundengineSetScalingFactorArgs, SoundengineStopAllArgs, SoundengineUnloadBankArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        AuxSendValue, GameObjectRef, MultiPositionType, Position,
+    };
+
+    let aux = SoundengineSetGameObjectAuxSendValuesArgs::new(
+        GameObjectRef::game_object(1),
+        vec![AuxSendValue::new(1u64, "MyAuxBus", -3.0)],
+    );
+    assert_eq!(
+        serde_json::to_value(aux).unwrap(),
+        json!({
+            "gameObject": 1,
+            "auxSendValues": [{"listener": 1, "auxBus": "MyAuxBus", "controlValue": -3.0}]
+        })
+    );
+
+    let positions = SoundengineSetMultiplePositionsArgs::new(
+        GameObjectRef::game_object(1),
+        vec![Position::origin().into()],
+        MultiPositionType::MultiSources,
+    );
+    assert_eq!(
+        serde_json::to_value(positions).unwrap(),
+        json!({
+            "gameObject": 1,
+            "positions": [{
+                "position": {
+                    "orientationFront": {"x": 0.0, "y": 0.0, "z": 1.0},
+                    "orientationTop": {"x": 0.0, "y": 1.0, "z": 0.0},
+                    "position": {"x": 0.0, "y": 0.0, "z": 0.0}
+                }
+            }],
+            "multiPositionType": 1
+        })
+    );
+
+    let listeners = SoundengineSetListenersArgs::new(
+        GameObjectRef::game_object(1),
+        vec![GameObjectRef::game_object(2)],
+    );
+    assert_eq!(
+        serde_json::to_value(listeners).unwrap(),
+        json!({"emitter": 1, "listeners": [2]})
+    );
+
+    let spatial = SoundengineSetListenerSpatializationArgs::new(
+        GameObjectRef::game_object(1),
+        true,
+        1,
+        vec![0.0, -6.0],
+    );
+    assert_eq!(
+        serde_json::to_value(spatial).unwrap(),
+        json!({"listener": 1, "spatialized": true, "channelConfig": 1, "volumeOffsets": [0.0, -6.0]})
+    );
+
+    let occ = SoundengineSetObjectObstructionAndOcclusionArgs::new(
+        GameObjectRef::game_object(1),
+        GameObjectRef::game_object(2),
+        0.5,
+        0.25,
+    );
+    assert_eq!(
+        serde_json::to_value(occ).unwrap(),
+        json!({"emitter": 1, "listener": 2, "obstructionLevel": 0.5, "occlusionLevel": 0.25})
+    );
+
+    let scaling = SoundengineSetScalingFactorArgs::new(GameObjectRef::game_object(1), 0.75);
+    assert_eq!(
+        serde_json::to_value(scaling).unwrap(),
+        json!({"gameObject": 1, "attenuationScalingFactor": 0.75})
+    );
+
+    let bus_vol = SoundengineSetGameObjectOutputBusVolumeArgs::new(
+        GameObjectRef::game_object(1),
+        GameObjectRef::game_object(2),
+        -6.0,
+    );
+    assert_eq!(
+        serde_json::to_value(bus_vol).unwrap(),
+        json!({"emitter": 1, "listener": 2, "controlValue": -6.0})
+    );
+
+    let reset = SoundengineResetRtpcValueArgs::new("Volume".into())
+        .game_object(GameObjectRef::game_object(1));
+    assert_eq!(
+        serde_json::to_value(reset).unwrap(),
+        json!({"rtpc": "Volume", "gameObject": 1})
+    );
+
+    let load = SoundengineLoadBankArgs::new("Init".into());
+    assert_eq!(
+        serde_json::to_value(load).unwrap(),
+        json!({"soundBank": "Init"})
+    );
+
+    let unload = SoundengineUnloadBankArgs::new("Init".into());
+    assert_eq!(
+        serde_json::to_value(unload).unwrap(),
+        json!({"soundBank": "Init"})
+    );
+
+    let stop_all = SoundengineStopAllArgs::new(GameObjectRef::game_object(1));
+    assert_eq!(
+        serde_json::to_value(stop_all).unwrap(),
+        json!({"gameObject": 1})
+    );
+
+    let msg = SoundenginePostMsgMonitorArgs::new("hello".to_string());
+    assert_eq!(
+        serde_json::to_value(msg).unwrap(),
+        json!({"message": "hello"})
+    );
+}
+
+#[test]
+fn object_introspection_roundtrip() {
+    use waapi_client::Property;
+    use waapi_client::api::generated::ak::wwise::core::object::{
+        CoreObjectGetPropertyAndReferenceNamesArgs, CoreObjectGetPropertyAndReferenceNamesResponse,
+        CoreObjectGetPropertyInfoArgs, CoreObjectGetPropertyInfoResponse,
+        CoreObjectGetTypesResponse, CoreObjectIsLinkedArgs, CoreObjectIsLinkedResponse,
+        CoreObjectIsPropertyEnabledArgs, CoreObjectIsPropertyEnabledResponse,
+        CoreObjectSetLinkedArgs, CoreObjectSetStateGroupsArgs, CoreObjectSetStatePropertiesArgs,
+    };
+    use waapi_client::api::generated::primitives::RtpcSupportMode;
+
+    let types: CoreObjectGetTypesResponse = serde_json::from_value(json!({
+        "return": [
+            {"type": "Sound", "classId": 65552, "name": "Sound"},
+            {"type": "ActorMixer", "classId": 524304, "name": "Actor-Mixer"}
+        ]
+    }))
+    .unwrap();
+    assert_eq!(types.types.len(), 2);
+    assert_eq!(types.types[0].object_type, "Sound");
+    assert_eq!(types.types[0].class_id, 65552);
+    assert_eq!(types.types[1].object_type, "ActorMixer");
+
+    let names_args =
+        CoreObjectGetPropertyAndReferenceNamesArgs::new().object(ObjectRef::guid("{OBJ-1}"));
+    assert_eq!(
+        serde_json::to_value(names_args).unwrap(),
+        json!({"object": "{OBJ-1}"})
+    );
+    let names: CoreObjectGetPropertyAndReferenceNamesResponse = serde_json::from_value(json!({
+        "return": ["Volume", "OutputBus"]
+    }))
+    .unwrap();
+    assert_eq!(names.names, vec!["Volume", "OutputBus"]);
+
+    let info_args =
+        CoreObjectGetPropertyInfoArgs::new(Property::Volume).object(ObjectRef::guid("{OBJ-1}"));
+    assert_eq!(
+        serde_json::to_value(info_args).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume"})
+    );
+    let info: CoreObjectGetPropertyInfoResponse = serde_json::from_value(json!({
+        "type": "Real64",
+        "name": "Volume",
+        "default": 0.0,
+        "audioEngineId": 0,
+        "supports": {"rtpc": "Additive", "randomizer": true, "unlink": false}
+    }))
+    .unwrap();
+    assert_eq!(info.object_type.as_deref(), Some("Real64"));
+    assert_eq!(info.name.as_deref(), Some("Volume"));
+    assert_eq!(info.default, Some(json!(0.0)));
+    assert_eq!(info.audio_engine_id, Some(0));
+    let supports = info.supports.unwrap();
+    assert_eq!(supports.rtpc, Some(RtpcSupportMode::Additive));
+    assert_eq!(supports.randomizer, Some(true));
+    assert_eq!(supports.unlink, Some(false));
+
+    let is_linked = CoreObjectIsLinkedArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        Property::Volume,
+        PlatformRef::Name("Windows".to_string()),
+    );
+    assert_eq!(
+        serde_json::to_value(is_linked).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume", "platform": "Windows"})
+    );
+    let linked_resp: CoreObjectIsLinkedResponse =
+        serde_json::from_value(json!({"linked": true})).unwrap();
+    assert_eq!(linked_resp.linked, Some(true));
+
+    let is_enabled = CoreObjectIsPropertyEnabledArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        PlatformRef::Name("Windows".to_string()),
+        Property::Volume,
+    );
+    assert_eq!(
+        serde_json::to_value(is_enabled).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume", "platform": "Windows"})
+    );
+    let enabled_resp: CoreObjectIsPropertyEnabledResponse =
+        serde_json::from_value(json!({"return": false})).unwrap();
+    assert_eq!(enabled_resp.enabled, Some(false));
+
+    let set_linked = CoreObjectSetLinkedArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        Property::Volume,
+        PlatformRef::Name("Windows".to_string()),
+        true,
+    );
+    assert_eq!(
+        serde_json::to_value(set_linked).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume", "platform": "Windows", "linked": true})
+    );
+
+    let set_groups = CoreObjectSetStateGroupsArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        vec![ObjectRef::guid("{STATE-GROUP-1}")],
+    );
+    assert_eq!(
+        serde_json::to_value(set_groups).unwrap(),
+        json!({"object": "{OBJ-1}", "stateGroups": ["{STATE-GROUP-1}"]})
+    );
+
+    let set_props = CoreObjectSetStatePropertiesArgs::new(
+        ObjectRef::guid("{OBJ-1}"),
+        vec!["Volume".to_string(), "Pitch".to_string()],
+    );
+    assert_eq!(
+        serde_json::to_value(set_props).unwrap(),
+        json!({"object": "{OBJ-1}", "stateProperties": ["Volume", "Pitch"]})
+    );
+}
+
+#[test]
+fn singles_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::CorePingResponse;
+    use waapi_client::api::generated::ak::wwise::core::gameParameter::CoreGameParameterSetRangeArgs;
+    use waapi_client::api::generated::ak::wwise::core::sound::CoreSoundSetActiveSourceArgs;
+    use waapi_client::api::generated::primitives::OnCurveUpdate;
+
+    let active = CoreSoundSetActiveSourceArgs::new(
+        ObjectRef::guid("{SOUND-1}"),
+        ObjectRef::guid("{SOURCE-1}"),
+    )
+    .platform(PlatformRef::Name("Windows".to_string()));
+    assert_eq!(
+        serde_json::to_value(active).unwrap(),
+        json!({"sound": "{SOUND-1}", "source": "{SOURCE-1}", "platform": "Windows"})
+    );
+
+    let range = CoreGameParameterSetRangeArgs::new(
+        ObjectRef::guid("{GAMEPARAM-1}"),
+        -100.0,
+        0.0,
+        OnCurveUpdate::Stretch,
+    );
+    assert_eq!(
+        serde_json::to_value(range).unwrap(),
+        json!({"object": "{GAMEPARAM-1}", "min": -100.0, "max": 0.0, "onCurveUpdate": "stretch"})
+    );
+    let preserve = CoreGameParameterSetRangeArgs::new(
+        ObjectRef::guid("{GAMEPARAM-1}"),
+        0.0,
+        100.0,
+        OnCurveUpdate::PreserveX,
+    );
+    assert_eq!(
+        serde_json::to_value(preserve).unwrap()["onCurveUpdate"],
+        "preserveX"
+    );
+
+    let ping: CorePingResponse = serde_json::from_value(json!({"isAvailable": true})).unwrap();
+    assert!(ping.is_available);
+}
+
+#[test]
+fn blend_container_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::blendContainer::{
+        CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddAssignmentResponse,
+        CoreBlendContainerAddTrackArgs, CoreBlendContainerAddTrackResponse,
+        CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerGetAssignmentsResponse,
+        CoreBlendContainerRemoveAssignmentArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        BlendEdge, BlendFadeMode, BlendTrackAssignment,
+    };
+
+    let add = CoreBlendContainerAddAssignmentArgs::new(
+        "{TRACK-1}".to_string(),
+        ObjectRef::guid("{CHILD-1}"),
+    )
+    .index(0)
+    .edges(vec![BlendEdge {
+        fade_mode: BlendFadeMode::Manual,
+        fade_shape: waapi_client::api::generated::primitives::CurveShape::Linear,
+        edge_position: 0.5,
+        fade_position: Some(0.25),
+    }]);
+    assert_eq!(
+        serde_json::to_value(add).unwrap(),
+        json!({
+            "object": "{TRACK-1}",
+            "child": "{CHILD-1}",
+            "index": 0,
+            "edges": [{"fadeMode": "Manual", "fadeShape": "Linear", "edgePosition": 0.5, "fadePosition": 0.25}]
+        })
+    );
+
+    let add_resp: CoreBlendContainerAddAssignmentResponse = serde_json::from_value(json!({
+        "child": "{CHILD-1}",
+        "index": 0,
+        "edges": [{"fadeMode": "Automatic", "fadeShape": "SCurve", "edgePosition": 0.0}]
+    }))
+    .unwrap();
+    assert_eq!(add_resp.child.as_deref(), Some("{CHILD-1}"));
+    assert_eq!(add_resp.edges.len(), 1);
+
+    let add_track =
+        CoreBlendContainerAddTrackArgs::new(ObjectRef::guid("{BLEND-1}"), "Track A".to_string());
+    assert_eq!(
+        serde_json::to_value(add_track).unwrap(),
+        json!({"object": "{BLEND-1}", "name": "Track A"})
+    );
+    let track_resp: CoreBlendContainerAddTrackResponse = serde_json::from_value(json!({
+        "id": "{TRACK-1}",
+        "type": "BlendTrack",
+        "shortId": 100,
+        "name": "Track A"
+    }))
+    .unwrap();
+    assert_eq!(track_resp.id.as_deref(), Some("{TRACK-1}"));
+    assert_eq!(track_resp.short_id, Some(100));
+
+    let get = CoreBlendContainerGetAssignmentsArgs::new("{TRACK-1}".to_string());
+    assert_eq!(
+        serde_json::to_value(get).unwrap(),
+        json!({"object": "{TRACK-1}"})
+    );
+    let get_resp: CoreBlendContainerGetAssignmentsResponse = serde_json::from_value(json!({
+        "return": [{"child": "{CHILD-1}", "index": 0}]
+    }))
+    .unwrap();
+    assert_eq!(
+        get_resp.assignments,
+        vec![BlendTrackAssignment {
+            child: "{CHILD-1}".to_string(),
+            index: Some(0),
+            edges: None,
+        }]
+    );
+
+    let remove = CoreBlendContainerRemoveAssignmentArgs::new(
+        "{TRACK-1}".to_string(),
+        ObjectRef::guid("{CHILD-1}"),
+    );
+    assert_eq!(
+        serde_json::to_value(remove).unwrap(),
+        json!({"object": "{TRACK-1}", "child": "{CHILD-1}"})
+    );
+}
+
+#[test]
+fn soundbank_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::soundbank::{
+        CoreSoundbankConvertExternalSourcesArgs, CoreSoundbankGenerateArgs,
+        CoreSoundbankGenerateResponse, CoreSoundbankGetInclusionsArgs,
+        CoreSoundbankGetInclusionsResponse, CoreSoundbankProcessDefinitionFilesArgs,
+        CoreSoundbankSetInclusionsArgs,
+    };
+    use waapi_client::api::generated::primitives::{
+        ExternalSourceInfo, LogSeverity, SoundBankInclusion, SoundBankInclusionFilter,
+        SoundBankInclusionOperation, SoundBankInclusionType, SoundBankInfo,
+    };
+
+    let generate = CoreSoundbankGenerateArgs::new()
+        .platforms(vec!["Mac".to_string()])
+        .languages(vec!["English(US)".into()])
+        .soundbanks(vec![
+            SoundBankInfo::new("Main")
+                .inclusions(vec![
+                    SoundBankInclusionType::Event,
+                    SoundBankInclusionType::Structure,
+                ])
+                .events(vec![ObjectRef::guid("{EVENT-1}")])
+                .rebuild(true),
+        ])
+        .skip_languages(false)
+        .write_to_disk(true);
+    let gen_json = serde_json::to_value(&generate).unwrap();
+    assert_eq!(gen_json["platforms"], json!(["Mac"]));
+    assert_eq!(gen_json["soundbanks"][0]["name"], "Main");
+    assert_eq!(
+        gen_json["soundbanks"][0]["inclusions"],
+        json!(["event", "structure"])
+    );
+    assert_eq!(gen_json["soundbanks"][0]["rebuild"], true);
+    assert_eq!(gen_json["writeToDisk"], true);
+
+    let gen_resp: CoreSoundbankGenerateResponse = serde_json::from_value(json!({
+        "logs": [{
+            "severity": "Message",
+            "time": 1710000000,
+            "messageId": "SB-1",
+            "message": "SoundBank generated"
+        }]
+    }))
+    .unwrap();
+    assert_eq!(gen_resp.logs.len(), 1);
+    assert_eq!(gen_resp.logs[0].severity, LogSeverity::Message);
+    assert_eq!(gen_resp.logs[0].message_id, "SB-1");
+
+    let get_inc = CoreSoundbankGetInclusionsArgs::new(ObjectRef::guid("{BANK-1}"));
+    assert_eq!(
+        serde_json::to_value(get_inc).unwrap(),
+        json!({"soundbank": "{BANK-1}"})
+    );
+    let inc_resp: CoreSoundbankGetInclusionsResponse = serde_json::from_value(json!({
+        "inclusions": [{"object": "{OBJ-1}", "filter": ["events", "media"]}]
+    }))
+    .unwrap();
+    assert_eq!(inc_resp.inclusions.len(), 1);
+    assert_eq!(
+        inc_resp.inclusions[0].filter,
+        vec![
+            SoundBankInclusionFilter::Events,
+            SoundBankInclusionFilter::Media
+        ]
+    );
+
+    let set_inc = CoreSoundbankSetInclusionsArgs::new(
+        ObjectRef::guid("{BANK-1}"),
+        vec![
+            SoundBankInclusion::new(ObjectRef::guid("{OBJ-1}"))
+                .filter(SoundBankInclusionFilter::Events),
+        ],
+        SoundBankInclusionOperation::Add,
+    );
+    assert_eq!(
+        serde_json::to_value(set_inc).unwrap(),
+        json!({
+            "soundbank": "{BANK-1}",
+            "inclusions": [{"object": "{OBJ-1}", "filter": ["events"]}],
+            "operation": "add"
+        })
+    );
+
+    let proc = CoreSoundbankProcessDefinitionFilesArgs::new(vec!["/path/def.wdef".to_string()]);
+    assert_eq!(
+        serde_json::to_value(proc).unwrap(),
+        json!({"files": ["/path/def.wdef"]})
+    );
+
+    let convert = CoreSoundbankConvertExternalSourcesArgs::new(vec![
+        ExternalSourceInfo::new(
+            PlatformRef::Name("Mac".to_string()),
+            "/in/file.wem".to_string(),
+        )
+        .output("/out/file.wem".to_string()),
+    ]);
+    assert_eq!(
+        serde_json::to_value(convert).unwrap(),
+        json!({
+            "sources": [{"platform": "Mac", "input": "/in/file.wem", "output": "/out/file.wem"}]
+        })
+    );
+}
+
+#[test]
+fn audio_mute_convert_and_import_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::audio::{
+        CoreAudioConvertArgs, CoreAudioConvertResponse, CoreAudioImportTabDelimitedArgs,
+        CoreAudioMuteArgs, CoreAudioSetConversionPluginArgs, CoreAudioSoloArgs,
+    };
+    use waapi_client::api::generated::primitives::LogSeverity;
+
+    let mute = CoreAudioMuteArgs::new(vec![ObjectRef::guid("{OBJ-1}")], true);
+    assert_eq!(
+        serde_json::to_value(mute).unwrap(),
+        json!({"objects": ["{OBJ-1}"], "value": true})
+    );
+
+    let solo = CoreAudioSoloArgs::new(vec![ObjectRef::guid("{OBJ-1}")], false);
+    assert_eq!(
+        serde_json::to_value(solo).unwrap(),
+        json!({"objects": ["{OBJ-1}"], "value": false})
+    );
+
+    let convert = CoreAudioConvertArgs::new(
+        vec![ObjectRef::guid("{OBJ-1}")],
+        vec![PlatformRef::Name("Mac".to_string())],
+        vec!["English(US)".into()],
+    );
+    assert_eq!(
+        serde_json::to_value(convert).unwrap(),
+        json!({"objects": ["{OBJ-1}"], "platforms": ["Mac"], "languages": ["English(US)"]})
+    );
+    let convert_resp: CoreAudioConvertResponse = serde_json::from_value(json!({
+        "errors": [{"severity": "Error", "message": "Failed"}]
+    }))
+    .unwrap();
+    assert_eq!(convert_resp.errors.len(), 1);
+    assert_eq!(convert_resp.errors[0].severity, LogSeverity::Error);
+
+    let import = CoreAudioImportTabDelimitedArgs::new(
+        "English(US)".to_string(),
+        "createNew".to_string(),
+        "/tmp/import.tsv".to_string(),
+    )
+    .import_location(ObjectRef::guid("{LOC-1}"))
+    .auto_add_to_source_control(false);
+    assert_eq!(
+        serde_json::to_value(import).unwrap(),
+        json!({
+            "importLanguage": "English(US)",
+            "importOperation": "createNew",
+            "importFile": "/tmp/import.tsv",
+            "importLocation": "{LOC-1}",
+            "autoAddToSourceControl": false
+        })
+    );
+
+    let set_plugin = CoreAudioSetConversionPluginArgs::new(
+        ObjectRef::guid("{CONV-1}"),
+        PlatformRef::Name("Mac".to_string()),
+        "PCM".to_string(),
+    );
+    assert_eq!(
+        serde_json::to_value(set_plugin).unwrap(),
+        json!({"conversion": "{CONV-1}", "platform": "Mac", "plugin": "PCM"})
+    );
+}
+
+#[test]
+fn topic_payloads_deserialize() {
+    use waapi_client::api::generated::ak::wwise::core::object::{
+        CoreObjectCreatedPayload, CoreObjectNameChangedPayload, CoreObjectPropertyChangedPayload,
+    };
+    use waapi_client::api::generated::ak::wwise::core::transport::CoreTransportStateChangedPayload;
+    use waapi_client::api::generated::primitives::TransportState;
+
+    let created: CoreObjectCreatedPayload = serde_json::from_value(json!({
+        "object": {"id": "{OBJ-1}", "name": "MySound", "type": "Sound"}
+    }))
+    .unwrap();
+    assert_eq!(created.object.id.as_deref(), Some("{OBJ-1}"));
+    assert_eq!(created.object.name.as_deref(), Some("MySound"));
+
+    let renamed: CoreObjectNameChangedPayload = serde_json::from_value(json!({
+        "object": {"id": "{OBJ-1}", "name": "Renamed"},
+        "newName": "Renamed",
+        "oldName": "MySound"
+    }))
+    .unwrap();
+    assert_eq!(renamed.new_name, "Renamed");
+    assert_eq!(renamed.old_name, "MySound");
+
+    let prop: CoreObjectPropertyChangedPayload = serde_json::from_value(json!({
+        "object": {"id": "{OBJ-1}"},
+        "property": "Volume",
+        "platform": "Mac",
+        "old": -3.0,
+        "new": -6.0
+    }))
+    .unwrap();
+    assert_eq!(prop.property, waapi_client::Property::Volume);
+    assert_eq!(prop.old, json!(-3.0));
+    assert_eq!(prop.new, json!(-6.0));
+
+    let state: CoreTransportStateChangedPayload = serde_json::from_value(json!({
+        "object": "{OBJ-1}",
+        "transport": 42,
+        "state": "playing"
+    }))
+    .unwrap();
+    assert_eq!(state.transport, 42);
+    assert_eq!(state.state, TransportState::Playing);
+    assert!(state.game_object.is_none());
+}
+
+#[test]
+fn remaining_topic_payloads_deserialize() {
+    use waapi_client::api::generated::ak::wwise::core::audio::CoreAudioImportedPayload;
+    use waapi_client::api::generated::ak::wwise::core::log::CoreLogItemAddedPayload;
+    use waapi_client::api::generated::ak::wwise::core::object::{
+        CoreObjectAttenuationCurveChangedPayload, CoreObjectAttenuationCurveLinkChangedPayload,
+        CoreObjectChildAddedPayload, CoreObjectChildRemovedPayload, CoreObjectCurveChangedPayload,
+        CoreObjectNotesChangedPayload, CoreObjectPostDeletedPayload, CoreObjectPreDeletedPayload,
+        CoreObjectReferenceChangedPayload,
+    };
+    use waapi_client::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogItemAddedPayload;
+    use waapi_client::api::generated::ak::wwise::core::profiler::{
+        CoreProfilerGameObjectRegisteredPayload, CoreProfilerGameObjectResetPayload,
+        CoreProfilerGameObjectUnregisteredPayload, CoreProfilerStateChangedPayload,
+        CoreProfilerSwitchChangedPayload,
+    };
+    use waapi_client::api::generated::ak::wwise::core::project::{
+        CoreProjectLoadedPayload, CoreProjectPostClosedPayload, CoreProjectPreClosedPayload,
+        CoreProjectSavedPayload,
+    };
+    use waapi_client::api::generated::ak::wwise::core::soundbank::{
+        CoreSoundbankGeneratedPayload, CoreSoundbankGenerationDonePayload,
+    };
+    use waapi_client::api::generated::ak::wwise::core::switchContainer::{
+        CoreSwitchContainerAssignmentAddedPayload, CoreSwitchContainerAssignmentRemovedPayload,
+    };
+    use waapi_client::api::generated::ak::wwise::debug::DebugAssertFailedPayload;
+    use waapi_client::api::generated::ak::wwise::ui::UiSelectionChangedPayload;
+    use waapi_client::api::generated::ak::wwise::ui::commands::UiCommandsExecutedPayload;
+    use waapi_client::api::generated::ak::wwise::ui::signal::{
+        UiSignalClickPayload, UiSignalTogglePayload,
+    };
+    use waapi_client::api::generated::primitives::{
+        AttenuationCurveType, GameObjectRef, LogChannel, LogSeverity,
+    };
+
+    // object.preDeleted / postDeleted
+    let pre_deleted: CoreObjectPreDeletedPayload =
+        serde_json::from_value(json!({"object": {"id": "{OBJ-1}"}})).unwrap();
+    assert_eq!(pre_deleted.object.id.as_deref(), Some("{OBJ-1}"));
+    let post_deleted: CoreObjectPostDeletedPayload =
+        serde_json::from_value(json!({"object": {"id": "{OBJ-1}"}})).unwrap();
+    assert_eq!(post_deleted.object.id.as_deref(), Some("{OBJ-1}"));
+
+    // object.childAdded / childRemoved
+    let child_added: CoreObjectChildAddedPayload = serde_json::from_value(json!({
+        "parent": {"id": "{PARENT}"},
+        "child": {"id": "{CHILD}"}
+    }))
+    .unwrap();
+    assert_eq!(child_added.parent.id.as_deref(), Some("{PARENT}"));
+    assert_eq!(child_added.child.id.as_deref(), Some("{CHILD}"));
+    let child_removed: CoreObjectChildRemovedPayload = serde_json::from_value(json!({
+        "parent": {"id": "{PARENT}"},
+        "child": {"id": "{CHILD}"}
+    }))
+    .unwrap();
+    assert_eq!(child_removed.parent.id.as_deref(), Some("{PARENT}"));
+    assert_eq!(child_removed.child.id.as_deref(), Some("{CHILD}"));
+
+    // object.notesChanged
+    let notes: CoreObjectNotesChangedPayload = serde_json::from_value(json!({
+        "object": {"id": "{OBJ-1}"},
+        "newNotes": "new note",
+        "oldNotes": "old note"
+    }))
+    .unwrap();
+    assert_eq!(notes.new_notes, "new note");
+    assert_eq!(notes.old_notes, "old note");
+
+    // object.referenceChanged
+    let ref_changed: CoreObjectReferenceChangedPayload = serde_json::from_value(json!({
+        "object": {"id": "{OBJ-1}"},
+        "reference": "OutputBus",
+        "old": {"id": "{OLD}"},
+        "new": {"id": "{NEW}"}
+    }))
+    .unwrap();
+    assert_eq!(ref_changed.reference, "OutputBus");
+    assert_eq!(ref_changed.old.id.as_deref(), Some("{OLD}"));
+    assert_eq!(ref_changed.new.id.as_deref(), Some("{NEW}"));
+    assert!(ref_changed.platform.is_none());
+
+    // object.curveChanged
+    let curve: CoreObjectCurveChangedPayload = serde_json::from_value(json!({
+        "owner": {"id": "{OWNER}"},
+        "notification": "curve updated",
+        "curve": {"id": "{CURVE}"}
+    }))
+    .unwrap();
+    assert_eq!(curve.owner.id.as_deref(), Some("{OWNER}"));
+    assert_eq!(curve.notification, "curve updated");
+    assert_eq!(curve.curve.id.as_deref(), Some("{CURVE}"));
+
+    // object.attenuationCurveChanged / LinkChanged
+    let atten_curve: CoreObjectAttenuationCurveChangedPayload = serde_json::from_value(json!({
+        "curveType": "VolumeDryUsage",
+        "attenuation": {"id": "{ATT}"}
+    }))
+    .unwrap();
+    assert_eq!(atten_curve.curve_type, AttenuationCurveType::VolumeDryUsage);
+    assert_eq!(atten_curve.attenuation.id.as_deref(), Some("{ATT}"));
+    let atten_link: CoreObjectAttenuationCurveLinkChangedPayload = serde_json::from_value(json!({
+        "curveType": "LowPassFilterUsage",
+        "attenuation": {"id": "{ATT2}"}
+    }))
+    .unwrap();
+    assert_eq!(
+        atten_link.curve_type,
+        AttenuationCurveType::LowPassFilterUsage
+    );
+    assert_eq!(atten_link.attenuation.id.as_deref(), Some("{ATT2}"));
+
+    // switchContainer.assignmentAdded / Removed
+    let assignment_added: CoreSwitchContainerAssignmentAddedPayload =
+        serde_json::from_value(json!({
+            "child": {"id": "{CHILD}"},
+            "stateOrSwitch": {"id": "{SOS}"},
+            "switchContainer": {"id": "{SC}"}
+        }))
+        .unwrap();
+    assert_eq!(assignment_added.child.id.as_deref(), Some("{CHILD}"));
+    assert_eq!(
+        assignment_added.state_or_switch.id.as_deref(),
+        Some("{SOS}")
+    );
+    assert_eq!(
+        assignment_added.switch_container.id.as_deref(),
+        Some("{SC}")
+    );
+    let assignment_removed: CoreSwitchContainerAssignmentRemovedPayload =
+        serde_json::from_value(json!({
+            "child": {"id": "{CHILD}"},
+            "stateOrSwitch": {"id": "{SOS}"},
+            "switchContainer": {"id": "{SC}"}
+        }))
+        .unwrap();
+    assert_eq!(
+        assignment_removed.switch_container.id.as_deref(),
+        Some("{SC}")
+    );
+
+    // soundbank.generated
+    let generated: CoreSoundbankGeneratedPayload = serde_json::from_value(json!({
+        "platform": {"id": "{PLAT}"},
+        "soundbank": {"id": "{SB}"},
+        "language": {"id": "{LANG}"},
+        "bankData": {"size": 10},
+        "pluginInfo": {"version": 1},
+        "error": null,
+        "bankInfo": [{"id": "{BI}"}]
+    }))
+    .unwrap();
+    assert_eq!(generated.platform, json!({"id": "{PLAT}"}));
+    assert_eq!(generated.soundbank.id.as_deref(), Some("{SB}"));
+    assert_eq!(generated.language, Some(json!({"id": "{LANG}"})));
+    assert_eq!(generated.bank_data, Some(json!({"size": 10})));
+    assert_eq!(generated.plugin_info, Some(json!({"version": 1})));
+    assert!(generated.error.is_none());
+    assert_eq!(generated.bank_info, vec![json!({"id": "{BI}"})]);
+
+    // soundbank.generationDone
+    let generation_done: CoreSoundbankGenerationDonePayload = serde_json::from_value(json!({
+        "logs": [{
+            "severity": "Message",
+            "time": 123,
+            "messageId": "M-1",
+            "message": "hello",
+            "platform": {"id": "{PLAT}"},
+            "parameters": ["a", "b"]
+        }],
+        "error": null
+    }))
+    .unwrap();
+    assert_eq!(generation_done.logs.len(), 1);
+    assert_eq!(generation_done.logs[0].severity, LogSeverity::Message);
+    assert_eq!(generation_done.logs[0].time, 123);
+    assert_eq!(generation_done.logs[0].message_id, "M-1");
+    assert!(generation_done.error.is_none());
+
+    // project empty payloads
+    let _pre_closed: CoreProjectPreClosedPayload = serde_json::from_value(json!({})).unwrap();
+    let _loaded: CoreProjectLoadedPayload = serde_json::from_value(json!({})).unwrap();
+    let _post_closed: CoreProjectPostClosedPayload = serde_json::from_value(json!({})).unwrap();
+
+    // project.saved
+    let saved: CoreProjectSavedPayload =
+        serde_json::from_value(json!({"modifiedPaths": ["/a.wproj", "/b.wwu"]})).unwrap();
+    assert_eq!(saved.modified_paths, vec!["/a.wproj", "/b.wwu"]);
+
+    // audio.imported
+    let imported: CoreAudioImportedPayload = serde_json::from_value(json!({
+        "files": ["a.wav"],
+        "operation": "createNew",
+        "objects": [{"id": "{OBJ-1}"}]
+    }))
+    .unwrap();
+    assert_eq!(imported.files, vec!["a.wav"]);
+    assert_eq!(imported.operation, "createNew");
+    assert_eq!(imported.objects[0].id.as_deref(), Some("{OBJ-1}"));
+
+    // log.itemAdded
+    let log_item: CoreLogItemAddedPayload = serde_json::from_value(json!({
+        "channel": "soundbankGenerate",
+        "item": {
+            "severity": "Warning",
+            "time": 5,
+            "messageId": "M-2",
+            "message": "warn"
+        }
+    }))
+    .unwrap();
+    assert_eq!(log_item.channel, LogChannel::SoundbankGenerate);
+    assert_eq!(log_item.item.severity, LogSeverity::Warning);
+    assert_eq!(log_item.item.message, "warn");
+
+    // profiler.gameObjectRegistered / Unregistered
+    let registered: CoreProfilerGameObjectRegisteredPayload = serde_json::from_value(json!({
+        "time": 10,
+        "gameObjectId": 1001,
+        "gameObjectName": "Emitter"
+    }))
+    .unwrap();
+    assert_eq!(registered.time, 10);
+    assert!(matches!(registered.game_object_id, GameObjectRef::Id(1001)));
+    assert_eq!(registered.game_object_name, "Emitter");
+    let unregistered: CoreProfilerGameObjectUnregisteredPayload = serde_json::from_value(json!({
+        "time": 11,
+        "gameObjectId": 1002,
+        "gameObjectName": "Listener"
+    }))
+    .unwrap();
+    assert!(matches!(
+        unregistered.game_object_id,
+        GameObjectRef::Id(1002)
+    ));
+
+    // profiler.gameObjectReset (empty)
+    let _reset: CoreProfilerGameObjectResetPayload = serde_json::from_value(json!({})).unwrap();
+
+    // profiler.stateChanged
+    let state_changed: CoreProfilerStateChangedPayload = serde_json::from_value(json!({
+        "state": {"id": "{S1}"},
+        "stateGroup": {"id": "{SG1}"}
+    }))
+    .unwrap();
+    assert_eq!(state_changed.state.id.as_deref(), Some("{S1}"));
+    assert_eq!(state_changed.state_group.id.as_deref(), Some("{SG1}"));
+
+    // profiler.switchChanged
+    let switch_changed: CoreProfilerSwitchChangedPayload = serde_json::from_value(json!({
+        "gameObjectID": 42,
+        "switchGroup": {"id": "{SG2}"},
+        "switch": {"id": "{SW2}"}
+    }))
+    .unwrap();
+    assert_eq!(switch_changed.game_object_id, 42);
+    assert_eq!(switch_changed.switch_group.id.as_deref(), Some("{SG2}"));
+    assert_eq!(switch_changed.switch.id.as_deref(), Some("{SW2}"));
+
+    // profiler.captureLog.itemAdded
+    let capture_log: CoreProfilerCaptureLogItemAddedPayload = serde_json::from_value(json!({
+        "type": "StateChanged",
+        "severity": "Normal",
+        "objectName": "MyObj",
+        "time": 20,
+        "gameObjectId": 1001,
+        "gameObjectName": "Emitter",
+        "playingId": 7,
+        "description": "desc",
+        "objectId": "{OBJ-1}",
+        "objectShortId": 9,
+        "errorCodeName": "None"
+    }))
+    .unwrap();
+    assert_eq!(capture_log.object_type, "StateChanged");
+    assert_eq!(capture_log.severity, "Normal");
+    assert_eq!(capture_log.object_name.as_deref(), Some("MyObj"));
+    assert_eq!(capture_log.time, 20);
+    assert!(matches!(
+        capture_log.game_object_id,
+        Some(GameObjectRef::Id(1001))
+    ));
+    assert_eq!(capture_log.game_object_name.as_deref(), Some("Emitter"));
+    assert_eq!(capture_log.playing_id, Some(7));
+    assert_eq!(capture_log.description, "desc");
+    assert_eq!(capture_log.object_id.as_deref(), Some("{OBJ-1}"));
+    assert_eq!(capture_log.object_short_id, Some(9));
+    assert_eq!(capture_log.error_code_name.as_deref(), Some("None"));
+
+    // debug.assertFailed
+    let assert_failed: DebugAssertFailedPayload = serde_json::from_value(json!({
+        "message": "boom",
+        "fileName": "x.cpp",
+        "expression": "a == b",
+        "lineNumber": 12,
+        "callstack": "stack"
+    }))
+    .unwrap();
+    assert_eq!(assert_failed.message.as_deref(), Some("boom"));
+    assert_eq!(assert_failed.file_name, "x.cpp");
+    assert_eq!(assert_failed.expression, "a == b");
+    assert_eq!(assert_failed.line_number, 12.0);
+    assert_eq!(assert_failed.callstack, "stack");
+
+    // ui.selectionChanged
+    let selection: UiSelectionChangedPayload = serde_json::from_value(json!({
+        "objects": [{"id": "{A}"}, {"id": "{B}"}]
+    }))
+    .unwrap();
+    assert_eq!(selection.objects.len(), 2);
+    assert_eq!(selection.objects[0].id.as_deref(), Some("{A}"));
+
+    // ui.commands.executed
+    let commands: UiCommandsExecutedPayload = serde_json::from_value(json!({
+        "platforms": ["{GUID1}", "Mac"],
+        "command": "Run",
+        "objects": [{"id": "{C}"}]
+    }))
+    .unwrap();
+    assert_eq!(commands.platforms.len(), 2);
+    assert!(
+        matches!(&commands.platforms[0], waapi_client::api::PlatformRef::Guid(s) if s == "{GUID1}")
+    );
+    assert!(
+        matches!(&commands.platforms[1], waapi_client::api::PlatformRef::Name(s) if s == "Mac")
+    );
+    assert_eq!(commands.command, "Run");
+    assert_eq!(commands.objects[0].id.as_deref(), Some("{C}"));
+
+    // ui.signal.click / toggle
+    let click: UiSignalClickPayload =
+        serde_json::from_value(json!({"handleID": "H1", "widgetID": "W1"})).unwrap();
+    assert_eq!(click.handle_id, "H1");
+    assert_eq!(click.widget_id, "W1");
+    let toggle: UiSignalTogglePayload =
+        serde_json::from_value(json!({"handleID": "H2", "widgetID": "W2"})).unwrap();
+    assert_eq!(toggle.handle_id, "H2");
+    assert_eq!(toggle.widget_id, "W2");
+}

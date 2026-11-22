@@ -10,8 +10,7 @@ use crate::api::generated::primitives::*;
 pub struct CoreGetProjectInfoResponse {
     /// Project id.
     pub id: String,
-    /// The Project name
-    /// Note that the Project name can differ from the WPROJ file name, if the file was renamed after Project creation.
+    /// The Project name. Note that the Project name can differ from the WPROJ file name, if the file was renamed after Project creation.
     pub name: String,
     /// The absolute path to the WPROJ file.
     pub path: String,

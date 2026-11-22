@@ -12,12 +12,10 @@ pub struct CoreObjectSetReferenceArgs {
     pub object: ObjectRef,
     /// The ID (GUID), name, path or definition of the object to be referred to.
     pub value: ObjectRef,
-    /// The ID (GUID) or unique name of the platform to link the reference
-    /// Set to null-guid for unlinked reference.
+    /// The ID (GUID) or unique name of the platform to link the reference. Set to null-guid for unlinked reference.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
-    /// The name of the reference to set
-    /// Refer to for more information on the references available.
+    /// The name of the reference to set. Refer to for more information on the references available.
     pub reference: Property,
 }
 

@@ -11,8 +11,7 @@ pub struct CoreObjectCreateArgs {
     /// For internal use only! The ID (GUID) to assign to the newly created Object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    /// The type of the new object
-    /// Refer to for possible object types.
+    /// The type of the new object. Refer to for possible object types.
     #[serde(rename = "type")]
     pub object_type: ObjectType,
     /// The name of the new object.
@@ -22,26 +21,21 @@ pub struct CoreObjectCreateArgs {
     pub notes: Option<String>,
     /// The ID (GUID), name, or path of the parent of the new object.
     pub parent: ObjectRef,
-    /// The name of the list in which to insert the object
-    /// If this argument is set, the object gets inserted in a list owned by the parent and not as a child.
+    /// The name of the list in which to insert the object. If this argument is set, the object gets inserted in a list owned by the parent and not as a child.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<ChildObject>>,
-    /// The ID (GUID) or unique name of the platform used when setting properties via this command
-    /// Not specifying a platform sets the value for all linked platforms.
+    /// The ID (GUID) or unique name of the platform used when setting properties via this command. Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
-    /// Determines if Wwise automatically performs an Add source control operation for affected work units
-    /// Defaults to true.
+    /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
     #[serde(
         rename = "autoAddToSourceControl",
         skip_serializing_if = "Option::is_none"
     )]
     pub auto_add_to_source_control: Option<bool>,
-    /// The action to take if "parent" already has a child with the same name
-    /// Default value is "fail"
-    /// Refer to for more information.
+    /// The action to take if "parent" already has a child with the same name. Default value is "fail". Refer to for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
     #[serde(flatten)]

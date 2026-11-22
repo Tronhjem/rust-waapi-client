@@ -8,8 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.transport.useOriginals`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreTransportUseOriginalsArgs {
-    /// If true, all playback will use original wav files
-    /// If false all playback will use converted files.
+    /// If true, all playback will use original wav files. If false all playback will use converted files.
     pub enable: bool,
 }
 

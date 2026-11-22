@@ -5,4 +5,7 @@ mod bring_to_foreground;
 pub mod commands;
 mod get_selected_objects;
 pub mod project;
+pub mod signal;
 pub use get_selected_objects::{UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse};
+mod selection_changed;
+pub use selection_changed::{UiSelectionChangedOptions, UiSelectionChangedPayload};

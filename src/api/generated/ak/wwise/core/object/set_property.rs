@@ -12,13 +12,9 @@ pub struct CoreObjectSetPropertyArgs {
     pub object: ObjectRef,
     /// The value of the object.
     pub value: PropertyValue,
-    /// The name of the property
-    /// For more information, refer to the property list of Wwise Objects listed in .
+    /// The name of the property. For more information, refer to the property list of Wwise Objects listed in .
     pub property: Property,
-    /// The ID (GUID) or unique name of the platform
-    /// This is used to set values for unlinked properties
-    /// This is an optional argument
-    /// When not specified, the current platform is used to set the property.
+    /// The ID (GUID) or unique name of the platform. This is used to set values for unlinked properties. This is an optional argument. When not specified, the current platform is used to set the property.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
 }

@@ -12,8 +12,7 @@ pub struct CoreObjectSetAttenuationCurveArgs {
     pub points: Vec<CurvePoint2D>,
     /// The ID (GUID), name, or path of attenuation object.
     pub object: ObjectRef,
-    /// The ID (GUID) or unique name of the platform to set curves
-    /// Set to null-guid for unlinked curve.
+    /// The ID (GUID) or unique name of the platform to set curves. Set to null-guid for unlinked curve.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
     /// The type of attenuation curve.

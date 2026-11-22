@@ -148,7 +148,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 
 ### 5. Currently Generated Typed Endpoints
 
-The following 46 endpoints currently have generated typed structs and chained methods under `waapi_client::api::generated`:
+The following 93 functions and 34 topics currently have generated typed structs, chained call methods, and typed `subscribe_*` methods under `waapi_client::api::generated`:
 
 | WAAPI URI | Chained Method on `WaapiClient` | `Args` Type | `Options` Type | `Response` Type |
 |---|---|---|---|---|
@@ -198,10 +198,100 @@ The following 46 endpoints currently have generated typed structs and chained me
 | `ak.soundengine.unregisterGameObj` | `client.soundengine().unregister_game_obj(args)` | `SoundengineUnregisterGameObjArgs` | — | `()` |
 | `ak.soundengine.setPosition` | `client.soundengine().set_position(args)` | `SoundengineSetPositionArgs` (`Position`, `Vector3`) | — | `()` |
 | `ak.soundengine.setDefaultListeners` | `client.soundengine().set_default_listeners(args)` | `SoundengineSetDefaultListenersArgs` | — | `()` |
+| `ak.soundengine.setSwitch` | `client.soundengine().set_switch(args)` | `SoundengineSetSwitchArgs` | — | `()` |
+| `ak.soundengine.setState` | `client.soundengine().set_state(args)` | `SoundengineSetStateArgs` | — | `()` |
+| `ak.soundengine.getSwitch` | `client.soundengine().get_switch(args, options)` | `SoundengineGetSwitchArgs` | `SoundengineGetSwitchOptions` | `SoundengineGetSwitchResponse` (`WwiseObject`) |
+| `ak.soundengine.getState` | `client.soundengine().get_state(args, options)` | `SoundengineGetStateArgs` | `SoundengineGetStateOptions` | `SoundengineGetStateResponse` (`WwiseObject`) |
+| `ak.soundengine.loadBank` | `client.soundengine().load_bank(args)` | `SoundengineLoadBankArgs` | — | `()` |
+| `ak.soundengine.unloadBank` | `client.soundengine().unload_bank(args)` | `SoundengineUnloadBankArgs` | — | `()` |
+| `ak.soundengine.stopAll` | `client.soundengine().stop_all(args)` | `SoundengineStopAllArgs` | — | `()` |
+| `ak.soundengine.stopPlayingID` | `client.soundengine().stop_playing_id(args)` | `SoundengineStopPlayingIdArgs` (`AkCurveInterpolation`) | — | `()` |
+| `ak.soundengine.seekOnEvent` | `client.soundengine().seek_on_event(args)` | `SoundengineSeekOnEventArgs` | — | `()` |
+| `ak.soundengine.setListeners` | `client.soundengine().set_listeners(args)` | `SoundengineSetListenersArgs` | — | `()` |
+| `ak.soundengine.setListenerSpatialization` | `client.soundengine().set_listener_spatialization(args)` | `SoundengineSetListenerSpatializationArgs` | — | `()` |
+| `ak.soundengine.setMultiplePositions` | `client.soundengine().set_multiple_positions(args)` | `SoundengineSetMultiplePositionsArgs` (`MultiPosition`, `MultiPositionType`) | — | `()` |
+| `ak.soundengine.setGameObjectAuxSendValues` | `client.soundengine().set_game_object_aux_send_values(args)` | `SoundengineSetGameObjectAuxSendValuesArgs` (`AuxSendValue`) | — | `()` |
+| `ak.soundengine.setGameObjectOutputBusVolume` | `client.soundengine().set_game_object_output_bus_volume(args)` | `SoundengineSetGameObjectOutputBusVolumeArgs` | — | `()` |
+| `ak.soundengine.setObjectObstructionAndOcclusion` | `client.soundengine().set_object_obstruction_and_occlusion(args)` | `SoundengineSetObjectObstructionAndOcclusionArgs` | — | `()` |
+| `ak.soundengine.setScalingFactor` | `client.soundengine().set_scaling_factor(args)` | `SoundengineSetScalingFactorArgs` | — | `()` |
+| `ak.soundengine.executeActionOnEvent` | `client.soundengine().execute_action_on_event(args)` | `SoundengineExecuteActionOnEventArgs` (`ActionOnEventType`, `AkCurveInterpolation`) | — | `()` |
+| `ak.soundengine.postTrigger` | `client.soundengine().post_trigger(args)` | `SoundenginePostTriggerArgs` | — | `()` |
+| `ak.soundengine.postMsgMonitor` | `client.soundengine().post_msg_monitor(args)` | `SoundenginePostMsgMonitorArgs` | — | `()` |
+| `ak.soundengine.resetRTPCValue` | `client.soundengine().reset_rtpc_value(args)` | `SoundengineResetRtpcValueArgs` | — | `()` |
+| `ak.wwise.core.object.getPropertyAndReferenceNames` | `client.wwise().core().object().get_property_and_reference_names(args)` | `CoreObjectGetPropertyAndReferenceNamesArgs` | — | `CoreObjectGetPropertyAndReferenceNamesResponse` |
+| `ak.wwise.core.object.getPropertyInfo` | `client.wwise().core().object().get_property_info(args)` | `CoreObjectGetPropertyInfoArgs` | — | `CoreObjectGetPropertyInfoResponse` (`PropertyInfoSupports`) |
+| `ak.wwise.core.object.getTypes` | `client.wwise().core().object().get_types()` | — | — | `CoreObjectGetTypesResponse` (`WwiseObjectTypeInfo`) |
+| `ak.wwise.core.object.isLinked` | `client.wwise().core().object().is_linked(args)` | `CoreObjectIsLinkedArgs` | — | `CoreObjectIsLinkedResponse` |
+| `ak.wwise.core.object.isPropertyEnabled` | `client.wwise().core().object().is_property_enabled(args)` | `CoreObjectIsPropertyEnabledArgs` | — | `CoreObjectIsPropertyEnabledResponse` |
+| `ak.wwise.core.object.setLinked` | `client.wwise().core().object().set_linked(args)` | `CoreObjectSetLinkedArgs` | — | `()` |
+| `ak.wwise.core.object.setStateGroups` | `client.wwise().core().object().set_state_groups(args)` | `CoreObjectSetStateGroupsArgs` | — | `()` |
+| `ak.wwise.core.object.setStateProperties` | `client.wwise().core().object().set_state_properties(args)` | `CoreObjectSetStatePropertiesArgs` | — | `()` |
+| `ak.wwise.core.sound.setActiveSource` | `client.wwise().core().sound().set_active_source(args)` | `CoreSoundSetActiveSourceArgs` | — | `()` |
+| `ak.wwise.core.gameParameter.setRange` | `client.wwise().core().game_parameter().set_range(args)` | `CoreGameParameterSetRangeArgs` (`OnCurveUpdate`) | — | `()` |
+| `ak.wwise.core.ping` | `client.wwise().core().ping()` | — | — | `CorePingResponse` |
+| `ak.wwise.core.blendContainer.addAssignment` | `client.wwise().core().blend_container().add_assignment(args)` | `CoreBlendContainerAddAssignmentArgs` (`BlendEdge`) | — | `CoreBlendContainerAddAssignmentResponse` |
+| `ak.wwise.core.blendContainer.addTrack` | `client.wwise().core().blend_container().add_track(args)` | `CoreBlendContainerAddTrackArgs` | — | `CoreBlendContainerAddTrackResponse` |
+| `ak.wwise.core.blendContainer.getAssignments` | `client.wwise().core().blend_container().get_assignments(args)` | `CoreBlendContainerGetAssignmentsArgs` | — | `CoreBlendContainerGetAssignmentsResponse` (`BlendTrackAssignment`) |
+| `ak.wwise.core.blendContainer.removeAssignment` | `client.wwise().core().blend_container().remove_assignment(args)` | `CoreBlendContainerRemoveAssignmentArgs` | — | `()` |
+| `ak.wwise.core.soundbank.convertExternalSources` | `client.wwise().core().soundbank().convert_external_sources(args)` | `CoreSoundbankConvertExternalSourcesArgs` (`ExternalSourceInfo`) | — | `()` |
+| `ak.wwise.core.soundbank.generate` | `client.wwise().core().soundbank().generate(args)` | `CoreSoundbankGenerateArgs` (`SoundBankInfo`) | — | `CoreSoundbankGenerateResponse` (`LogCentralItem`) |
+| `ak.wwise.core.soundbank.getInclusions` | `client.wwise().core().soundbank().get_inclusions(args)` | `CoreSoundbankGetInclusionsArgs` | — | `CoreSoundbankGetInclusionsResponse` (`SoundBankInclusion`) |
+| `ak.wwise.core.soundbank.processDefinitionFiles` | `client.wwise().core().soundbank().process_definition_files(args)` | `CoreSoundbankProcessDefinitionFilesArgs` | — | `()` |
+| `ak.wwise.core.soundbank.setInclusions` | `client.wwise().core().soundbank().set_inclusions(args)` | `CoreSoundbankSetInclusionsArgs` (`SoundBankInclusion`, `SoundBankInclusionOperation`) | — | `()` |
+| `ak.wwise.core.audio.convert` | `client.wwise().core().audio().convert(args)` | `CoreAudioConvertArgs` | — | `CoreAudioConvertResponse` (`AudioConvertError`) |
+| `ak.wwise.core.audio.importTabDelimited` | `client.wwise().core().audio().import_tab_delimited(args, options)` | `CoreAudioImportTabDelimitedArgs` | `CoreAudioImportTabDelimitedOptions` | `CoreAudioImportTabDelimitedResponse` |
+| `ak.wwise.core.audio.mute` | `client.wwise().core().audio().mute(args)` | `CoreAudioMuteArgs` | — | `()` |
+| `ak.wwise.core.audio.resetMute` | `client.wwise().core().audio().reset_mute()` | — | — | `()` |
+| `ak.wwise.core.audio.resetSolo` | `client.wwise().core().audio().reset_solo()` | — | — | `()` |
+| `ak.wwise.core.audio.setConversionPlugin` | `client.wwise().core().audio().set_conversion_plugin(args)` | `CoreAudioSetConversionPluginArgs` | — | `()` |
+| `ak.wwise.core.audio.solo` | `client.wwise().core().audio().solo(args)` | `CoreAudioSoloArgs` | — | `()` |
 
-All generated modules live under `waapi_client::api::generated::ak` (e.g. `ak::wwise::core::object`, `ak::wwise::core::transport`, `ak::wwise::core::undo`, `ak::wwise::core::switchContainer`, `ak::wwise::ui::commands`).
+All generated modules live under `waapi_client::api::generated::ak` (e.g. `ak::wwise::core::object`, `ak::wwise::core::transport`, `ak::wwise::core::undo`, `ak::wwise::core::switchContainer`, `ak::wwise::core::soundbank`, `ak::wwise::ui::commands`).
 
-For any of the 170 WAAPI functions or 34 topics not yet in the table above, use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
+#### Typed Topics
+
+Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*` chained method returning `WaapiResult<(u64, UnboundedReceiver<Payload>)>`:
+
+| Topic URI | Subscribe Method | Payload |
+|---|---|---|
+| `ak.wwise.core.object.created` | `client.wwise().core().object().subscribe_created(opts)` | `CoreObjectCreatedPayload` (`object`) |
+| `ak.wwise.core.object.preDeleted` | `client.wwise().core().object().subscribe_pre_deleted(opts)` | `CoreObjectPreDeletedPayload` (`object`) |
+| `ak.wwise.core.object.postDeleted` | `client.wwise().core().object().subscribe_post_deleted(opts)` | `CoreObjectPostDeletedPayload` (`object`) |
+| `ak.wwise.core.object.childAdded` | `client.wwise().core().object().subscribe_child_added(opts)` | `CoreObjectChildAddedPayload` (`parent`, `child`) |
+| `ak.wwise.core.object.childRemoved` | `client.wwise().core().object().subscribe_child_removed(opts)` | `CoreObjectChildRemovedPayload` (`parent`, `child`) |
+| `ak.wwise.core.object.nameChanged` | `client.wwise().core().object().subscribe_name_changed(opts)` | `CoreObjectNameChangedPayload` (`object`, `newName`, `oldName`) |
+| `ak.wwise.core.object.notesChanged` | `client.wwise().core().object().subscribe_notes_changed(opts)` | `CoreObjectNotesChangedPayload` (`object`, `newNotes`, `oldNotes`) |
+| `ak.wwise.core.object.propertyChanged` | `client.wwise().core().object().subscribe_property_changed(opts)` | `CoreObjectPropertyChangedPayload` (`object`, `property`, `old`, `new`) |
+| `ak.wwise.core.object.referenceChanged` | `client.wwise().core().object().subscribe_reference_changed(opts)` | `CoreObjectReferenceChangedPayload` |
+| `ak.wwise.core.object.curveChanged` | `client.wwise().core().object().subscribe_curve_changed(opts)` | `CoreObjectCurveChangedPayload` |
+| `ak.wwise.core.object.attenuationCurveChanged` | `client.wwise().core().object().subscribe_attenuation_curve_changed(opts)` | `CoreObjectAttenuationCurveChangedPayload` (`curveType`) |
+| `ak.wwise.core.object.attenuationCurveLinkChanged` | `client.wwise().core().object().subscribe_attenuation_curve_link_changed(opts)` | `CoreObjectAttenuationCurveLinkChangedPayload` (`curveType`) |
+| `ak.wwise.core.switchContainer.assignmentAdded` | `client.wwise().core().switch_container().subscribe_assignment_added(opts)` | `CoreSwitchContainerAssignmentAddedPayload` |
+| `ak.wwise.core.switchContainer.assignmentRemoved` | `client.wwise().core().switch_container().subscribe_assignment_removed(opts)` | `CoreSwitchContainerAssignmentRemovedPayload` |
+| `ak.wwise.core.transport.stateChanged` | `client.wwise().core().transport().subscribe_state_changed(opts)` | `CoreTransportStateChangedPayload` (`state`) |
+| `ak.wwise.core.soundbank.generated` | `client.wwise().core().soundbank().subscribe_generated(opts)` | `CoreSoundbankGeneratedPayload` |
+| `ak.wwise.core.soundbank.generationDone` | `client.wwise().core().soundbank().subscribe_generation_done(opts)` | `CoreSoundbankGenerationDonePayload` (`logs`, `error`) |
+| `ak.wwise.core.project.preClosed` | `client.wwise().core().project().subscribe_pre_closed(opts)` | `CoreProjectPreClosedPayload` |
+| `ak.wwise.core.project.loaded` | `client.wwise().core().project().subscribe_loaded(opts)` | `CoreProjectLoadedPayload` |
+| `ak.wwise.core.project.postClosed` | `client.wwise().core().project().subscribe_post_closed(opts)` | `CoreProjectPostClosedPayload` |
+| `ak.wwise.core.project.saved` | `client.wwise().core().project().subscribe_saved(opts)` | `CoreProjectSavedPayload` (`modifiedPaths`) |
+| `ak.wwise.core.audio.imported` | `client.wwise().core().audio().subscribe_imported(opts)` | `CoreAudioImportedPayload` (`files`, `objects`) |
+| `ak.wwise.core.log.itemAdded` | `client.wwise().core().log().subscribe_item_added(opts)` | `CoreLogItemAddedPayload` (`channel`, `item`) |
+| `ak.wwise.core.profiler.gameObjectRegistered` | `client.wwise().core().profiler().subscribe_game_object_registered(opts)` | `CoreProfilerGameObjectRegisteredPayload` |
+| `ak.wwise.core.profiler.gameObjectUnregistered` | `client.wwise().core().profiler().subscribe_game_object_unregistered(opts)` | `CoreProfilerGameObjectUnregisteredPayload` |
+| `ak.wwise.core.profiler.gameObjectReset` | `client.wwise().core().profiler().subscribe_game_object_reset(opts)` | `CoreProfilerGameObjectResetPayload` |
+| `ak.wwise.core.profiler.stateChanged` | `client.wwise().core().profiler().subscribe_state_changed(opts)` | `CoreProfilerStateChangedPayload` |
+| `ak.wwise.core.profiler.switchChanged` | `client.wwise().core().profiler().subscribe_switch_changed(opts)` | `CoreProfilerSwitchChangedPayload` |
+| `ak.wwise.core.profiler.captureLog.itemAdded` | `client.wwise().core().profiler().capture_log().subscribe_item_added(opts)` | `CoreProfilerCaptureLogItemAddedPayload` |
+| `ak.wwise.debug.assertFailed` | `client.wwise().debug().subscribe_assert_failed(opts)` | `DebugAssertFailedPayload` |
+| `ak.wwise.ui.selectionChanged` | `client.wwise().ui().subscribe_selection_changed(opts)` | `UiSelectionChangedPayload` (`objects`) |
+| `ak.wwise.ui.commands.executed` | `client.wwise().ui().commands().subscribe_executed(opts)` | `UiCommandsExecutedPayload` |
+| `ak.wwise.ui.signal.click` | `client.wwise().ui().signal().subscribe_click(opts)` | `UiSignalClickPayload` |
+| `ak.wwise.ui.signal.toggle` | `client.wwise().ui().signal().subscribe_toggle(opts)` | `UiSignalTogglePayload` |
+
+Topic `opts` is `Option<XxxOptions>`; most options structs offer `.return_(Vec<ObjectReturnField>)` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
+
+For any of the 170 WAAPI functions not yet in the table above (the ~77 remaining raw-JSON endpoints, e.g. `ui.layout.*`, `debug.*`, `waapi.*`, `sourceControl.*`, `remote.*`, `profiler.*`, `audioSourcePeaks.*`, `log.*`), use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 
 ### Specifying Return Fields
 

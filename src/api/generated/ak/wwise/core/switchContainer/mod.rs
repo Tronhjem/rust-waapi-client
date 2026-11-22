@@ -3,6 +3,14 @@
 
 mod add_assignment;
 pub use add_assignment::CoreSwitchContainerAddAssignmentArgs;
+mod assignment_added;
+pub use assignment_added::{
+    CoreSwitchContainerAssignmentAddedOptions, CoreSwitchContainerAssignmentAddedPayload,
+};
+mod assignment_removed;
+pub use assignment_removed::{
+    CoreSwitchContainerAssignmentRemovedOptions, CoreSwitchContainerAssignmentRemovedPayload,
+};
 mod get_assignments;
 pub use get_assignments::{
     CoreSwitchContainerGetAssignmentsArgs, CoreSwitchContainerGetAssignmentsResponse,

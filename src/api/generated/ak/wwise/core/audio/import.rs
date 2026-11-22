@@ -8,15 +8,13 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.audio.import`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreAudioImportArgs {
-    /// Determines if Wwise automatically performs a source control Add operation on the imported files
-    /// Defaults to true.
+    /// Determines if Wwise automatically performs a source control Add operation on the imported files. Defaults to true.
     #[serde(
         rename = "autoAddToSourceControl",
         skip_serializing_if = "Option::is_none"
     )]
     pub auto_add_to_source_control: Option<bool>,
-    /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files
-    /// Defaults to true.
+    /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files. Defaults to true.
     #[serde(
         rename = "autoCheckOutToSourceControl",
         skip_serializing_if = "Option::is_none"
@@ -26,8 +24,7 @@ pub struct CoreAudioImportArgs {
     pub import_operation: Option<ImportOperation>,
     /// Array of import commands.
     pub imports: Vec<ImportItem>,
-    /// Default values for each item in "imports"
-    /// Use this object to avoid repeating common properties of every imported element.
+    /// Default values for each item in "imports". Use this object to avoid repeating common properties of every imported element.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<ImportDefaults>,
 }

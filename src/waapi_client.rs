@@ -206,6 +206,45 @@ impl WaapiClient {
         self.subscribe(topic, options).await
     }
 
+    /// Type-safe WAAPI subscription that deserializes each event into a typed
+    /// payload.
+    ///
+    /// The WAAPI topic payload (the single object in `event.kwargs`) is
+    /// deserialized into `Payload`. Events whose payload fails to deserialize
+    /// are logged and skipped rather than propagated.
+    pub async fn subscribe_payload<Options, Payload>(
+        &mut self,
+        topic: WaapiTopic,
+        options: Option<Options>,
+    ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Payload>)>
+    where
+        Options: serde::Serialize,
+        Payload: serde::de::DeserializeOwned + Send + 'static,
+    {
+        let (id, mut event_rx) = self.subscribe_typed(topic, options).await?;
+        let (tx, rx) = mpsc::unbounded_channel();
+        tokio::spawn(async move {
+            while let Some(event) = event_rx.recv().await {
+                let kwargs = if event.kwargs.is_null() {
+                    serde_json::Value::Object(serde_json::Map::new())
+                } else {
+                    event.kwargs
+                };
+                match serde_json::from_value::<Payload>(kwargs) {
+                    Ok(payload) => {
+                        if tx.send(payload).is_err() {
+                            break;
+                        }
+                    }
+                    Err(err) => {
+                        log::warn!("failed to deserialize WAAPI topic payload: {err}");
+                    }
+                }
+            }
+        });
+        Ok((id, rx))
+    }
+
     /// Unsubscribe from a previously subscribed topic.
     pub async fn unsubscribe(&mut self, subscription_id: u64) -> WaapiResult<()> {
         self.wamp

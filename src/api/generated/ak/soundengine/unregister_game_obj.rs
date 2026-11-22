@@ -8,9 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.soundengine.unregisterGameObj`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineUnregisterGameObjArgs {
-    /// ID of the game object to be unregistered
-    /// Valid range is [0, 0xFFFFFFFFFFFFFFDF]
-    /// Use \c AK_INVALID_GAME_OBJECT to unregister all game objects.
+    /// ID of the game object to be unregistered. Valid range is [0, 0xFFFFFFFFFFFFFFDF]. Use \c AK_INVALID_GAME_OBJECT to unregister all game objects.
     #[serde(rename = "gameObject")]
     pub game_object: GameObjectRef,
 }

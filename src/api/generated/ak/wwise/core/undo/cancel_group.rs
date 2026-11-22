@@ -8,8 +8,7 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.core.undo.cancelGroup`.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreUndoCancelGroupArgs {
-    /// Specify if the operations are undone
-    /// False when not specified.
+    /// Specify if the operations are undone. False when not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub undo: Option<bool>,
 }

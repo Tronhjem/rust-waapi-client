@@ -8,12 +8,9 @@ use crate::api::generated::primitives::*;
 /// Arguments for `ak.wwise.ui.project.open`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiProjectOpenArgs {
-    /// The path to the project WPROJ file
-    /// For using WAAPI on Mac, please refer to .
+    /// The path to the project WPROJ file. For using WAAPI on Mac, please refer to .
     pub path: String,
-    /// (DEPRECATED) The action to be executed when opening a project that needs to be upgraded
-    /// Note, this is deprecated
-    /// Please use onMigrationRequired instead.
+    /// (DEPRECATED) The action to be executed when opening a project that needs to be upgraded. Note, this is deprecated. Please use onMigrationRequired instead.
     #[serde(rename = "onUpgrade", skip_serializing_if = "Option::is_none")]
     pub on_upgrade: Option<ProjectMigrationAction>,
     /// The action to be executed when opening a project that needs to be migrated.
@@ -22,12 +19,10 @@ pub struct UiProjectOpenArgs {
         skip_serializing_if = "Option::is_none"
     )]
     pub on_migration_required: Option<ProjectMigrationAction>,
-    /// Indicates if the user should not be prompted to save the current project
-    /// Defaults to true.
+    /// Indicates if the user should not be prompted to save the current project. Defaults to true.
     #[serde(rename = "bypassSave", skip_serializing_if = "Option::is_none")]
     pub bypass_save: Option<bool>,
-    /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project
-    /// Defaults to true.
+    /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     #[serde(
         rename = "autoCheckOutToSourceControl",
         skip_serializing_if = "Option::is_none"
