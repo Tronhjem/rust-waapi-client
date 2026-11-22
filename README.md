@@ -1,9 +1,11 @@
 # wwise-waapi
 
+[![Docs (GitHub Pages)](https://img.shields.io/badge/docs-github%20pages-blue)](https://tronhjem.github.io/rust-waapi-client/wwise_waapi/)
 [![docs.rs](https://docs.rs/wwise-waapi/badge.svg)](https://docs.rs/wwise-waapi)
 
 Async, typed Rust client for the Wwise Authoring API (WAAPI).
-More information about WAAPI can be found here: https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
+- **API Documentation (Rustdoc):** https://tronhjem.github.io/rust-waapi-client/wwise_waapi/
+- **Wwise WAAPI Reference:** https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
 This crate ships with a small, private WAMP v2 client that speaks JSON over WebSocket. It is no longer dependent on an external `wampire` submodule.
 

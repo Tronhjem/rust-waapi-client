@@ -1,0 +1,56 @@
+name: Docs
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy-docs:
+    name: Build & Deploy Rustdoc to GitHub Pages
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build rustdoc
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: |
+          cargo doc --no-deps
+          touch target/doc/.nojekyll
+          cat << 'EOF' > target/doc/index.html
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <title>Redirecting to wwise_waapi docs...</title>
+              <meta http-equiv="refresh" content="0; url=wwise_waapi/index.html">
+              <link rel="canonical" href="wwise_waapi/index.html">
+            </head>
+            <body>
+              <p>Redirecting to <a href="wwise_waapi/index.html">wwise_waapi documentation</a>...</p>
+            </body>
+          </html>
+          EOF
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/doc
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
