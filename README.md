@@ -4,11 +4,17 @@
 [![docs.rs](https://docs.rs/wwise-waapi/badge.svg)](https://docs.rs/wwise-waapi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Async, typed Rust client for the Wwise Authoring API (WAAPI).
+Async, compile-time checked, and strongly typed Rust client for the Wwise Authoring API (WAAPI).
 - **API Documentation (Rustdoc):** https://tronhjem.github.io/rust-waapi-client/wwise_waapi/
 - **Wwise WAAPI Reference:** https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
-This crate ships with a small, private WAMP v2 client that speaks JSON over WebSocket. It is no longer dependent on an external `wampire` submodule.
+## Why `wwise-waapi`?
+
+Most Wwise automation and tooling is written in Python using raw JSON dictionaries, where a misspelled URI, wrong argument shape, invalid property name, or Wwise version rename only fails at runtime. `wwise-waapi` brings **compile-time verification** and **native performance** to Wwise tooling and companion apps:
+
+- **Compile-Time Checked & Type-Safe:** All 180 WAAPI functions, 35 subscription topics, 77 Wwise `ObjectType` variants, and 493 `Property` accessors are generated directly from Wwise's schemas and `WObjects.xml`. Invalid arguments, missing required fields, or mistyped property and object names are caught by the Rust compiler before your tool ever runs.
+- **Multi-Version Wwise 2024 & 2025+ Support:** Generated from the union of Wwise 2024 and 2025+ schemas so a single typed API works seamlessly across Wwise versions (including 2025 hierarchy and `ActorMixer` -> `PropertyContainer` renames).
+- **Significantly Faster than Python (`waapi-client`):** Built on a lightweight, low-latency WAMP v2 transport with single-pass `serde` serialization and async request pipelining - delivering **~3x faster per-call roundtrips** (`1.99 ms` vs `5.88 ms` on a 186-object `object.get` query) and **~8.5x faster end-to-end CLI execution** (`9.2 ms` vs `77.4 ms` from process start to exit).
 
 ## Basic Usage
 
