@@ -219,7 +219,7 @@ impl From<CoreObjectSetItem> for CoreObjectSetArgs {
 pub type CoreObjectSetOptions = ObjectReturnOptions;
 
 /// One object entry in the `object.set` response.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetObject {
     /// The ID (GUID) of the parent.
     #[serde(default)]
@@ -271,6 +271,48 @@ impl CoreObjectSetObject {
     /// Look up a string (`&str`) property value in `extra`.
     pub fn property_str(&self, prop: Property) -> Option<&str> {
         self.property(prop).and_then(serde_json::Value::as_str)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for CoreObjectSetObject {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct CoreObjectSetObjectVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for CoreObjectSetObjectVisitor {
+            type Value = CoreObjectSetObject;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct CoreObjectSetObject")
+            }
+
+            fn visit_map<M: serde::de::MapAccess<'de>>(
+                self,
+                mut map: M,
+            ) -> Result<Self::Value, M::Error> {
+                let mut id: Option<String> = None;
+                let mut name: Option<String> = None;
+                let mut children: Option<Vec<WwiseObject>> = None;
+                let mut extra = std::collections::HashMap::<String, serde_json::Value>::new();
+                while let Some(key) = map.next_key::<std::borrow::Cow<'de, str>>()? {
+                    match key.as_ref() {
+                        "id" => id = map.next_value()?,
+                        "name" => name = map.next_value()?,
+                        "children" => children = map.next_value()?,
+                        _ => {
+                            extra.insert(key.into_owned(), map.next_value()?);
+                        }
+                    }
+                }
+                Ok(CoreObjectSetObject {
+                    id,
+                    name,
+                    children: children.unwrap_or_default(),
+                    extra,
+                })
+            }
+        }
+
+        deserializer.deserialize_map(CoreObjectSetObjectVisitor)
     }
 }
 

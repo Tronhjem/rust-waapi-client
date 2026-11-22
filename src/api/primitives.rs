@@ -69,14 +69,25 @@ impl Serialize for ObjectRef {
 
 impl<'de> Deserialize<'de> for ObjectRef {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
-        if s.starts_with('{') && s.ends_with('}') {
-            Ok(ObjectRef::Guid(s))
-        } else if s.starts_with('\\') {
-            Ok(ObjectRef::Path(s))
-        } else {
-            Ok(ObjectRef::Name(s))
+        struct ObjectRefVisitor;
+
+        impl serde::de::Visitor<'_> for ObjectRefVisitor {
+            type Value = ObjectRef;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a Wwise object GUID, path, or name string")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Self::Value, E> {
+                Ok(ObjectRef::from(v))
+            }
+
+            fn visit_string<E: serde::de::Error>(self, v: String) -> Result<Self::Value, E> {
+                Ok(ObjectRef::from(v))
+            }
         }
+
+        deserializer.deserialize_string(ObjectRefVisitor)
     }
 }
 
@@ -133,12 +144,25 @@ impl Serialize for PlatformRef {
 
 impl<'de> Deserialize<'de> for PlatformRef {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
-        if s.starts_with('{') && s.ends_with('}') {
-            Ok(PlatformRef::Guid(s))
-        } else {
-            Ok(PlatformRef::Name(s))
+        struct PlatformRefVisitor;
+
+        impl serde::de::Visitor<'_> for PlatformRefVisitor {
+            type Value = PlatformRef;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a Wwise platform GUID or name string")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Self::Value, E> {
+                Ok(PlatformRef::from(v))
+            }
+
+            fn visit_string<E: serde::de::Error>(self, v: String) -> Result<Self::Value, E> {
+                Ok(PlatformRef::from(v))
+            }
         }
+
+        deserializer.deserialize_string(PlatformRefVisitor)
     }
 }
 
@@ -331,16 +355,27 @@ impl Serialize for OnNameConflict {
 
 impl<'de> Deserialize<'de> for OnNameConflict {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
-        match s.as_str() {
-            "rename" => Ok(OnNameConflict::Rename),
-            "replace" => Ok(OnNameConflict::Replace),
-            "fail" => Ok(OnNameConflict::Fail),
-            "merge" => Ok(OnNameConflict::Merge),
-            _ => Err(serde::de::Error::custom(format!(
-                "unknown OnNameConflict: {s}"
-            ))),
+        struct OnNameConflictVisitor;
+
+        impl serde::de::Visitor<'_> for OnNameConflictVisitor {
+            type Value = OnNameConflict;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("one of \"rename\", \"replace\", \"fail\", or \"merge\"")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, s: &str) -> Result<Self::Value, E> {
+                match s {
+                    "rename" => Ok(OnNameConflict::Rename),
+                    "replace" => Ok(OnNameConflict::Replace),
+                    "fail" => Ok(OnNameConflict::Fail),
+                    "merge" => Ok(OnNameConflict::Merge),
+                    _ => Err(E::custom(format!("unknown OnNameConflict: {s}"))),
+                }
+            }
         }
+
+        deserializer.deserialize_str(OnNameConflictVisitor)
     }
 }
 
@@ -370,18 +405,40 @@ impl Serialize for ListMode {
 
 impl<'de> Deserialize<'de> for ListMode {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
-        match s.as_str() {
-            "replaceAll" => Ok(ListMode::ReplaceAll),
-            "append" => Ok(ListMode::Append),
-            _ => Err(serde::de::Error::custom(format!("unknown ListMode: {s}"))),
+        struct ListModeVisitor;
+
+        impl serde::de::Visitor<'_> for ListModeVisitor {
+            type Value = ListMode;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("one of \"replaceAll\" or \"append\"")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, s: &str) -> Result<Self::Value, E> {
+                match s {
+                    "replaceAll" => Ok(ListMode::ReplaceAll),
+                    "append" => Ok(ListMode::Append),
+                    _ => Err(E::custom(format!("unknown ListMode: {s}"))),
+                }
+            }
         }
+
+        deserializer.deserialize_str(ListModeVisitor)
     }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Property values and child object definitions
 // ─────────────────────────────────────────────────────────────────────────────
+
+struct AtPrefixedKey<'a>(&'a str);
+
+impl Serialize for AtPrefixedKey<'_> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let bare = self.0.strip_prefix('@').unwrap_or(self.0);
+        serializer.collect_str(&format_args!("@{bare}"))
+    }
+}
 
 /// A new Wwise object to create, nested under a parent via `children` or a
 /// named list via an `@`-prefixed field.
@@ -423,7 +480,7 @@ impl Serialize for ChildObject {
             ser.serialize_entry("children", &self.children)?;
         }
         for (key, value) in &self.properties {
-            ser.serialize_entry(&format!("@{key}"), value)?;
+            ser.serialize_entry(&AtPrefixedKey(key), value)?;
         }
         ser.end()
     }

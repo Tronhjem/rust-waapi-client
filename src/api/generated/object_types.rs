@@ -542,7 +542,20 @@ impl serde::Serialize for ObjectType {
 
 impl<'de> serde::Deserialize<'de> for ObjectType {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let s = String::deserialize(deserializer)?;
-        s.parse().map_err(serde::de::Error::custom)
+        struct ObjectTypeVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for ObjectTypeVisitor {
+            type Value = ObjectType;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("a Wwise ObjectType string")
+            }
+
+            fn visit_str<E: serde::de::Error>(self, s: &str) -> Result<Self::Value, E> {
+                s.parse().map_err(E::custom)
+            }
+        }
+
+        deserializer.deserialize_str(ObjectTypeVisitor)
     }
 }

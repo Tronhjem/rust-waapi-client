@@ -6,7 +6,7 @@ use tokio::sync::mpsc;
 use crate::waapi_function_api::WaapiFunction;
 use crate::waapi_topics_api::WaapiTopic;
 pub use crate::wamp::Event;
-use crate::wamp::{WampClient, WampError};
+use crate::wamp::{WampClient, WampError, raw_kwargs_str};
 
 /// Result alias for WAAPI client operations.
 pub type WaapiResult<T> = Result<T, WaapiError>;
@@ -220,7 +220,9 @@ impl WaapiClient {
 
     /// Type-safe WAAPI call.
     ///
-    /// Serializes typed args/options and deserializes the response.
+    /// Serializes typed args/options directly into the outgoing WAMP frame and
+    /// deserializes the response directly from the incoming JSON payload without
+    /// intermediate `serde_json::Value` allocations.
     pub async fn call_typed<Args, Options, Response>(
         &self,
         uri: WaapiFunction,
@@ -232,10 +234,16 @@ impl WaapiClient {
         Options: serde::Serialize,
         Response: serde::de::DeserializeOwned,
     {
-        let args = args.map(serde_json::to_value).transpose()?;
-        let options = options.map(serde_json::to_value).transpose()?;
-        let value = self.call(uri, args, options).await?;
-        Ok(serde_json::from_value(value)?)
+        let raw = self
+            .wamp
+            .as_ref()
+            .ok_or(WaapiError::ClientShutdown)?
+            .call_typed(uri.as_str(), options.as_ref(), args.as_ref())
+            .await
+            .map_err(WaapiError::from)?;
+        Ok(serde_json::from_str::<Response>(raw_kwargs_str(
+            raw.as_deref(),
+        ))?)
     }
 
     /// Type-safe WAAPI call that discards the response.
@@ -251,9 +259,12 @@ impl WaapiClient {
         Args: serde::Serialize,
         Options: serde::Serialize,
     {
-        let args = args.map(serde_json::to_value).transpose()?;
-        let options = options.map(serde_json::to_value).transpose()?;
-        self.call(uri, args, options).await?;
+        self.wamp
+            .as_ref()
+            .ok_or(WaapiError::ClientShutdown)?
+            .call_typed(uri.as_str(), options.as_ref(), args.as_ref())
+            .await
+            .map_err(WaapiError::from)?;
         Ok(())
     }
 
@@ -292,7 +303,7 @@ impl WaapiClient {
 
     /// Type-safe WAAPI subscription.
     ///
-    /// Serializes typed options before subscribing.
+    /// Serializes typed options directly into the outgoing WAMP frame before subscribing.
     pub async fn subscribe_typed<Options>(
         &self,
         topic: WaapiTopic,
@@ -301,16 +312,24 @@ impl WaapiClient {
     where
         Options: serde::Serialize,
     {
-        let options = options.map(serde_json::to_value).transpose()?;
-        self.subscribe(topic, options).await
+        let (tx, rx) = mpsc::unbounded_channel();
+        let id = self
+            .wamp
+            .as_ref()
+            .ok_or(WaapiError::ClientShutdown)?
+            .subscribe_with_options(topic.as_str(), options.as_ref(), tx)
+            .await
+            .map_err(WaapiError::from)?;
+        Ok((id, rx))
     }
 
     /// Type-safe WAAPI subscription that deserializes each event into a typed
     /// payload.
     ///
     /// The WAAPI topic payload (the single object in `event.kwargs`) is
-    /// deserialized into `Payload`. Events whose payload fails to deserialize
-    /// are logged and skipped rather than propagated.
+    /// deserialized directly from the raw JSON payload into `Payload` without an
+    /// intermediate `serde_json::Value` tree. Events whose payload fails to
+    /// deserialize are logged and skipped rather than propagated.
     pub async fn subscribe_payload<Options, Payload>(
         &self,
         topic: WaapiTopic,
@@ -320,16 +339,18 @@ impl WaapiClient {
         Options: serde::Serialize,
         Payload: serde::de::DeserializeOwned + Send + 'static,
     {
-        let (id, mut event_rx) = self.subscribe_typed(topic, options).await?;
+        let (raw_tx, mut raw_rx) = mpsc::unbounded_channel();
+        let id = self
+            .wamp
+            .as_ref()
+            .ok_or(WaapiError::ClientShutdown)?
+            .subscribe_raw_payload(topic.as_str(), options.as_ref(), raw_tx)
+            .await
+            .map_err(WaapiError::from)?;
         let (tx, rx) = mpsc::unbounded_channel();
         tokio::spawn(async move {
-            while let Some(event) = event_rx.recv().await {
-                let kwargs = if event.kwargs.is_null() {
-                    serde_json::Value::Object(serde_json::Map::new())
-                } else {
-                    event.kwargs
-                };
-                match serde_json::from_value::<Payload>(kwargs) {
+            while let Some(raw_kwargs) = raw_rx.recv().await {
+                match serde_json::from_str::<Payload>(raw_kwargs_str(raw_kwargs.as_deref())) {
                     Ok(payload) => {
                         if tx.send(payload).is_err() {
                             break;

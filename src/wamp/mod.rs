@@ -5,16 +5,29 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use futures_util::{SinkExt, StreamExt};
+use serde_json::value::RawValue;
 use serde_json::{Map, Value};
 use tokio::sync::{mpsc, oneshot};
 use tokio::task::JoinHandle;
-use tokio_tungstenite::connect_async;
+use tokio_tungstenite::connect_async_with_config;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tokio_tungstenite::tungstenite::http::HeaderValue;
 use tokio_tungstenite::tungstenite::protocol::Message as WsMessage;
 
 pub use error::{WampError, WampResult};
-pub use message::{Message, RequestId, SubscriptionId};
+pub use message::{
+    IncomingMessage, Message, RequestId, SubscriptionId, serialize_call, serialize_subscribe,
+    serialize_unsubscribe,
+};
+
+/// Extract the raw JSON object string from an optional [`RawValue`], defaulting
+/// to `"{}"` when omitted or `"null"`.
+pub fn raw_kwargs_str(raw: Option<&RawValue>) -> &str {
+    match raw.map(|r| r.get().trim()) {
+        Some(s) if !s.is_empty() && s != "null" => s,
+        _ => "{}",
+    }
+}
 
 /// A raw WAMP event received from a subscribed WAAPI topic.
 #[derive(Debug, Clone)]
@@ -25,25 +38,27 @@ pub struct Event {
     pub kwargs: Value,
 }
 
+enum SubscriptionSink {
+    Event(mpsc::UnboundedSender<Event>),
+    RawKwargs(mpsc::UnboundedSender<Option<Box<RawValue>>>),
+}
+
 enum Command {
     Call {
         request_id: RequestId,
-        options: Value,
-        procedure: String,
-        args: Vec<Value>,
-        kwargs: Value,
-        tx: oneshot::Sender<WampResult<Value>>,
+        frame: String,
+        tx: oneshot::Sender<WampResult<Option<Box<RawValue>>>>,
     },
     Subscribe {
         request_id: RequestId,
-        options: Value,
-        topic: String,
-        event_tx: mpsc::UnboundedSender<Event>,
+        frame: String,
+        sink: SubscriptionSink,
         tx: oneshot::Sender<WampResult<SubscriptionId>>,
     },
     Unsubscribe {
         request_id: RequestId,
         subscription_id: SubscriptionId,
+        frame: String,
         tx: oneshot::Sender<WampResult<()>>,
     },
     Shutdown,
@@ -64,7 +79,8 @@ impl WampClient {
             HeaderValue::from_static("wamp.2.json"),
         );
 
-        let (ws_stream, _) = connect_async(request).await?;
+        // Set disable_nagle = true (TCP_NODELAY) to avoid 40ms Nagle + delayed-ACK latency spikes.
+        let (ws_stream, _) = connect_async_with_config(request, None, true).await?;
         let (mut write_half, mut read_half) = ws_stream.split();
 
         // Perform the WAMP HELLO / WELCOME handshake before spawning the IO loop.
@@ -96,12 +112,14 @@ impl WampClient {
         let (cmd_tx, mut cmd_rx) = mpsc::unbounded_channel::<Command>();
 
         let handle = tokio::spawn(async move {
-            let mut pending_calls: HashMap<RequestId, oneshot::Sender<WampResult<Value>>> =
-                HashMap::new();
+            let mut pending_calls: HashMap<
+                RequestId,
+                oneshot::Sender<WampResult<Option<Box<RawValue>>>>,
+            > = HashMap::new();
             let mut pending_subscribes: HashMap<
                 RequestId,
                 (
-                    mpsc::UnboundedSender<Event>,
+                    SubscriptionSink,
                     oneshot::Sender<WampResult<SubscriptionId>>,
                 ),
             > = HashMap::new();
@@ -109,36 +127,35 @@ impl WampClient {
                 RequestId,
                 (SubscriptionId, oneshot::Sender<WampResult<()>>),
             > = HashMap::new();
-            let mut subscriptions: HashMap<SubscriptionId, mpsc::UnboundedSender<Event>> =
-                HashMap::new();
+            let mut subscriptions: HashMap<SubscriptionId, SubscriptionSink> = HashMap::new();
 
             loop {
                 tokio::select! {
                     incoming = read_half.next() => {
                         match incoming {
                             Some(Ok(WsMessage::Text(text))) => {
-                                let msg = serde_json::from_str::<Message>(text.as_str())
+                                let msg = serde_json::from_str::<IncomingMessage>(text.as_str())
                                     .map_err(WampError::Deserialize)?;
 
                                 match msg {
-                                    Message::Result(request_id, _, _, kwargs) => {
+                                    IncomingMessage::Result(request_id, kwargs) => {
                                         if let Some(tx) = pending_calls.remove(&request_id) {
                                             let _ = tx.send(Ok(kwargs));
                                         }
                                     }
-                                    Message::Subscribed(request_id, subscription_id) => {
-                                        if let Some((event_tx, tx)) = pending_subscribes.remove(&request_id) {
-                                            subscriptions.insert(subscription_id, event_tx);
+                                    IncomingMessage::Subscribed(request_id, subscription_id) => {
+                                        if let Some((sink, tx)) = pending_subscribes.remove(&request_id) {
+                                            subscriptions.insert(subscription_id, sink);
                                             let _ = tx.send(Ok(subscription_id));
                                         }
                                     }
-                                    Message::Unsubscribed(request_id) => {
+                                    IncomingMessage::Unsubscribed(request_id) => {
                                         if let Some((subscription_id, tx)) = pending_unsubscribes.remove(&request_id) {
                                             subscriptions.remove(&subscription_id);
                                             let _ = tx.send(Ok(()));
                                         }
                                     }
-                                    Message::Error(_, request_id, _, error, args, kwargs) => {
+                                    IncomingMessage::Error(request_id, error, args, kwargs) => {
                                         let err = WampError::CallError {
                                             uri: error,
                                             args,
@@ -152,17 +169,25 @@ impl WampClient {
                                             let _ = tx.send(Err(err));
                                         }
                                     }
-                                    Message::Event(subscription_id, _, _, args, kwargs) => {
-                                        let closed = if let Some(tx) = subscriptions.get(&subscription_id) {
-                                            tx.send(Event { args, kwargs }).is_err()
-                                        } else {
-                                            false
+                                    IncomingMessage::Event(subscription_id, args, kwargs) => {
+                                        let closed = match subscriptions.get(&subscription_id) {
+                                            Some(SubscriptionSink::RawKwargs(tx)) => {
+                                                tx.send(kwargs).is_err()
+                                            }
+                                            Some(SubscriptionSink::Event(tx)) => {
+                                                let kw_val = serde_json::from_str::<Value>(
+                                                    raw_kwargs_str(kwargs.as_deref()),
+                                                )
+                                                .unwrap_or_else(|_| Value::Object(Map::new()));
+                                                tx.send(Event { args, kwargs: kw_val }).is_err()
+                                            }
+                                            None => false,
                                         };
                                         if closed {
                                             subscriptions.remove(&subscription_id);
                                         }
                                     }
-                                    Message::Goodbye(_, _) => {
+                                    IncomingMessage::Goodbye => {
                                         let reply = Message::Goodbye(
                                             Value::Object(Map::new()),
                                             "wamp.error.goodbye_and_out".to_string(),
@@ -171,10 +196,10 @@ impl WampClient {
                                         let _ = write_half.close().await;
                                         return Ok(());
                                     }
-                                    Message::Abort(_, reason) => {
+                                    IncomingMessage::Abort(reason) => {
                                         return Err(WampError::WebSocket(reason));
                                     }
-                                    _ => {}
+                                    IncomingMessage::Other => {}
                                 }
                             }
                             Some(Ok(WsMessage::Close(_))) | None => {
@@ -186,41 +211,57 @@ impl WampClient {
                             Some(_) => {}
                         }
                     }
-                    cmd = cmd_rx.recv() => {
-                        match cmd {
-                            Some(Command::Call { request_id, options, procedure, args, kwargs, tx }) => {
-                                let msg = Message::Call(request_id, options, procedure, args, kwargs);
-                                if let Err(e) = send_msg(&mut write_half, &msg).await {
-                                    let _ = tx.send(Err(e));
-                                    return Err(WampError::ConnectionClosed);
+                    first_cmd = cmd_rx.recv() => {
+                        let mut current = first_cmd;
+                        let mut shutdown_requested = false;
+
+                        loop {
+                            match current {
+                                Some(Command::Call { request_id, frame, tx }) => {
+                                    if let Err(e) = write_half.feed(WsMessage::Text(frame.into())).await {
+                                        let _ = tx.send(Err(WampError::WebSocket(e.to_string())));
+                                        return Err(WampError::ConnectionClosed);
+                                    }
+                                    pending_calls.insert(request_id, tx);
                                 }
-                                pending_calls.insert(request_id, tx);
-                            }
-                            Some(Command::Subscribe { request_id, options, topic, event_tx, tx }) => {
-                                let msg = Message::Subscribe(request_id, options, topic);
-                                if let Err(e) = send_msg(&mut write_half, &msg).await {
-                                    let _ = tx.send(Err(e));
-                                    return Err(WampError::ConnectionClosed);
+                                Some(Command::Subscribe { request_id, frame, sink, tx }) => {
+                                    if let Err(e) = write_half.feed(WsMessage::Text(frame.into())).await {
+                                        let _ = tx.send(Err(WampError::WebSocket(e.to_string())));
+                                        return Err(WampError::ConnectionClosed);
+                                    }
+                                    pending_subscribes.insert(request_id, (sink, tx));
                                 }
-                                pending_subscribes.insert(request_id, (event_tx, tx));
-                            }
-                            Some(Command::Unsubscribe { request_id, subscription_id, tx }) => {
-                                let msg = Message::Unsubscribe(request_id, subscription_id);
-                                if let Err(e) = send_msg(&mut write_half, &msg).await {
-                                    let _ = tx.send(Err(e));
-                                    return Err(WampError::ConnectionClosed);
+                                Some(Command::Unsubscribe { request_id, subscription_id, frame, tx }) => {
+                                    if let Err(e) = write_half.feed(WsMessage::Text(frame.into())).await {
+                                        let _ = tx.send(Err(WampError::WebSocket(e.to_string())));
+                                        return Err(WampError::ConnectionClosed);
+                                    }
+                                    pending_unsubscribes.insert(request_id, (subscription_id, tx));
                                 }
-                                pending_unsubscribes.insert(request_id, (subscription_id, tx));
+                                Some(Command::Shutdown) | None => {
+                                    shutdown_requested = true;
+                                    break;
+                                }
                             }
-                            Some(Command::Shutdown) | None => {
-                                let goodbye = Message::Goodbye(
-                                    Value::Object(Map::new()),
-                                    "wamp.error.close_realm".to_string(),
-                                );
-                                let _ = send_msg(&mut write_half, &goodbye).await;
-                                let _ = write_half.close().await;
-                                return Ok(());
+
+                            match cmd_rx.try_recv() {
+                                Ok(next) => current = Some(next),
+                                Err(_) => break,
                             }
+                        }
+
+                        if write_half.flush().await.is_err() {
+                            return Err(WampError::ConnectionClosed);
+                        }
+
+                        if shutdown_requested {
+                            let goodbye = Message::Goodbye(
+                                Value::Object(Map::new()),
+                                "wamp.error.close_realm".to_string(),
+                            );
+                            let _ = send_msg(&mut write_half, &goodbye).await;
+                            let _ = write_half.close().await;
+                            return Ok(());
                         }
                     }
                 }
@@ -238,6 +279,28 @@ impl WampClient {
         self.request_id.fetch_add(1, Ordering::Relaxed)
     }
 
+    pub async fn call_typed<Options: serde::Serialize, Kwargs: serde::Serialize>(
+        &self,
+        procedure: &str,
+        options: Option<&Options>,
+        kwargs: Option<&Kwargs>,
+    ) -> WampResult<Option<Box<RawValue>>> {
+        let request_id = self.next_id();
+        let frame =
+            serialize_call(request_id, options, procedure, kwargs).map_err(WampError::Serialize)?;
+
+        let (tx, rx) = oneshot::channel();
+        self.cmd_tx
+            .send(Command::Call {
+                request_id,
+                frame,
+                tx,
+            })
+            .map_err(|_| WampError::ConnectionClosed)?;
+
+        rx.await.map_err(|_| WampError::ConnectionClosed)?
+    }
+
     pub async fn call(
         &self,
         procedure: &str,
@@ -245,19 +308,79 @@ impl WampClient {
         args: Option<Vec<Value>>,
         kwargs: Option<Value>,
     ) -> WampResult<Value> {
+        let options = options.filter(|v| !v.is_null());
+        let kwargs = kwargs.filter(|v| !v.is_null());
+
+        let raw = match args.filter(|a| !a.is_empty()) {
+            None => {
+                self.call_typed(procedure, options.as_ref(), kwargs.as_ref())
+                    .await?
+            }
+            Some(positional_args) => {
+                let request_id = self.next_id();
+                let msg = Message::Call(
+                    request_id,
+                    options.unwrap_or_else(|| Value::Object(Map::new())),
+                    procedure.to_string(),
+                    positional_args,
+                    kwargs.unwrap_or(Value::Null),
+                );
+                let frame = serde_json::to_string(&msg).map_err(WampError::Serialize)?;
+                let (tx, rx) = oneshot::channel();
+                self.cmd_tx
+                    .send(Command::Call {
+                        request_id,
+                        frame,
+                        tx,
+                    })
+                    .map_err(|_| WampError::ConnectionClosed)?;
+                rx.await.map_err(|_| WampError::ConnectionClosed)??
+            }
+        };
+
+        serde_json::from_str::<Value>(raw_kwargs_str(raw.as_deref()))
+            .map_err(WampError::Deserialize)
+    }
+
+    pub async fn subscribe_with_options<Options: serde::Serialize>(
+        &self,
+        topic: &str,
+        options: Option<&Options>,
+        event_tx: mpsc::UnboundedSender<Event>,
+    ) -> WampResult<SubscriptionId> {
         let request_id = self.next_id();
-        let options = options.unwrap_or_else(|| Value::Object(Map::new()));
-        let args = args.unwrap_or_default();
-        let kwargs = kwargs.unwrap_or(Value::Null);
+        let frame =
+            serialize_subscribe(request_id, options, topic).map_err(WampError::Serialize)?;
 
         let (tx, rx) = oneshot::channel();
         self.cmd_tx
-            .send(Command::Call {
+            .send(Command::Subscribe {
                 request_id,
-                options,
-                procedure: procedure.to_string(),
-                args,
-                kwargs,
+                frame,
+                sink: SubscriptionSink::Event(event_tx),
+                tx,
+            })
+            .map_err(|_| WampError::ConnectionClosed)?;
+
+        rx.await.map_err(|_| WampError::ConnectionClosed)?
+    }
+
+    pub async fn subscribe_raw_payload<Options: serde::Serialize>(
+        &self,
+        topic: &str,
+        options: Option<&Options>,
+        raw_tx: mpsc::UnboundedSender<Option<Box<RawValue>>>,
+    ) -> WampResult<SubscriptionId> {
+        let request_id = self.next_id();
+        let frame =
+            serialize_subscribe(request_id, options, topic).map_err(WampError::Serialize)?;
+
+        let (tx, rx) = oneshot::channel();
+        self.cmd_tx
+            .send(Command::Subscribe {
+                request_id,
+                frame,
+                sink: SubscriptionSink::RawKwargs(raw_tx),
                 tx,
             })
             .map_err(|_| WampError::ConnectionClosed)?;
@@ -271,31 +394,22 @@ impl WampClient {
         options: Option<Value>,
         event_tx: mpsc::UnboundedSender<Event>,
     ) -> WampResult<SubscriptionId> {
-        let request_id = self.next_id();
-        let options = options.unwrap_or_else(|| Value::Object(Map::new()));
-
-        let (tx, rx) = oneshot::channel();
-        self.cmd_tx
-            .send(Command::Subscribe {
-                request_id,
-                options,
-                topic: topic.to_string(),
-                event_tx,
-                tx,
-            })
-            .map_err(|_| WampError::ConnectionClosed)?;
-
-        rx.await.map_err(|_| WampError::ConnectionClosed)?
+        let options = options.filter(|v| !v.is_null());
+        self.subscribe_with_options(topic, options.as_ref(), event_tx)
+            .await
     }
 
     pub async fn unsubscribe(&self, subscription_id: SubscriptionId) -> WampResult<()> {
         let request_id = self.next_id();
+        let frame =
+            serialize_unsubscribe(request_id, subscription_id).map_err(WampError::Serialize)?;
 
         let (tx, rx) = oneshot::channel();
         self.cmd_tx
             .send(Command::Unsubscribe {
                 request_id,
                 subscription_id,
+                frame,
                 tx,
             })
             .map_err(|_| WampError::ConnectionClosed)?;

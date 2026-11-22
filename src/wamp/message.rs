@@ -1,7 +1,8 @@
 use serde::de::{self, SeqAccess, Visitor};
-use serde::ser::SerializeSeq;
+use serde::ser::{SerializeMap, SerializeSeq};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
+use serde_json::value::RawValue;
 
 pub type SessionId = u64;
 pub type RequestId = u64;
@@ -313,6 +314,225 @@ impl<'de> Visitor<'de> for MessageVisitor {
             }
             _ => Err(de::Error::custom(format!("unknown message type {code}"))),
         }
+    }
+}
+
+struct EmptyObject;
+
+impl Serialize for EmptyObject {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_map(Some(0))?.end()
+    }
+}
+
+struct EmptyArray;
+
+impl Serialize for EmptyArray {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_seq(Some(0))?.end()
+    }
+}
+
+struct OutgoingCall<'a, Options, Kwargs> {
+    request_id: RequestId,
+    options: Option<&'a Options>,
+    procedure: &'a str,
+    kwargs: Option<&'a Kwargs>,
+}
+
+impl<Options: Serialize, Kwargs: Serialize> Serialize for OutgoingCall<'_, Options, Kwargs> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let has_kwargs = self.kwargs.is_some();
+        let len = if has_kwargs { 6 } else { 4 };
+        let mut seq = serializer.serialize_seq(Some(len))?;
+        seq.serialize_element(&CALL)?;
+        seq.serialize_element(&self.request_id)?;
+        match self.options {
+            Some(opts) => seq.serialize_element(opts)?,
+            None => seq.serialize_element(&EmptyObject)?,
+        }
+        seq.serialize_element(self.procedure)?;
+        if let Some(kw) = self.kwargs {
+            seq.serialize_element(&EmptyArray)?;
+            seq.serialize_element(kw)?;
+        }
+        seq.end()
+    }
+}
+
+pub fn serialize_call<Options: Serialize, Kwargs: Serialize>(
+    request_id: RequestId,
+    options: Option<&Options>,
+    procedure: &str,
+    kwargs: Option<&Kwargs>,
+) -> Result<String, serde_json::Error> {
+    serde_json::to_string(&OutgoingCall {
+        request_id,
+        options,
+        procedure,
+        kwargs,
+    })
+}
+
+struct OutgoingSubscribe<'a, Options> {
+    request_id: RequestId,
+    options: Option<&'a Options>,
+    topic: &'a str,
+}
+
+impl<Options: Serialize> Serialize for OutgoingSubscribe<'_, Options> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(4))?;
+        seq.serialize_element(&SUBSCRIBE)?;
+        seq.serialize_element(&self.request_id)?;
+        match self.options {
+            Some(opts) => seq.serialize_element(opts)?,
+            None => seq.serialize_element(&EmptyObject)?,
+        }
+        seq.serialize_element(self.topic)?;
+        seq.end()
+    }
+}
+
+pub fn serialize_subscribe<Options: Serialize>(
+    request_id: RequestId,
+    options: Option<&Options>,
+    topic: &str,
+) -> Result<String, serde_json::Error> {
+    serde_json::to_string(&OutgoingSubscribe {
+        request_id,
+        options,
+        topic,
+    })
+}
+
+struct OutgoingUnsubscribe {
+    request_id: RequestId,
+    subscription_id: SubscriptionId,
+}
+
+impl Serialize for OutgoingUnsubscribe {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(3))?;
+        seq.serialize_element(&UNSUBSCRIBE)?;
+        seq.serialize_element(&self.request_id)?;
+        seq.serialize_element(&self.subscription_id)?;
+        seq.end()
+    }
+}
+
+pub fn serialize_unsubscribe(
+    request_id: RequestId,
+    subscription_id: SubscriptionId,
+) -> Result<String, serde_json::Error> {
+    serde_json::to_string(&OutgoingUnsubscribe {
+        request_id,
+        subscription_id,
+    })
+}
+
+/// Fast client-side incoming WAMP message representation that captures `RESULT`
+/// and `EVENT` keyword payloads as raw JSON slices (`Box<RawValue>`) and skips
+/// unused metadata fields without allocating intermediate `serde_json::Value` trees.
+#[derive(Debug)]
+pub enum IncomingMessage {
+    Result(RequestId, Option<Box<RawValue>>),
+    Subscribed(RequestId, SubscriptionId),
+    Unsubscribed(RequestId),
+    Error(RequestId, String, Vec<Value>, Value),
+    Event(SubscriptionId, Vec<Value>, Option<Box<RawValue>>),
+    Goodbye,
+    Abort(String),
+    Other,
+}
+
+impl<'de> Deserialize<'de> for IncomingMessage {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        deserializer.deserialize_seq(IncomingMessageVisitor)
+    }
+}
+
+struct IncomingMessageVisitor;
+
+impl<'de> Visitor<'de> for IncomingMessageVisitor {
+    type Value = IncomingMessage;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a WAMP message array")
+    }
+
+    fn visit_seq<A: SeqAccess<'de>>(self, mut seq: A) -> Result<Self::Value, A::Error> {
+        let code = seq
+            .next_element::<u8>()?
+            .ok_or_else(|| de::Error::custom("missing message type code"))?;
+
+        let msg = match code {
+            RESULT => {
+                let request_id = seq
+                    .next_element::<RequestId>()?
+                    .ok_or_else(|| de::Error::custom("missing result request id"))?;
+                let _details = seq.next_element::<de::IgnoredAny>()?;
+                let _args = seq.next_element::<de::IgnoredAny>()?;
+                let kwargs = seq.next_element::<Option<Box<RawValue>>>()?.flatten();
+                IncomingMessage::Result(request_id, kwargs)
+            }
+            SUBSCRIBED => {
+                let request_id = seq
+                    .next_element::<RequestId>()?
+                    .ok_or_else(|| de::Error::custom("missing subscribed request id"))?;
+                let subscription_id = seq
+                    .next_element::<SubscriptionId>()?
+                    .ok_or_else(|| de::Error::custom("missing subscription id"))?;
+                IncomingMessage::Subscribed(request_id, subscription_id)
+            }
+            UNSUBSCRIBED => {
+                let request_id = seq
+                    .next_element::<RequestId>()?
+                    .ok_or_else(|| de::Error::custom("missing unsubscribed request id"))?;
+                IncomingMessage::Unsubscribed(request_id)
+            }
+            ERROR => {
+                let _request_type = seq
+                    .next_element::<u8>()?
+                    .ok_or_else(|| de::Error::custom("missing error request type"))?;
+                let request_id = seq
+                    .next_element::<RequestId>()?
+                    .ok_or_else(|| de::Error::custom("missing error request id"))?;
+                let _details = seq.next_element::<de::IgnoredAny>()?;
+                let error = seq
+                    .next_element::<String>()?
+                    .ok_or_else(|| de::Error::custom("missing error uri"))?;
+                let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
+                let kwargs = seq
+                    .next_element::<Value>()?
+                    .unwrap_or_else(|| Value::Object(serde_json::Map::new()));
+                IncomingMessage::Error(request_id, error, args, kwargs)
+            }
+            EVENT => {
+                let subscription_id = seq
+                    .next_element::<SubscriptionId>()?
+                    .ok_or_else(|| de::Error::custom("missing event subscription id"))?;
+                let _publication_id = seq
+                    .next_element::<de::IgnoredAny>()?
+                    .ok_or_else(|| de::Error::custom("missing publication id"))?;
+                let _details = seq.next_element::<de::IgnoredAny>()?;
+                let args = seq.next_element::<Vec<Value>>()?.unwrap_or_default();
+                let kwargs = seq.next_element::<Option<Box<RawValue>>>()?.flatten();
+                IncomingMessage::Event(subscription_id, args, kwargs)
+            }
+            GOODBYE => IncomingMessage::Goodbye,
+            ABORT => {
+                let _details = seq.next_element::<de::IgnoredAny>()?;
+                let reason = seq
+                    .next_element::<String>()?
+                    .ok_or_else(|| de::Error::custom("missing abort reason"))?;
+                IncomingMessage::Abort(reason)
+            }
+            _ => IncomingMessage::Other,
+        };
+
+        while seq.next_element::<de::IgnoredAny>()?.is_some() {}
+        Ok(msg)
     }
 }
 

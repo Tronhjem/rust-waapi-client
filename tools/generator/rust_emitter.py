@@ -58,11 +58,74 @@ INTO_CTOR_TYPES = {
 }
 
 
+def emit_flat_map_deserialize(struct_name, fields):
+    """Emit a single-pass MapAccess Deserialize impl that avoids #[serde(flatten)] Content buffering."""
+    lines = [
+        f"impl<'de> serde::Deserialize<'de> for {struct_name} {{",
+        "    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {",
+        f"        struct {struct_name}Visitor;",
+        "",
+        f"        impl<'de> serde::de::Visitor<'de> for {struct_name}Visitor {{",
+        f"            type Value = {struct_name};",
+        "",
+        "            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {",
+        f'                formatter.write_str("struct {struct_name}")',
+        "            }",
+        "",
+        "            fn visit_map<M: serde::de::MapAccess<'de>>(self, mut map: M) -> Result<Self::Value, M::Error> {",
+    ]
+    for f in fields:
+        lines.append(f"                let mut {f.rust_name}: Option<{f.ty}> = None;")
+    lines.append(
+        "                let mut extra = std::collections::HashMap::<String, serde_json::Value>::new();"
+    )
+    lines.append(
+        "                while let Some(key) = map.next_key::<std::borrow::Cow<'de, str>>()? {"
+    )
+    lines.append("                    match key.as_ref() {")
+    for f in fields:
+        if f.optional:
+            lines.append(
+                f'                        "{f.wire}" => {f.rust_name} = map.next_value()?,',
+            )
+        else:
+            lines.append(
+                f'                        "{f.wire}" => {f.rust_name} = Some(map.next_value()?),',
+            )
+    lines.append("                        _ => {")
+    lines.append("                            extra.insert(key.into_owned(), map.next_value()?);")
+    lines.append("                        }")
+    lines.append("                    }")
+    lines.append("                }")
+    lines.append(f"                Ok({struct_name} {{")
+    for f in fields:
+        if f.optional and f.ty.startswith("Vec<"):
+            lines.append(f"                    {f.rust_name}: {f.rust_name}.unwrap_or_default(),")
+        elif f.optional:
+            lines.append(f"                    {f.rust_name},")
+        else:
+            lines.append(
+                f'                    {f.rust_name}: {f.rust_name}.ok_or_else(|| serde::de::Error::missing_field("{f.wire}"))?,'
+            )
+    lines.append("                    extra,")
+    lines.append("                })")
+    lines.append("            }")
+    lines.append("        }")
+    lines.append("")
+    lines.append(f"        deserializer.deserialize_map({struct_name}Visitor)")
+    lines.append("    }")
+    lines.append("}")
+    return lines
+
+
 def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_order=None, extra_flatten=False):
     """Emit an Args/Options (Serialize) or Response (Serialize+Deserialize) struct."""
     lines = doc_lines(doc) or [f"/// `{ctx.uri}` {kind}."]
     if kind == "response":
-        lines.append("#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]")
+        if extra_flatten:
+            lines.append("#[derive(Debug, Clone, serde::Serialize)]")
+        else:
+            lines.append("#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]")
     elif all(f.optional for f in fields):
         lines.append("#[derive(Debug, Clone, Default, serde::Serialize)]")
     else:
@@ -133,6 +196,9 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
                     lines.append("")
                 lines.extend(block)
             lines.append("}")
+        if extra_flatten:
+            lines.append("")
+            lines.extend(emit_flat_map_deserialize(struct_name, fields))
         return "\n".join(lines)
 
     ctor_fields = []
@@ -478,8 +544,21 @@ def gen_object_types(schema_dirs) -> str:
     lines.append("")
     lines.append("impl<'de> serde::Deserialize<'de> for ObjectType {")
     lines.append("    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {")
-    lines.append("        let s = String::deserialize(deserializer)?;")
-    lines.append("        s.parse().map_err(serde::de::Error::custom)")
+    lines.append("        struct ObjectTypeVisitor;")
+    lines.append("")
+    lines.append("        impl<'de> serde::de::Visitor<'de> for ObjectTypeVisitor {")
+    lines.append("            type Value = ObjectType;")
+    lines.append("")
+    lines.append("            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {")
+    lines.append('                formatter.write_str("a Wwise ObjectType string")')
+    lines.append("            }")
+    lines.append("")
+    lines.append("            fn visit_str<E: serde::de::Error>(self, s: &str) -> Result<Self::Value, E> {")
+    lines.append("                s.parse().map_err(E::custom)")
+    lines.append("            }")
+    lines.append("        }")
+    lines.append("")
+    lines.append("        deserializer.deserialize_str(ObjectTypeVisitor)")
     lines.append("    }")
     lines.append("}")
     return "\n".join(lines) + "\n"
@@ -611,13 +690,26 @@ def gen_properties(schema_dirs) -> str:
     lines.append("")
     lines.append("impl<'de> serde::Deserialize<'de> for Property {")
     lines.append("    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {")
-    lines.append("        let s = String::deserialize(deserializer)?;")
-    lines.append("        let bare = s.strip_prefix('@').unwrap_or(s.as_str());")
-    lines.append("        match bare {")
+    lines.append("        struct PropertyVisitor;")
+    lines.append("")
+    lines.append("        impl<'de> serde::de::Visitor<'de> for PropertyVisitor {")
+    lines.append("            type Value = Property;")
+    lines.append("")
+    lines.append("            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {")
+    lines.append('                formatter.write_str("a Wwise Property name")')
+    lines.append("            }")
+    lines.append("")
+    lines.append("            fn visit_str<E: serde::de::Error>(self, s: &str) -> Result<Self::Value, E> {")
+    lines.append("                let bare = s.strip_prefix('@').unwrap_or(s);")
+    lines.append("                match bare {")
     for wire, variant, _ in variants:
-        lines.append(f'            "{wire}" => Ok(Self::{variant}),')
-    lines.append('            _ => Err(serde::de::Error::custom(format!("unknown Wwise Property: {s}"))),')
+        lines.append(f'                    "{wire}" => Ok(Property::{variant}),')
+    lines.append('                    _ => Err(E::custom(format!("unknown Wwise Property: {s}"))),')
+    lines.append("                }")
+    lines.append("            }")
     lines.append("        }")
+    lines.append("")
+    lines.append("        deserializer.deserialize_str(PropertyVisitor)")
     lines.append("    }")
     lines.append("}")
     return "\n".join(lines) + "\n"
@@ -737,7 +829,7 @@ def gen_wwise_object(ctx):
         "/// A Wwise object as returned by `object.get` and similar endpoints.",
         "/// Fields are optional because their presence depends on the `return` options;",
         "/// accessors not listed here (e.g. `@Property` values) land in `extra`.",
-        "#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]",
+        "#[derive(Debug, Clone, Default, serde::Serialize)]",
         "pub struct WwiseObject {",
     ]
     for f in fields:
@@ -800,6 +892,8 @@ def gen_wwise_object(ctx):
     lines.append("        self.property(prop).and_then(serde_json::Value::as_str)")
     lines.append("    }")
     lines.append("}")
+    lines.append("")
+    lines.extend(emit_flat_map_deserialize("WwiseObject", fields))
     return "\n".join(lines)
 
 

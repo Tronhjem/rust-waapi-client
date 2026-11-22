@@ -750,7 +750,7 @@ pub enum LogSeverity {
 /// A Wwise object as returned by `object.get` and similar endpoints.
 /// Fields are optional because their presence depends on the `return` options;
 /// accessors not listed here (e.g. `@Property` values) land in `extra`.
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct WwiseObject {
     /// The ID (GUID) of the object.
     #[serde(default)]
@@ -1093,6 +1093,366 @@ impl WwiseObject {
     /// Look up a string (`&str`) property value in `extra`.
     pub fn property_str(&self, prop: Property) -> Option<&str> {
         self.property(prop).and_then(serde_json::Value::as_str)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for WwiseObject {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct WwiseObjectVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for WwiseObjectVisitor {
+            type Value = WwiseObject;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("struct WwiseObject")
+            }
+
+            fn visit_map<M: serde::de::MapAccess<'de>>(
+                self,
+                mut map: M,
+            ) -> Result<Self::Value, M::Error> {
+                let mut id: Option<String> = None;
+                let mut name: Option<String> = None;
+                let mut notes: Option<String> = None;
+                let mut object_type: Option<ObjectType> = None;
+                let mut plugin_name: Option<String> = None;
+                let mut path: Option<String> = None;
+                let mut parent: Option<WwiseObjectRef> = None;
+                let mut owner: Option<WwiseObjectRef> = None;
+                let mut is_playable: Option<bool> = None;
+                let mut short_id: Option<i64> = None;
+                let mut class_id: Option<u32> = None;
+                let mut category: Option<String> = None;
+                let mut file_path: Option<String> = None;
+                let mut workunit: Option<WwiseObjectRef> = None;
+                let mut children_count: Option<f64> = None;
+                let mut total_size: Option<i64> = None;
+                let mut media_size: Option<i64> = None;
+                let mut object_size: Option<i64> = None;
+                let mut structure_size: Option<i64> = None;
+                let mut music_transition_root: Option<serde_json::Value> = None;
+                let mut music_playlist_root: Option<serde_json::Value> = None;
+                let mut music_transition_object: Option<serde_json::Value> = None;
+                let mut transition_object: Option<serde_json::Value> = None;
+                let mut original_wav_file_path: Option<String> = None;
+                let mut original_file_path: Option<String> = None;
+                let mut original_relative_file_path: Option<String> = None;
+                let mut active_source: Option<WwiseObjectRef> = None;
+                let mut converted_wem_file_path: Option<String> = None;
+                let mut converted_file_path: Option<String> = None;
+                let mut soundbank_bnk_file_path: Option<String> = None;
+                let mut playback_duration: Option<serde_json::Value> = None;
+                let mut duration: Option<serde_json::Value> = None;
+                let mut max_duration_source: Option<serde_json::Value> = None;
+                let mut audio_source_trim_values: Option<serde_json::Value> = None;
+                let mut max_radius_attenuation: Option<serde_json::Value> = None;
+                let mut audio_source_language: Option<WwiseObjectRef> = None;
+                let mut original_total_channel_count: Option<f64> = None;
+                let mut original_normal_channel_count: Option<f64> = None;
+                let mut original_height_channel_count: Option<f64> = None;
+                let mut original_lfe_channel_count: Option<f64> = None;
+                let mut original_non_lfe_channel_count: Option<f64> = None;
+                let mut original_anonymous_channel_count: Option<f64> = None;
+                let mut original_ambisonics_channel_count: Option<f64> = None;
+                let mut original_channel_config: Option<String> = None;
+                let mut original_channel_mask: Option<f64> = None;
+                let mut original_sample_rate: Option<f64> = None;
+                let mut original_bit_depth: Option<f64> = None;
+                let mut original_file_size: Option<f64> = None;
+                let mut original_data_size: Option<f64> = None;
+                let mut original_sample_count: Option<f64> = None;
+                let mut original_duration: Option<f64> = None;
+                let mut original_codec: Option<String> = None;
+                let mut converted_total_channel_count: Option<f64> = None;
+                let mut converted_normal_channel_count: Option<f64> = None;
+                let mut converted_height_channel_count: Option<f64> = None;
+                let mut converted_lfe_channel_count: Option<f64> = None;
+                let mut converted_non_lfe_channel_count: Option<f64> = None;
+                let mut converted_anonymous_channel_count: Option<f64> = None;
+                let mut converted_ambisonics_channel_count: Option<f64> = None;
+                let mut converted_channel_config: Option<String> = None;
+                let mut converted_channel_mask: Option<f64> = None;
+                let mut converted_sample_rate: Option<f64> = None;
+                let mut converted_sample_rate_setting: Option<String> = None;
+                let mut converted_bit_depth: Option<f64> = None;
+                let mut converted_file_size: Option<f64> = None;
+                let mut converted_data_size: Option<f64> = None;
+                let mut converted_sample_count: Option<f64> = None;
+                let mut converted_duration: Option<f64> = None;
+                let mut converted_trimmed_duration: Option<f64> = None;
+                let mut converted_codec: Option<String> = None;
+                let mut conversion_format: Option<String> = None;
+                let mut workunit_is_default: Option<bool> = None;
+                let mut workunit_type: Option<String> = None;
+                let mut workunit_is_dirty: Option<bool> = None;
+                let mut workunit_is_loaded: Option<bool> = None;
+                let mut switch_container_child_context: Option<serde_json::Value> = None;
+                let mut switch_group_game_parameter: Option<WwiseObjectRef> = None;
+                let mut is_explicit_mute: Option<bool> = None;
+                let mut is_explicit_solo: Option<bool> = None;
+                let mut is_implicit_mute: Option<bool> = None;
+                let mut is_implicit_solo: Option<bool> = None;
+                let mut is_included: Option<bool> = None;
+                let mut is_language_included: Option<bool> = None;
+                let mut points: Option<serde_json::Value> = None;
+                let mut state_properties: Option<serde_json::Value> = None;
+                let mut state_groups: Option<Vec<WwiseObjectRef>> = None;
+                let mut custom_states: Option<Vec<WwiseObjectRef>> = None;
+                let mut original_state: Option<WwiseObjectRef> = None;
+                let mut supports_states: Option<bool> = None;
+                let mut supports_randomizer: Option<bool> = None;
+                let mut has_empty_switch_state_assignment: Option<bool> = None;
+                let mut extract_events: Option<Vec<WwiseObjectRef>> = None;
+                let mut extract_structures: Option<Vec<WwiseObjectRef>> = None;
+                let mut extract_media: Option<Vec<String>> = None;
+                let mut soundbanks_referencing_event: Option<Vec<WwiseObjectRef>> = None;
+                let mut extra = std::collections::HashMap::<String, serde_json::Value>::new();
+                while let Some(key) = map.next_key::<std::borrow::Cow<'de, str>>()? {
+                    match key.as_ref() {
+                        "id" => id = map.next_value()?,
+                        "name" => name = map.next_value()?,
+                        "notes" => notes = map.next_value()?,
+                        "type" => object_type = map.next_value()?,
+                        "pluginName" => plugin_name = map.next_value()?,
+                        "path" => path = map.next_value()?,
+                        "parent" => parent = map.next_value()?,
+                        "owner" => owner = map.next_value()?,
+                        "isPlayable" => is_playable = map.next_value()?,
+                        "shortId" => short_id = map.next_value()?,
+                        "classId" => class_id = map.next_value()?,
+                        "category" => category = map.next_value()?,
+                        "filePath" => file_path = map.next_value()?,
+                        "workunit" => workunit = map.next_value()?,
+                        "childrenCount" => children_count = map.next_value()?,
+                        "totalSize" => total_size = map.next_value()?,
+                        "mediaSize" => media_size = map.next_value()?,
+                        "objectSize" => object_size = map.next_value()?,
+                        "structureSize" => structure_size = map.next_value()?,
+                        "musicTransitionRoot" => music_transition_root = map.next_value()?,
+                        "musicPlaylistRoot" => music_playlist_root = map.next_value()?,
+                        "musicTransitionObject" => music_transition_object = map.next_value()?,
+                        "transitionObject" => transition_object = map.next_value()?,
+                        "originalWavFilePath" => original_wav_file_path = map.next_value()?,
+                        "originalFilePath" => original_file_path = map.next_value()?,
+                        "originalRelativeFilePath" => {
+                            original_relative_file_path = map.next_value()?
+                        }
+                        "activeSource" => active_source = map.next_value()?,
+                        "convertedWemFilePath" => converted_wem_file_path = map.next_value()?,
+                        "convertedFilePath" => converted_file_path = map.next_value()?,
+                        "soundbankBnkFilePath" => soundbank_bnk_file_path = map.next_value()?,
+                        "playbackDuration" => playback_duration = map.next_value()?,
+                        "duration" => duration = map.next_value()?,
+                        "maxDurationSource" => max_duration_source = map.next_value()?,
+                        "audioSourceTrimValues" => audio_source_trim_values = map.next_value()?,
+                        "maxRadiusAttenuation" => max_radius_attenuation = map.next_value()?,
+                        "audioSourceLanguage" => audio_source_language = map.next_value()?,
+                        "originalTotalChannelCount" => {
+                            original_total_channel_count = map.next_value()?
+                        }
+                        "originalNormalChannelCount" => {
+                            original_normal_channel_count = map.next_value()?
+                        }
+                        "originalHeightChannelCount" => {
+                            original_height_channel_count = map.next_value()?
+                        }
+                        "originalLFEChannelCount" => {
+                            original_lfe_channel_count = map.next_value()?
+                        }
+                        "originalNonLFEChannelCount" => {
+                            original_non_lfe_channel_count = map.next_value()?
+                        }
+                        "originalAnonymousChannelCount" => {
+                            original_anonymous_channel_count = map.next_value()?
+                        }
+                        "originalAmbisonicsChannelCount" => {
+                            original_ambisonics_channel_count = map.next_value()?
+                        }
+                        "originalChannelConfig" => original_channel_config = map.next_value()?,
+                        "originalChannelMask" => original_channel_mask = map.next_value()?,
+                        "originalSampleRate" => original_sample_rate = map.next_value()?,
+                        "originalBitDepth" => original_bit_depth = map.next_value()?,
+                        "originalFileSize" => original_file_size = map.next_value()?,
+                        "originalDataSize" => original_data_size = map.next_value()?,
+                        "originalSampleCount" => original_sample_count = map.next_value()?,
+                        "originalDuration" => original_duration = map.next_value()?,
+                        "originalCodec" => original_codec = map.next_value()?,
+                        "convertedTotalChannelCount" => {
+                            converted_total_channel_count = map.next_value()?
+                        }
+                        "convertedNormalChannelCount" => {
+                            converted_normal_channel_count = map.next_value()?
+                        }
+                        "convertedHeightChannelCount" => {
+                            converted_height_channel_count = map.next_value()?
+                        }
+                        "convertedLFEChannelCount" => {
+                            converted_lfe_channel_count = map.next_value()?
+                        }
+                        "convertedNonLFEChannelCount" => {
+                            converted_non_lfe_channel_count = map.next_value()?
+                        }
+                        "convertedAnonymousChannelCount" => {
+                            converted_anonymous_channel_count = map.next_value()?
+                        }
+                        "convertedAmbisonicsChannelCount" => {
+                            converted_ambisonics_channel_count = map.next_value()?
+                        }
+                        "convertedChannelConfig" => converted_channel_config = map.next_value()?,
+                        "convertedChannelMask" => converted_channel_mask = map.next_value()?,
+                        "convertedSampleRate" => converted_sample_rate = map.next_value()?,
+                        "convertedSampleRateSetting" => {
+                            converted_sample_rate_setting = map.next_value()?
+                        }
+                        "convertedBitDepth" => converted_bit_depth = map.next_value()?,
+                        "convertedFileSize" => converted_file_size = map.next_value()?,
+                        "convertedDataSize" => converted_data_size = map.next_value()?,
+                        "convertedSampleCount" => converted_sample_count = map.next_value()?,
+                        "convertedDuration" => converted_duration = map.next_value()?,
+                        "convertedTrimmedDuration" => {
+                            converted_trimmed_duration = map.next_value()?
+                        }
+                        "convertedCodec" => converted_codec = map.next_value()?,
+                        "conversionFormat" => conversion_format = map.next_value()?,
+                        "workunitIsDefault" => workunit_is_default = map.next_value()?,
+                        "workunitType" => workunit_type = map.next_value()?,
+                        "workunitIsDirty" => workunit_is_dirty = map.next_value()?,
+                        "workunitIsLoaded" => workunit_is_loaded = map.next_value()?,
+                        "switchContainerChildContext" => {
+                            switch_container_child_context = map.next_value()?
+                        }
+                        "switchGroupGameParameter" => {
+                            switch_group_game_parameter = map.next_value()?
+                        }
+                        "isExplicitMute" => is_explicit_mute = map.next_value()?,
+                        "isExplicitSolo" => is_explicit_solo = map.next_value()?,
+                        "isImplicitMute" => is_implicit_mute = map.next_value()?,
+                        "isImplicitSolo" => is_implicit_solo = map.next_value()?,
+                        "isIncluded" => is_included = map.next_value()?,
+                        "isLanguageIncluded" => is_language_included = map.next_value()?,
+                        "points" => points = map.next_value()?,
+                        "stateProperties" => state_properties = map.next_value()?,
+                        "stateGroups" => state_groups = map.next_value()?,
+                        "customStates" => custom_states = map.next_value()?,
+                        "originalState" => original_state = map.next_value()?,
+                        "supportsStates" => supports_states = map.next_value()?,
+                        "supportsRandomizer" => supports_randomizer = map.next_value()?,
+                        "hasEmptySwitchStateAssignment" => {
+                            has_empty_switch_state_assignment = map.next_value()?
+                        }
+                        "extractEvents" => extract_events = map.next_value()?,
+                        "extractStructures" => extract_structures = map.next_value()?,
+                        "extractMedia" => extract_media = map.next_value()?,
+                        "soundbanksReferencingEvent" => {
+                            soundbanks_referencing_event = map.next_value()?
+                        }
+                        _ => {
+                            extra.insert(key.into_owned(), map.next_value()?);
+                        }
+                    }
+                }
+                Ok(WwiseObject {
+                    id,
+                    name,
+                    notes,
+                    object_type,
+                    plugin_name,
+                    path,
+                    parent,
+                    owner,
+                    is_playable,
+                    short_id,
+                    class_id,
+                    category,
+                    file_path,
+                    workunit,
+                    children_count,
+                    total_size,
+                    media_size,
+                    object_size,
+                    structure_size,
+                    music_transition_root,
+                    music_playlist_root,
+                    music_transition_object,
+                    transition_object,
+                    original_wav_file_path,
+                    original_file_path,
+                    original_relative_file_path,
+                    active_source,
+                    converted_wem_file_path,
+                    converted_file_path,
+                    soundbank_bnk_file_path,
+                    playback_duration,
+                    duration,
+                    max_duration_source,
+                    audio_source_trim_values,
+                    max_radius_attenuation,
+                    audio_source_language,
+                    original_total_channel_count,
+                    original_normal_channel_count,
+                    original_height_channel_count,
+                    original_lfe_channel_count,
+                    original_non_lfe_channel_count,
+                    original_anonymous_channel_count,
+                    original_ambisonics_channel_count,
+                    original_channel_config,
+                    original_channel_mask,
+                    original_sample_rate,
+                    original_bit_depth,
+                    original_file_size,
+                    original_data_size,
+                    original_sample_count,
+                    original_duration,
+                    original_codec,
+                    converted_total_channel_count,
+                    converted_normal_channel_count,
+                    converted_height_channel_count,
+                    converted_lfe_channel_count,
+                    converted_non_lfe_channel_count,
+                    converted_anonymous_channel_count,
+                    converted_ambisonics_channel_count,
+                    converted_channel_config,
+                    converted_channel_mask,
+                    converted_sample_rate,
+                    converted_sample_rate_setting,
+                    converted_bit_depth,
+                    converted_file_size,
+                    converted_data_size,
+                    converted_sample_count,
+                    converted_duration,
+                    converted_trimmed_duration,
+                    converted_codec,
+                    conversion_format,
+                    workunit_is_default,
+                    workunit_type,
+                    workunit_is_dirty,
+                    workunit_is_loaded,
+                    switch_container_child_context,
+                    switch_group_game_parameter,
+                    is_explicit_mute,
+                    is_explicit_solo,
+                    is_implicit_mute,
+                    is_implicit_solo,
+                    is_included,
+                    is_language_included,
+                    points,
+                    state_properties,
+                    state_groups: state_groups.unwrap_or_default(),
+                    custom_states: custom_states.unwrap_or_default(),
+                    original_state,
+                    supports_states,
+                    supports_randomizer,
+                    has_empty_switch_state_assignment,
+                    extract_events: extract_events.unwrap_or_default(),
+                    extract_structures: extract_structures.unwrap_or_default(),
+                    extract_media: extract_media.unwrap_or_default(),
+                    soundbanks_referencing_event: soundbanks_referencing_event.unwrap_or_default(),
+                    extra,
+                })
+            }
+        }
+
+        deserializer.deserialize_map(WwiseObjectVisitor)
     }
 }
 
