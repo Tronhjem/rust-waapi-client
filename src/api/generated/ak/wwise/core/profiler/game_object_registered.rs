@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.profiler.gameObjectRegistered
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.profiler.gameObjectRegistered`.
+///
+/// Sent when a game object has been registered.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGameObjectRegisteredPayload {
     /// The time at which the game object was registered. This is the elapsed time in milliseconds since the initialization of the sound engine.
@@ -17,3 +26,4 @@ pub struct CoreProfilerGameObjectRegisteredPayload {
     #[serde(rename = "gameObjectName")]
     pub game_object_name: String,
 }
+

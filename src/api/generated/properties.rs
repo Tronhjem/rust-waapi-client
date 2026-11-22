@@ -9,215 +9,215 @@
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Property {
-    /// `3DPosition` (Property) [int16].
+    /// `3DPosition` (Property) (`int16`).
     _3DPosition,
-    /// `3DSpatialization` (Property) [int16].
+    /// `3DSpatialization` (Property) (`int16`).
     _3DSpatialization,
-    /// `AbsoluteOrRelative` (Property) [int16].
+    /// `AbsoluteOrRelative` (Property) (`int16`).
     AbsoluteOrRelative,
-    /// `AbsorptionHigh` (Property) [Real32].
+    /// `AbsorptionHigh` (Property) (`Real32`).
     AbsorptionHigh,
-    /// `AbsorptionLow` (Property) [Real32].
+    /// `AbsorptionLow` (Property) (`Real32`).
     AbsorptionLow,
-    /// `AbsorptionMidHigh` (Property) [Real32].
+    /// `AbsorptionMidHigh` (Property) (`Real32`).
     AbsorptionMidHigh,
-    /// `AbsorptionMidLow` (Property) [Real32].
+    /// `AbsorptionMidLow` (Property) (`Real32`).
     AbsorptionMidLow,
-    /// `AbsorptionOffset` (Property) [Real32].
+    /// `AbsorptionOffset` (Property) (`Real32`).
     AbsorptionOffset,
-    /// `ActionType` (Property) [int16].
+    /// `ActionType` (Property) (`int16`).
     ActionType,
-    /// `AllowChannelUpmix` (Property) [bool].
+    /// `AllowChannelUpmix` (Property) (`bool`).
     AllowChannelUpmix,
-    /// `AlwaysSaveMediaIDsFile` (Property) [bool].
+    /// `AlwaysSaveMediaIDsFile` (Property) (`bool`).
     AlwaysSaveMediaIDsFile,
-    /// `AnalysisType` (Property) [int32].
+    /// `AnalysisType` (Property) (`int32`).
     AnalysisType,
-    /// `AppendOffset` (Property) [Uint32].
+    /// `AppendOffset` (Property) (`Uint32`).
     AppendOffset,
-    /// `ApplyOn` (Property) [int16].
+    /// `ApplyOn` (Property) (`int16`).
     ApplyOn,
-    /// `ApplyToDynamicSequence` (Property) [bool].
+    /// `ApplyToDynamicSequence` (Property) (`bool`).
     ApplyToDynamicSequence,
-    /// `ApplyToStateTransition` (Property) [bool].
+    /// `ApplyToStateTransition` (Property) (`bool`).
     ApplyToStateTransition,
     /// `Argument` (Reference).
     Argument,
     /// `Arguments` (ObjectList).
     Arguments,
-    /// `Attenuation` (Property) [string].
+    /// `Attenuation` (Property) (`string`).
     Attenuation,
-    /// `AttenuationDistanceScaling` (Property) [Real32].
+    /// `AttenuationDistanceScaling` (Property) (`Real32`).
     AttenuationDistanceScaling,
-    /// `AudioDescription` (Property) [string].
+    /// `AudioDescription` (Property) (`string`).
     AudioDescription,
     /// `AudioDevice` (Reference).
     AudioDevice,
     /// `AudioNode` (Reference).
     AudioNode,
-    /// `AudioSimilarityPath` (Property) [string].
+    /// `AudioSimilarityPath` (Property) (`string`).
     AudioSimilarityPath,
-    /// `AudioSimilarityRegionEnd` (Property) [Real64].
+    /// `AudioSimilarityRegionEnd` (Property) (`Real64`).
     AudioSimilarityRegionEnd,
-    /// `AudioSimilarityRegionStart` (Property) [Real64].
+    /// `AudioSimilarityRegionStart` (Property) (`Real64`).
     AudioSimilarityRegionStart,
-    /// `AutoDetectFFTWindowSize` (Property) [int16].
+    /// `AutoDetectFFTWindowSize` (Property) (`int16`).
     AutoDetectFFTWindowSize,
-    /// `AutoDetectThresholdHigh` (Property) [Real64].
+    /// `AutoDetectThresholdHigh` (Property) (`Real64`).
     AutoDetectThresholdHigh,
-    /// `AutoDetectThresholdLow` (Property) [Real64].
+    /// `AutoDetectThresholdLow` (Property) (`Real64`).
     AutoDetectThresholdLow,
-    /// `AutoDetectThresholdMedium` (Property) [Real64].
+    /// `AutoDetectThresholdMedium` (Property) (`Real64`).
     AutoDetectThresholdMedium,
-    /// `AutoSoundBankAllEvents` (Property) [bool].
+    /// `AutoSoundBankAllEvents` (Property) (`bool`).
     AutoSoundBankAllEvents,
-    /// `AutoSoundBankEnabled` (Property) [bool].
+    /// `AutoSoundBankEnabled` (Property) (`bool`).
     AutoSoundBankEnabled,
-    /// `BeginTrimOffset` (Property) [Real64].
+    /// `BeginTrimOffset` (Property) (`Real64`).
     BeginTrimOffset,
-    /// `BelowThresholdBehavior` (Property) [int16].
+    /// `BelowThresholdBehavior` (Property) (`int16`).
     BelowThresholdBehavior,
-    /// `BindToBuiltInParam` (Property) [int16].
+    /// `BindToBuiltInParam` (Property) (`int16`).
     BindToBuiltInParam,
-    /// `BlendBehavior` (Property) [int16].
+    /// `BlendBehavior` (Property) (`int16`).
     BlendBehavior,
-    /// `BusChannelConfig` (Property) [int32].
+    /// `BusChannelConfig` (Property) (`int32`).
     BusChannelConfig,
-    /// `BusVolume` (Property) [Real64, Decibels].
+    /// `BusVolume` (Property) (`Real64`, `Decibels`).
     BusVolume,
-    /// `Bypass` (Property) [bool].
+    /// `Bypass` (Property) (`bool`).
     Bypass,
-    /// `BypassEffect` (Property) [bool].
+    /// `BypassEffect` (Property) (`bool`).
     BypassEffect,
-    /// `BypassFlag` (Property) [bool].
+    /// `BypassFlag` (Property) (`bool`).
     BypassFlag,
-    /// `BypassGameParameterInternalTransition` (Property) [bool].
+    /// `BypassGameParameterInternalTransition` (Property) (`bool`).
     BypassGameParameterInternalTransition,
-    /// `CenterPercentage` (Property) [int32].
+    /// `CenterPercentage` (Property) (`int32`).
     CenterPercentage,
-    /// `ChannelConfigOverride` (Property) [int64].
+    /// `ChannelConfigOverride` (Property) (`int64`).
     ChannelConfigOverride,
-    /// `Channels` (Property) [int32].
+    /// `Channels` (Property) (`int32`).
     Channels,
     /// `Clips` (ObjectList).
     Clips,
-    /// `Color` (Property) [int16].
+    /// `Color` (Property) (`int16`).
     Color,
-    /// `CommPortDiscoveryBroadcast` (Property) [Uint16].
+    /// `CommPortDiscoveryBroadcast` (Property) (`Uint16`).
     CommPortDiscoveryBroadcast,
-    /// `CommPortDiscoveryResponse` (Property) [Uint16].
+    /// `CommPortDiscoveryResponse` (Property) (`Uint16`).
     CommPortDiscoveryResponse,
-    /// `CommSerialPortBase` (Property) [Uint16].
+    /// `CommSerialPortBase` (Property) (`Uint16`).
     CommSerialPortBase,
-    /// `ConditionalOperator` (Property) [int16].
+    /// `ConditionalOperator` (Property) (`int16`).
     ConditionalOperator,
-    /// `ConeAttenuation` (Property) [Real64, Decibels].
+    /// `ConeAttenuation` (Property) (`Real64`, `Decibels`).
     ConeAttenuation,
-    /// `ConeHighPassFilterValue` (Property) [int32].
+    /// `ConeHighPassFilterValue` (Property) (`int32`).
     ConeHighPassFilterValue,
-    /// `ConeInnerAngle` (Property) [int32].
+    /// `ConeInnerAngle` (Property) (`int32`).
     ConeInnerAngle,
-    /// `ConeLowPassFilterValue` (Property) [int32].
+    /// `ConeLowPassFilterValue` (Property) (`int32`).
     ConeLowPassFilterValue,
-    /// `ConeOuterAngle` (Property) [int32].
+    /// `ConeOuterAngle` (Property) (`int32`).
     ConeOuterAngle,
-    /// `ConeUse` (Property) [bool].
+    /// `ConeUse` (Property) (`bool`).
     ConeUse,
-    /// `ContinuePlay` (Property) [bool].
+    /// `ContinuePlay` (Property) (`bool`).
     ContinuePlay,
     /// `ControlInput` (Reference).
     ControlInput,
-    /// `Conversion` (Property) [string].
+    /// `Conversion` (Property) (`string`).
     Conversion,
-    /// `ConvertExternalSources` (Property) [bool].
+    /// `ConvertExternalSources` (Property) (`bool`).
     ConvertExternalSources,
-    /// `CooldownTime` (Property) [Real32].
+    /// `CooldownTime` (Property) (`Real32`).
     CooldownTime,
-    /// `CopyLooseStreamedMedia` (Property) [bool].
+    /// `CopyLooseStreamedMedia` (Property) (`bool`).
     CopyLooseStreamedMedia,
-    /// `CriteriaType` (Property) [int32].
+    /// `CriteriaType` (Property) (`int32`).
     CriteriaType,
-    /// `CrossfadeDuration` (Property) [Real64].
+    /// `CrossfadeDuration` (Property) (`Real64`).
     CrossfadeDuration,
-    /// `CrossfadeShape` (Property) [int16].
+    /// `CrossfadeShape` (Property) (`int16`).
     CrossfadeShape,
-    /// `CueType` (Property) [int16].
+    /// `CueType` (Property) (`int16`).
     CueType,
     /// `Cues` (ObjectList).
     Cues,
     /// `Curve` (Reference).
     Curve,
-    /// `CurveType` (Property) [int16].
+    /// `CurveType` (Property) (`int16`).
     CurveType,
-    /// `CurveUsage` (Property) [int16].
+    /// `CurveUsage` (Property) (`int16`).
     CurveUsage,
-    /// `CustomCueMatchName` (Property) [string].
+    /// `CustomCueMatchName` (Property) (`string`).
     CustomCueMatchName,
-    /// `DSFEmphasis` (Property) [Real64].
+    /// `DSFEmphasis` (Property) (`Real64`).
     DSFEmphasis,
-    /// `DataFileName` (Property) [string].
+    /// `DataFileName` (Property) (`string`).
     DataFileName,
-    /// `DefaultLanguage` (Property) [string].
+    /// `DefaultLanguage` (Property) (`string`).
     DefaultLanguage,
-    /// `DefaultSoundVolume` (Property) [Real64, Decibels].
+    /// `DefaultSoundVolume` (Property) (`Real64`, `Decibels`).
     DefaultSoundVolume,
     /// `DefaultSwitchOrState` (Reference).
     DefaultSwitchOrState,
-    /// `DefaultSwitchState` (Property) [string].
+    /// `DefaultSwitchState` (Property) (`string`).
     DefaultSwitchState,
-    /// `DefaultTransitionTime` (Property) [Real64].
+    /// `DefaultTransitionTime` (Property) (`Real64`).
     DefaultTransitionTime,
-    /// `Delay` (Property) [Real64].
+    /// `Delay` (Property) (`Real64`).
     Delay,
     /// `DestinationContextObject` (Reference).
     DestinationContextObject,
-    /// `DestinationContextType` (Property) [int16].
+    /// `DestinationContextType` (Property) (`int16`).
     DestinationContextType,
-    /// `DestinationJumpPositionPreset` (Property) [int16].
+    /// `DestinationJumpPositionPreset` (Property) (`int16`).
     DestinationJumpPositionPreset,
-    /// `DestinationPlaylistJumpTo` (Property) [int16].
+    /// `DestinationPlaylistJumpTo` (Property) (`int16`).
     DestinationPlaylistJumpTo,
-    /// `DontPlayAgainTime` (Property) [Real64].
+    /// `DontPlayAgainTime` (Property) (`Real64`).
     DontPlayAgainTime,
-    /// `Duration` (Property) [Uint32].
+    /// `Duration` (Property) (`Uint32`).
     Duration,
-    /// `Effect` (Property) [string].
+    /// `Effect` (Property) (`string`).
     Effect,
-    /// `EffectClassID` (Property) [string].
+    /// `EffectClassID` (Property) (`string`).
     EffectClassID,
-    /// `EffectSlot` (Property) [int16].
+    /// `EffectSlot` (Property) (`int16`).
     EffectSlot,
     /// `Effects` (ObjectList).
     Effects,
-    /// `EnableAttenuation` (Property) [bool].
+    /// `EnableAttenuation` (Property) (`bool`).
     EnableAttenuation,
-    /// `EnableCrossFading` (Property) [bool].
+    /// `EnableCrossFading` (Property) (`bool`).
     EnableCrossFading,
-    /// `EnableDestinationFadeIn` (Property) [bool].
+    /// `EnableDestinationFadeIn` (Property) (`bool`).
     EnableDestinationFadeIn,
-    /// `EnableDiffraction` (Property) [bool].
+    /// `EnableDiffraction` (Property) (`bool`).
     EnableDiffraction,
-    /// `EnableInsert` (Property) [bool].
+    /// `EnableInsert` (Property) (`bool`).
     EnableInsert,
-    /// `EnableLoudnessNormalization` (Property) [bool].
+    /// `EnableLoudnessNormalization` (Property) (`bool`).
     EnableLoudnessNormalization,
-    /// `EnableMidiNoteTracking` (Property) [bool].
+    /// `EnableMidiNoteTracking` (Property) (`bool`).
     EnableMidiNoteTracking,
-    /// `EnableRemove` (Property) [bool].
+    /// `EnableRemove` (Property) (`bool`).
     EnableRemove,
-    /// `EnableReplace` (Property) [bool].
+    /// `EnableReplace` (Property) (`bool`).
     EnableReplace,
-    /// `EnableSourceFadeOut` (Property) [bool].
+    /// `EnableSourceFadeOut` (Property) (`bool`).
     EnableSourceFadeOut,
-    /// `EnableTransitionFadeIn` (Property) [bool].
+    /// `EnableTransitionFadeIn` (Property) (`bool`).
     EnableTransitionFadeIn,
-    /// `EnableTransitionFadeOut` (Property) [bool].
+    /// `EnableTransitionFadeOut` (Property) (`bool`).
     EnableTransitionFadeOut,
-    /// `Enabled` (Property) [bool].
+    /// `Enabled` (Property) (`bool`).
     Enabled,
-    /// `EndPosition` (Property) [Real64].
+    /// `EndPosition` (Property) (`Real64`).
     EndPosition,
-    /// `EndTrimOffset` (Property) [Real64].
+    /// `EndTrimOffset` (Property) (`Real64`).
     EndTrimOffset,
     /// `Entries` (ObjectList).
     Entries,
@@ -225,461 +225,461 @@ pub enum Property {
     EntryPath,
     /// `EntryPathObject` (Reference).
     EntryPathObject,
-    /// `EnvelopeAttackCurve` (Property) [Real64].
+    /// `EnvelopeAttackCurve` (Property) (`Real64`).
     EnvelopeAttackCurve,
-    /// `EnvelopeAttackTime` (Property) [Real64].
+    /// `EnvelopeAttackTime` (Property) (`Real64`).
     EnvelopeAttackTime,
-    /// `EnvelopeAutoRelease` (Property) [bool].
+    /// `EnvelopeAutoRelease` (Property) (`bool`).
     EnvelopeAutoRelease,
-    /// `EnvelopeDecayTime` (Property) [Real64].
+    /// `EnvelopeDecayTime` (Property) (`Real64`).
     EnvelopeDecayTime,
-    /// `EnvelopeReleaseTime` (Property) [Real64].
+    /// `EnvelopeReleaseTime` (Property) (`Real64`).
     EnvelopeReleaseTime,
-    /// `EnvelopeStopPlayback` (Property) [bool].
+    /// `EnvelopeStopPlayback` (Property) (`bool`).
     EnvelopeStopPlayback,
-    /// `EnvelopeSustainLevel` (Property) [Real64].
+    /// `EnvelopeSustainLevel` (Property) (`Real64`).
     EnvelopeSustainLevel,
-    /// `EnvelopeSustainTime` (Property) [Real64].
+    /// `EnvelopeSustainTime` (Property) (`Real64`).
     EnvelopeSustainTime,
-    /// `EnvelopeTriggerOn` (Property) [int32].
+    /// `EnvelopeTriggerOn` (Property) (`int32`).
     EnvelopeTriggerOn,
     /// `EnvironmentalCurves` (Reference).
     EnvironmentalCurves,
-    /// `ErrorResult` (Property) [string].
+    /// `ErrorResult` (Property) (`string`).
     ErrorResult,
-    /// `EventActionNamePosition` (Property) [int16].
+    /// `EventActionNamePosition` (Property) (`int16`).
     EventActionNamePosition,
-    /// `EventCreationSettingsOverride` (Property) [bool].
+    /// `EventCreationSettingsOverride` (Property) (`bool`).
     EventCreationSettingsOverride,
-    /// `EventNameCaseType` (Property) [int16].
+    /// `EventNameCaseType` (Property) (`int16`).
     EventNameCaseType,
-    /// `EventNameModifyCase` (Property) [bool].
+    /// `EventNameModifyCase` (Property) (`bool`).
     EventNameModifyCase,
-    /// `EventsReferencedInOperator` (Property) [int16].
+    /// `EventsReferencedInOperator` (Property) (`int16`).
     EventsReferencedInOperator,
-    /// `ExitSourceAt` (Property) [int16].
+    /// `ExitSourceAt` (Property) (`int16`).
     ExitSourceAt,
-    /// `ExitSourceCustomCueMatchName` (Property) [string].
+    /// `ExitSourceCustomCueMatchName` (Property) (`string`).
     ExitSourceCustomCueMatchName,
-    /// `ExternalSourcesInputPath` (Property) [string].
+    /// `ExternalSourcesInputPath` (Property) (`string`).
     ExternalSourcesInputPath,
-    /// `ExternalSourcesOutputPath` (Property) [string].
+    /// `ExternalSourcesOutputPath` (Property) (`string`).
     ExternalSourcesOutputPath,
-    /// `ExternalSourcesOverrideInputPath` (Property) [bool].
+    /// `ExternalSourcesOverrideInputPath` (Property) (`bool`).
     ExternalSourcesOverrideInputPath,
-    /// `ExternalSourcesOverrideOutputPath` (Property) [bool].
+    /// `ExternalSourcesOverrideOutputPath` (Property) (`bool`).
     ExternalSourcesOverrideOutputPath,
-    /// `FadeCurve` (Property) [int16].
+    /// `FadeCurve` (Property) (`int16`).
     FadeCurve,
-    /// `FadeInCurve` (Property) [int16].
+    /// `FadeInCurve` (Property) (`int16`).
     FadeInCurve,
-    /// `FadeInDuration` (Property) [Real64].
+    /// `FadeInDuration` (Property) (`Real64`).
     FadeInDuration,
-    /// `FadeInMode` (Property) [int16].
+    /// `FadeInMode` (Property) (`int16`).
     FadeInMode,
-    /// `FadeInShape` (Property) [int16].
+    /// `FadeInShape` (Property) (`int16`).
     FadeInShape,
-    /// `FadeInTime` (Property) [Real64].
+    /// `FadeInTime` (Property) (`Real64`).
     FadeInTime,
-    /// `FadeOffset` (Property) [Real64].
+    /// `FadeOffset` (Property) (`Real64`).
     FadeOffset,
-    /// `FadeOutCurve` (Property) [int16].
+    /// `FadeOutCurve` (Property) (`int16`).
     FadeOutCurve,
-    /// `FadeOutDuration` (Property) [Real64].
+    /// `FadeOutDuration` (Property) (`Real64`).
     FadeOutDuration,
-    /// `FadeOutMode` (Property) [int16].
+    /// `FadeOutMode` (Property) (`int16`).
     FadeOutMode,
-    /// `FadeOutShape` (Property) [int16].
+    /// `FadeOutShape` (Property) (`int16`).
     FadeOutShape,
-    /// `FadeOutTime` (Property) [Real64].
+    /// `FadeOutTime` (Property) (`Real64`).
     FadeOutTime,
-    /// `FadeTime` (Property) [Real64].
+    /// `FadeTime` (Property) (`Real64`).
     FadeTime,
-    /// `FadeType` (Property) [int16].
+    /// `FadeType` (Property) (`int16`).
     FadeType,
-    /// `FieldName` (Property) [string].
+    /// `FieldName` (Property) (`string`).
     FieldName,
-    /// `Fill` (Property) [bool].
+    /// `Fill` (Property) (`bool`).
     Fill,
-    /// `FilterBehavior` (Property) [int16].
+    /// `FilterBehavior` (Property) (`int16`).
     FilterBehavior,
-    /// `FilterTimeDown` (Property) [Real64].
+    /// `FilterTimeDown` (Property) (`Real64`).
     FilterTimeDown,
-    /// `FilterTimeUp` (Property) [Real64].
+    /// `FilterTimeUp` (Property) (`Real64`).
     FilterTimeUp,
     /// `Filters` (ObjectList).
     Filters,
-    /// `FirstOccurenceOnly` (Property) [bool].
+    /// `FirstOccurenceOnly` (Property) (`bool`).
     FirstOccurenceOnly,
-    /// `Flags` (Property) [int32].
+    /// `Flags` (Property) (`int32`).
     Flags,
-    /// `GameAuxSendDSF` (Property) [Real64, Decibels].
+    /// `GameAuxSendDSF` (Property) (`Real64`, `Decibels`).
     GameAuxSendDSF,
-    /// `GameAuxSendHPF` (Property) [int16].
+    /// `GameAuxSendHPF` (Property) (`int16`).
     GameAuxSendHPF,
-    /// `GameAuxSendLPF` (Property) [int16].
+    /// `GameAuxSendLPF` (Property) (`int16`).
     GameAuxSendLPF,
-    /// `GameAuxSendVolume` (Property) [Real64, Decibels].
+    /// `GameAuxSendVolume` (Property) (`Real64`, `Decibels`).
     GameAuxSendVolume,
-    /// `GameParameter` (Property) [string].
+    /// `GameParameter` (Property) (`string`).
     GameParameter,
-    /// `GameParameterValue` (Property) [Real64].
+    /// `GameParameterValue` (Property) (`Real64`).
     GameParameterValue,
-    /// `GarbageCollectWaveAnalysis` (Property) [bool].
+    /// `GarbageCollectWaveAnalysis` (Property) (`bool`).
     GarbageCollectWaveAnalysis,
-    /// `GenerateMainSoundBank` (Property) [bool].
+    /// `GenerateMainSoundBank` (Property) (`bool`).
     GenerateMainSoundBank,
-    /// `GenerateMultipleBanks` (Property) [bool].
+    /// `GenerateMultipleBanks` (Property) (`bool`).
     GenerateMultipleBanks,
-    /// `GenerateSoundBankJSON` (Property) [bool].
+    /// `GenerateSoundBankJSON` (Property) (`bool`).
     GenerateSoundBankJSON,
-    /// `GenerateSoundBankXML` (Property) [bool].
+    /// `GenerateSoundBankXML` (Property) (`bool`).
     GenerateSoundBankXML,
-    /// `GlobalOrPerObject` (Property) [int16].
+    /// `GlobalOrPerObject` (Property) (`int16`).
     GlobalOrPerObject,
-    /// `GlobalVoiceInstancesLimit` (Property) [int16].
+    /// `GlobalVoiceInstancesLimit` (Property) (`int16`).
     GlobalVoiceInstancesLimit,
-    /// `GridFrequencyPreset` (Property) [int16].
+    /// `GridFrequencyPreset` (Property) (`int16`).
     GridFrequencyPreset,
-    /// `GridOffsetCustom` (Property) [Real64].
+    /// `GridOffsetCustom` (Property) (`Real64`).
     GridOffsetCustom,
-    /// `GridOffsetPreset` (Property) [int16].
+    /// `GridOffsetPreset` (Property) (`int16`).
     GridOffsetPreset,
-    /// `GroupType` (Property) [int16].
+    /// `GroupType` (Property) (`int16`).
     GroupType,
-    /// `HardwareControllerKey` (Property) [string].
+    /// `HardwareControllerKey` (Property) (`string`).
     HardwareControllerKey,
-    /// `HasEmptyAssignation` (Property) [bool].
+    /// `HasEmptyAssignation` (Property) (`bool`).
     HasEmptyAssignation,
-    /// `HdrActiveRange` (Property) [Real64].
+    /// `HdrActiveRange` (Property) (`Real64`).
     HdrActiveRange,
-    /// `HdrEnable` (Property) [bool].
+    /// `HdrEnable` (Property) (`bool`).
     HdrEnable,
-    /// `HdrEnableEnvelope` (Property) [bool].
+    /// `HdrEnableEnvelope` (Property) (`bool`).
     HdrEnableEnvelope,
-    /// `HdrEnvelope` (Property) [Real64].
+    /// `HdrEnvelope` (Property) (`Real64`).
     HdrEnvelope,
-    /// `HdrEnvelopeSensitivity` (Property) [Real64].
+    /// `HdrEnvelopeSensitivity` (Property) (`Real64`).
     HdrEnvelopeSensitivity,
-    /// `HdrOutputGameParameterMax` (Property) [Real64].
+    /// `HdrOutputGameParameterMax` (Property) (`Real64`).
     HdrOutputGameParameterMax,
-    /// `HdrOutputGameParameterMin` (Property) [Real64].
+    /// `HdrOutputGameParameterMin` (Property) (`Real64`).
     HdrOutputGameParameterMin,
     /// `HdrPeakOutputGameParameter` (Reference).
     HdrPeakOutputGameParameter,
-    /// `HdrRatio` (Property) [Real64].
+    /// `HdrRatio` (Property) (`Real64`).
     HdrRatio,
-    /// `HdrReleaseTime` (Property) [Real64].
+    /// `HdrReleaseTime` (Property) (`Real64`).
     HdrReleaseTime,
-    /// `HdrReleaseTimeMode` (Property) [int16].
+    /// `HdrReleaseTimeMode` (Property) (`int16`).
     HdrReleaseTimeMode,
-    /// `HdrThreshold` (Property) [Real64].
+    /// `HdrThreshold` (Property) (`Real64`).
     HdrThreshold,
-    /// `HeightSpreadEnable` (Property) [bool].
+    /// `HeightSpreadEnable` (Property) (`bool`).
     HeightSpreadEnable,
-    /// `Highpass` (Property) [int16].
+    /// `Highpass` (Property) (`int16`).
     Highpass,
-    /// `HoldEmitterPositionOrientation` (Property) [bool].
+    /// `HoldEmitterPositionOrientation` (Property) (`bool`).
     HoldEmitterPositionOrientation,
-    /// `HoldListenerOrientation` (Property) [bool].
+    /// `HoldListenerOrientation` (Property) (`bool`).
     HoldListenerOrientation,
-    /// `IgnoreParentMaxSoundInstance` (Property) [bool].
+    /// `IgnoreParentMaxSoundInstance` (Property) (`bool`).
     IgnoreParentMaxSoundInstance,
-    /// `IncludeFilter` (Property) [bool].
+    /// `IncludeFilter` (Property) (`bool`).
     IncludeFilter,
-    /// `Inclusion` (Property) [bool].
+    /// `Inclusion` (Property) (`bool`).
     Inclusion,
-    /// `InitialDelay` (Property) [Real64].
+    /// `InitialDelay` (Property) (`Real64`).
     InitialDelay,
-    /// `InitialValue` (Property) [Real64].
+    /// `InitialValue` (Property) (`Real64`).
     InitialValue,
-    /// `InsertAtPosition` (Property) [int32].
+    /// `InsertAtPosition` (Property) (`int32`).
     InsertAtPosition,
-    /// `InsertFrom` (Property) [int16].
+    /// `InsertFrom` (Property) (`int16`).
     InsertFrom,
-    /// `InsertStartAt` (Property) [int32].
+    /// `InsertStartAt` (Property) (`int32`).
     InsertStartAt,
-    /// `InsertToInsert` (Property) [string].
+    /// `InsertToInsert` (Property) (`string`).
     InsertToInsert,
-    /// `InsertWhat` (Property) [int16].
+    /// `InsertWhat` (Property) (`int16`).
     InsertWhat,
-    /// `InstanceLimit` (Property) [int16].
+    /// `InstanceLimit` (Property) (`int16`).
     InstanceLimit,
-    /// `IsChecked` (Property) [bool].
+    /// `IsChecked` (Property) (`bool`).
     IsChecked,
-    /// `IsFolder` (Property) [bool].
+    /// `IsFolder` (Property) (`bool`).
     IsFolder,
-    /// `IsGlobalLimit` (Property) [int16].
+    /// `IsGlobalLimit` (Property) (`int16`).
     IsGlobalLimit,
-    /// `IsLinked` (Property) [bool].
+    /// `IsLinked` (Property) (`bool`).
     IsLinked,
-    /// `IsLoopingEnabled` (Property) [bool].
+    /// `IsLoopingEnabled` (Property) (`bool`).
     IsLoopingEnabled,
-    /// `IsLoopingInfinite` (Property) [bool].
+    /// `IsLoopingInfinite` (Property) (`bool`).
     IsLoopingInfinite,
-    /// `IsNonCachable` (Property) [bool].
+    /// `IsNonCachable` (Property) (`bool`).
     IsNonCachable,
-    /// `IsSourceOfOverride` (Property) [bool].
+    /// `IsSourceOfOverride` (Property) (`bool`).
     IsSourceOfOverride,
-    /// `IsSpecialSearch` (Property) [bool].
+    /// `IsSpecialSearch` (Property) (`bool`).
     IsSpecialSearch,
-    /// `IsStreamingEnabled` (Property) [bool].
+    /// `IsStreamingEnabled` (Property) (`bool`).
     IsStreamingEnabled,
-    /// `IsUsed` (Property) [bool].
+    /// `IsUsed` (Property) (`bool`).
     IsUsed,
-    /// `IsVoice` (Property) [bool].
+    /// `IsVoice` (Property) (`bool`).
     IsVoice,
-    /// `IsZeroLatency` (Property) [bool].
+    /// `IsZeroLatency` (Property) (`bool`).
     IsZeroLatency,
-    /// `JumpToCustomCueMatchMode` (Property) [int16].
+    /// `JumpToCustomCueMatchMode` (Property) (`int16`).
     JumpToCustomCueMatchMode,
-    /// `JumpToCustomCueMatchName` (Property) [string].
+    /// `JumpToCustomCueMatchName` (Property) (`string`).
     JumpToCustomCueMatchName,
-    /// `LRMix` (Property) [Real64].
+    /// `LRMix` (Property) (`Real64`).
     LRMix,
-    /// `Label` (Property) [string].
+    /// `Label` (Property) (`string`).
     Label,
     /// `LayerCrossFadeControlInput` (Reference).
     LayerCrossFadeControlInput,
-    /// `LeftValue` (Property) [Real64].
+    /// `LeftValue` (Property) (`Real64`).
     LeftValue,
-    /// `LfoAttack` (Property) [Real64].
+    /// `LfoAttack` (Property) (`Real64`).
     LfoAttack,
-    /// `LfoDepth` (Property) [Real64].
+    /// `LfoDepth` (Property) (`Real64`).
     LfoDepth,
-    /// `LfoFrequency` (Property) [Real64, Frequency].
+    /// `LfoFrequency` (Property) (`Real64`, `Frequency`).
     LfoFrequency,
-    /// `LfoInitialPhase` (Property) [Real64].
+    /// `LfoInitialPhase` (Property) (`Real64`).
     LfoInitialPhase,
-    /// `LfoPWM` (Property) [Real64].
+    /// `LfoPWM` (Property) (`Real64`).
     LfoPWM,
-    /// `LfoSmoothing` (Property) [Real64].
+    /// `LfoSmoothing` (Property) (`Real64`).
     LfoSmoothing,
-    /// `LfoWaveform` (Property) [int32].
+    /// `LfoWaveform` (Property) (`int32`).
     LfoWaveform,
-    /// `LicenseKey` (Property) [string].
+    /// `LicenseKey` (Property) (`string`).
     LicenseKey,
-    /// `LimitScope` (Property) [int16].
+    /// `LimitScope` (Property) (`int16`).
     LimitScope,
-    /// `LineEnding` (Property) [Uint16].
+    /// `LineEnding` (Property) (`Uint16`).
     LineEnding,
-    /// `LinearTime` (Property) [bool].
+    /// `LinearTime` (Property) (`bool`).
     LinearTime,
-    /// `ListenerRelativeRouting` (Property) [bool].
+    /// `ListenerRelativeRouting` (Property) (`bool`).
     ListenerRelativeRouting,
-    /// `LogicalOperator` (Property) [int16].
+    /// `LogicalOperator` (Property) (`int16`).
     LogicalOperator,
-    /// `LookAheadTime` (Property) [int16].
+    /// `LookAheadTime` (Property) (`int16`).
     LookAheadTime,
-    /// `LoopBegin` (Property) [Real64].
+    /// `LoopBegin` (Property) (`Real64`).
     LoopBegin,
-    /// `LoopCount` (Property) [int32].
+    /// `LoopCount` (Property) (`int32`).
     LoopCount,
-    /// `LoopEnd` (Property) [Real64].
+    /// `LoopEnd` (Property) (`Real64`).
     LoopEnd,
-    /// `LoudnessNormalizationTarget` (Property) [Real64, Decibels].
+    /// `LoudnessNormalizationTarget` (Property) (`Real64`, `Decibels`).
     LoudnessNormalizationTarget,
-    /// `LoudnessNormalizationType` (Property) [int16].
+    /// `LoudnessNormalizationType` (Property) (`int16`).
     LoudnessNormalizationType,
-    /// `Lowpass` (Property) [int16].
+    /// `Lowpass` (Property) (`int16`).
     Lowpass,
-    /// `MakeUpGain` (Property) [Real64, Decibels].
+    /// `MakeUpGain` (Property) (`Real64`, `Decibels`).
     MakeUpGain,
-    /// `MarkerDetectionSensitivity` (Property) [Real64].
+    /// `MarkerDetectionSensitivity` (Property) (`Real64`).
     MarkerDetectionSensitivity,
-    /// `MarkerInputMode` (Property) [int16].
+    /// `MarkerInputMode` (Property) (`int16`).
     MarkerInputMode,
     /// `Markers` (ObjectList).
     Markers,
-    /// `MasterResume` (Property) [bool].
+    /// `MasterResume` (Property) (`bool`).
     MasterResume,
-    /// `Max` (Property) [Real64].
+    /// `Max` (Property) (`Real64`).
     Max,
-    /// `MaxDangerousVirtualVoices` (Property) [Uint32].
+    /// `MaxDangerousVirtualVoices` (Property) (`Uint32`).
     MaxDangerousVirtualVoices,
-    /// `MaxDuckVolume` (Property) [Real64, Decibels].
+    /// `MaxDuckVolume` (Property) (`Real64`, `Decibels`).
     MaxDuckVolume,
-    /// `MaxMessagesPerMessageId` (Property) [Uint32].
+    /// `MaxMessagesPerMessageId` (Property) (`Uint32`).
     MaxMessagesPerMessageId,
-    /// `MaxReachedBehavior` (Property) [int16].
+    /// `MaxReachedBehavior` (Property) (`int16`).
     MaxReachedBehavior,
-    /// `MaxSampleRate` (Property) [int32].
+    /// `MaxSampleRate` (Property) (`int32`).
     MaxSampleRate,
-    /// `MaxSoundPerInstance` (Property) [int16].
+    /// `MaxSoundPerInstance` (Property) (`int16`).
     MaxSoundPerInstance,
-    /// `Maximum` (Property) [int32].
+    /// `Maximum` (Property) (`int32`).
     Maximum,
-    /// `MediaAutoBankSubFolders` (Property) [bool].
+    /// `MediaAutoBankSubFolders` (Property) (`bool`).
     MediaAutoBankSubFolders,
-    /// `MediaIDsInSingleFile` (Property) [bool].
+    /// `MediaIDsInSingleFile` (Property) (`bool`).
     MediaIDsInSingleFile,
-    /// `Metadata` (Property) [string].
+    /// `Metadata` (Property) (`string`).
     Metadata,
-    /// `MetadataClassID` (Property) [string].
+    /// `MetadataClassID` (Property) (`string`).
     MetadataClassID,
-    /// `MidiBreakOnNoteOff` (Property) [bool].
+    /// `MidiBreakOnNoteOff` (Property) (`bool`).
     MidiBreakOnNoteOff,
-    /// `MidiChannelFilter` (Property) [int32].
+    /// `MidiChannelFilter` (Property) (`int32`).
     MidiChannelFilter,
-    /// `MidiKeyFilterMax` (Property) [int32].
+    /// `MidiKeyFilterMax` (Property) (`int32`).
     MidiKeyFilterMax,
-    /// `MidiKeyFilterMin` (Property) [int32].
+    /// `MidiKeyFilterMin` (Property) (`int32`).
     MidiKeyFilterMin,
-    /// `MidiPlayOnNoteType` (Property) [int16].
+    /// `MidiPlayOnNoteType` (Property) (`int16`).
     MidiPlayOnNoteType,
     /// `MidiTarget` (Reference).
     MidiTarget,
-    /// `MidiTempoSource` (Property) [int16].
+    /// `MidiTempoSource` (Property) (`int16`).
     MidiTempoSource,
-    /// `MidiTrackingRootNote` (Property) [int32].
+    /// `MidiTrackingRootNote` (Property) (`int32`).
     MidiTrackingRootNote,
-    /// `MidiTransposition` (Property) [int32].
+    /// `MidiTransposition` (Property) (`int32`).
     MidiTransposition,
-    /// `MidiVelocityFilterMax` (Property) [int32].
+    /// `MidiVelocityFilterMax` (Property) (`int32`).
     MidiVelocityFilterMax,
-    /// `MidiVelocityFilterMin` (Property) [int32].
+    /// `MidiVelocityFilterMin` (Property) (`int32`).
     MidiVelocityFilterMin,
-    /// `MidiVelocityOffset` (Property) [int32].
+    /// `MidiVelocityOffset` (Property) (`int32`).
     MidiVelocityOffset,
-    /// `Min` (Property) [Real64].
+    /// `Min` (Property) (`Real64`).
     Min,
-    /// `MinSampleRate` (Property) [int32].
+    /// `MinSampleRate` (Property) (`int32`).
     MinSampleRate,
-    /// `Mode` (Property) [int16].
+    /// `Mode` (Property) (`int16`).
     Mode,
-    /// `ModulatorScope` (Property) [int32].
+    /// `ModulatorScope` (Property) (`int32`).
     ModulatorScope,
-    /// `MusicSegment` (Property) [string].
+    /// `MusicSegment` (Property) (`string`).
     MusicSegment,
-    /// `MusicSyncType` (Property) [int32].
+    /// `MusicSyncType` (Property) (`int32`).
     MusicSyncType,
-    /// `MusicTrackType` (Property) [int16].
+    /// `MusicTrackType` (Property) (`int16`).
     MusicTrackType,
-    /// `NewPathForEachSound` (Property) [bool].
+    /// `NewPathForEachSound` (Property) (`bool`).
     NewPathForEachSound,
-    /// `NormalOrShuffle` (Property) [int16].
+    /// `NormalOrShuffle` (Property) (`int16`).
     NormalOrShuffle,
-    /// `NumSegmentAdvance` (Property) [int16].
+    /// `NumSegmentAdvance` (Property) (`int16`).
     NumSegmentAdvance,
-    /// `NumericOperator` (Property) [int16].
+    /// `NumericOperator` (Property) (`int16`).
     NumericOperator,
-    /// `ObjectIndexInView` (Property) [int32].
+    /// `ObjectIndexInView` (Property) (`int32`).
     ObjectIndexInView,
-    /// `ObjectReferenced` (Property) [string].
+    /// `ObjectReferenced` (Property) (`string`).
     ObjectReferenced,
-    /// `ObjectType` (Property) [int32].
+    /// `ObjectType` (Property) (`int32`).
     ObjectType,
-    /// `OperatorNumeric` (Property) [int32].
+    /// `OperatorNumeric` (Property) (`int32`).
     OperatorNumeric,
-    /// `OperatorText` (Property) [int32].
+    /// `OperatorText` (Property) (`int32`).
     OperatorText,
-    /// `OutputBus` (Property) [string].
+    /// `OutputBus` (Property) (`string`).
     OutputBus,
-    /// `OutputBusDualshelf` (Property) [Real64, Decibels].
+    /// `OutputBusDualshelf` (Property) (`Real64`, `Decibels`).
     OutputBusDualshelf,
-    /// `OutputBusHighpass` (Property) [int16].
+    /// `OutputBusHighpass` (Property) (`int16`).
     OutputBusHighpass,
-    /// `OutputBusLowpass` (Property) [int16].
+    /// `OutputBusLowpass` (Property) (`int16`).
     OutputBusLowpass,
-    /// `OutputBusVolume` (Property) [Real64, Decibels].
+    /// `OutputBusVolume` (Property) (`Real64`, `Decibels`).
     OutputBusVolume,
-    /// `OverLimitBehavior` (Property) [int16].
+    /// `OverLimitBehavior` (Property) (`int16`).
     OverLimitBehavior,
-    /// `OverrideAnalysis` (Property) [bool].
+    /// `OverrideAnalysis` (Property) (`bool`).
     OverrideAnalysis,
-    /// `OverrideClockSettings` (Property) [bool].
+    /// `OverrideClockSettings` (Property) (`bool`).
     OverrideClockSettings,
-    /// `OverrideColor` (Property) [bool].
+    /// `OverrideColor` (Property) (`bool`).
     OverrideColor,
-    /// `OverrideConversion` (Property) [bool].
+    /// `OverrideConversion` (Property) (`bool`).
     OverrideConversion,
-    /// `OverrideEarlyReflections` (Property) [bool].
+    /// `OverrideEarlyReflections` (Property) (`bool`).
     OverrideEarlyReflections,
-    /// `OverrideEffect` (Property) [bool].
+    /// `OverrideEffect` (Property) (`bool`).
     OverrideEffect,
-    /// `OverrideGameAuxSends` (Property) [bool].
+    /// `OverrideGameAuxSends` (Property) (`bool`).
     OverrideGameAuxSends,
-    /// `OverrideHdrEnvelope` (Property) [bool].
+    /// `OverrideHdrEnvelope` (Property) (`bool`).
     OverrideHdrEnvelope,
-    /// `OverrideMetadata` (Property) [bool].
+    /// `OverrideMetadata` (Property) (`bool`).
     OverrideMetadata,
-    /// `OverrideMidiEventsBehavior` (Property) [bool].
+    /// `OverrideMidiEventsBehavior` (Property) (`bool`).
     OverrideMidiEventsBehavior,
-    /// `OverrideMidiNoteTracking` (Property) [bool].
+    /// `OverrideMidiNoteTracking` (Property) (`bool`).
     OverrideMidiNoteTracking,
-    /// `OverrideMidiTarget` (Property) [bool].
+    /// `OverrideMidiTarget` (Property) (`bool`).
     OverrideMidiTarget,
-    /// `OverrideMidiTempo` (Property) [bool].
+    /// `OverrideMidiTempo` (Property) (`bool`).
     OverrideMidiTempo,
-    /// `OverrideOutput` (Property) [bool].
+    /// `OverrideOutput` (Property) (`bool`).
     OverrideOutput,
-    /// `OverridePositioning` (Property) [bool].
+    /// `OverridePositioning` (Property) (`bool`).
     OverridePositioning,
-    /// `OverridePriority` (Property) [bool].
+    /// `OverridePriority` (Property) (`bool`).
     OverridePriority,
-    /// `OverrideUserAuxSends` (Property) [bool].
+    /// `OverrideUserAuxSends` (Property) (`bool`).
     OverrideUserAuxSends,
-    /// `OverrideVirtualVoice` (Property) [bool].
+    /// `OverrideVirtualVoice` (Property) (`bool`).
     OverrideVirtualVoice,
-    /// `OverrideWavLoop` (Property) [bool].
+    /// `OverrideWavLoop` (Property) (`bool`).
     OverrideWavLoop,
-    /// `PanX` (Property) [Real64].
+    /// `PanX` (Property) (`Real64`).
     PanX,
-    /// `PanY` (Property) [Real64].
+    /// `PanY` (Property) (`Real64`).
     PanY,
-    /// `PanZ` (Property) [Real64].
+    /// `PanZ` (Property) (`Real64`).
     PanZ,
-    /// `Path` (Property) [string].
+    /// `Path` (Property) (`string`).
     Path,
     /// `Paths` (ObjectList).
     Paths,
-    /// `PauseDelayedResumeAction` (Property) [bool].
+    /// `PauseDelayedResumeAction` (Property) (`bool`).
     PauseDelayedResumeAction,
-    /// `Pitch` (Property) [int32, PitchCents].
+    /// `Pitch` (Property) (`int32`, `PitchCents`).
     Pitch,
-    /// `Platform` (Property) [int16].
+    /// `Platform` (Property) (`int16`).
     Platform,
-    /// `PlayAt` (Property) [Real64].
+    /// `PlayAt` (Property) (`Real64`).
     PlayAt,
-    /// `PlayDestinationPreEntry` (Property) [bool].
+    /// `PlayDestinationPreEntry` (Property) (`bool`).
     PlayDestinationPreEntry,
-    /// `PlayMechanismInfiniteOrNumberOfLoops` (Property) [int16].
+    /// `PlayMechanismInfiniteOrNumberOfLoops` (Property) (`int16`).
     PlayMechanismInfiniteOrNumberOfLoops,
-    /// `PlayMechanismLoop` (Property) [bool].
+    /// `PlayMechanismLoop` (Property) (`bool`).
     PlayMechanismLoop,
-    /// `PlayMechanismLoopCount` (Property) [int32].
+    /// `PlayMechanismLoopCount` (Property) (`int32`).
     PlayMechanismLoopCount,
-    /// `PlayMechanismRandomOrSequence` (Property) [int16].
+    /// `PlayMechanismRandomOrSequence` (Property) (`int16`).
     PlayMechanismRandomOrSequence,
-    /// `PlayMechanismResetPlaylistEachPlay` (Property) [bool].
+    /// `PlayMechanismResetPlaylistEachPlay` (Property) (`bool`).
     PlayMechanismResetPlaylistEachPlay,
-    /// `PlayMechanismSpecialTransitions` (Property) [bool].
+    /// `PlayMechanismSpecialTransitions` (Property) (`bool`).
     PlayMechanismSpecialTransitions,
-    /// `PlayMechanismSpecialTransitionsType` (Property) [int16].
+    /// `PlayMechanismSpecialTransitionsType` (Property) (`int16`).
     PlayMechanismSpecialTransitionsType,
-    /// `PlayMechanismSpecialTransitionsValue` (Property) [Real64].
+    /// `PlayMechanismSpecialTransitionsValue` (Property) (`Real64`).
     PlayMechanismSpecialTransitionsValue,
-    /// `PlayMechanismStepOrContinuous` (Property) [int16].
+    /// `PlayMechanismStepOrContinuous` (Property) (`int16`).
     PlayMechanismStepOrContinuous,
-    /// `PlayMechanismTransitionTime` (Property) [Real64].
+    /// `PlayMechanismTransitionTime` (Property) (`Real64`).
     PlayMechanismTransitionTime,
-    /// `PlayMechanismTransitionUse` (Property) [bool].
+    /// `PlayMechanismTransitionUse` (Property) (`bool`).
     PlayMechanismTransitionUse,
-    /// `PlayMode` (Property) [int16].
+    /// `PlayMode` (Property) (`int16`).
     PlayMode,
-    /// `PlaySegmentAt` (Property) [int16].
+    /// `PlaySegmentAt` (Property) (`int16`).
     PlaySegmentAt,
-    /// `PlaySourcePostExit` (Property) [bool].
+    /// `PlaySourcePostExit` (Property) (`bool`).
     PlaySourcePostExit,
-    /// `PlayTransitionPostExit` (Property) [bool].
+    /// `PlayTransitionPostExit` (Property) (`bool`).
     PlayTransitionPostExit,
-    /// `PlayTransitionPreEntry` (Property) [bool].
+    /// `PlayTransitionPreEntry` (Property) (`bool`).
     PlayTransitionPreEntry,
-    /// `PlaybackSpeed` (Property) [Real64].
+    /// `PlaybackSpeed` (Property) (`Real64`).
     PlaybackSpeed,
     /// `Playlist` (ObjectList).
     Playlist,
-    /// `PlaylistItemType` (Property) [int16].
+    /// `PlaylistItemType` (Property) (`int16`).
     PlaylistItemType,
     /// `PlaylistObject` (Reference).
     PlaylistObject,
@@ -687,253 +687,253 @@ pub enum Property {
     PlaylistRoot,
     /// `PostEventTarget` (Reference).
     PostEventTarget,
-    /// `PostGenerateStepUserOverride` (Property) [bool].
+    /// `PostGenerateStepUserOverride` (Property) (`bool`).
     PostGenerateStepUserOverride,
-    /// `PreFetchLength` (Property) [int16].
+    /// `PreFetchLength` (Property) (`int16`).
     PreFetchLength,
-    /// `PreGenerateStepUserOverride` (Property) [bool].
+    /// `PreGenerateStepUserOverride` (Property) (`bool`).
     PreGenerateStepUserOverride,
-    /// `Priority` (Property) [int16].
+    /// `Priority` (Property) (`int16`).
     Priority,
-    /// `PriorityDistanceFactor` (Property) [bool].
+    /// `PriorityDistanceFactor` (Property) (`bool`).
     PriorityDistanceFactor,
-    /// `PriorityDistanceOffset` (Property) [int16].
+    /// `PriorityDistanceOffset` (Property) (`int16`).
     PriorityDistanceOffset,
-    /// `Probability` (Property) [int32].
+    /// `Probability` (Property) (`int32`).
     Probability,
-    /// `PropertyName` (Property) [string].
+    /// `PropertyName` (Property) (`string`).
     PropertyName,
     /// `RTPC` (ObjectList).
     RTPC,
-    /// `RTPCOperator` (Property) [int16].
+    /// `RTPCOperator` (Property) (`int16`).
     RTPCOperator,
-    /// `RTPCRamping` (Property) [int16].
+    /// `RTPCRamping` (Property) (`int16`).
     RTPCRamping,
-    /// `RadiusMax` (Property) [Real64].
+    /// `RadiusMax` (Property) (`Real64`).
     RadiusMax,
-    /// `RandomAvoidRepeating` (Property) [bool].
+    /// `RandomAvoidRepeating` (Property) (`bool`).
     RandomAvoidRepeating,
-    /// `RandomAvoidRepeatingCount` (Property) [int32].
+    /// `RandomAvoidRepeatingCount` (Property) (`int32`).
     RandomAvoidRepeatingCount,
-    /// `RandomOrSequence` (Property) [int16].
+    /// `RandomOrSequence` (Property) (`int16`).
     RandomOrSequence,
-    /// `RandomX` (Property) [Real64].
+    /// `RandomX` (Property) (`Real64`).
     RandomX,
-    /// `RandomY` (Property) [Real64].
+    /// `RandomY` (Property) (`Real64`).
     RandomY,
-    /// `RandomZ` (Property) [Real64].
+    /// `RandomZ` (Property) (`Real64`).
     RandomZ,
-    /// `RecoveryTime` (Property) [Real64].
+    /// `RecoveryTime` (Property) (`Real64`).
     RecoveryTime,
     /// `ReflectionsAuxSend` (Reference).
     ReflectionsAuxSend,
-    /// `ReflectionsVolume` (Property) [Real64, Decibels].
+    /// `ReflectionsVolume` (Property) (`Real64`, `Decibels`).
     ReflectionsVolume,
-    /// `RemoveAtPosition` (Property) [int32].
+    /// `RemoveAtPosition` (Property) (`int32`).
     RemoveAtPosition,
-    /// `RemoveCount` (Property) [int32].
+    /// `RemoveCount` (Property) (`int32`).
     RemoveCount,
-    /// `RemoveDCOffset` (Property) [bool].
+    /// `RemoveDCOffset` (Property) (`bool`).
     RemoveDCOffset,
-    /// `RemoveFrom` (Property) [int16].
+    /// `RemoveFrom` (Property) (`int16`).
     RemoveFrom,
-    /// `RemoveUnusedGeneratedFiles` (Property) [bool].
+    /// `RemoveUnusedGeneratedFiles` (Property) (`bool`).
     RemoveUnusedGeneratedFiles,
-    /// `Render` (Property) [bool].
+    /// `Render` (Property) (`bool`).
     Render,
-    /// `ReplaceEnableMatchCase` (Property) [bool].
+    /// `ReplaceEnableMatchCase` (Property) (`bool`).
     ReplaceEnableMatchCase,
-    /// `ReplaceEnableReplaceAllInstances` (Property) [int16].
+    /// `ReplaceEnableReplaceAllInstances` (Property) (`int16`).
     ReplaceEnableReplaceAllInstances,
-    /// `ReplaceEnableUseRegularExpression` (Property) [bool].
+    /// `ReplaceEnableUseRegularExpression` (Property) (`bool`).
     ReplaceEnableUseRegularExpression,
-    /// `ReplaceFindWhat` (Property) [string].
+    /// `ReplaceFindWhat` (Property) (`string`).
     ReplaceFindWhat,
-    /// `ReplaceReplaceWith` (Property) [string].
+    /// `ReplaceReplaceWith` (Property) (`string`).
     ReplaceReplaceWith,
-    /// `RestartBeginningOrBackward` (Property) [int16].
+    /// `RestartBeginningOrBackward` (Property) (`int16`).
     RestartBeginningOrBackward,
-    /// `ResumeStateTransition` (Property) [bool].
+    /// `ResumeStateTransition` (Property) (`bool`).
     ResumeStateTransition,
-    /// `RightValue` (Property) [Real64].
+    /// `RightValue` (Property) (`Real64`).
     RightValue,
-    /// `RndSeqContainerType` (Property) [int16].
+    /// `RndSeqContainerType` (Property) (`int16`).
     RndSeqContainerType,
-    /// `SRConversionQuality` (Property) [int32].
+    /// `SRConversionQuality` (Property) (`int32`).
     SRConversionQuality,
-    /// `SampleRate` (Property) [int32].
+    /// `SampleRate` (Property) (`int32`).
     SampleRate,
-    /// `SampleRateConversionType` (Property) [int16].
+    /// `SampleRateConversionType` (Property) (`int16`).
     SampleRateConversionType,
-    /// `Scattering` (Property) [Real32].
+    /// `Scattering` (Property) (`Real32`).
     Scattering,
-    /// `Scope` (Property) [int16].
+    /// `Scope` (Property) (`int16`).
     Scope,
-    /// `SeekPercent` (Property) [Real64].
+    /// `SeekPercent` (Property) (`Real64`).
     SeekPercent,
-    /// `SeekTime` (Property) [Real64].
+    /// `SeekTime` (Property) (`Real64`).
     SeekTime,
-    /// `SeekToMarker` (Property) [bool].
+    /// `SeekToMarker` (Property) (`bool`).
     SeekToMarker,
-    /// `SeekType` (Property) [int16].
+    /// `SeekType` (Property) (`int16`).
     SeekType,
     /// `Segment` (Reference).
     Segment,
     /// `Sequences` (ObjectList).
     Sequences,
-    /// `SettingsUserOverride` (Property) [bool].
+    /// `SettingsUserOverride` (Property) (`bool`).
     SettingsUserOverride,
-    /// `SidechainMixChannelConfig` (Property) [int32].
+    /// `SidechainMixChannelConfig` (Property) (`int32`).
     SidechainMixChannelConfig,
-    /// `SimulationValue` (Property) [Real64].
+    /// `SimulationValue` (Property) (`Real64`).
     SimulationValue,
-    /// `SlewRateDown` (Property) [Real64].
+    /// `SlewRateDown` (Property) (`Real64`).
     SlewRateDown,
-    /// `SlewRateUp` (Property) [Real64].
+    /// `SlewRateUp` (Property) (`Real64`).
     SlewRateUp,
-    /// `SoundBankAllowExceedingSB` (Property) [bool].
+    /// `SoundBankAllowExceedingSB` (Property) (`bool`).
     SoundBankAllowExceedingSB,
-    /// `SoundBankDefinitionFileFormat` (Property) [int16].
+    /// `SoundBankDefinitionFileFormat` (Property) (`int16`).
     SoundBankDefinitionFileFormat,
-    /// `SoundBankGenerateDefinitionFile` (Property) [bool].
+    /// `SoundBankGenerateDefinitionFile` (Property) (`bool`).
     SoundBankGenerateDefinitionFile,
-    /// `SoundBankGenerateEstimatedDuration` (Property) [bool].
+    /// `SoundBankGenerateEstimatedDuration` (Property) (`bool`).
     SoundBankGenerateEstimatedDuration,
-    /// `SoundBankGenerateHeaderFile` (Property) [bool].
+    /// `SoundBankGenerateHeaderFile` (Property) (`bool`).
     SoundBankGenerateHeaderFile,
-    /// `SoundBankGenerateMaxAttenuationInfo` (Property) [bool].
+    /// `SoundBankGenerateMaxAttenuationInfo` (Property) (`bool`).
     SoundBankGenerateMaxAttenuationInfo,
-    /// `SoundBankGeneratePrintColor` (Property) [bool].
+    /// `SoundBankGeneratePrintColor` (Property) (`bool`).
     SoundBankGeneratePrintColor,
-    /// `SoundBankGeneratePrintGUID` (Property) [bool].
+    /// `SoundBankGeneratePrintGUID` (Property) (`bool`).
     SoundBankGeneratePrintGUID,
-    /// `SoundBankGeneratePrintPath` (Property) [bool].
+    /// `SoundBankGeneratePrintPath` (Property) (`bool`).
     SoundBankGeneratePrintPath,
-    /// `SoundBankGenerateReadableFile` (Property) [bool].
+    /// `SoundBankGenerateReadableFile` (Property) (`bool`).
     SoundBankGenerateReadableFile,
-    /// `SoundBankHeaderFilePath` (Property) [string].
+    /// `SoundBankHeaderFilePath` (Property) (`string`).
     SoundBankHeaderFilePath,
-    /// `SoundBankIncludeSoundbankNamesStrings` (Property) [bool].
+    /// `SoundBankIncludeSoundbankNamesStrings` (Property) (`bool`).
     SoundBankIncludeSoundbankNamesStrings,
-    /// `SoundBankPathUserOverride` (Property) [bool].
+    /// `SoundBankPathUserOverride` (Property) (`bool`).
     SoundBankPathUserOverride,
-    /// `SoundBankPaths` (Property) [string].
+    /// `SoundBankPaths` (Property) (`string`).
     SoundBankPaths,
-    /// `SoundBankPostGenerateCustomCmdDescription` (Property) [string].
+    /// `SoundBankPostGenerateCustomCmdDescription` (Property) (`string`).
     SoundBankPostGenerateCustomCmdDescription,
-    /// `SoundBankPostGenerateCustomCmdLines` (Property) [string].
+    /// `SoundBankPostGenerateCustomCmdLines` (Property) (`string`).
     SoundBankPostGenerateCustomCmdLines,
-    /// `SoundBankPreGenerateCustomCmdDescription` (Property) [string].
+    /// `SoundBankPreGenerateCustomCmdDescription` (Property) (`string`).
     SoundBankPreGenerateCustomCmdDescription,
-    /// `SoundBankPreGenerateCustomCmdLines` (Property) [string].
+    /// `SoundBankPreGenerateCustomCmdLines` (Property) (`string`).
     SoundBankPreGenerateCustomCmdLines,
-    /// `SoundBankUpdateAudioFiles` (Property) [bool].
+    /// `SoundBankUpdateAudioFiles` (Property) (`bool`).
     SoundBankUpdateAudioFiles,
-    /// `SoundType` (Property) [int16].
+    /// `SoundType` (Property) (`int16`).
     SoundType,
-    /// `SourceAudioFormat` (Property) [string].
+    /// `SourceAudioFormat` (Property) (`string`).
     SourceAudioFormat,
-    /// `SourceChannelsLFEOption` (Property) [int32].
+    /// `SourceChannelsLFEOption` (Property) (`int32`).
     SourceChannelsLFEOption,
-    /// `SourceChannelsOthersCount` (Property) [int32].
+    /// `SourceChannelsOthersCount` (Property) (`int32`).
     SourceChannelsOthersCount,
-    /// `SourceChannelsOthersOption` (Property) [int32].
+    /// `SourceChannelsOthersOption` (Property) (`int32`).
     SourceChannelsOthersOption,
     /// `SourceContextObject` (Reference).
     SourceContextObject,
-    /// `SourceContextType` (Property) [int16].
+    /// `SourceContextType` (Property) (`int16`).
     SourceContextType,
-    /// `SourceControlGeneratedFiles` (Property) [bool].
+    /// `SourceControlGeneratedFiles` (Property) (`bool`).
     SourceControlGeneratedFiles,
-    /// `SourceLanguage` (Property) [string].
+    /// `SourceLanguage` (Property) (`string`).
     SourceLanguage,
-    /// `SourceType` (Property) [string].
+    /// `SourceType` (Property) (`string`).
     SourceType,
-    /// `SpeakerPanning` (Property) [int16].
+    /// `SpeakerPanning` (Property) (`int16`).
     SpeakerPanning,
-    /// `SpeakerPanning3DSpatializationMix` (Property) [int32].
+    /// `SpeakerPanning3DSpatializationMix` (Property) (`int32`).
     SpeakerPanning3DSpatializationMix,
     /// `StartObject` (Reference).
     StartObject,
-    /// `State` (Property) [string].
+    /// `State` (Property) (`string`).
     State,
-    /// `StateGroup` (Property) [string].
+    /// `StateGroup` (Property) (`string`).
     StateGroup,
-    /// `StatePropertyUsage` (Property) [int16].
+    /// `StatePropertyUsage` (Property) (`int16`).
     StatePropertyUsage,
     /// `Stingers` (ObjectList).
     Stingers,
-    /// `SwitchBehavior` (Property) [int16].
+    /// `SwitchBehavior` (Property) (`int16`).
     SwitchBehavior,
-    /// `SwitchGroup` (Property) [string].
+    /// `SwitchGroup` (Property) (`string`).
     SwitchGroup,
     /// `SwitchGroupOrStateGroup` (Reference).
     SwitchGroupOrStateGroup,
-    /// `SwitchingOperator` (Property) [int16].
+    /// `SwitchingOperator` (Property) (`int16`).
     SwitchingOperator,
     /// `Target` (Reference).
     Target,
-    /// `TargetClassID` (Property) [int32].
+    /// `TargetClassID` (Property) (`int32`).
     TargetClassID,
     /// `TargetEffect` (Reference).
     TargetEffect,
-    /// `TargetName` (Property) [string].
+    /// `TargetName` (Property) (`string`).
     TargetName,
     /// `TargetObject` (Reference).
     TargetObject,
-    /// `TargetType` (Property) [int16].
+    /// `TargetType` (Property) (`int16`).
     TargetType,
-    /// `Tempo` (Property) [Real64].
+    /// `Tempo` (Property) (`Real64`).
     Tempo,
-    /// `Time` (Property) [Real64].
+    /// `Time` (Property) (`Real64`).
     Time,
-    /// `TimeModDuration` (Property) [Real64].
+    /// `TimeModDuration` (Property) (`Real64`).
     TimeModDuration,
-    /// `TimeModInitialDelay` (Property) [Real64].
+    /// `TimeModInitialDelay` (Property) (`Real64`).
     TimeModInitialDelay,
-    /// `TimeModLoops` (Property) [int32].
+    /// `TimeModLoops` (Property) (`int32`).
     TimeModLoops,
-    /// `TimeModPlaybackRate` (Property) [Real64].
+    /// `TimeModPlaybackRate` (Property) (`Real64`).
     TimeModPlaybackRate,
-    /// `TimeMs` (Property) [Real64].
+    /// `TimeMs` (Property) (`Real64`).
     TimeMs,
-    /// `TimeSignatureLower` (Property) [int16].
+    /// `TimeSignatureLower` (Property) (`int16`).
     TimeSignatureLower,
-    /// `TimeSignatureUpper` (Property) [int16].
+    /// `TimeSignatureUpper` (Property) (`int16`).
     TimeSignatureUpper,
     /// `TrackSequenceSwitch` (Reference).
     TrackSequenceSwitch,
     /// `TransitionRoot` (Reference).
     TransitionRoot,
-    /// `Trigger` (Property) [string].
+    /// `Trigger` (Property) (`string`).
     Trigger,
-    /// `TrimBegin` (Property) [Real64].
+    /// `TrimBegin` (Property) (`Real64`).
     TrimBegin,
-    /// `TrimEnd` (Property) [Real64].
+    /// `TrimEnd` (Property) (`Real64`).
     TrimEnd,
-    /// `UIntValue` (Property) [Uint32].
+    /// `UIntValue` (Property) (`Uint32`).
     UIntValue,
-    /// `UseActionNameForEvent` (Property) [bool].
+    /// `UseActionNameForEvent` (Property) (`bool`).
     UseActionNameForEvent,
-    /// `UseDefaultLanguage` (Property) [bool].
+    /// `UseDefaultLanguage` (Property) (`bool`).
     UseDefaultLanguage,
-    /// `UseDither` (Property) [bool].
+    /// `UseDither` (Property) (`bool`).
     UseDither,
-    /// `UseFilenameMarker` (Property) [bool].
+    /// `UseFilenameMarker` (Property) (`bool`).
     UseFilenameMarker,
-    /// `UseGameAuxSends` (Property) [bool].
+    /// `UseGameAuxSends` (Property) (`bool`).
     UseGameAuxSends,
-    /// `UseGameParameter` (Property) [bool].
+    /// `UseGameParameter` (Property) (`bool`).
     UseGameParameter,
-    /// `UseMaxDangerousVirtualVoices` (Property) [bool].
+    /// `UseMaxDangerousVirtualVoices` (Property) (`bool`).
     UseMaxDangerousVirtualVoices,
-    /// `UseMaxMessagesPerMessageId` (Property) [bool].
+    /// `UseMaxMessagesPerMessageId` (Property) (`bool`).
     UseMaxMessagesPerMessageId,
-    /// `UseMaxSoundPerInstance` (Property) [bool].
+    /// `UseMaxSoundPerInstance` (Property) (`bool`).
     UseMaxSoundPerInstance,
-    /// `UseTransitionObject` (Property) [bool].
+    /// `UseTransitionObject` (Property) (`bool`).
     UseTransitionObject,
-    /// `UsedForBackgroundMusic` (Property) [bool].
+    /// `UsedForBackgroundMusic` (Property) (`bool`).
     UsedForBackgroundMusic,
     /// `UserAuxSend0` (Reference).
     UserAuxSend0,
@@ -943,55 +943,55 @@ pub enum Property {
     UserAuxSend2,
     /// `UserAuxSend3` (Reference).
     UserAuxSend3,
-    /// `UserAuxSendHPF0` (Property) [int16].
+    /// `UserAuxSendHPF0` (Property) (`int16`).
     UserAuxSendHPF0,
-    /// `UserAuxSendHPF1` (Property) [int16].
+    /// `UserAuxSendHPF1` (Property) (`int16`).
     UserAuxSendHPF1,
-    /// `UserAuxSendHPF2` (Property) [int16].
+    /// `UserAuxSendHPF2` (Property) (`int16`).
     UserAuxSendHPF2,
-    /// `UserAuxSendHPF3` (Property) [int16].
+    /// `UserAuxSendHPF3` (Property) (`int16`).
     UserAuxSendHPF3,
-    /// `UserAuxSendLPF0` (Property) [int16].
+    /// `UserAuxSendLPF0` (Property) (`int16`).
     UserAuxSendLPF0,
-    /// `UserAuxSendLPF1` (Property) [int16].
+    /// `UserAuxSendLPF1` (Property) (`int16`).
     UserAuxSendLPF1,
-    /// `UserAuxSendLPF2` (Property) [int16].
+    /// `UserAuxSendLPF2` (Property) (`int16`).
     UserAuxSendLPF2,
-    /// `UserAuxSendLPF3` (Property) [int16].
+    /// `UserAuxSendLPF3` (Property) (`int16`).
     UserAuxSendLPF3,
-    /// `UserAuxSendVolume0` (Property) [Real64, Decibels].
+    /// `UserAuxSendVolume0` (Property) (`Real64`, `Decibels`).
     UserAuxSendVolume0,
-    /// `UserAuxSendVolume1` (Property) [Real64, Decibels].
+    /// `UserAuxSendVolume1` (Property) (`Real64`, `Decibels`).
     UserAuxSendVolume1,
-    /// `UserAuxSendVolume2` (Property) [Real64, Decibels].
+    /// `UserAuxSendVolume2` (Property) (`Real64`, `Decibels`).
     UserAuxSendVolume2,
-    /// `UserAuxSendVolume3` (Property) [Real64, Decibels].
+    /// `UserAuxSendVolume3` (Property) (`Real64`, `Decibels`).
     UserAuxSendVolume3,
-    /// `UserString` (Property) [string].
+    /// `UserString` (Property) (`string`).
     UserString,
-    /// `UsingOperator` (Property) [int16].
+    /// `UsingOperator` (Property) (`int16`).
     UsingOperator,
-    /// `ValueDouble` (Property) [Real64].
+    /// `ValueDouble` (Property) (`Real64`).
     ValueDouble,
-    /// `ValueInteger` (Property) [Uint64].
+    /// `ValueInteger` (Property) (`Uint64`).
     ValueInteger,
-    /// `ValueText` (Property) [string].
+    /// `ValueText` (Property) (`string`).
     ValueText,
-    /// `VirtualVoiceQueueBehavior` (Property) [int16].
+    /// `VirtualVoiceQueueBehavior` (Property) (`int16`).
     VirtualVoiceQueueBehavior,
-    /// `Volume` (Property) [Real64, Decibels].
+    /// `Volume` (Property) (`Real64`, `Decibels`).
     Volume,
-    /// `VolumeOffset` (Property) [Real64, Decibels].
+    /// `VolumeOffset` (Property) (`Real64`, `Decibels`).
     VolumeOffset,
-    /// `VolumeThreshold` (Property) [Real64].
+    /// `VolumeThreshold` (Property) (`Real64`).
     VolumeThreshold,
-    /// `WAQL` (Property) [string].
+    /// `WAQL` (Property) (`string`).
     WAQL,
-    /// `Weight` (Property) [Real64].
+    /// `Weight` (Property) (`Real64`).
     Weight,
-    /// `WwiseConsoleLoadUserSettings` (Property) [bool].
+    /// `WwiseConsoleLoadUserSettings` (Property) (`bool`).
     WwiseConsoleLoadUserSettings,
-    /// `WwiseVersionWhenCreated` (Property) [string].
+    /// `WwiseVersionWhenCreated` (Property) (`string`).
     WwiseVersionWhenCreated,
 }
 
@@ -1404,13 +1404,9 @@ impl Property {
             Self::SoundBankIncludeSoundbankNamesStrings => "SoundBankIncludeSoundbankNamesStrings",
             Self::SoundBankPathUserOverride => "SoundBankPathUserOverride",
             Self::SoundBankPaths => "SoundBankPaths",
-            Self::SoundBankPostGenerateCustomCmdDescription => {
-                "SoundBankPostGenerateCustomCmdDescription"
-            }
+            Self::SoundBankPostGenerateCustomCmdDescription => "SoundBankPostGenerateCustomCmdDescription",
             Self::SoundBankPostGenerateCustomCmdLines => "SoundBankPostGenerateCustomCmdLines",
-            Self::SoundBankPreGenerateCustomCmdDescription => {
-                "SoundBankPreGenerateCustomCmdDescription"
-            }
+            Self::SoundBankPreGenerateCustomCmdDescription => "SoundBankPreGenerateCustomCmdDescription",
             Self::SoundBankPreGenerateCustomCmdLines => "SoundBankPreGenerateCustomCmdLines",
             Self::SoundBankUpdateAudioFiles => "SoundBankUpdateAudioFiles",
             Self::SoundType => "SoundType",
@@ -1906,13 +1902,9 @@ impl Property {
             Self::SoundBankIncludeSoundbankNamesStrings => "@SoundBankIncludeSoundbankNamesStrings",
             Self::SoundBankPathUserOverride => "@SoundBankPathUserOverride",
             Self::SoundBankPaths => "@SoundBankPaths",
-            Self::SoundBankPostGenerateCustomCmdDescription => {
-                "@SoundBankPostGenerateCustomCmdDescription"
-            }
+            Self::SoundBankPostGenerateCustomCmdDescription => "@SoundBankPostGenerateCustomCmdDescription",
             Self::SoundBankPostGenerateCustomCmdLines => "@SoundBankPostGenerateCustomCmdLines",
-            Self::SoundBankPreGenerateCustomCmdDescription => {
-                "@SoundBankPreGenerateCustomCmdDescription"
-            }
+            Self::SoundBankPreGenerateCustomCmdDescription => "@SoundBankPreGenerateCustomCmdDescription",
             Self::SoundBankPreGenerateCustomCmdLines => "@SoundBankPreGenerateCustomCmdLines",
             Self::SoundBankUpdateAudioFiles => "@SoundBankUpdateAudioFiles",
             Self::SoundType => "@SoundType",
@@ -2077,9 +2069,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Bypass" => Ok(Self::Bypass),
             "BypassEffect" => Ok(Self::BypassEffect),
             "BypassFlag" => Ok(Self::BypassFlag),
-            "BypassGameParameterInternalTransition" => {
-                Ok(Self::BypassGameParameterInternalTransition)
-            }
+            "BypassGameParameterInternalTransition" => Ok(Self::BypassGameParameterInternalTransition),
             "CenterPercentage" => Ok(Self::CenterPercentage),
             "ChannelConfigOverride" => Ok(Self::ChannelConfigOverride),
             "Channels" => Ok(Self::Channels),
@@ -2355,18 +2345,14 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Platform" => Ok(Self::Platform),
             "PlayAt" => Ok(Self::PlayAt),
             "PlayDestinationPreEntry" => Ok(Self::PlayDestinationPreEntry),
-            "PlayMechanismInfiniteOrNumberOfLoops" => {
-                Ok(Self::PlayMechanismInfiniteOrNumberOfLoops)
-            }
+            "PlayMechanismInfiniteOrNumberOfLoops" => Ok(Self::PlayMechanismInfiniteOrNumberOfLoops),
             "PlayMechanismLoop" => Ok(Self::PlayMechanismLoop),
             "PlayMechanismLoopCount" => Ok(Self::PlayMechanismLoopCount),
             "PlayMechanismRandomOrSequence" => Ok(Self::PlayMechanismRandomOrSequence),
             "PlayMechanismResetPlaylistEachPlay" => Ok(Self::PlayMechanismResetPlaylistEachPlay),
             "PlayMechanismSpecialTransitions" => Ok(Self::PlayMechanismSpecialTransitions),
             "PlayMechanismSpecialTransitionsType" => Ok(Self::PlayMechanismSpecialTransitionsType),
-            "PlayMechanismSpecialTransitionsValue" => {
-                Ok(Self::PlayMechanismSpecialTransitionsValue)
-            }
+            "PlayMechanismSpecialTransitionsValue" => Ok(Self::PlayMechanismSpecialTransitionsValue),
             "PlayMechanismStepOrContinuous" => Ok(Self::PlayMechanismStepOrContinuous),
             "PlayMechanismTransitionTime" => Ok(Self::PlayMechanismTransitionTime),
             "PlayMechanismTransitionUse" => Ok(Self::PlayMechanismTransitionUse),
@@ -2444,18 +2430,12 @@ impl<'de> serde::Deserialize<'de> for Property {
             "SoundBankGeneratePrintPath" => Ok(Self::SoundBankGeneratePrintPath),
             "SoundBankGenerateReadableFile" => Ok(Self::SoundBankGenerateReadableFile),
             "SoundBankHeaderFilePath" => Ok(Self::SoundBankHeaderFilePath),
-            "SoundBankIncludeSoundbankNamesStrings" => {
-                Ok(Self::SoundBankIncludeSoundbankNamesStrings)
-            }
+            "SoundBankIncludeSoundbankNamesStrings" => Ok(Self::SoundBankIncludeSoundbankNamesStrings),
             "SoundBankPathUserOverride" => Ok(Self::SoundBankPathUserOverride),
             "SoundBankPaths" => Ok(Self::SoundBankPaths),
-            "SoundBankPostGenerateCustomCmdDescription" => {
-                Ok(Self::SoundBankPostGenerateCustomCmdDescription)
-            }
+            "SoundBankPostGenerateCustomCmdDescription" => Ok(Self::SoundBankPostGenerateCustomCmdDescription),
             "SoundBankPostGenerateCustomCmdLines" => Ok(Self::SoundBankPostGenerateCustomCmdLines),
-            "SoundBankPreGenerateCustomCmdDescription" => {
-                Ok(Self::SoundBankPreGenerateCustomCmdDescription)
-            }
+            "SoundBankPreGenerateCustomCmdDescription" => Ok(Self::SoundBankPreGenerateCustomCmdDescription),
             "SoundBankPreGenerateCustomCmdLines" => Ok(Self::SoundBankPreGenerateCustomCmdLines),
             "SoundBankUpdateAudioFiles" => Ok(Self::SoundBankUpdateAudioFiles),
             "SoundType" => Ok(Self::SoundType),
@@ -2540,9 +2520,7 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Weight" => Ok(Self::Weight),
             "WwiseConsoleLoadUserSettings" => Ok(Self::WwiseConsoleLoadUserSettings),
             "WwiseVersionWhenCreated" => Ok(Self::WwiseVersionWhenCreated),
-            _ => Err(serde::de::Error::custom(format!(
-                "unknown Wwise Property: {s}"
-            ))),
+            _ => Err(serde::de::Error::custom(format!("unknown Wwise Property: {s}"))),
         }
     }
 }

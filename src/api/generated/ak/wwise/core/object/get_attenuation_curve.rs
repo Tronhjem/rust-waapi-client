@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.getAttenuationCurve
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.getAttenuationCurve`.
+///
+/// Gets the specified attenuation curve for a given attenuation object.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectGetAttenuationCurveArgs {
     /// The ID (GUID), name, or path of attenuation object.
@@ -19,6 +28,7 @@ pub struct CoreObjectGetAttenuationCurveArgs {
 }
 
 impl CoreObjectGetAttenuationCurveArgs {
+    /// Creates a new [`CoreObjectGetAttenuationCurveArgs`] with the required fields.
     pub fn new(object: ObjectRef, curve_type: AttenuationCurveType) -> Self {
         Self {
             object,
@@ -27,6 +37,7 @@ impl CoreObjectGetAttenuationCurveArgs {
         }
     }
 
+    /// The ID (GUID) or unique name of the platform to get curves. Set to null-guid for unlinked reference.
     pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
         self.platform = Some(platform.into());
         self
@@ -34,6 +45,8 @@ impl CoreObjectGetAttenuationCurveArgs {
 }
 
 /// Response from `ak.wwise.core.object.getAttenuationCurve`.
+///
+/// Gets the specified attenuation curve for a given attenuation object.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectGetAttenuationCurveResponse {
     /// The attenuation curve.
@@ -45,3 +58,4 @@ pub struct CoreObjectGetAttenuationCurveResponse {
     #[serde(rename = "use")]
     pub use_: AttenuationCurveUse,
 }
+

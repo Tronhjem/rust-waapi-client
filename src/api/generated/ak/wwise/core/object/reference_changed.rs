@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.object.referenceChanged
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.object.referenceChanged`.
+///
+/// Sent when an object reference is changed.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectReferenceChangedPayload {
     /// The object which had its reference changed.
@@ -21,7 +30,10 @@ pub struct CoreObjectReferenceChangedPayload {
     pub new: WwiseObject,
 }
 
+
 /// Subscription options for `ak.wwise.core.object.referenceChanged`.
+///
+/// Sent when an object reference is changed.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreObjectReferenceChangedOptions {
     /// Data to be returned for the object, the old reference and the new reference.
@@ -33,15 +45,18 @@ pub struct CoreObjectReferenceChangedOptions {
 }
 
 impl CoreObjectReferenceChangedOptions {
+    /// Creates a new [`CoreObjectReferenceChangedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Data to be returned for the object, the old reference and the new reference.
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
         self
     }
 
+    /// The ID (GUID) of the platform.
     pub fn platform(mut self, platform: impl Into<String>) -> Self {
         self.platform = Some(platform.into());
         self

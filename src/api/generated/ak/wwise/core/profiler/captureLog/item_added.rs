@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.profiler.captureLog.itemAdded
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.profiler.captureLog.itemAdded`.
+///
+/// Sent when a new entry is added to the capture log. Note that all entries are being sent. No filtering is applied as opposed to the Capture Log view.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerCaptureLogItemAddedPayload {
     /// The entry type. Equivalent to the Type column in the Capture Log.
@@ -40,7 +49,10 @@ pub struct CoreProfilerCaptureLogItemAddedPayload {
     pub error_code_name: Option<String>,
 }
 
+
 /// Subscription options for `ak.wwise.core.profiler.captureLog.itemAdded`.
+///
+/// Sent when a new entry is added to the capture log. Note that all entries are being sent. No filtering is applied as opposed to the Capture Log view.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreProfilerCaptureLogItemAddedOptions {
     /// Defines which types of capture log items to receive. This filter can help to reduce the amount of data serialized. When no types are specified, all types are being sent.
@@ -49,10 +61,12 @@ pub struct CoreProfilerCaptureLogItemAddedOptions {
 }
 
 impl CoreProfilerCaptureLogItemAddedOptions {
+    /// Creates a new [`CoreProfilerCaptureLogItemAddedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Defines which types of capture log items to receive. This filter can help to reduce the amount of data serialized. When no types are specified, all types are being sent.
     pub fn types(mut self, types: impl Into<Vec<String>>) -> Self {
         self.types = Some(types.into());
         self

@@ -1,4 +1,8 @@
+//! Typed WAAPI bindings, shared primitives, and chained namespace clients.
+
+/// Auto-generated typed WAAPI bindings, object types, properties, and namespace clients.
 pub mod generated;
+/// Hand-written shared primitives for object references, 3D vectors/positions, and child object creation.
 pub mod primitives;
 
 pub use generated::ak;

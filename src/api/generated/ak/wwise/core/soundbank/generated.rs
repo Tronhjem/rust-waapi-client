@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.soundbank.generated
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.soundbank.generated`.
+///
+/// Sent when a single SoundBank is generated. This could be sent multiple times during SoundBank generation, for every SoundBank generated and for every platform. To generate SoundBanks, see `ak.wwise.core.soundbank.generate` or `ak.wwise.ui.commands.execute` with one of the SoundBank generation commands. See the Wwise global command IDs reference for the list of commands.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSoundbankGeneratedPayload {
     /// The platform for which the SoundBank was generated.
@@ -29,10 +38,13 @@ pub struct CoreSoundbankGeneratedPayload {
     pub bank_info: Vec<serde_json::Value>,
 }
 
+
 /// Subscription options for `ak.wwise.core.soundbank.generated`.
+///
+/// Sent when a single SoundBank is generated. This could be sent multiple times during SoundBank generation, for every SoundBank generated and for every platform. To generate SoundBanks, see `ak.wwise.core.soundbank.generate` or `ak.wwise.ui.commands.execute` with one of the SoundBank generation commands. See the Wwise global command IDs reference for the list of commands.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreSoundbankGeneratedOptions {
-    /// Data to be returned for the SoundBank generated. See for more information on the properties available.
+    /// Data to be returned for the SoundBank generated. See the Wwise Objects Reference for more information on the properties available.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
     pub return_: Option<Vec<ObjectReturnField>>,
     /// Embed the JSON SoundBank info file in the response.
@@ -47,25 +59,30 @@ pub struct CoreSoundbankGeneratedOptions {
 }
 
 impl CoreSoundbankGeneratedOptions {
+    /// Creates a new [`CoreSoundbankGeneratedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Data to be returned for the SoundBank generated. See the Wwise Objects Reference for more information on the properties available.
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
         self
     }
 
+    /// Embed the JSON SoundBank info file in the response.
     pub fn info_file(mut self, info_file: impl Into<bool>) -> Self {
         self.info_file = Some(info_file.into());
         self
     }
 
+    /// Embed the base64 SoundBank data in the response.
     pub fn bank_data(mut self, bank_data: impl Into<bool>) -> Self {
         self.bank_data = Some(bank_data.into());
         self
     }
 
+    /// Embed the JSON PluginInfo file in the response.
     pub fn plugin_info(mut self, plugin_info: impl Into<bool>) -> Self {
         self.plugin_info = Some(plugin_info.into());
         self

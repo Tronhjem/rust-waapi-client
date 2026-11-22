@@ -400,12 +400,166 @@ def snake_case(name):
     return ident
 
 
+def _build_ref_uri_map():
+    m = {"ak_wwise_console_project_open": "`ak.wwise.console.project.open`"}
+    for sdir in SCHEMA_DIRS:
+        for p in sdir.glob("ak.*.json"):
+            uri = p.stem
+            m[uri.replace(".", "_").lower()] = f"`{uri}`"
+    return m
+
+
+_REF_URI_MAP = _build_ref_uri_map()
+
+_REF_DOC_MAP = {
+    "akcurveinterpolation": "`AkCurveInterpolation`",
+    "wobjects_index": "the Wwise Objects Reference",
+    "wobjectnodetypes": "the Wwise Object Node Types reference",
+    "wwiseobject_action": "the Wwise Action object reference",
+    "waapi_import": "the WAAPI Import documentation",
+    "waapi_create_objects_modes": "the WAAPI object creation modes documentation",
+    "waapi_set_lists_modes": "the WAAPI list modes documentation",
+    "waapi_path_on_mac": "the WAAPI Mac path documentation",
+    "waapi_query": "the WAAPI query documentation",
+    "waapi_query_return": "the WAAPI query return options documentation",
+    "waql_introduction": "the WAQL introduction documentation",
+    "globalcommandsids": "the Wwise global command IDs reference",
+    "globalcountersids": "the Wwise global counter IDs reference",
+    "defining_custom_commands": "the Wwise custom commands documentation",
+    "defining_custom_properties": "the Wwise custom properties documentation",
+}
+
+
 def clean_doc(text):
     if not text:
         return ""
-    text = re.sub(r"\\ref \S+", "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+
+    def _replace_verbatim(m):
+        inner = m.group(1).strip()
+        trailing = ""
+        if inner.endswith("."):
+            inner = inner[:-1].rstrip()
+            trailing = "."
+        return f"`{inner}`{trailing}"
+
+    text = re.sub(
+        r"\\verbatim\s*(.*?)\s*\\endverbatim",
+        _replace_verbatim,
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"<tt>(.*?)</tt>",
+        lambda m: f"`{m.group(1).strip()}`",
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"<b>(.*?)</b>",
+        lambda m: f"**{m.group(1).strip()}**",
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    text = text.replace(r"\@", "@")
+    text = re.sub(r"\\c\s+'([^']+)'", r"`\1`", text)
+    text = re.sub(r'\\c\s+"([^"]+)"', r"`\1`", text)
+
+    def _replace_c_token(m):
+        tok = m.group(1)
+        trailing = ""
+        while tok and tok[-1] in ".,;:!?)":
+            trailing = tok[-1] + trailing
+            tok = tok[:-1]
+        return f"`{tok}`{trailing}" if tok else trailing
+
+    text = re.sub(r"\\c\s+(\S+)", _replace_c_token, text)
+    text = re.sub(r"\bRefer\s+\\ref\b", r"Refer to \\ref", text)
+    text = re.sub(r"\brefer\s+\\ref\b", r"refer to \\ref", text)
+
+    def _replace_ref(m):
+        raw = m.group(1)
+        trailing = ""
+        while raw and raw[-1] in ".,;:!?)":
+            trailing = raw[-1] + trailing
+            raw = raw[:-1]
+        key = raw.lower()
+        if key in _REF_URI_MAP:
+            rep = _REF_URI_MAP[key]
+        elif key in _REF_DOC_MAP:
+            rep = _REF_DOC_MAP[key]
+        else:
+            rep = f"`{raw}`"
+        return f"{rep}{trailing}"
+
+    text = re.sub(r"\\ref\s+(\S+)", _replace_ref, text)
+    text = re.sub(r"(?<!`)\[([^\[\]`]+)\](?!`|\()", r"`[\1]`", text)
+
+    lines = []
+    for raw_line in text.splitlines():
+        line = re.sub(r"[ \t]+", " ", raw_line).strip()
+        line = re.sub(r"\s+([.,;:])", r"\1", line)
+        lines.append(line)
+    while lines and not lines[0]:
+        lines.pop(0)
+    while lines and not lines[-1]:
+        lines.pop()
+    cleaned_lines = []
+    prev_empty = False
+    for line in lines:
+        if not line:
+            if not prev_empty:
+                cleaned_lines.append("")
+            prev_empty = True
+        else:
+            cleaned_lines.append(line)
+            prev_empty = False
+    return "\n".join(cleaned_lines)
+
+
+def schema_description(ctx, schema):
+    """Return the cleaned description for `schema`, following `$ref` chains if needed."""
+    if not isinstance(schema, dict):
+        return ""
+    cur = schema
+    seen = set()
+    while isinstance(cur, dict):
+        desc = cur.get("description", "")
+        if desc:
+            return clean_doc(desc)
+        ref = cur.get("$ref")
+        if not ref or ref in seen or ctx is None:
+            break
+        seen.add(ref)
+        cur = ctx.schemas.resolve(ref, ctx.doc, ctx.local_root)
+    return ""
+
+
+def extract_string_enum_docs(schema):
+    """Extract per-variant descriptions from a `oneOf` string enum schema."""
+    docs = {}
+    if isinstance(schema, dict):
+        if "oneOf" in schema:
+            for branch in schema["oneOf"]:
+                if (
+                    isinstance(branch, dict)
+                    and "enum" in branch
+                    and len(branch["enum"]) == 1
+                    and isinstance(branch["enum"][0], str)
+                ):
+                    val = branch["enum"][0]
+                    desc = clean_doc(branch.get("description", ""))
+                    if desc:
+                        docs[val] = desc
+        for v in schema.values():
+            if isinstance(v, (dict, list)):
+                for k, d in extract_string_enum_docs(v).items():
+                    docs.setdefault(k, d)
+    elif isinstance(schema, list):
+        for item in schema:
+            for k, d in extract_string_enum_docs(item).items():
+                docs.setdefault(k, d)
+    return docs
 
 
 def unique_names(values, name_fn, suffix):
@@ -567,7 +721,13 @@ def doc_lines(text, prefix=""):
     text = clean_doc(text)
     if not text:
         return []
-    return [f"{prefix}/// {text}"]
+    out = []
+    for line in text.split("\n"):
+        if line:
+            out.append(f"{prefix}/// {line}")
+        else:
+            out.append(f"{prefix}///")
+    return out
 
 
 class Field:
@@ -602,7 +762,7 @@ class Field:
             ty = f"Option<{self.ty}>"
         else:
             ty = self.ty
-        lines = doc_lines(self.doc, "    ")
+        lines = doc_lines(self.doc, "    ") or [f"    /// `{self.wire}`."]
         lines += [f"    {a}" for a in self.serde_attrs(kind)]
         lines.append(f"    pub {self.rust_name}: {ty},")
         return lines
@@ -643,7 +803,8 @@ def collect_fields(ctx, schema, kind, struct_name):
             else:
                 ty = rust_type(sub, ctx, self_name=struct_name)
         optional = wire not in req_set
-        fields.append(Field(wire, field_name(ctx.uri, wire, kind), ty, optional, sub.get("description", "")))
+        fdoc = schema_description(ctx, sub)
+        fields.append(Field(wire, field_name(ctx.uri, wire, kind), ty, optional, fdoc))
     return fields
 
 
@@ -660,6 +821,7 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
     for f in fields:
         lines += f.declaration(kind)
     if extra_flatten:
+        lines.append("    /// Additional `@`-prefixed properties, references, or list values.")
         lines.append("    #[serde(flatten)]")
         lines.append("    pub extra: std::collections::HashMap<String, serde_json::Value>,")
     lines.append("}")
@@ -685,6 +847,7 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
         by_wire = {f.wire: f for f in required}
         ctor_fields = [by_wire[w] for w in order]
         params = ", ".join(f"{f.rust_name}: {f.ty}" for f in ctor_fields)
+        lines.append(f"    /// Creates a new [`{struct_name}`] with the required fields.")
         lines.append(f"    pub fn new({params}) -> Self {{")
         lines.append("        Self {")
         for f in ctor_fields:
@@ -696,12 +859,14 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
         lines.append("        }")
         lines.append("    }")
     elif kind != "response":
+        lines.append(f"    /// Creates a new [`{struct_name}`] with all fields unset.")
         lines.append("    pub fn new() -> Self {")
         lines.append("        Self::default()")
         lines.append("    }")
     if kind != "response":
         for f in optional:
             lines.append("")
+            lines += doc_lines(f.doc, "    ") or [f"    /// Sets `{f.wire}`."]
             lines.append(f"    pub fn {f.rust_name}(mut self, {f.rust_name}: impl Into<{f.ty}>) -> Self {{")
             lines.append(f"        self.{f.rust_name} = Some({f.rust_name}.into());")
             lines.append("        self")
@@ -729,13 +894,18 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
     return "\n".join(lines)
 
 
-def emit_enum(name, doc, values, derive_both=True):
+def emit_enum(name, doc, values, derive_both=True, variant_docs=None):
     """Emit a simple string enum with explicit serde renames."""
     lines = doc_lines(doc)
     derives = "serde::Serialize, serde::Deserialize" if derive_both else "serde::Serialize"
     lines.append(f"#[derive(Debug, Clone, Copy, PartialEq, Eq, {derives})]")
     lines.append(f"pub enum {name} {{")
     for v, variant in unique_names(values, pascal_case, "Legacy").items():
+        vdoc = (variant_docs or {}).get(v)
+        if vdoc:
+            lines.extend(doc_lines(vdoc, "    "))
+        else:
+            lines.append(f"    /// `{v}`.")
         lines.append(f'    #[serde(rename = "{v}")]')
         lines.append(f"    {variant},")
     lines.append("}")
@@ -752,11 +922,14 @@ def emit_int_enum(name, doc, values):
     lines.append("#[repr(u32)]")
     lines.append(f"pub enum {name} {{")
     for variant, value in values:
+        lines.append(f"    /// `{variant}` (`{value}`).")
         lines.append(f"    {variant} = {value},")
     lines.append("}")
     lines.append("")
     lines.append(f"impl {name} {{")
+    lines.append("    /// Returns the raw integer discriminant for this variant.")
     lines.append(f"    pub const fn as_u32(self) -> u32 {{ self as u32 }}")
+    lines.append("    /// Converts a raw integer discriminant into the corresponding variant, if valid.")
     lines.append("    pub const fn from_u32(value: u32) -> Option<Self> {")
     lines.append("        match value {")
     for variant, value in values:
@@ -833,7 +1006,7 @@ def gen_object_types(schema_dirs) -> str:
         "// Auto-generated Wwise object types from WObjects.xml.",
         "// This file is generated by tools/generate_typed_api.py; do not edit by hand.",
         "",
-        "/// Typed identifier for a Wwise object type (`\\ref wobjects_index`).",
+        "/// Typed identifier for a Wwise object type (from the Wwise Objects Reference).",
         "///",
         "/// Derived from the union of `<WwiseObject>` definitions in `WObjects.xml`",
         "/// across all supported Wwise versions.",
@@ -998,10 +1171,10 @@ def gen_properties(schema_dirs) -> str:
     for wire, variant, meta in variants:
         details = [f"`{wire}` ({meta['kind']})"]
         if meta["display"]:
-            details.append(f"— {meta['display']}")
-        qualifiers = [q for q in (meta["type"], meta["meaning"]) if q]
+            details.append(f"- {meta['display']}")
+        qualifiers = [f"`{q}`" for q in (meta["type"], meta["meaning"]) if q]
         if qualifiers:
-            details.append(f"[{', '.join(qualifiers)}]")
+            details.append(f"({', '.join(qualifiers)})")
         lines.append(f"    /// {' '.join(details)}.")
         lines.append(f"    {variant},")
     lines.append("}")
@@ -1104,12 +1277,30 @@ def union_definition_enum_values(schema_dirs, definition_file, key):
     return ordered
 
 
-def gen_object_return_field(enum_vals):
+def load_object_return_props():
+    props = {}
+    for sdir in SCHEMA_DIRS:
+        defs_path = sdir / "Definitions" / "waapi_definitions.json"
+        if not defs_path.exists():
+            continue
+        waapi_defs = json.loads(defs_path.read_text())
+        obj_return = waapi_defs.get("definitions", {}).get("objectReturn", {})
+        for wire, sub in obj_return.get("properties", {}).items():
+            props[wire] = sub
+    return props
+
+
+def gen_object_return_field(enum_vals, field_docs=None):
     lines = doc_lines("A field that can be requested in `return` options.")
     lines.append("#[derive(Debug, Clone)]")
     lines.append("pub enum ObjectReturnField {")
     arms = []
     for v, variant in unique_names(enum_vals, pascal_case, "Legacy").items():
+        vdoc = (field_docs or {}).get(v)
+        if vdoc:
+            lines.extend(doc_lines(vdoc, "    "))
+        else:
+            lines.append(f"    /// `{v}`.")
         lines.append(f"    {variant},")
         arms.append(f"            ObjectReturnField::{variant} => \"{v}\",")
     lines.append("    /// Request a Wwise object property, reference, or list (`@Property`).")
@@ -1141,15 +1332,7 @@ def gen_object_return_field(enum_vals):
 
 
 def gen_wwise_object(ctx):
-    props = {}
-    for sdir in SCHEMA_DIRS:
-        defs_path = sdir / "Definitions" / "waapi_definitions.json"
-        if not defs_path.exists():
-            continue
-        waapi_defs = json.loads(defs_path.read_text())
-        obj_return = waapi_defs.get("definitions", {}).get("objectReturn", {})
-        for wire, sub in obj_return.get("properties", {}).items():
-            props[wire] = sub
+    props = load_object_return_props()
     names = unique_names(props.keys(), lambda w: field_name(ctx.uri, w, "response"), "_legacy")
     fields = []
     for wire, sub in props.items():
@@ -1157,7 +1340,7 @@ def gen_wwise_object(ctx):
             ty = "ObjectType"
         else:
             ty = rust_type(sub, ctx)
-        fields.append(Field(wire, names[wire], ty, True, sub.get("description", "")))
+        fields.append(Field(wire, names[wire], ty, True, schema_description(ctx, sub)))
     lines = [
         "/// A Wwise object as returned by `object.get` and similar endpoints.",
         "/// Fields are optional because their presence depends on the `return` options;",
@@ -1167,6 +1350,7 @@ def gen_wwise_object(ctx):
     ]
     for f in fields:
         lines += f.declaration("response")
+    lines.append("    /// Additional `@`-prefixed properties, references, or list values returned by the query.")
     lines.append("    #[serde(flatten)]")
     lines.append("    pub extra: std::collections::HashMap<String, serde_json::Value>,")
     lines.append("}")
@@ -1195,11 +1379,12 @@ def gen_object_query(ctx):
             item_ty = "String"
         else:
             item_ty = "serde_json::Value"
-        variants.append((prop, pascal_case(prop), item_ty))
+        variants.append((prop, pascal_case(prop), item_ty, schema_description(ctx, sub)))
     lines = ["/// Argument to the `from` field of `object.get`."]
     lines.append("#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]")
     lines.append("pub enum ObjectQuery {")
-    for wire, variant, item_ty in variants:
+    for wire, variant, item_ty, vdoc in variants:
+        lines += doc_lines(vdoc, "    ") or [f"    /// `{wire}`."]
         lines.append(f'    #[serde(rename = "{wire}")]')
         lines.append(f"    {variant}(Vec<{item_ty}>),")
     lines.append("}")
@@ -1348,6 +1533,7 @@ pub struct CurvePoint2D {
 }
 
 impl CurvePoint2D {
+    /// Creates a new [`CurvePoint2D`].
     pub const fn new(x: f64, y: f64, shape: CurveShape) -> Self {
         Self { x, y, shape }
     }
@@ -1409,6 +1595,7 @@ pub struct AuxSendValue {
 }
 
 impl AuxSendValue {
+    /// Creates a new [`AuxSendValue`].
     pub fn new(listener: impl Into<GameObjectRef>, aux_bus: impl Into<SoundEngineObjectRef>, control_value: f64) -> Self {
         Self { listener: listener.into(), aux_bus: aux_bus.into(), control_value }
     }
@@ -1416,10 +1603,12 @@ impl AuxSendValue {
         """/// A single position entry for `soundengine.setMultiplePositions`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct MultiPosition {
+    /// The 3D position and orientation of the sound source.
     pub position: Position,
 }
 
 impl MultiPosition {
+    /// Creates a new [`MultiPosition`].
     pub fn new(position: Position) -> Self {
         Self { position }
     }
@@ -1447,10 +1636,13 @@ pub struct WwiseObjectTypeInfo {
         """/// RTPC/randomizer/unlink support flags for a property (`object.getPropertyInfo`).
 #[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
 pub struct PropertyInfoSupports {
+    /// How the property supports RTPC curves.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rtpc: Option<RtpcSupportMode>,
+    /// Whether the property supports a randomizer modifier.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub randomizer: Option<bool>,
+    /// Whether the property can be unlinked per platform.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unlink: Option<bool>,
 }""",
@@ -1458,12 +1650,16 @@ pub struct PropertyInfoSupports {
         """/// An edge of a blend track (`blendContainer.addAssignment` / `getAssignments`).
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct BlendEdge {
+    /// Crossfade mode for this edge.
     #[serde(rename = "fadeMode")]
     pub fade_mode: BlendFadeMode,
+    /// Shape of the crossfade curve.
     #[serde(rename = "fadeShape")]
     pub fade_shape: CurveShape,
+    /// Position of the edge along the blend track X axis.
     #[serde(rename = "edgePosition")]
     pub edge_position: f64,
+    /// Position where the fade starts or ends along the blend track X axis.
     #[serde(default, rename = "fadePosition", skip_serializing_if = "Option::is_none")]
     pub fade_position: Option<f64>,
 }""",
@@ -1472,8 +1668,10 @@ pub struct BlendEdge {
 pub struct BlendTrackAssignment {
     /// GUID of the assigned child.
     pub child: String,
+    /// Zero-based index of the assignment within the blend track.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
+    /// Start and end edges of the assignment along the blend track.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub edges: Option<Vec<BlendEdge>>,
 }""",
@@ -1484,16 +1682,20 @@ pub struct BlendTrackAssignment {
         """/// A SoundBank inclusion (`soundbank.get/setInclusions`).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SoundBankInclusion {
+    /// Object included in the SoundBank.
     pub object: ObjectRef,
+    /// Inclusion filter categories (`events`, `structures`, `media`).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub filter: Vec<SoundBankInclusionFilter>,
 }
 
 impl SoundBankInclusion {
+    /// Creates a new [`SoundBankInclusion`] for `object` with an empty filter list.
     pub fn new(object: impl Into<ObjectRef>) -> Self {
         Self { object: object.into(), filter: Vec::new() }
     }
 
+    /// Appends a [`SoundBankInclusionFilter`] to the inclusion filter list.
     pub fn filter(mut self, filter: SoundBankInclusionFilter) -> Self {
         self.filter.push(filter);
         self
@@ -1502,37 +1704,47 @@ impl SoundBankInclusion {
         """/// A user-defined SoundBank to generate (`soundbank.generate`).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundBankInfo {
+    /// Name of the SoundBank.
     pub name: String,
+    /// Inclusion types to include in the generated SoundBank.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub inclusions: Option<Vec<SoundBankInclusionType>>,
+    /// Events to include in the SoundBank.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub events: Option<Vec<ObjectRef>>,
+    /// Auxiliary busses to include in the SoundBank.
     #[serde(default, rename = "auxBusses", skip_serializing_if = "Option::is_none")]
     pub aux_busses: Option<Vec<ObjectRef>>,
+    /// Whether to force a rebuild of the SoundBank.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rebuild: Option<bool>,
 }
 
 impl SoundBankInfo {
+    /// Creates a new [`SoundBankInfo`] with the given SoundBank `name`.
     pub fn new(name: impl Into<String>) -> Self {
         Self { name: name.into(), inclusions: None, events: None, aux_busses: None, rebuild: None }
     }
 
+    /// Sets the inclusion types for the SoundBank.
     pub fn inclusions(mut self, inclusions: Vec<SoundBankInclusionType>) -> Self {
         self.inclusions = Some(inclusions);
         self
     }
 
+    /// Sets the events to include in the SoundBank.
     pub fn events(mut self, events: Vec<ObjectRef>) -> Self {
         self.events = Some(events);
         self
     }
 
+    /// Sets the auxiliary busses to include in the SoundBank.
     pub fn aux_busses(mut self, aux_busses: Vec<ObjectRef>) -> Self {
         self.aux_busses = Some(aux_busses);
         self
     }
 
+    /// Sets whether to force a rebuild of the SoundBank.
     pub fn rebuild(mut self, rebuild: bool) -> Self {
         self.rebuild = Some(rebuild);
         self
@@ -1541,13 +1753,19 @@ impl SoundBankInfo {
         """/// A central log entry (`logCentralItem`).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LogCentralItem {
+    /// Severity level of the log item.
     pub severity: LogSeverity,
+    /// Timestamp of the log entry in seconds.
     pub time: i64,
+    /// Identifier of the log message type.
     #[serde(rename = "messageId")]
     pub message_id: String,
+    /// Human-readable log message text.
     pub message: String,
+    /// Platform associated with the log entry, if any.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub platform: Option<WwiseObject>,
+    /// Additional message parameters, if any.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parameters: Option<Vec<String>>,
 }""",
@@ -1557,17 +1775,22 @@ pub struct LogCentralItem {
         """/// A source file to convert (`soundbank.convertExternalSources`).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ExternalSourceInfo {
+    /// Target platform for conversion.
     pub platform: PlatformRef,
+    /// Path to the `.wsources` input file.
     pub input: String,
+    /// Optional output directory override.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output: Option<String>,
 }
 
 impl ExternalSourceInfo {
+    /// Creates a new [`ExternalSourceInfo`] for `platform` and `input`.
     pub fn new(platform: impl Into<PlatformRef>, input: impl Into<String>) -> Self {
         Self { platform: platform.into(), input: input.into(), output: None }
     }
 
+    /// Sets the output directory override.
     pub fn output(mut self, output: impl Into<String>) -> Self {
         self.output = Some(output.into());
         self
@@ -1576,7 +1799,9 @@ impl ExternalSourceInfo {
         """/// A logged error from `audio.convert`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AudioConvertError {
+    /// Severity level of the conversion log entry.
     pub severity: LogSeverity,
+    /// Human-readable conversion error or warning message.
     pub message: String,
 }""",
     ]
@@ -1597,16 +1822,22 @@ def gen_primitives(schemas, endpoints_docs):
     switch_ctx = endpoints_docs["ak.wwise.core.switchContainer.getAssignments"]
     open_ctx = endpoints_docs["ak.wwise.ui.project.open"]
 
-    import_operation_vals = [
-        b["enum"][0] for b in waapi_defs["definitions"]["importOperationType"]["oneOf"]
-    ]
-    log_severity_vals = [
-        b["enum"][0] for b in waapi_defs["definitions"]["logCentralSeverity"]["oneOf"]
-    ]
+    import_op_node = waapi_defs["definitions"]["importOperationType"]
+    import_operation_vals = [b["enum"][0] for b in import_op_node["oneOf"]]
+    import_operation_docs = extract_string_enum_docs(import_op_node)
+
+    log_sev_node = waapi_defs["definitions"]["logCentralSeverity"]
+    log_severity_vals = [b["enum"][0] for b in log_sev_node["oneOf"]]
+    log_severity_docs = extract_string_enum_docs(log_sev_node)
+
     # Union of return-field enums across versions so 2024-only variants remain
     # usable (e.g. colorRGB, transitionObject, nextGain, prevGain).
     return_field_vals = union_definition_enum_values(
         SCHEMA_DIRS, "waapi_definitions.json", "returnExpression")
+    return_field_docs = {
+        wire: schema_description(get_ctx, sub)
+        for wire, sub in load_object_return_props().items()
+    }
     bus_return_vals = union_definition_enum_values(
         SCHEMA_DIRS, "waapi_definitions.json", "busReturnOptions")
     audio_return_vals = union_definition_enum_values(
@@ -1623,7 +1854,7 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append("};")
     parts.append("")
     parts.append(STATIC_REFS)
-    parts.append(gen_object_return_field(return_field_vals))
+    parts.append(gen_object_return_field(return_field_vals, return_field_docs))
     parts.append(STATIC_OBJECT_RETURN_OPTIONS)
     parts.append(emit_enum("BusReturnField", "Return fields for `ak.wwise.core.profiler.getBusses`.",
                            bus_return_vals))
@@ -1631,8 +1862,10 @@ def gen_primitives(schemas, endpoints_docs):
                            audio_return_vals))
     parts.append(emit_enum("VoiceReturnField", "Return fields for `ak.wwise.core.profiler.getVoices`.",
                            voice_return_vals))
-    parts.append(emit_enum("ImportOperation", "Determines how imported objects are created.", import_operation_vals))
-    parts.append(emit_enum("LogSeverity", "Severity level of an audio import log entry.", log_severity_vals))
+    parts.append(emit_enum("ImportOperation", "Determines how imported objects are created.",
+                           import_operation_vals, variant_docs=import_operation_docs))
+    parts.append(emit_enum("LogSeverity", "Severity level of an audio import log entry.",
+                           log_severity_vals, variant_docs=log_severity_docs))
     parts.append(gen_wwise_object(get_ctx))
     parts.append(STATIC_WWISE_OBJECT_REF)
     parts.append(gen_object_query(get_ctx))
@@ -1655,8 +1888,11 @@ STATIC_REFS = """/// Object reference accepted by soundengine endpoints: name, G
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SoundEngineObjectRef {
+    /// Object name.
     Name(String),
+    /// Object GUID (`{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`).
     Guid(String),
+    /// Object 32-bit Short ID.
     ShortId(u32),
 }
 
@@ -1680,10 +1916,12 @@ pub type RtpcRef = SoundEngineObjectRef;
 #[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum GameObjectRef {
+    /// Numeric 64-bit game object ID.
     Id(u64),
 }
 
 impl GameObjectRef {
+    /// Creates a [`GameObjectRef`] from a 64-bit game object ID.
     pub fn game_object(id: u64) -> Self {
         GameObjectRef::Id(id)
     }
@@ -1700,7 +1938,9 @@ impl From<u32> for GameObjectRef {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum LanguageRef {
+    /// Language name.
     Name(String),
+    /// Language GUID.
     Guid(String),
 }
 
@@ -1714,19 +1954,24 @@ impl From<String> for LanguageRef {
 STATIC_OBJECT_RETURN_OPTIONS = """/// Options controlling which fields are returned for each object.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct ObjectReturnOptions {
+    /// List of return expressions/fields to include in each returned object.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
     pub return_fields: Option<Vec<ObjectReturnField>>,
+    /// Platform to use when evaluating platform-dependent properties.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
+    /// Language to use when evaluating language-dependent properties.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<LanguageRef>,
 }
 
 impl ObjectReturnOptions {
+    /// Creates a new [`ObjectReturnOptions`] with default settings.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Specifies the fields or `@Property` expressions to return for each object.
     pub fn return_fields<I, T>(mut self, fields: I) -> Self
     where
         I: IntoIterator<Item = T>,
@@ -1736,11 +1981,13 @@ impl ObjectReturnOptions {
         self
     }
 
+    /// Specifies the platform to use when querying properties.
     pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
         self.platform = Some(platform.into());
         self
     }
 
+    /// Specifies the language to use when querying language-specific properties.
     pub fn language(mut self, language: impl Into<LanguageRef>) -> Self {
         self.language = Some(language.into());
         self
@@ -1750,8 +1997,10 @@ impl ObjectReturnOptions {
 STATIC_WWISE_OBJECT_REF = """/// A lightweight object reference returned inside other objects.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct WwiseObjectRef {
+    /// Object ID (GUID).
     #[serde(default, rename = "id")]
     pub id: Option<String>,
+    /// Object name.
     #[serde(default)]
     pub name: Option<String>,
 }"""
@@ -1760,14 +2009,21 @@ STATIC_TRANSFORM = """/// A single transformation step in an `object.get` query.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum Transform {
+    /// Select related objects (`parent`, `children`, `descendants`, `ancestors`, or `referencesTo`).
     Select {
+        /// Selector list (contains a single [`TransformSelect`] element).
         select: Vec<TransformSelect>,
     },
+    /// Deduplicate object instances (`"distinct"`).
     Distinct(String),
+    /// Slice results by `[from, count]` boundary indexes.
     Range {
+        /// Two-element range `[from, count]`.
         range: Vec<usize>,
     },
+    /// Filter objects using a `where` predicate and parameter.
     Where {
+        /// Predicate name followed by its parameter(s).
         #[serde(rename = "where")]
         where_: Vec<serde_json::Value>,
     },
@@ -1886,8 +2142,16 @@ def is_empty_schema(sch):
     return not sch.get("properties") and "$ref" not in sch
 
 
+def _compose_struct_doc(header, desc):
+    desc = clean_doc(desc)
+    if desc:
+        return f"{header}\n\n{desc}"
+    return header
+
+
 def gen_endpoint_file(ctx):
     base = endpoint_base_name(ctx.uri)
+    endpoint_desc = clean_doc(ctx.doc.get("description", ""))
     args_schema = ctx.doc.get("argsSchema", {})
     options_schema = ctx.doc.get("optionsSchema", {})
     result_schema = ctx.doc.get("resultSchema", {})
@@ -1922,25 +2186,37 @@ def gen_endpoint_file(ctx):
             fields = collect_fields(ctx, args_schema, "args", name)
             ctx.local_root = None
             extra_flatten = bool(args_schema.get("patternProperties"))
-            sections.append(emit_struct("args", name, f"Arguments for `{ctx.uri}`.",
+            args_doc = _compose_struct_doc(
+                f"Arguments for `{ctx.uri}`.",
+                schema_description(ctx, args_schema) or endpoint_desc,
+            )
+            sections.append(emit_struct("args", name, args_doc,
                                         fields, ctx, ctor_order=CTOR_ORDER.get(ctx.uri),
                                         required_order=schema_required(args_schema),
                                         extra_flatten=extra_flatten))
     if has_options:
         name = f"{base}Options"
         exports.append(name)
+        opts_doc = _compose_struct_doc(
+            f"Options for `{ctx.uri}`.",
+            schema_description(ctx, options_schema) or endpoint_desc,
+        )
         if options_is_object_return:
-            sections.append(f"/// Options for `{ctx.uri}`.\npub type {name} = ObjectReturnOptions;")
+            sections.append("\n".join([*doc_lines(opts_doc), f"pub type {name} = ObjectReturnOptions;"]))
         else:
             ctx.local_root = options_schema
             fields = collect_fields(ctx, options_schema, "options", name)
             ctx.local_root = None
-            sections.append(emit_struct("options", name, f"Options for `{ctx.uri}`.", fields, ctx))
+            sections.append(emit_struct("options", name, opts_doc, fields, ctx))
     if has_response:
         name = f"{base}Response"
         exports.append(name)
+        resp_doc = _compose_struct_doc(
+            f"Response from `{ctx.uri}`.",
+            schema_description(ctx, result_schema) or endpoint_desc,
+        )
         if result_is_object_return:
-            sections.append(f"/// Response from `{ctx.uri}`.\npub type {name} = WwiseObject;")
+            sections.append("\n".join([*doc_lines(resp_doc), f"pub type {name} = WwiseObject;"]))
         elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Object"
             exports.append(item_name)
@@ -1949,7 +2225,7 @@ def gen_endpoint_file(ctx):
             ctx.local_root = result_schema
             fields = collect_fields(ctx, result_schema, "response", name)
             ctx.local_root = None
-            sections.append(emit_struct("response", name, f"Response from `{ctx.uri}`.", fields, ctx))
+            sections.append(emit_struct("response", name, resp_doc, fields, ctx))
 
     return "\n\n".join(sections) + "\n", exports, has_args, has_options, has_response
 
@@ -1957,6 +2233,7 @@ def gen_endpoint_file(ctx):
 def gen_topic_file(ctx):
     """Generate the payload struct and subscription options for a WAAPI topic."""
     base = endpoint_base_name(ctx.uri)
+    topic_desc = clean_doc(ctx.doc.get("description", ""))
     options_schema = ctx.doc.get("optionsSchema", {})
     publish_schema = ctx.doc.get("publishSchema", {})
 
@@ -1971,26 +2248,36 @@ def gen_topic_file(ctx):
 
     payload_name = f"{base}Payload"
     exports.append(payload_name)
+    payload_doc = _compose_struct_doc(
+        f"Payload for `{ctx.uri}`.",
+        schema_description(ctx, publish_schema) or topic_desc,
+    )
     if publish_is_empty:
-        sections.append(f"/// Payload for `{ctx.uri}` (no data).\n"
-                        "#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]\n"
-                        f"pub struct {payload_name} {{}}")
+        sections.append("\n".join([
+            *doc_lines(payload_doc),
+            "#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]",
+            f"pub struct {payload_name} {{}}",
+        ]))
     else:
         ctx.local_root = publish_schema
         fields = collect_fields(ctx, publish_schema, "response", payload_name)
         ctx.local_root = None
-        sections.append(emit_struct("response", payload_name, f"Payload for `{ctx.uri}`.", fields, ctx))
+        sections.append(emit_struct("response", payload_name, payload_doc, fields, ctx))
 
     if has_options:
         name = f"{base}Options"
         exports.append(name)
+        opts_doc = _compose_struct_doc(
+            f"Subscription options for `{ctx.uri}`.",
+            schema_description(ctx, options_schema) or topic_desc,
+        )
         if options_is_object_return:
-            sections.append(f"/// Subscription options for `{ctx.uri}`.\npub type {name} = ObjectReturnOptions;")
+            sections.append("\n".join([*doc_lines(opts_doc), f"pub type {name} = ObjectReturnOptions;"]))
         else:
             ctx.local_root = options_schema
             fields = collect_fields(ctx, options_schema, "options", name)
             ctx.local_root = None
-            sections.append(emit_struct("options", name, f"Subscription options for `{ctx.uri}`.", fields, ctx))
+            sections.append(emit_struct("options", name, opts_doc, fields, ctx))
 
     return "\n\n".join(sections) + "\n", exports, has_options
 
@@ -2000,18 +2287,19 @@ def gen_object_get_args(ctx, name):
 /// a `from` query; both are optional in the schema but one is required in practice.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct {name} {{
-    /// A WAQL query.
+    /// Specifies a query in the WAQL language. See the WAQL introduction documentation for more information.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub waql: Option<String>,
-    /// The query starting point.
+    /// The query starting point. Note, this is deprecated. The WAQL argument should be used instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub from: Option<ObjectQuery>,
-    /// Sequential transformations on the object list returned by `from`.
+    /// Array of sequential transformations chained on the object list returned by `from`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transform: Option<Vec<Transform>>,
 }}
 
 impl {name} {{
+    /// Creates a new [`{name}`] starting from a `from` [`ObjectQuery`].
     pub fn new(from: ObjectQuery) -> Self {{
         Self {{
             waql: None,
@@ -2020,6 +2308,7 @@ impl {name} {{
         }}
     }}
 
+    /// Creates a new [`{name}`] from a WAQL query string.
     pub fn from_waql(waql: impl Into<String>) -> Self {{
         Self {{
             waql: Some(waql.into()),
@@ -2028,16 +2317,19 @@ impl {name} {{
         }}
     }}
 
+    /// Specifies a query in the WAQL language.
     pub fn waql(mut self, waql: impl Into<String>) -> Self {{
         self.waql = Some(waql.into());
         self
     }}
 
+    /// Sets the query starting point (`from`).
     pub fn from(mut self, from: impl Into<ObjectQuery>) -> Self {{
         self.from = Some(from.into());
         self
     }}
 
+    /// Sets the sequential transformations applied to the object list returned by `from`.
     pub fn transform(mut self, transform: impl Into<Vec<Transform>>) -> Self {{
         self.transform = Some(transform.into());
         self
@@ -2065,7 +2357,7 @@ def gen_object_set_args(ctx, args_name, item_name):
             ty = rust_type(sub, ctx, self_name=item_name)
         optional = wire not in (item_schema.get("required") or [])
         fields.append(Field(wire, field_name(ctx.uri, wire, "args"), ty, optional,
-                            sub.get("description", "")))
+                            schema_description(ctx, sub)))
     out = emit_struct("args", item_name,
                       "One object specification in the `objects` array of `object.set`.",
                       fields, ctx, required_order=item_schema.get("required"),
@@ -2076,7 +2368,11 @@ def gen_object_set_args(ctx, args_name, item_name):
         if f.wire == "objects":
             f.ty = f"Vec<{item_name}>"
     out += "\n\n"
-    out += emit_struct("args", args_name, f"Arguments for `{ctx.uri}`.", fields, ctx,
+    args_doc = _compose_struct_doc(
+        f"Arguments for `{ctx.uri}`.",
+        clean_doc(ctx.doc.get("description", "")),
+    )
+    out += emit_struct("args", args_name, args_doc, fields, ctx,
                        required_order=args_schema.get("required"))
     return out
 
@@ -2097,7 +2393,11 @@ def gen_object_set_response(ctx, resp_name, item_name):
         if f.wire == "objects":
             f.ty = f"Vec<{item_name}>"
     out += "\n\n"
-    out += emit_struct("response", resp_name, f"Response from `{ctx.uri}`.", fields, ctx)
+    resp_doc = _compose_struct_doc(
+        f"Response from `{ctx.uri}`.",
+        clean_doc(ctx.doc.get("description", "")),
+    )
+    out += emit_struct("response", resp_name, resp_doc, fields, ctx)
     return out
 
 
@@ -2115,13 +2415,15 @@ def build_module_tree(endpoints):
     return tree
 
 
-def emit_module_tree(tree, dir_path):
+def emit_module_tree(tree, dir_path, prefix_parts=()):
     lines = ["// Auto-generated typed WAAPI bindings.",
              "// This file is generated by tools/generate_typed_api.py; do not edit by hand.", ""]
     for name in sorted(k for k in tree if k != "__endpoints__"):
         child_dir = dir_path / name
         child_dir.mkdir(parents=True, exist_ok=True)
-        emit_module_tree(tree[name], child_dir)
+        child_parts = (*prefix_parts, name)
+        emit_module_tree(tree[name], child_dir, child_parts)
+        lines.append(f"/// Typed bindings for the `{'/'.join(child_parts).replace('/', '.')}` WAAPI namespace.")
         if not name.islower():
             lines.append("#[allow(non_snake_case)]")
         lines.append(f"pub mod {name};")
@@ -2190,7 +2492,7 @@ def client_struct_name(path_segments):
 
 
 def build_chain_tree(uris):
-    """Build an ordered list of (struct_name, prefix, [(method, child_struct)]) from endpoint URIs."""
+    """Build an ordered list of (struct_name, prefix, [(method, child_struct, child_prefix)]) from endpoint URIs."""
     children_by_path = {}
     all_paths = []
 
@@ -2204,7 +2506,7 @@ def build_chain_tree(uris):
             if depth < len(mod_segs):
                 next_seg = mod_segs[depth]
                 child_segs = mod_segs[: depth + 1]
-                entry = (snake_case(next_seg), client_struct_name(child_segs))
+                entry = (snake_case(next_seg), client_struct_name(child_segs), ".".join(child_segs))
                 if entry not in children_by_path[prefix_segs]:
                     children_by_path[prefix_segs].append(entry)
 
@@ -2250,12 +2552,14 @@ def gen_clients(endpoints, topics):
         topic_by_prefix.setdefault(prefix, []).append(uri)
 
     for struct_name, prefix, children in build_chain_tree(all_uris):
+        lines.append(f"/// Typed client for the `{prefix}` WAAPI namespace.")
         lines.append(f"pub struct {struct_name}<'a> {{")
         lines.append("    client: &'a mut WaapiClient,")
         lines.append("}")
         lines.append("")
         lines.append(f"impl<'a> {struct_name}<'a> {{")
-        for method, child in children:
+        for method, child, child_prefix in children:
+            lines.append(f"    /// Access the `{child_prefix}` WAAPI namespace.")
             lines.append(f"    pub fn {method}(self) -> {child}<'a> {{")
             lines.append(f"        {child} {{ client: self.client }}")
             lines.append("    }")
@@ -2266,7 +2570,11 @@ def gen_clients(endpoints, topics):
             ret = f"WaapiResult<{info['base']}Response>" if has_response else "WaapiResult<()>"
             param_list = ",\n        ".join(f"{n}: {t}" for n, t in params)
             sig = f"        &mut self,\n        {param_list}," if params else "        &mut self,"
-            lines.append(f"    /// `{uri}`.")
+            desc = clean_doc(info["ctx"].doc.get("description", ""))
+            if desc:
+                lines.extend(doc_lines(desc, "    "))
+                lines.append("    ///")
+            lines.append(f"    /// WAAPI endpoint: `{uri}`.")
             lines.append(f"    pub async fn {method_name(uri)}(")
             lines.append(sig)
             lines.append(f"    ) -> {ret} {{")
@@ -2278,7 +2586,11 @@ def gen_clients(endpoints, topics):
             info = topics[uri]
             payload = f"{info['base']}Payload"
             method = f"subscribe_{method_name(uri)}"
-            lines.append(f"    /// Subscribe to `{uri}`.")
+            desc = clean_doc(info["ctx"].doc.get("description", ""))
+            if desc:
+                lines.extend(doc_lines(desc, "    "))
+                lines.append("    ///")
+            lines.append(f"    /// Subscribes to the `{uri}` WAAPI topic and returns `(subscription_id, receiver)`.")
             if info["has_options"]:
                 opts = f"{info['base']}Options"
                 lines.append(f"    pub async fn {method}(")
@@ -2365,10 +2677,15 @@ def main():
     (OUT_DIR / "mod.rs").write_text(
         "// Auto-generated typed WAAPI bindings.\n"
         "// This file is generated by tools/generate_typed_api.py; do not edit by hand.\n\n"
+        "/// Typed request, option, response, and payload types organized by WAAPI URI namespace.\n"
         "pub mod ak;\n"
+        "/// Chained namespace client wrappers on [`crate::WaapiClient`].\n"
         "pub mod clients;\n"
+        "/// Typed Wwise object type identifiers (`ObjectType`).\n"
         "pub mod object_types;\n"
+        "/// Shared request/response types, enums, and query builders.\n"
         "pub mod primitives;\n"
+        "/// Typed Wwise property, reference, and list identifiers (`Property`).\n"
         "pub mod properties;\n\n"
         "pub use object_types::ObjectType;\n"
         "pub use properties::Property;\n"

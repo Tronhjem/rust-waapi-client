@@ -1,10 +1,19 @@
 // Generated bindings for topic ak.wwise.core.profiler.gameObjectReset
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
-/// Payload for `ak.wwise.core.profiler.gameObjectReset` (no data).
+
+
+/// Payload for `ak.wwise.core.profiler.gameObjectReset`.
+///
+/// Sent when the game objects have been reset, such as closing a connection to a game while profiling.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGameObjectResetPayload {}

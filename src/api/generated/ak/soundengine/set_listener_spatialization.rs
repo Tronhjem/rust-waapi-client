@@ -1,14 +1,23 @@
 // Generated bindings for ak.soundengine.setListenerSpatialization
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.setListenerSpatialization`.
+///
+/// Sets a listener's spatialization parameters. This lets you define listener-specific volume offsets for each audio channel. See `AK::SoundEngine::SetListenerSpatialization`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetListenerSpatializationArgs {
-    /// Channel configuration associated with volumeOffsets. Use <tt>AK::AkChannelConfig::Serialize</tt> to serialize the value.
+    /// Channel configuration associated with volumeOffsets. Use `AK::AkChannelConfig::Serialize` to serialize the value.
     #[serde(rename = "channelConfig")]
     pub channel_config: u32,
     /// Listener game object ID.
@@ -21,12 +30,8 @@ pub struct SoundengineSetListenerSpatializationArgs {
 }
 
 impl SoundengineSetListenerSpatializationArgs {
-    pub fn new(
-        listener: GameObjectRef,
-        spatialized: bool,
-        channel_config: u32,
-        volume_offsets: Vec<f64>,
-    ) -> Self {
+    /// Creates a new [`SoundengineSetListenerSpatializationArgs`] with the required fields.
+    pub fn new(listener: GameObjectRef, spatialized: bool, channel_config: u32, volume_offsets: Vec<f64>) -> Self {
         Self {
             listener,
             spatialized,

@@ -3,7 +3,10 @@
 
 mod item_added;
 pub use item_added::{
-    CoreProfilerCaptureLogItemAddedOptions, CoreProfilerCaptureLogItemAddedPayload,
+    CoreProfilerCaptureLogItemAddedPayload,
+    CoreProfilerCaptureLogItemAddedOptions,
 };
 mod save;
-pub use save::CoreProfilerCaptureLogSaveArgs;
+pub use save::{
+    CoreProfilerCaptureLogSaveArgs,
+};

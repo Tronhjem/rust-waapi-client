@@ -4,17 +4,28 @@ use serde_json::Value;
 
 pub type WampResult<T> = std::result::Result<T, WampError>;
 
+/// Low-level WAMP protocol and WebSocket transport errors.
 #[derive(Debug)]
 pub enum WampError {
+    /// WebSocket connection or frame error.
     WebSocket(String),
+    /// Failed to serialize an outbound WAMP message.
     Serialize(serde_json::Error),
+    /// Failed to deserialize an inbound WAMP message.
     Deserialize(serde_json::Error),
+    /// Received an unexpected WAMP message during handshake or session.
     UnexpectedMessage(String),
+    /// The underlying WebSocket connection was closed.
     ConnectionClosed,
+    /// The WAMP client has already been shut down.
     Shutdown,
+    /// The WAMP router/peer returned an `ERROR` response for a request.
     CallError {
+        /// Error URI returned by the WAMP peer.
         uri: String,
+        /// Positional error arguments.
         args: Vec<Value>,
+        /// Keyword error details.
         kwargs: Value,
     },
 }

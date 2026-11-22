@@ -20,12 +20,15 @@ pub enum ObjectRef {
 }
 
 impl ObjectRef {
+    /// Creates an [`ObjectRef::Guid`] from a GUID string.
     pub fn guid(s: impl Into<String>) -> Self {
         ObjectRef::Guid(s.into())
     }
+    /// Creates an [`ObjectRef::Path`] from a backslash-separated hierarchy path.
     pub fn path(s: impl Into<String>) -> Self {
         ObjectRef::Path(s.into())
     }
+    /// Creates an [`ObjectRef::Name`] from an object name.
     pub fn name(s: impl Into<String>) -> Self {
         ObjectRef::Name(s.into())
     }
@@ -74,14 +77,18 @@ impl<'de> Deserialize<'de> for ObjectRef {
 /// Identifies a Wwise platform for platform-specific property overrides.
 #[derive(Debug, Clone)]
 pub enum PlatformRef {
+    /// Platform GUID (`{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`).
     Guid(String),
+    /// Platform name (e.g. `"Windows"`, `"Mac"`).
     Name(String),
 }
 
 impl PlatformRef {
+    /// Creates a [`PlatformRef::Guid`] from a platform GUID string.
     pub fn guid(s: impl Into<String>) -> Self {
         PlatformRef::Guid(s.into())
     }
+    /// Creates a [`PlatformRef::Name`] from a platform name.
     pub fn name(s: impl Into<String>) -> Self {
         PlatformRef::Name(s.into())
     }
@@ -114,13 +121,17 @@ impl<'de> Deserialize<'de> for PlatformRef {
 /// A 3D vector used for position and orientation.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 pub struct Vector3 {
+    /// X coordinate.
     pub x: f64,
+    /// Y coordinate.
     pub y: f64,
+    /// Z coordinate.
     pub z: f64,
 }
 
 #[allow(non_upper_case_globals)]
 impl Vector3 {
+    /// Creates a new [`Vector3`] with coordinates `(x, y, z)`.
     pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
     }
@@ -202,10 +213,13 @@ impl std::ops::Neg for Vector3 {
 /// A complete game-object position: position plus front/top orientation vectors.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Position {
+    /// Orientation of the front vector (must be normalized and orthogonal to `orientation_top`).
     #[serde(rename = "orientationFront")]
     pub orientation_front: Vector3,
+    /// Orientation of the top vector (must be normalized and orthogonal to `orientation_front`).
     #[serde(rename = "orientationTop")]
     pub orientation_top: Vector3,
+    /// 3D position of the game object.
     pub position: Vector3,
 }
 
@@ -254,9 +268,13 @@ impl Position {
 /// Action to take when a child with the same name already exists.
 #[derive(Debug, Clone)]
 pub enum OnNameConflict {
+    /// The new object receives a unique name automatically by appending a number.
     Rename,
+    /// The existing object is deleted along with its children and replaced by the new object.
     Replace,
+    /// The call fails and returns an error.
     Fail,
+    /// The existing object is kept and its properties, lists, and children are merged with the new object.
     Merge,
 }
 
@@ -295,7 +313,9 @@ impl<'de> Deserialize<'de> for OnNameConflict {
 /// Action to take when an object already has items in a named list.
 #[derive(Debug, Clone)]
 pub enum ListMode {
+    /// Remove all existing items in the list and replace them with the provided items.
     ReplaceAll,
+    /// Append the provided items to the existing items in the list.
     Append,
 }
 
@@ -335,13 +355,16 @@ impl<'de> Deserialize<'de> for ListMode {
 pub struct ChildObject {
     /// The Wwise object type, e.g. [`ObjectType::Sound`], [`ObjectType::Event`], [`ObjectType::RandomSequenceContainer`].
     pub object_type: ObjectType,
+    /// Name of the new object.
     pub name: String,
+    /// Optional notes or comments for the new object.
     pub notes: Option<String>,
+    /// Optional platform override used when setting properties on the new object.
     pub platform: Option<PlatformRef>,
     /// Nested children to create under this object (recursive).
     pub children: Vec<ChildObject>,
     /// `@PropertyName` / `@ReferenceName` / `@ListName` fields.
-    /// Keys are bare names without the `@` prefix — it is added during serialization.
+    /// Keys are bare names without the `@` prefix - it is added during serialization.
     pub properties: Vec<(String, PropertyValue)>,
 }
 
@@ -373,6 +396,7 @@ impl Serialize for ChildObject {
 }
 
 impl ChildObject {
+    /// Creates a new [`ChildObject`] of the given `object_type` and `name`.
     pub fn new(object_type: ObjectType, name: impl Into<String>) -> Self {
         ChildObject {
             object_type,
@@ -384,11 +408,13 @@ impl ChildObject {
         }
     }
 
+    /// Sets the notes or comments for the new object.
     pub fn notes(mut self, notes: impl Into<String>) -> Self {
         self.notes = Some(notes.into());
         self
     }
 
+    /// Sets the platform used when applying property values to the new object.
     pub fn platform(mut self, platform: PlatformRef) -> Self {
         self.platform = Some(platform);
         self
@@ -402,11 +428,13 @@ impl ChildObject {
         self
     }
 
+    /// Appends a nested [`ChildObject`] to create under this object.
     pub fn child(mut self, child: ChildObject) -> Self {
         self.children.push(child);
         self
     }
 
+    /// Appends multiple nested [`ChildObject`] entries to create under this object.
     pub fn children(mut self, children: impl Into<Vec<ChildObject>>) -> Self {
         self.children.extend(children.into());
         self

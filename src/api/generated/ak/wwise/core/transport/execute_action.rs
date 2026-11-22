@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.transport.executeAction
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.transport.executeAction`.
+///
+/// Executes an action on the given transport object, or all transport objects if none is specified.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreTransportExecuteActionArgs {
     /// The transport object ID to be used with all other ak.wwise.core.transport functions.
@@ -16,6 +25,7 @@ pub struct CoreTransportExecuteActionArgs {
 }
 
 impl CoreTransportExecuteActionArgs {
+    /// Creates a new [`CoreTransportExecuteActionArgs`] with the required fields.
     pub fn new(action: TransportAction) -> Self {
         Self {
             action,
@@ -23,6 +33,7 @@ impl CoreTransportExecuteActionArgs {
         }
     }
 
+    /// The transport object ID to be used with all other ak.wwise.core.transport functions.
     pub fn transport(mut self, transport: impl Into<u32>) -> Self {
         self.transport = Some(transport.into());
         self

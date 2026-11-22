@@ -69,16 +69,14 @@ def build_module_tree(functions: List[str]) -> Dict:
     return tree
 
 
-def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
+def generate_module_code(
+    tree: Dict,
+    descriptions: Dict[str, str],
+    indent_level: int = 0,
+    prefix_parts: Tuple[str, ...] = (),
+) -> List[str]:
     """
     Recursively generate Rust module code from the tree structure.
-    
-    Args:
-        tree: The module tree dictionary
-        indent_level: Current indentation level (multiples of 4 spaces)
-    
-    Returns:
-        List of code lines
     """
     lines = []
     indent = '    ' * indent_level
@@ -92,7 +90,7 @@ def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
     
     for func_name, full_path in functions:
         escaped_name = escape_if_keyword(func_name)
-        
+        lines.extend(format_doc_comment(descriptions.get(full_path, ""), full_path, indent))
         const_line = f'{indent}pub const {escaped_name}: &str = "{full_path}";'
         
         if len(const_line) > 100:
@@ -105,9 +103,15 @@ def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
         if functions and not lines[-1] == '':
             lines.append('')
         
+        mod_parts = (*prefix_parts, module_name)
+        if indent_level > 0:
+            mod_uri = ".".join(mod_parts)
+            lines.append(f'{indent}/// The `{mod_uri}` WAAPI namespace.')
         lines.append(f'{indent}pub mod {module_name} {{')
         
-        submodule_lines = generate_module_code(subtree, indent_level + 1)
+        submodule_lines = generate_module_code(
+            subtree, descriptions, indent_level + 1, mod_parts
+        )
         lines.extend(submodule_lines)
         
         lines.append(f'{indent}}}')
@@ -115,7 +119,9 @@ def generate_module_code(tree: Dict, indent_level: int = 0) -> List[str]:
     return lines
 
 
-def generate_enum_code(uris: List[str], enum_name: str) -> List[str]:
+def generate_enum_code(
+    uris: List[str], enum_name: str, descriptions: Dict[str, str]
+) -> List[str]:
     sorted_uris = sorted(uris)
     lines = [
         '',
@@ -126,12 +132,13 @@ def generate_enum_code(uris: List[str], enum_name: str) -> List[str]:
     ]
     for uri in sorted_uris:
         variant = uri_variant_name(uri)
-        lines.append(f'    /// `{uri}`')
+        lines.extend(format_doc_comment(descriptions.get(uri, ""), uri, "    "))
         lines.append(f'    {variant},')
     lines.extend([
         '}',
         '',
         f'impl {enum_name} {{',
+        '    /// Returns the WAAPI URI string for this endpoint.',
         "    pub const fn as_str(self) -> &'static str {",
         '        match self {',
     ])
@@ -159,27 +166,27 @@ def generate_enum_code(uris: List[str], enum_name: str) -> List[str]:
     return lines
 
 
-def generate_api_file(functions: List[str], output_path: Path, enum_name: str):
+def generate_api_file(
+    functions: List[str],
+    output_path: Path,
+    enum_name: str,
+    descriptions: Dict[str, str],
+):
     """
     Generate the complete URI module and enum file.
-    
-    Args:
-        functions: List of WAAPI URI paths
-        output_path: Path to write the Rust file
-        enum_name: Name of the generated URI enum
     """
     # Build the module tree
     tree = build_module_tree(functions)
     
     lines = [
-        '/// Wwise Authoring API endpoints',
+        '/// Wwise Authoring API URI constants organized by namespace.',
         '#[allow(non_upper_case_globals)]',
         '#[allow(non_snake_case)]',
     ]
     
-    module_lines = generate_module_code(tree, 0)
+    module_lines = generate_module_code(tree, descriptions, 0)
     lines.extend(module_lines)
-    lines.extend(generate_enum_code(functions, enum_name))
+    lines.extend(generate_enum_code(functions, enum_name, descriptions))
     content = '\n'.join(lines) + '\n'
     output_path.write_text(content, encoding='utf-8')
     
@@ -203,24 +210,157 @@ def discover_schema_dirs(schemas_root: Path) -> List[Path]:
     return sorted(dirs, key=_version_sort_key)
 
 
-def load_endpoints_from_schemas(schema_dirs: List[Path]) -> Tuple[List[str], List[str]]:
+_REF_DOC_MAP = {
+    "akcurveinterpolation": "`AkCurveInterpolation`",
+    "wobjects_index": "the Wwise Objects Reference",
+    "wobjectnodetypes": "the Wwise Object Node Types reference",
+    "wwiseobject_action": "the Wwise Action object reference",
+    "waapi_import": "the WAAPI Import documentation",
+    "waapi_create_objects_modes": "the WAAPI object creation modes documentation",
+    "waapi_set_lists_modes": "the WAAPI list modes documentation",
+    "waapi_path_on_mac": "the WAAPI Mac path documentation",
+    "waapi_query": "the WAAPI query documentation",
+    "waapi_query_return": "the WAAPI query return options documentation",
+    "waql_introduction": "the WAQL introduction documentation",
+    "globalcommandsids": "the Wwise global command IDs reference",
+    "globalcountersids": "the Wwise global counter IDs reference",
+    "defining_custom_commands": "the Wwise custom commands documentation",
+    "defining_custom_properties": "the Wwise custom properties documentation",
+}
+
+
+def clean_doc(text: str, ref_uri_map: Dict[str, str]) -> str:
+    if not text:
+        return ""
+
+    def _replace_verbatim(m: re.Match) -> str:
+        inner = m.group(1).strip()
+        trailing = ""
+        if inner.endswith("."):
+            inner = inner[:-1].rstrip()
+            trailing = "."
+        return f"`{inner}`{trailing}"
+
+    text = re.sub(
+        r"\\verbatim\s*(.*?)\s*\\endverbatim",
+        _replace_verbatim,
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"<tt>(.*?)</tt>",
+        lambda m: f"`{m.group(1).strip()}`",
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"<b>(.*?)</b>",
+        lambda m: f"**{m.group(1).strip()}**",
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    text = text.replace(r"\@", "@")
+    text = re.sub(r"\\c\s+'([^']+)'", r"`\1`", text)
+    text = re.sub(r'\\c\s+"([^"]+)"', r"`\1`", text)
+
+    def _replace_c_token(m: re.Match) -> str:
+        tok = m.group(1)
+        trailing = ""
+        while tok and tok[-1] in ".,;:!?)":
+            trailing = tok[-1] + trailing
+            tok = tok[:-1]
+        return f"`{tok}`{trailing}" if tok else trailing
+
+    text = re.sub(r"\\c\s+(\S+)", _replace_c_token, text)
+    text = re.sub(r"\bRefer\s+\\ref\b", r"Refer to \\ref", text)
+    text = re.sub(r"\brefer\s+\\ref\b", r"refer to \\ref", text)
+
+    def _replace_ref(m: re.Match) -> str:
+        raw = m.group(1)
+        trailing = ""
+        while raw and raw[-1] in ".,;:!?)":
+            trailing = raw[-1] + trailing
+            raw = raw[:-1]
+        key = raw.lower()
+        if key in ref_uri_map:
+            rep = ref_uri_map[key]
+        elif key in _REF_DOC_MAP:
+            rep = _REF_DOC_MAP[key]
+        else:
+            rep = f"`{raw}`"
+        return f"{rep}{trailing}"
+
+    text = re.sub(r"\\ref\s+(\S+)", _replace_ref, text)
+    text = re.sub(r"(?<!`)\[([^\[\]`]+)\](?!`|\()", r"`[\1]`", text)
+
+    lines = []
+    for raw_line in text.splitlines():
+        line = re.sub(r"[ \t]+", " ", raw_line).strip()
+        line = re.sub(r"\s+([.,;:])", r"\1", line)
+        lines.append(line)
+    while lines and not lines[0]:
+        lines.pop(0)
+    while lines and not lines[-1]:
+        lines.pop()
+    cleaned_lines: List[str] = []
+    prev_empty = False
+    for line in lines:
+        if not line:
+            if not prev_empty:
+                cleaned_lines.append("")
+            prev_empty = True
+        else:
+            cleaned_lines.append(line)
+            prev_empty = False
+    return "\n".join(cleaned_lines)
+
+
+def format_doc_comment(desc: str, uri: str, pad: str) -> List[str]:
+    lines: List[str] = []
+    if desc:
+        for line in desc.split("\n"):
+            if line:
+                lines.append(f"{pad}/// {line}")
+            else:
+                lines.append(f"{pad}///")
+        lines.append(f"{pad}///")
+    lines.append(f"{pad}/// WAAPI URI: `{uri}`.")
+    return lines
+
+
+def load_endpoints_from_schemas(
+    schema_dirs: List[Path],
+) -> Tuple[List[str], List[str], Dict[str, str]]:
     all_uris: List[str] = []
     seen: set = set()
     topic_uris: set = set()
+    raw_descriptions: Dict[str, str] = {}
+    ref_uri_map: Dict[str, str] = {
+        "ak_wwise_console_project_open": "`ak.wwise.console.project.open`"
+    }
     for schema_dir in schema_dirs:
         if not schema_dir.exists():
             continue
         for path in sorted(schema_dir.glob("ak.*.json")):
             uri = path.stem
+            ref_uri_map[uri.replace(".", "_").lower()] = f"`{uri}`"
             if uri not in seen:
                 seen.add(uri)
                 all_uris.append(uri)
             data = json.loads(path.read_text(encoding="utf-8"))
             if "publishSchema" in data:
                 topic_uris.add(uri)
+            desc = data.get("description", "")
+            if desc:
+                raw_descriptions[uri] = desc
+    descriptions = {
+        uri: clean_doc(desc, ref_uri_map)
+        for uri, desc in raw_descriptions.items()
+    }
     functions = [u for u in all_uris if u not in topic_uris]
     topics = [u for u in all_uris if u in topic_uris]
-    return functions, topics
+    return functions, topics, descriptions
 
 
 def main():
@@ -234,10 +374,10 @@ def main():
         )
     src_dir = script_dir.parent / "src"
 
-    functions, topics = load_endpoints_from_schemas(version_dirs)
+    functions, topics, descriptions = load_endpoints_from_schemas(version_dirs)
     print(f"Union of {len(version_dirs)} version(s): {len(functions)} functions, {len(topics)} topics")
-    generate_api_file(functions, src_dir / "waapi_function_api.rs", "WaapiFunction")
-    generate_api_file(topics, src_dir / "waapi_topics_api.rs", "WaapiTopic")
+    generate_api_file(functions, src_dir / "waapi_function_api.rs", "WaapiFunction", descriptions)
+    generate_api_file(topics, src_dir / "waapi_topics_api.rs", "WaapiTopic", descriptions)
 
 
 if __name__ == '__main__':

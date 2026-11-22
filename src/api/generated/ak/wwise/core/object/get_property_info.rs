@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.getPropertyInfo
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.getPropertyInfo`.
+///
+/// Retrieves information about an object property. Note that this function does not return the value of a property. To retrieve the value of a property, see `ak.wwise.core.object.get` and the WAAPI query return options documentation.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectGetPropertyInfoArgs {
     /// The ID (class ID) of the object to retrieve the property from.
@@ -14,11 +23,12 @@ pub struct CoreObjectGetPropertyInfoArgs {
     /// The ID (GUID), name, or path of the object to watch.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub object: Option<ObjectRef>,
-    /// The name of the property to retrieve. For more information, refer to the property list of Wwise Objects listed in .
+    /// The name of the property to retrieve. For more information, refer to the property list of Wwise Objects listed in the Wwise Objects Reference.
     pub property: Property,
 }
 
 impl CoreObjectGetPropertyInfoArgs {
+    /// Creates a new [`CoreObjectGetPropertyInfoArgs`] with the required fields.
     pub fn new(property: Property) -> Self {
         Self {
             property,
@@ -27,11 +37,13 @@ impl CoreObjectGetPropertyInfoArgs {
         }
     }
 
+    /// The ID (class ID) of the object to retrieve the property from.
     pub fn class_id(mut self, class_id: impl Into<u32>) -> Self {
         self.class_id = Some(class_id.into());
         self
     }
 
+    /// The ID (GUID), name, or path of the object to watch.
     pub fn object(mut self, object: impl Into<ObjectRef>) -> Self {
         self.object = Some(object.into());
         self
@@ -39,12 +51,14 @@ impl CoreObjectGetPropertyInfoArgs {
 }
 
 /// Response from `ak.wwise.core.object.getPropertyInfo`.
+///
+/// Retrieves information about an object property. Note that this function does not return the value of a property. To retrieve the value of a property, see `ak.wwise.core.object.get` and the WAAPI query return options documentation.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectGetPropertyInfoResponse {
     /// The name of the property.
     #[serde(default)]
     pub name: Option<String>,
-    /// The type of the property. For more information, refer to the property list of Wwise Objects found in .
+    /// The type of the property. For more information, refer to the property list of Wwise Objects found in the Wwise Objects Reference.
     #[serde(rename = "type", default, skip_serializing_if = "Option::is_none")]
     pub object_type: Option<String>,
     /// The default value of the property.
@@ -69,3 +83,4 @@ pub struct CoreObjectGetPropertyInfoResponse {
     #[serde(default)]
     pub ui: Option<serde_json::Value>,
 }
+

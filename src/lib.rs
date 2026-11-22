@@ -1,6 +1,11 @@
+//! Rust client library for the Wwise Authoring API (WAAPI) over WAMP/WebSocket.
+
 pub mod api;
+/// Re-exports of `serde_json::Map` and `serde_json::Value`.
 pub mod types;
+/// Auto-generated WAAPI RPC function URI constants and [`WaapiFunction`] enum.
 pub mod waapi_function_api;
+/// Auto-generated WAAPI subscription topic URI constants and [`WaapiTopic`] enum.
 pub mod waapi_topics_api;
 
 mod waapi_client;

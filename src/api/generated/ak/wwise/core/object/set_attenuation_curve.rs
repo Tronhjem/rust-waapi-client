@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.setAttenuationCurve
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.setAttenuationCurve`.
+///
+/// Sets the specified attenuation curve for a given attenuation object.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetAttenuationCurveArgs {
     /// The attenuation curve.
@@ -24,12 +33,8 @@ pub struct CoreObjectSetAttenuationCurveArgs {
 }
 
 impl CoreObjectSetAttenuationCurveArgs {
-    pub fn new(
-        object: ObjectRef,
-        curve_type: AttenuationCurveType,
-        use_: AttenuationCurveUse,
-        points: Vec<CurvePoint2D>,
-    ) -> Self {
+    /// Creates a new [`CoreObjectSetAttenuationCurveArgs`] with the required fields.
+    pub fn new(object: ObjectRef, curve_type: AttenuationCurveType, use_: AttenuationCurveUse, points: Vec<CurvePoint2D>) -> Self {
         Self {
             object,
             curve_type,
@@ -39,6 +44,7 @@ impl CoreObjectSetAttenuationCurveArgs {
         }
     }
 
+    /// The ID (GUID) or unique name of the platform to set curves. Set to null-guid for unlinked curve.
     pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
         self.platform = Some(platform.into());
         self

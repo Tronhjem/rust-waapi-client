@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.create
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.create`.
+///
+/// Creates an object of type 'type', as a child of 'parent'. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise. To create Effect or Source plug-ins, use `ak.wwise.core.object.set`, and see the Wwise Objects Reference for the classId.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectCreateArgs {
     /// For internal use only! The ID (GUID) to assign to the newly created Object.
@@ -13,7 +22,7 @@ pub struct CoreObjectCreateArgs {
     pub id: Option<String>,
     /// The name of the new object.
     pub name: String,
-    /// The type of the new object. See for possible object types.
+    /// The type of the new object. See the Wwise Objects Reference for possible object types.
     #[serde(rename = "type")]
     pub object_type: ObjectType,
     /// The notes or comments of the new object.
@@ -24,25 +33,25 @@ pub struct CoreObjectCreateArgs {
     /// The name of the list in which to insert the object. If this argument is set, the object gets inserted in a list owned by the parent and not as a child.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list: Option<String>,
+    /// An array of child objects to be created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<ChildObject>>,
     /// The ID (GUID) or unique name of the platform used when setting properties via this command. Not specifying a platform sets the value for all linked platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    #[serde(
-        rename = "autoAddToSourceControl",
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(rename = "autoAddToSourceControl", skip_serializing_if = "Option::is_none")]
     pub auto_add_to_source_control: Option<bool>,
-    /// The action to take if "parent" already has a child with the same name. Default value is "fail". See for more information.
+    /// The action to take if "parent" already has a child with the same name. Default value is "fail". See the WAAPI object creation modes documentation for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
+    /// Additional `@`-prefixed properties, references, or list values.
     #[serde(flatten)]
     pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl CoreObjectCreateArgs {
+    /// Creates a new [`CoreObjectCreateArgs`] with the required fields.
     pub fn new(parent: ObjectRef, object_type: ObjectType, name: String) -> Self {
         Self {
             parent,
@@ -59,39 +68,43 @@ impl CoreObjectCreateArgs {
         }
     }
 
+    /// For internal use only! The ID (GUID) to assign to the newly created Object.
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
     }
 
+    /// The notes or comments of the new object.
     pub fn notes(mut self, notes: impl Into<String>) -> Self {
         self.notes = Some(notes.into());
         self
     }
 
+    /// The name of the list in which to insert the object. If this argument is set, the object gets inserted in a list owned by the parent and not as a child.
     pub fn list(mut self, list: impl Into<String>) -> Self {
         self.list = Some(list.into());
         self
     }
 
+    /// An array of child objects to be created.
     pub fn children(mut self, children: impl Into<Vec<ChildObject>>) -> Self {
         self.children = Some(children.into());
         self
     }
 
+    /// The ID (GUID) or unique name of the platform used when setting properties via this command. Not specifying a platform sets the value for all linked platforms.
     pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
         self.platform = Some(platform.into());
         self
     }
 
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
+    /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: impl Into<bool>) -> Self {
         self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
         self
     }
 
+    /// The action to take if "parent" already has a child with the same name. Default value is "fail". See the WAAPI object creation modes documentation for more information.
     pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
         self.on_name_conflict = Some(on_name_conflict.into());
         self
@@ -117,6 +130,8 @@ impl CoreObjectCreateArgs {
 }
 
 /// Response from `ak.wwise.core.object.create`.
+///
+/// Creates an object of type 'type', as a child of 'parent'. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise. To create Effect or Source plug-ins, use `ak.wwise.core.object.set`, and see the Wwise Objects Reference for the classId.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectCreateResponse {
     /// The ID (GUID) of the newly created Object.
@@ -129,3 +144,4 @@ pub struct CoreObjectCreateResponse {
     #[serde(default)]
     pub children: Vec<CoreObjectCreateResponse>,
 }
+

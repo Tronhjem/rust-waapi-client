@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.object.nameChanged
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.object.nameChanged`.
+///
+/// Sent when an object is renamed. Publishes the renamed object. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectNameChangedPayload {
     /// The object that was renamed.
@@ -18,7 +27,10 @@ pub struct CoreObjectNameChangedPayload {
     pub old_name: String,
 }
 
+
 /// Subscription options for `ak.wwise.core.object.nameChanged`.
+///
+/// Sent when an object is renamed. Publishes the renamed object. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreObjectNameChangedOptions {
     /// Data to be returned for every name change.
@@ -30,15 +42,18 @@ pub struct CoreObjectNameChangedOptions {
 }
 
 impl CoreObjectNameChangedOptions {
+    /// Creates a new [`CoreObjectNameChangedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Data to be returned for every name change.
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
         self
     }
 
+    /// The ID (GUID) of the platform.
     pub fn platform(mut self, platform: impl Into<String>) -> Self {
         self.platform = Some(platform.into());
         self

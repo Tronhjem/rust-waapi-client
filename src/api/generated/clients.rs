@@ -4,2125 +4,1860 @@
 use crate::{WaapiClient, WaapiFunction, WaapiResult, WaapiTopic};
 use tokio::sync::mpsc::UnboundedReceiver;
 
-use crate::api::generated::ak::soundengine::SoundengineExecuteActionOnEventArgs;
-use crate::api::generated::ak::soundengine::SoundengineLoadBankArgs;
-use crate::api::generated::ak::soundengine::SoundenginePostMsgMonitorArgs;
-use crate::api::generated::ak::soundengine::SoundenginePostTriggerArgs;
-use crate::api::generated::ak::soundengine::SoundengineRegisterGameObjArgs;
-use crate::api::generated::ak::soundengine::SoundengineResetRtpcValueArgs;
-use crate::api::generated::ak::soundengine::SoundengineSeekOnEventArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetDefaultListenersArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetGameObjectAuxSendValuesArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetGameObjectOutputBusVolumeArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetListenerSpatializationArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetListenersArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetMultiplePositionsArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetObjectObstructionAndOcclusionArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetPositionArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetRtpcValueArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetScalingFactorArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetStateArgs;
-use crate::api::generated::ak::soundengine::SoundengineSetSwitchArgs;
-use crate::api::generated::ak::soundengine::SoundengineStopAllArgs;
-use crate::api::generated::ak::soundengine::SoundengineStopPlayingIdArgs;
-use crate::api::generated::ak::soundengine::SoundengineUnloadBankArgs;
-use crate::api::generated::ak::soundengine::SoundengineUnregisterGameObjArgs;
-use crate::api::generated::ak::soundengine::{
-    SoundengineGetStateArgs, SoundengineGetStateOptions, SoundengineGetStateResponse,
-};
-use crate::api::generated::ak::soundengine::{
-    SoundengineGetSwitchArgs, SoundengineGetSwitchOptions, SoundengineGetSwitchResponse,
-};
-use crate::api::generated::ak::soundengine::{
-    SoundenginePostEventArgs, SoundenginePostEventResponse,
-};
-use crate::api::generated::ak::wwise::core::CoreGetInfoResponse;
-use crate::api::generated::ak::wwise::core::CoreGetProjectInfoResponse;
-use crate::api::generated::ak::wwise::core::CorePingResponse;
-use crate::api::generated::ak::wwise::core::audio::CoreAudioMuteArgs;
-use crate::api::generated::ak::wwise::core::audio::CoreAudioSetConversionPluginArgs;
-use crate::api::generated::ak::wwise::core::audio::CoreAudioSoloArgs;
-use crate::api::generated::ak::wwise::core::audio::{
-    CoreAudioConvertArgs, CoreAudioConvertResponse,
-};
-use crate::api::generated::ak::wwise::core::audio::{
-    CoreAudioImportArgs, CoreAudioImportOptions, CoreAudioImportResponse,
-};
-use crate::api::generated::ak::wwise::core::audio::{
-    CoreAudioImportTabDelimitedArgs, CoreAudioImportTabDelimitedOptions,
-    CoreAudioImportTabDelimitedResponse,
-};
-use crate::api::generated::ak::wwise::core::audio::{
-    CoreAudioImportedOptions, CoreAudioImportedPayload,
-};
-use crate::api::generated::ak::wwise::core::blendContainer::CoreBlendContainerRemoveAssignmentArgs;
-use crate::api::generated::ak::wwise::core::blendContainer::{
-    CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddAssignmentResponse,
-};
-use crate::api::generated::ak::wwise::core::blendContainer::{
-    CoreBlendContainerAddTrackArgs, CoreBlendContainerAddTrackResponse,
-};
-use crate::api::generated::ak::wwise::core::blendContainer::{
-    CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerGetAssignmentsResponse,
-};
-use crate::api::generated::ak::wwise::core::gameParameter::CoreGameParameterSetRangeArgs;
-use crate::api::generated::ak::wwise::core::log::CoreLogItemAddedPayload;
-use crate::api::generated::ak::wwise::core::mediaPool::CoreMediaPoolGetFieldsResponse;
-use crate::api::generated::ak::wwise::core::mediaPool::{
-    CoreMediaPoolGetArgs, CoreMediaPoolGetOptions, CoreMediaPoolGetResponse,
-};
-use crate::api::generated::ak::wwise::core::object::CoreObjectDeleteArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectGetTypesResponse;
-use crate::api::generated::ak::wwise::core::object::CoreObjectPastePropertiesArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetAttenuationCurveArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetLinkedArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetNameArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetNotesArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetPropertyArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetRandomizerArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetReferenceArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetStateGroupsArgs;
-use crate::api::generated::ak::wwise::core::object::CoreObjectSetStatePropertiesArgs;
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectAttenuationCurveChangedOptions, CoreObjectAttenuationCurveChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectAttenuationCurveLinkChangedOptions, CoreObjectAttenuationCurveLinkChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectChildAddedOptions, CoreObjectChildAddedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectChildRemovedOptions, CoreObjectChildRemovedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCopyResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectCreateArgs, CoreObjectCreateResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectCreatedOptions, CoreObjectCreatedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectCurveChangedOptions, CoreObjectCurveChangedPayload,
-};
+use crate::api::generated::ak::soundengine::{SoundengineExecuteActionOnEventArgs};
+use crate::api::generated::ak::soundengine::{SoundengineGetStateArgs, SoundengineGetStateOptions, SoundengineGetStateResponse};
+use crate::api::generated::ak::soundengine::{SoundengineGetSwitchArgs, SoundengineGetSwitchOptions, SoundengineGetSwitchResponse};
+use crate::api::generated::ak::soundengine::{SoundengineLoadBankArgs};
+use crate::api::generated::ak::soundengine::{SoundenginePostEventArgs, SoundenginePostEventResponse};
+use crate::api::generated::ak::soundengine::{SoundenginePostMsgMonitorArgs};
+use crate::api::generated::ak::soundengine::{SoundenginePostTriggerArgs};
+use crate::api::generated::ak::soundengine::{SoundengineRegisterGameObjArgs};
+use crate::api::generated::ak::soundengine::{SoundengineResetRtpcValueArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSeekOnEventArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetDefaultListenersArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetGameObjectAuxSendValuesArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetGameObjectOutputBusVolumeArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetListenerSpatializationArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetListenersArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetMultiplePositionsArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetObjectObstructionAndOcclusionArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetPositionArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetRtpcValueArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetScalingFactorArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetStateArgs};
+use crate::api::generated::ak::soundengine::{SoundengineSetSwitchArgs};
+use crate::api::generated::ak::soundengine::{SoundengineStopAllArgs};
+use crate::api::generated::ak::soundengine::{SoundengineStopPlayingIdArgs};
+use crate::api::generated::ak::soundengine::{SoundengineUnloadBankArgs};
+use crate::api::generated::ak::soundengine::{SoundengineUnregisterGameObjArgs};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioConvertArgs, CoreAudioConvertResponse};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioImportArgs, CoreAudioImportOptions, CoreAudioImportResponse};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioImportTabDelimitedArgs, CoreAudioImportTabDelimitedOptions, CoreAudioImportTabDelimitedResponse};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioMuteArgs};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioSetConversionPluginArgs};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioSoloArgs};
+use crate::api::generated::ak::wwise::core::blendContainer::{CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddAssignmentResponse};
+use crate::api::generated::ak::wwise::core::blendContainer::{CoreBlendContainerAddTrackArgs, CoreBlendContainerAddTrackResponse};
+use crate::api::generated::ak::wwise::core::blendContainer::{CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerGetAssignmentsResponse};
+use crate::api::generated::ak::wwise::core::blendContainer::{CoreBlendContainerRemoveAssignmentArgs};
+use crate::api::generated::ak::wwise::core::gameParameter::{CoreGameParameterSetRangeArgs};
+use crate::api::generated::ak::wwise::core::{CoreGetInfoResponse};
+use crate::api::generated::ak::wwise::core::{CoreGetProjectInfoResponse};
+use crate::api::generated::ak::wwise::core::mediaPool::{CoreMediaPoolGetArgs, CoreMediaPoolGetOptions, CoreMediaPoolGetResponse};
+use crate::api::generated::ak::wwise::core::mediaPool::{CoreMediaPoolGetFieldsResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCopyResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectCreateArgs, CoreObjectCreateResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectDeleteArgs};
 use crate::api::generated::ak::wwise::core::object::{CoreObjectDiffArgs, CoreObjectDiffResponse};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectGetResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectGetPropertyAndReferenceNamesArgs, CoreObjectGetPropertyAndReferenceNamesResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectGetPropertyInfoArgs, CoreObjectGetPropertyInfoResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectIsLinkedArgs, CoreObjectIsLinkedResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectIsPropertyEnabledArgs, CoreObjectIsPropertyEnabledResponse,
-};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectGetResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectGetPropertyAndReferenceNamesArgs, CoreObjectGetPropertyAndReferenceNamesResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectGetPropertyInfoArgs, CoreObjectGetPropertyInfoResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectGetTypesResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectIsLinkedArgs, CoreObjectIsLinkedResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectIsPropertyEnabledArgs, CoreObjectIsPropertyEnabledResponse};
 use crate::api::generated::ak::wwise::core::object::{CoreObjectMoveArgs, CoreObjectMoveResponse};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectNameChangedOptions, CoreObjectNameChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectNotesChangedOptions, CoreObjectNotesChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectPostDeletedOptions, CoreObjectPostDeletedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectPreDeletedOptions, CoreObjectPreDeletedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectPropertyChangedOptions, CoreObjectPropertyChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectReferenceChangedOptions, CoreObjectReferenceChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectSetArgs, CoreObjectSetOptions, CoreObjectSetResponse,
-};
-use crate::api::generated::ak::wwise::core::object::{
-    CoreObjectStructureChangedOptions, CoreObjectStructureChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectRegisteredPayload;
-use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectResetPayload;
-use crate::api::generated::ak::wwise::core::profiler::CoreProfilerGameObjectUnregisteredPayload;
-use crate::api::generated::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogSaveArgs;
-use crate::api::generated::ak::wwise::core::profiler::captureLog::{
-    CoreProfilerCaptureLogItemAddedOptions, CoreProfilerCaptureLogItemAddedPayload,
-};
-use crate::api::generated::ak::wwise::core::profiler::{
-    CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse,
-};
-use crate::api::generated::ak::wwise::core::profiler::{
-    CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse,
-};
-use crate::api::generated::ak::wwise::core::profiler::{
-    CoreProfilerStateChangedOptions, CoreProfilerStateChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::profiler::{
-    CoreProfilerSwitchChangedOptions, CoreProfilerSwitchChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::project::CoreProjectLoadedPayload;
-use crate::api::generated::ak::wwise::core::project::CoreProjectPostClosedPayload;
-use crate::api::generated::ak::wwise::core::project::CoreProjectPreClosedPayload;
-use crate::api::generated::ak::wwise::core::project::CoreProjectSaveArgs;
-use crate::api::generated::ak::wwise::core::project::CoreProjectSavedPayload;
-use crate::api::generated::ak::wwise::core::sound::CoreSoundSetActiveSourceArgs;
-use crate::api::generated::ak::wwise::core::soundbank::CoreSoundbankConvertExternalSourcesArgs;
-use crate::api::generated::ak::wwise::core::soundbank::CoreSoundbankGenerationDonePayload;
-use crate::api::generated::ak::wwise::core::soundbank::CoreSoundbankProcessDefinitionFilesArgs;
-use crate::api::generated::ak::wwise::core::soundbank::CoreSoundbankSetInclusionsArgs;
-use crate::api::generated::ak::wwise::core::soundbank::{
-    CoreSoundbankGenerateArgs, CoreSoundbankGenerateResponse,
-};
-use crate::api::generated::ak::wwise::core::soundbank::{
-    CoreSoundbankGeneratedOptions, CoreSoundbankGeneratedPayload,
-};
-use crate::api::generated::ak::wwise::core::soundbank::{
-    CoreSoundbankGetInclusionsArgs, CoreSoundbankGetInclusionsResponse,
-};
-use crate::api::generated::ak::wwise::core::switchContainer::CoreSwitchContainerAddAssignmentArgs;
-use crate::api::generated::ak::wwise::core::switchContainer::CoreSwitchContainerRemoveAssignmentArgs;
-use crate::api::generated::ak::wwise::core::switchContainer::{
-    CoreSwitchContainerAssignmentAddedOptions, CoreSwitchContainerAssignmentAddedPayload,
-};
-use crate::api::generated::ak::wwise::core::switchContainer::{
-    CoreSwitchContainerAssignmentRemovedOptions, CoreSwitchContainerAssignmentRemovedPayload,
-};
-use crate::api::generated::ak::wwise::core::switchContainer::{
-    CoreSwitchContainerGetAssignmentsArgs, CoreSwitchContainerGetAssignmentsResponse,
-};
-use crate::api::generated::ak::wwise::core::transport::CoreTransportDestroyArgs;
-use crate::api::generated::ak::wwise::core::transport::CoreTransportExecuteActionArgs;
-use crate::api::generated::ak::wwise::core::transport::CoreTransportGetListResponse;
-use crate::api::generated::ak::wwise::core::transport::CoreTransportPrepareArgs;
-use crate::api::generated::ak::wwise::core::transport::CoreTransportUseOriginalsArgs;
-use crate::api::generated::ak::wwise::core::transport::{
-    CoreTransportCreateArgs, CoreTransportCreateResponse,
-};
-use crate::api::generated::ak::wwise::core::transport::{
-    CoreTransportGetStateArgs, CoreTransportGetStateResponse,
-};
-use crate::api::generated::ak::wwise::core::transport::{
-    CoreTransportStateChangedOptions, CoreTransportStateChangedPayload,
-};
-use crate::api::generated::ak::wwise::core::undo::CoreUndoCancelGroupArgs;
-use crate::api::generated::ak::wwise::core::undo::CoreUndoEndGroupArgs;
-use crate::api::generated::ak::wwise::core::workUnit::CoreWorkUnitLoadArgs;
-use crate::api::generated::ak::wwise::core::workUnit::CoreWorkUnitUnloadArgs;
-use crate::api::generated::ak::wwise::debug::DebugAssertFailedPayload;
-use crate::api::generated::ak::wwise::ui::UiGetSelectedFilesResponse;
-use crate::api::generated::ak::wwise::ui::commands::UiCommandsExecuteArgs;
-use crate::api::generated::ak::wwise::ui::commands::UiCommandsGetCommandsResponse;
-use crate::api::generated::ak::wwise::ui::commands::{
-    UiCommandsExecutedOptions, UiCommandsExecutedPayload,
-};
-use crate::api::generated::ak::wwise::ui::layout::UiLayoutCloseViewArgs;
-use crate::api::generated::ak::wwise::ui::layout::UiLayoutResetLayoutsArgs;
-use crate::api::generated::ak::wwise::ui::project::UiProjectOpenArgs;
+use crate::api::generated::ak::wwise::core::object::{CoreObjectPastePropertiesArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetArgs, CoreObjectSetOptions, CoreObjectSetResponse};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetAttenuationCurveArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetLinkedArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetNameArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetNotesArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetPropertyArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetRandomizerArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetReferenceArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetStateGroupsArgs};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectSetStatePropertiesArgs};
+use crate::api::generated::ak::wwise::core::{CorePingResponse};
+use crate::api::generated::ak::wwise::core::profiler::captureLog::{CoreProfilerCaptureLogSaveArgs};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse};
+use crate::api::generated::ak::wwise::core::project::{CoreProjectSaveArgs};
+use crate::api::generated::ak::wwise::core::sound::{CoreSoundSetActiveSourceArgs};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankConvertExternalSourcesArgs};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankGenerateArgs, CoreSoundbankGenerateResponse};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankGetInclusionsArgs, CoreSoundbankGetInclusionsResponse};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankProcessDefinitionFilesArgs};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankSetInclusionsArgs};
+use crate::api::generated::ak::wwise::core::switchContainer::{CoreSwitchContainerAddAssignmentArgs};
+use crate::api::generated::ak::wwise::core::switchContainer::{CoreSwitchContainerGetAssignmentsArgs, CoreSwitchContainerGetAssignmentsResponse};
+use crate::api::generated::ak::wwise::core::switchContainer::{CoreSwitchContainerRemoveAssignmentArgs};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportCreateArgs, CoreTransportCreateResponse};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportDestroyArgs};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportExecuteActionArgs};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportGetListResponse};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportGetStateArgs, CoreTransportGetStateResponse};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportPrepareArgs};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportUseOriginalsArgs};
+use crate::api::generated::ak::wwise::core::undo::{CoreUndoCancelGroupArgs};
+use crate::api::generated::ak::wwise::core::undo::{CoreUndoEndGroupArgs};
+use crate::api::generated::ak::wwise::core::workUnit::{CoreWorkUnitLoadArgs};
+use crate::api::generated::ak::wwise::core::workUnit::{CoreWorkUnitUnloadArgs};
+use crate::api::generated::ak::wwise::ui::commands::{UiCommandsExecuteArgs};
+use crate::api::generated::ak::wwise::ui::commands::{UiCommandsGetCommandsResponse};
+use crate::api::generated::ak::wwise::ui::{UiGetSelectedFilesResponse};
+use crate::api::generated::ak::wwise::ui::{UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse};
+use crate::api::generated::ak::wwise::ui::layout::{UiLayoutCloseViewArgs};
+use crate::api::generated::ak::wwise::ui::layout::{UiLayoutResetLayoutsArgs};
 use crate::api::generated::ak::wwise::ui::project::{UiProjectCloseArgs, UiProjectCloseResponse};
-use crate::api::generated::ak::wwise::ui::signal::{UiSignalClickOptions, UiSignalClickPayload};
-use crate::api::generated::ak::wwise::ui::signal::{UiSignalToggleOptions, UiSignalTogglePayload};
-use crate::api::generated::ak::wwise::ui::{
-    UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
-};
-use crate::api::generated::ak::wwise::ui::{UiSelectionChangedOptions, UiSelectionChangedPayload};
+use crate::api::generated::ak::wwise::ui::project::{UiProjectOpenArgs};
+use crate::api::generated::ak::wwise::core::audio::{CoreAudioImportedPayload, CoreAudioImportedOptions};
+use crate::api::generated::ak::wwise::core::log::{CoreLogItemAddedPayload};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectAttenuationCurveChangedPayload, CoreObjectAttenuationCurveChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectAttenuationCurveLinkChangedPayload, CoreObjectAttenuationCurveLinkChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectChildAddedPayload, CoreObjectChildAddedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectChildRemovedPayload, CoreObjectChildRemovedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectCreatedPayload, CoreObjectCreatedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectCurveChangedPayload, CoreObjectCurveChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectNameChangedPayload, CoreObjectNameChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectNotesChangedPayload, CoreObjectNotesChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectPostDeletedPayload, CoreObjectPostDeletedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectPreDeletedPayload, CoreObjectPreDeletedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectPropertyChangedPayload, CoreObjectPropertyChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectReferenceChangedPayload, CoreObjectReferenceChangedOptions};
+use crate::api::generated::ak::wwise::core::object::{CoreObjectStructureChangedPayload, CoreObjectStructureChangedOptions};
+use crate::api::generated::ak::wwise::core::profiler::captureLog::{CoreProfilerCaptureLogItemAddedPayload, CoreProfilerCaptureLogItemAddedOptions};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerGameObjectRegisteredPayload};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerGameObjectResetPayload};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerGameObjectUnregisteredPayload};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerStateChangedPayload, CoreProfilerStateChangedOptions};
+use crate::api::generated::ak::wwise::core::profiler::{CoreProfilerSwitchChangedPayload, CoreProfilerSwitchChangedOptions};
+use crate::api::generated::ak::wwise::core::project::{CoreProjectLoadedPayload};
+use crate::api::generated::ak::wwise::core::project::{CoreProjectPostClosedPayload};
+use crate::api::generated::ak::wwise::core::project::{CoreProjectPreClosedPayload};
+use crate::api::generated::ak::wwise::core::project::{CoreProjectSavedPayload};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankGeneratedPayload, CoreSoundbankGeneratedOptions};
+use crate::api::generated::ak::wwise::core::soundbank::{CoreSoundbankGenerationDonePayload};
+use crate::api::generated::ak::wwise::core::switchContainer::{CoreSwitchContainerAssignmentAddedPayload, CoreSwitchContainerAssignmentAddedOptions};
+use crate::api::generated::ak::wwise::core::switchContainer::{CoreSwitchContainerAssignmentRemovedPayload, CoreSwitchContainerAssignmentRemovedOptions};
+use crate::api::generated::ak::wwise::core::transport::{CoreTransportStateChangedPayload, CoreTransportStateChangedOptions};
+use crate::api::generated::ak::wwise::debug::{DebugAssertFailedPayload};
+use crate::api::generated::ak::wwise::ui::commands::{UiCommandsExecutedPayload, UiCommandsExecutedOptions};
+use crate::api::generated::ak::wwise::ui::{UiSelectionChangedPayload, UiSelectionChangedOptions};
+use crate::api::generated::ak::wwise::ui::signal::{UiSignalClickPayload, UiSignalClickOptions};
+use crate::api::generated::ak::wwise::ui::signal::{UiSignalTogglePayload, UiSignalToggleOptions};
 
+/// Typed client for the `ak` WAAPI namespace.
 pub struct AkClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> AkClient<'a> {
+    /// Access the `ak.soundengine` WAAPI namespace.
     pub fn soundengine(self) -> SoundengineClient<'a> {
-        SoundengineClient {
-            client: self.client,
-        }
+        SoundengineClient { client: self.client }
     }
 
+    /// Access the `ak.wwise` WAAPI namespace.
     pub fn wwise(self) -> WwiseClient<'a> {
-        WwiseClient {
-            client: self.client,
-        }
+        WwiseClient { client: self.client }
     }
 }
 
+/// Typed client for the `ak.soundengine` WAAPI namespace.
 pub struct SoundengineClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> SoundengineClient<'a> {
-    /// `ak.soundengine.postEvent`.
+    /// Asynchronously post an Event to the sound engine (by event ID). See `AK::SoundEngine::PostEvent`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.postEvent`.
     pub async fn post_event(
         &mut self,
         args: SoundenginePostEventArgs,
     ) -> WaapiResult<SoundenginePostEventResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_soundengine_postEvent, Some(args), None)
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_soundengine_postEvent, Some(args), None).await
     }
 
-    /// `ak.soundengine.setRTPCValue`.
-    pub async fn set_rtpc_value(&mut self, args: SoundengineSetRtpcValueArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setRTPCValue, Some(args), None)
-            .await?;
+    /// Sets the value of a Game Parameter for real-time parameter control. See `AK::SoundEngine::SetRTPCValue`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setRTPCValue`.
+    pub async fn set_rtpc_value(
+        &mut self,
+        args: SoundengineSetRtpcValueArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setRTPCValue, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.registerGameObj`.
+    /// Register a game object. Registering a game object twice does nothing. Unregistering it once unregisters it no matter how many times it has been registered. See `AK::SoundEngine::RegisterGameObj`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.registerGameObj`.
     pub async fn register_game_obj(
         &mut self,
         args: SoundengineRegisterGameObjArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_registerGameObj,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_registerGameObj, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.unregisterGameObj`.
+    /// Unregisters a game object. Registering a game object twice does nothing. Unregistering it once unregisters it no matter how many times it has been registered. Unregistering a game object while it is in use is allowed, but the control over the parameters of this game object is lost. For example, say a sound associated with this game object is a 3D moving sound. It stops moving when the game object is unregistered, and there is no way to regain control over the game object. See `AK::SoundEngine::UnregisterGameObj`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.unregisterGameObj`.
     pub async fn unregister_game_obj(
         &mut self,
         args: SoundengineUnregisterGameObjArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_unregisterGameObj,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_unregisterGameObj, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setPosition`.
-    pub async fn set_position(&mut self, args: SoundengineSetPositionArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setPosition, Some(args), None)
-            .await?;
+    /// Sets the position of a game object. See `AK::SoundEngine::SetPosition`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setPosition`.
+    pub async fn set_position(
+        &mut self,
+        args: SoundengineSetPositionArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setPosition, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setDefaultListeners`.
+    /// Sets the default active listeners for all subsequent game objects that are registered. See `AK::SoundEngine::SetDefaultListeners`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setDefaultListeners`.
     pub async fn set_default_listeners(
         &mut self,
         args: SoundengineSetDefaultListenersArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setDefaultListeners,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setDefaultListeners, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setSwitch`.
-    pub async fn set_switch(&mut self, args: SoundengineSetSwitchArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setSwitch, Some(args), None)
-            .await?;
+    /// Sets the State of a Switch Group. See `AK::SoundEngine::SetSwitch`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setSwitch`.
+    pub async fn set_switch(
+        &mut self,
+        args: SoundengineSetSwitchArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setSwitch, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setState`.
-    pub async fn set_state(&mut self, args: SoundengineSetStateArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setState, Some(args), None)
-            .await?;
+    /// Sets the State of a State Group. See `AK::SoundEngine::SetState`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setState`.
+    pub async fn set_state(
+        &mut self,
+        args: SoundengineSetStateArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setState, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.getSwitch`.
+    /// Gets the current state of a Switch Group for a given Game Object.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.getSwitch`.
     pub async fn get_switch(
         &mut self,
         args: SoundengineGetSwitchArgs,
         options: SoundengineGetSwitchOptions,
     ) -> WaapiResult<SoundengineGetSwitchResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_soundengine_getSwitch,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_soundengine_getSwitch, Some(args), Some(options)).await
     }
 
-    /// `ak.soundengine.getState`.
+    /// Gets the current state of a State Group. When using setState just prior to getState, allow a brief delay (no more than 10ms) for the information to update in the sound engine.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.getState`.
     pub async fn get_state(
         &mut self,
         args: SoundengineGetStateArgs,
         options: SoundengineGetStateOptions,
     ) -> WaapiResult<SoundengineGetStateResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_soundengine_getState,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_soundengine_getState, Some(args), Some(options)).await
     }
 
-    /// `ak.soundengine.loadBank`.
-    pub async fn load_bank(&mut self, args: SoundengineLoadBankArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_loadBank, Some(args), None)
-            .await?;
+    /// Load a SoundBank. See `AK::SoundEngine::LoadBank`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.loadBank`.
+    pub async fn load_bank(
+        &mut self,
+        args: SoundengineLoadBankArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_loadBank, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.unloadBank`.
-    pub async fn unload_bank(&mut self, args: SoundengineUnloadBankArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_unloadBank, Some(args), None)
-            .await?;
+    /// Unload a SoundBank. See `AK::SoundEngine::UnloadBank`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.unloadBank`.
+    pub async fn unload_bank(
+        &mut self,
+        args: SoundengineUnloadBankArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_unloadBank, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.stopAll`.
-    pub async fn stop_all(&mut self, args: SoundengineStopAllArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_stopAll, Some(args), None)
-            .await?;
+    /// Stop playing the current content associated to the specified game object ID. If no game object is specified, all sounds are stopped. See `AK::SoundEngine::StopAll`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.stopAll`.
+    pub async fn stop_all(
+        &mut self,
+        args: SoundengineStopAllArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_stopAll, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.stopPlayingID`.
-    pub async fn stop_playing_id(&mut self, args: SoundengineStopPlayingIdArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_stopPlayingID,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Stops the current content, associated to the specified playing ID, from playing. See `AK::SoundEngine::StopPlayingID`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.stopPlayingID`.
+    pub async fn stop_playing_id(
+        &mut self,
+        args: SoundengineStopPlayingIdArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_stopPlayingID, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.seekOnEvent`.
-    pub async fn seek_on_event(&mut self, args: SoundengineSeekOnEventArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_seekOnEvent, Some(args), None)
-            .await?;
+    /// Seeks inside all playing objects that are referenced in Play Actions of the specified Event. See `AK::SoundEngine::SeekOnEvent`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.seekOnEvent`.
+    pub async fn seek_on_event(
+        &mut self,
+        args: SoundengineSeekOnEventArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_seekOnEvent, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setListeners`.
-    pub async fn set_listeners(&mut self, args: SoundengineSetListenersArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setListeners, Some(args), None)
-            .await?;
+    /// Sets a single game object's active listeners. By default, all new game objects have no listeners active, but this behavior can be overridden with `SetDefaultListeners()`. Inactive listeners are not computed. See `AK::SoundEngine::SetListeners`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setListeners`.
+    pub async fn set_listeners(
+        &mut self,
+        args: SoundengineSetListenersArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setListeners, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setListenerSpatialization`.
+    /// Sets a listener's spatialization parameters. This lets you define listener-specific volume offsets for each audio channel. See `AK::SoundEngine::SetListenerSpatialization`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setListenerSpatialization`.
     pub async fn set_listener_spatialization(
         &mut self,
         args: SoundengineSetListenerSpatializationArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setListenerSpatialization,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setListenerSpatialization, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setMultiplePositions`.
+    /// Sets multiple positions for a single game object. Setting multiple positions for a single game object is a way to simulate multiple emission sources while using the resources of only one voice. This can be used to simulate wall openings, area sounds, or multiple objects emitting the same sound in the same area. See `AK::SoundEngine::SetMultiplePositions`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setMultiplePositions`.
     pub async fn set_multiple_positions(
         &mut self,
         args: SoundengineSetMultiplePositionsArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setMultiplePositions,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setMultiplePositions, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setGameObjectAuxSendValues`.
+    /// Sets the Auxiliary Busses to route the specified game object. See `AK::SoundEngine::SetGameObjectAuxSendValues`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setGameObjectAuxSendValues`.
     pub async fn set_game_object_aux_send_values(
         &mut self,
         args: SoundengineSetGameObjectAuxSendValuesArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setGameObjectAuxSendValues,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setGameObjectAuxSendValues, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setGameObjectOutputBusVolume`.
+    /// Set the output bus volume (direct) to be used for the specified game object. See `AK::SoundEngine::SetGameObjectOutputBusVolume`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setGameObjectOutputBusVolume`.
     pub async fn set_game_object_output_bus_volume(
         &mut self,
         args: SoundengineSetGameObjectOutputBusVolumeArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setGameObjectOutputBusVolume,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setGameObjectOutputBusVolume, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setObjectObstructionAndOcclusion`.
+    /// Set a game object's obstruction and occlusion levels. This function is used to affect how an object should be heard by a specific listener. See `AK::SoundEngine::SetObjectObstructionAndOcclusion`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setObjectObstructionAndOcclusion`.
     pub async fn set_object_obstruction_and_occlusion(
         &mut self,
         args: SoundengineSetObjectObstructionAndOcclusionArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setObjectObstructionAndOcclusion,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setObjectObstructionAndOcclusion, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.setScalingFactor`.
+    /// Sets the scaling factor of a game object. You can modify the attenuation computations on this game object to simulate sounds with a larger or smaller affected areas. See `AK::SoundEngine::SetScalingFactor`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.setScalingFactor`.
     pub async fn set_scaling_factor(
         &mut self,
         args: SoundengineSetScalingFactorArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_setScalingFactor,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setScalingFactor, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.executeActionOnEvent`.
+    /// Executes an action on all nodes that are referenced in the specified event in a Play action. See `AK::SoundEngine::ExecuteActionOnEvent`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.executeActionOnEvent`.
     pub async fn execute_action_on_event(
         &mut self,
         args: SoundengineExecuteActionOnEventArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_executeActionOnEvent,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_executeActionOnEvent, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.postTrigger`.
-    pub async fn post_trigger(&mut self, args: SoundenginePostTriggerArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_postTrigger, Some(args), None)
-            .await?;
+    /// Posts the specified Trigger. See `AK::SoundEngine::PostTrigger`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.postTrigger`.
+    pub async fn post_trigger(
+        &mut self,
+        args: SoundenginePostTriggerArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_postTrigger, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.postMsgMonitor`.
+    /// Display a message in the Profiler's Capture Log view.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.postMsgMonitor`.
     pub async fn post_msg_monitor(
         &mut self,
         args: SoundenginePostMsgMonitorArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_postMsgMonitor,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_postMsgMonitor, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.soundengine.resetRTPCValue`.
+    /// Resets the value of a real-time parameter control to its default value, as specified in the Wwise project. See `AK::SoundEngine::ResetRTPCValue`.
+    ///
+    /// WAAPI endpoint: `ak.soundengine.resetRTPCValue`.
     pub async fn reset_rtpc_value(
         &mut self,
         args: SoundengineResetRtpcValueArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_soundengine_resetRTPCValue,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_resetRTPCValue, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise` WAAPI namespace.
 pub struct WwiseClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseClient<'a> {
+    /// Access the `ak.wwise.core` WAAPI namespace.
     pub fn core(self) -> WwiseCoreClient<'a> {
-        WwiseCoreClient {
-            client: self.client,
-        }
+        WwiseCoreClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.debug` WAAPI namespace.
     pub fn debug(self) -> WwiseDebugClient<'a> {
-        WwiseDebugClient {
-            client: self.client,
-        }
+        WwiseDebugClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.ui` WAAPI namespace.
     pub fn ui(self) -> WwiseUiClient<'a> {
-        WwiseUiClient {
-            client: self.client,
-        }
+        WwiseUiClient { client: self.client }
     }
 }
 
+/// Typed client for the `ak.wwise.core` WAAPI namespace.
 pub struct WwiseCoreClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreClient<'a> {
+    /// Access the `ak.wwise.core.audio` WAAPI namespace.
     pub fn audio(self) -> WwiseCoreAudioClient<'a> {
-        WwiseCoreAudioClient {
-            client: self.client,
-        }
+        WwiseCoreAudioClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.blendContainer` WAAPI namespace.
     pub fn blend_container(self) -> WwiseCoreBlendContainerClient<'a> {
-        WwiseCoreBlendContainerClient {
-            client: self.client,
-        }
+        WwiseCoreBlendContainerClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.gameParameter` WAAPI namespace.
     pub fn game_parameter(self) -> WwiseCoreGameParameterClient<'a> {
-        WwiseCoreGameParameterClient {
-            client: self.client,
-        }
+        WwiseCoreGameParameterClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.log` WAAPI namespace.
     pub fn log(self) -> WwiseCoreLogClient<'a> {
-        WwiseCoreLogClient {
-            client: self.client,
-        }
+        WwiseCoreLogClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.mediaPool` WAAPI namespace.
     pub fn media_pool(self) -> WwiseCoreMediaPoolClient<'a> {
-        WwiseCoreMediaPoolClient {
-            client: self.client,
-        }
+        WwiseCoreMediaPoolClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.object` WAAPI namespace.
     pub fn object(self) -> WwiseCoreObjectClient<'a> {
-        WwiseCoreObjectClient {
-            client: self.client,
-        }
+        WwiseCoreObjectClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.profiler` WAAPI namespace.
     pub fn profiler(self) -> WwiseCoreProfilerClient<'a> {
-        WwiseCoreProfilerClient {
-            client: self.client,
-        }
+        WwiseCoreProfilerClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.project` WAAPI namespace.
     pub fn project(self) -> WwiseCoreProjectClient<'a> {
-        WwiseCoreProjectClient {
-            client: self.client,
-        }
+        WwiseCoreProjectClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.sound` WAAPI namespace.
     pub fn sound(self) -> WwiseCoreSoundClient<'a> {
-        WwiseCoreSoundClient {
-            client: self.client,
-        }
+        WwiseCoreSoundClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.soundbank` WAAPI namespace.
     pub fn soundbank(self) -> WwiseCoreSoundbankClient<'a> {
-        WwiseCoreSoundbankClient {
-            client: self.client,
-        }
+        WwiseCoreSoundbankClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.switchContainer` WAAPI namespace.
     pub fn switch_container(self) -> WwiseCoreSwitchContainerClient<'a> {
-        WwiseCoreSwitchContainerClient {
-            client: self.client,
-        }
+        WwiseCoreSwitchContainerClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.transport` WAAPI namespace.
     pub fn transport(self) -> WwiseCoreTransportClient<'a> {
-        WwiseCoreTransportClient {
-            client: self.client,
-        }
+        WwiseCoreTransportClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.undo` WAAPI namespace.
     pub fn undo(self) -> WwiseCoreUndoClient<'a> {
-        WwiseCoreUndoClient {
-            client: self.client,
-        }
+        WwiseCoreUndoClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.core.workUnit` WAAPI namespace.
     pub fn work_unit(self) -> WwiseCoreWorkUnitClient<'a> {
-        WwiseCoreWorkUnitClient {
-            client: self.client,
-        }
+        WwiseCoreWorkUnitClient { client: self.client }
     }
 
-    /// `ak.wwise.core.getInfo`.
-    pub async fn get_info(&mut self) -> WaapiResult<CoreGetInfoResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None)
-            .await
+    /// Retrieve global Wwise information.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.getInfo`.
+    pub async fn get_info(
+        &mut self,
+    ) -> WaapiResult<CoreGetInfoResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None).await
     }
 
-    /// `ak.wwise.core.getProjectInfo`.
-    pub async fn get_project_info(&mut self) -> WaapiResult<CoreGetProjectInfoResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getProjectInfo, None, None)
-            .await
+    /// Retrieve information about the current project opened, including platforms, languages and project directories.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.getProjectInfo`.
+    pub async fn get_project_info(
+        &mut self,
+    ) -> WaapiResult<CoreGetProjectInfoResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getProjectInfo, None, None).await
     }
 
-    /// `ak.wwise.core.ping`.
-    pub async fn ping(&mut self) -> WaapiResult<CorePingResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_ping, None, None)
-            .await
+    /// Verify if WAAPI is currently available.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.ping`.
+    pub async fn ping(
+        &mut self,
+    ) -> WaapiResult<CorePingResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_ping, None, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.debug` WAAPI namespace.
 pub struct WwiseDebugClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseDebugClient<'a> {
-    /// Subscribe to `ak.wwise.debug.assertFailed`.
+    /// Sent when an assert has failed. This is only available in Debug builds.
+    ///
+    /// Subscribes to the `ak.wwise.debug.assertFailed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assert_failed(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<DebugAssertFailedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_debug_assertFailed, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_debug_assertFailed, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.ui` WAAPI namespace.
 pub struct WwiseUiClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseUiClient<'a> {
+    /// Access the `ak.wwise.ui.commands` WAAPI namespace.
     pub fn commands(self) -> WwiseUiCommandsClient<'a> {
-        WwiseUiCommandsClient {
-            client: self.client,
-        }
+        WwiseUiCommandsClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.ui.layout` WAAPI namespace.
     pub fn layout(self) -> WwiseUiLayoutClient<'a> {
-        WwiseUiLayoutClient {
-            client: self.client,
-        }
+        WwiseUiLayoutClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.ui.project` WAAPI namespace.
     pub fn project(self) -> WwiseUiProjectClient<'a> {
-        WwiseUiProjectClient {
-            client: self.client,
-        }
+        WwiseUiProjectClient { client: self.client }
     }
 
+    /// Access the `ak.wwise.ui.signal` WAAPI namespace.
     pub fn signal(self) -> WwiseUiSignalClient<'a> {
-        WwiseUiSignalClient {
-            client: self.client,
-        }
+        WwiseUiSignalClient { client: self.client }
     }
 
-    /// `ak.wwise.ui.getSelectedObjects`.
+    /// Retrieves the list of objects currently selected by the user in the active view. Note that this function is not available in WwiseConsole.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.getSelectedObjects`.
     pub async fn get_selected_objects(
         &mut self,
         options: UiGetSelectedObjectsOptions,
     ) -> WaapiResult<UiGetSelectedObjectsResponse> {
-        self.client
-            .call_typed::<(), _, _>(
-                WaapiFunction::ak_wwise_ui_getSelectedObjects,
-                None,
-                Some(options),
-            )
-            .await
+        self.client.call_typed::<(), _, _>(WaapiFunction::ak_wwise_ui_getSelectedObjects, None, Some(options)).await
     }
 
-    /// `ak.wwise.ui.bringToForeground`.
-    pub async fn bring_to_foreground(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_ui_bringToForeground, None, None)
-            .await?;
+    /// Bring Wwise main window to foreground. See SetForegroundWindow and AllowSetForegroundWindow on MSDN for more information on the restrictions. See ak.wwise.core.getInfo to obtain the Wwise process ID for AllowSetForegroundWindow.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.bringToForeground`.
+    pub async fn bring_to_foreground(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_ui_bringToForeground, None, None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.ui.getSelectedFiles`.
-    pub async fn get_selected_files(&mut self) -> WaapiResult<UiGetSelectedFilesResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_getSelectedFiles, None, None)
-            .await
+    /// Retrieves the list of files currently selected by the user in the active view. Note that this function is not available in WwiseConsole.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.getSelectedFiles`.
+    pub async fn get_selected_files(
+        &mut self,
+    ) -> WaapiResult<UiGetSelectedFilesResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_getSelectedFiles, None, None).await
     }
 
-    /// Subscribe to `ak.wwise.ui.selectionChanged`.
+    /// Sent when the selection changes in the project.
+    ///
+    /// Subscribes to the `ak.wwise.ui.selectionChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_selection_changed(
         &mut self,
         options: Option<UiSelectionChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSelectionChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_ui_selectionChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_ui_selectionChanged, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.audio` WAAPI namespace.
 pub struct WwiseCoreAudioClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreAudioClient<'a> {
-    /// `ak.wwise.core.audio.import`.
+    /// Creates Wwise objects and imports audio files. This function does not return an error when something fails during the import process, please see the log for the result of each import command. This function uses the same importation processor available through the Tab Delimited import in the Audio File Importer. The function returns an array of all objects created, replaced or re-used. Use the options to specify how the objects are returned. For more information, see the WAAPI Import documentation.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.import`.
     pub async fn import(
         &mut self,
         args: CoreAudioImportArgs,
         options: CoreAudioImportOptions,
     ) -> WaapiResult<CoreAudioImportResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_audio_import,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_audio_import, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.audio.convert`.
+    /// Creates a converted audio file. When errors occur, this function returns a list of messages with corresponding levels of severity.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.convert`.
     pub async fn convert(
         &mut self,
         args: CoreAudioConvertArgs,
     ) -> WaapiResult<CoreAudioConvertResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_audio_convert, Some(args), None)
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_audio_convert, Some(args), None).await
     }
 
-    /// `ak.wwise.core.audio.importTabDelimited`.
+    /// Scripted object creation and audio file import from a tab-delimited file.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.importTabDelimited`.
     pub async fn import_tab_delimited(
         &mut self,
         args: CoreAudioImportTabDelimitedArgs,
         options: CoreAudioImportTabDelimitedOptions,
     ) -> WaapiResult<CoreAudioImportTabDelimitedResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_audio_importTabDelimited,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_audio_importTabDelimited, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.audio.mute`.
-    pub async fn mute(&mut self, args: CoreAudioMuteArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_mute, Some(args), None)
-            .await?;
+    /// Mutes an object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.mute`.
+    pub async fn mute(
+        &mut self,
+        args: CoreAudioMuteArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_mute, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.audio.resetMute`.
-    pub async fn reset_mute(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetMute, None, None)
-            .await?;
+    /// Unmute all muted objects.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.resetMute`.
+    pub async fn reset_mute(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetMute, None, None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.audio.resetSolo`.
-    pub async fn reset_solo(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetSolo, None, None)
-            .await?;
+    /// Unsolo all soloed objects.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.resetSolo`.
+    pub async fn reset_solo(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetSolo, None, None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.audio.setConversionPlugin`.
+    /// Changes the plug-in to use for audio file conversion.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.setConversionPlugin`.
     pub async fn set_conversion_plugin(
         &mut self,
         args: CoreAudioSetConversionPluginArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_audio_setConversionPlugin,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_setConversionPlugin, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.audio.solo`.
-    pub async fn solo(&mut self, args: CoreAudioSoloArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_solo, Some(args), None)
-            .await?;
+    /// Solos an object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.audio.solo`.
+    pub async fn solo(
+        &mut self,
+        args: CoreAudioSoloArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_solo, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.audio.imported`.
+    /// Sent at the end of an import operation.
+    ///
+    /// Subscribes to the `ak.wwise.core.audio.imported` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_imported(
         &mut self,
         options: Option<CoreAudioImportedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreAudioImportedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_audio_imported, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_audio_imported, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.blendContainer` WAAPI namespace.
 pub struct WwiseCoreBlendContainerClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreBlendContainerClient<'a> {
-    /// `ak.wwise.core.blendContainer.addAssignment`.
+    /// Adds a new assignment to a Blend Track. Equivalent to performing a drag-and-drop operation in the Blend Tracks Editor.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.blendContainer.addAssignment`.
     pub async fn add_assignment(
         &mut self,
         args: CoreBlendContainerAddAssignmentArgs,
     ) -> WaapiResult<CoreBlendContainerAddAssignmentResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_blendContainer_addAssignment,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_blendContainer_addAssignment, Some(args), None).await
     }
 
-    /// `ak.wwise.core.blendContainer.addTrack`.
+    /// Adds a new Blend Track to a Blend Container. Equivalent to clicking New Blend Track in the Blend Track Editor. To get the list of Blend Tracks, use the function ak.wwise.core.object.get with {return = "blendTracks"}.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.blendContainer.addTrack`.
     pub async fn add_track(
         &mut self,
         args: CoreBlendContainerAddTrackArgs,
     ) -> WaapiResult<CoreBlendContainerAddTrackResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_blendContainer_addTrack,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_blendContainer_addTrack, Some(args), None).await
     }
 
-    /// `ak.wwise.core.blendContainer.getAssignments`.
+    /// Returns a list of a Blend Track assignments.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.blendContainer.getAssignments`.
     pub async fn get_assignments(
         &mut self,
         args: CoreBlendContainerGetAssignmentsArgs,
     ) -> WaapiResult<CoreBlendContainerGetAssignmentsResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_blendContainer_getAssignments,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_blendContainer_getAssignments, Some(args), None).await
     }
 
-    /// `ak.wwise.core.blendContainer.removeAssignment`.
+    /// Removes an assignment from a Blend Track. Equivalent to deleting an entry in the Blend Tracks Editor.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.blendContainer.removeAssignment`.
     pub async fn remove_assignment(
         &mut self,
         args: CoreBlendContainerRemoveAssignmentArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_blendContainer_removeAssignment,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_blendContainer_removeAssignment, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.core.gameParameter` WAAPI namespace.
 pub struct WwiseCoreGameParameterClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreGameParameterClient<'a> {
-    /// `ak.wwise.core.gameParameter.setRange`.
-    pub async fn set_range(&mut self, args: CoreGameParameterSetRangeArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_gameParameter_setRange,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets the Min and Max properties on a Game Parameter. Modifies the RTPC curves and blend tracks that use this Game Parameter for their X axis.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.gameParameter.setRange`.
+    pub async fn set_range(
+        &mut self,
+        args: CoreGameParameterSetRangeArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_gameParameter_setRange, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.core.log` WAAPI namespace.
 pub struct WwiseCoreLogClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreLogClient<'a> {
-    /// Subscribe to `ak.wwise.core.log.itemAdded`.
+    /// Sent when an item is added to the log. This could be used to retrieve items added to the SoundBank generation log. To retrieve the complete log, see `ak.wwise.core.log.get`.
+    ///
+    /// Subscribes to the `ak.wwise.core.log.itemAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_item_added(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreLogItemAddedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_log_itemAdded, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_log_itemAdded, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.mediaPool` WAAPI namespace.
 pub struct WwiseCoreMediaPoolClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreMediaPoolClient<'a> {
-    /// `ak.wwise.core.mediaPool.get`.
+    /// Retrieve files from Media Pool. Use the return options to specify which properties of the files to return.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.mediaPool.get`.
     pub async fn get(
         &mut self,
         args: CoreMediaPoolGetArgs,
         options: CoreMediaPoolGetOptions,
     ) -> WaapiResult<CoreMediaPoolGetResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_mediaPool_get,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_mediaPool_get, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.mediaPool.getFields`.
-    pub async fn get_fields(&mut self) -> WaapiResult<CoreMediaPoolGetFieldsResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_mediaPool_getFields, None, None)
-            .await
+    /// Retrieve all fields present in the Media Pool. You can then use the fields to query the Media Pool. The Media Pool discovers some fields when it scans audio files. Others, such as WAV fields, are always available.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.mediaPool.getFields`.
+    pub async fn get_fields(
+        &mut self,
+    ) -> WaapiResult<CoreMediaPoolGetFieldsResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_mediaPool_getFields, None, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.object` WAAPI namespace.
 pub struct WwiseCoreObjectClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreObjectClient<'a> {
-    /// `ak.wwise.core.object.get`.
+    /// Performs a query and returns the data, as specified in the options, for each object in the query result. The query can specify either a 'waql' argument or a 'from' argument with an optional 'transform' argument. See the WAQL introduction documentation or the WAAPI query documentation for more information. See the WAAPI query return options documentation to learn about options.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.get`.
     pub async fn get(
         &mut self,
         args: CoreObjectGetArgs,
         options: CoreObjectGetOptions,
     ) -> WaapiResult<CoreObjectGetResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_object_get,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_object_get, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.object.create`.
+    /// Creates an object of type 'type', as a child of 'parent'. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise. To create Effect or Source plug-ins, use `ak.wwise.core.object.set`, and see the Wwise Objects Reference for the classId.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.create`.
     pub async fn create(
         &mut self,
         args: CoreObjectCreateArgs,
     ) -> WaapiResult<CoreObjectCreateResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_create, Some(args), None)
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_create, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.delete`.
-    pub async fn delete(&mut self, args: CoreObjectDeleteArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_delete, Some(args), None)
-            .await?;
+    /// Deletes the specified object. Note that if a Work Unit is deleted, the operation cannot be undone and the project will be saved.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.delete`.
+    pub async fn delete(
+        &mut self,
+        args: CoreObjectDeleteArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_delete, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.set`.
+    /// Allows for batch processing of the following operations: Object creation in a child hierarchy, Object creation in a list, Setting name, notes, properties and references. See the WAAPI Import documentation for more information about creating objects. Also see `ak.wwise.core.audio.import` to import audio files to Wwise.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.set`.
     pub async fn set(
         &mut self,
         args: CoreObjectSetArgs,
         options: CoreObjectSetOptions,
     ) -> WaapiResult<CoreObjectSetResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_object_set,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_object_set, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.object.move`.
-    pub async fn move_(&mut self, args: CoreObjectMoveArgs) -> WaapiResult<CoreObjectMoveResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_move, Some(args), None)
-            .await
+    /// Moves an object to the given parent. Returns the moved object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.move`.
+    pub async fn move_(
+        &mut self,
+        args: CoreObjectMoveArgs,
+    ) -> WaapiResult<CoreObjectMoveResponse> {
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_move, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.copy`.
+    /// Copies an object to the given parent. Note that if a Work Unit is copied, the operation cannot be undone and the project will be saved.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.copy`.
     pub async fn copy(
         &mut self,
         args: CoreObjectCopyArgs,
         options: CoreObjectCopyOptions,
     ) -> WaapiResult<CoreObjectCopyResponse> {
-        self.client
-            .call_typed(
-                WaapiFunction::ak_wwise_core_object_copy,
-                Some(args),
-                Some(options),
-            )
-            .await
+        self.client.call_typed(WaapiFunction::ak_wwise_core_object_copy, Some(args), Some(options)).await
     }
 
-    /// `ak.wwise.core.object.setName`.
-    pub async fn set_name(&mut self, args: CoreObjectSetNameArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setName,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Renames an object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setName`.
+    pub async fn set_name(
+        &mut self,
+        args: CoreObjectSetNameArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setName, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setNotes`.
-    pub async fn set_notes(&mut self, args: CoreObjectSetNotesArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setNotes,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets the object's notes.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setNotes`.
+    pub async fn set_notes(
+        &mut self,
+        args: CoreObjectSetNotesArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setNotes, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setProperty`.
-    pub async fn set_property(&mut self, args: CoreObjectSetPropertyArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setProperty,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets a property value of an object for a specific platform. See the Wwise Objects Reference for more information on the properties available on each object type. See `ak.wwise.core.object.setReference` to set a reference to an object. See `ak.wwise.core.object.get` to obtain the value of a property for an object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setProperty`.
+    pub async fn set_property(
+        &mut self,
+        args: CoreObjectSetPropertyArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setProperty, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setReference`.
-    pub async fn set_reference(&mut self, args: CoreObjectSetReferenceArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setReference,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets an object's reference value. See the Wwise Objects Reference for more information on the references available on each object type.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setReference`.
+    pub async fn set_reference(
+        &mut self,
+        args: CoreObjectSetReferenceArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setReference, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setRandomizer`.
-    pub async fn set_randomizer(&mut self, args: CoreObjectSetRandomizerArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setRandomizer,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets the randomizer values of a property of an object for a specific platform. See the Wwise Objects Reference for more information on the properties available on each object type.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setRandomizer`.
+    pub async fn set_randomizer(
+        &mut self,
+        args: CoreObjectSetRandomizerArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setRandomizer, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.getAttenuationCurve`.
+    /// Gets the specified attenuation curve for a given attenuation object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.getAttenuationCurve`.
     pub async fn get_attenuation_curve(
         &mut self,
         args: CoreObjectGetAttenuationCurveArgs,
     ) -> WaapiResult<CoreObjectGetAttenuationCurveResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_object_getAttenuationCurve,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_getAttenuationCurve, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.setAttenuationCurve`.
+    /// Sets the specified attenuation curve for a given attenuation object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setAttenuationCurve`.
     pub async fn set_attenuation_curve(
         &mut self,
         args: CoreObjectSetAttenuationCurveArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setAttenuationCurve,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setAttenuationCurve, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.diff`.
-    pub async fn diff(&mut self, args: CoreObjectDiffArgs) -> WaapiResult<CoreObjectDiffResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_diff, Some(args), None)
-            .await
+    /// Compares properties and lists of the source object with those in the target object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.diff`.
+    pub async fn diff(
+        &mut self,
+        args: CoreObjectDiffArgs,
+    ) -> WaapiResult<CoreObjectDiffResponse> {
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_diff, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.pasteProperties`.
+    /// Pastes properties, references and lists from one object to any number of target objects. Only those properties, references and lists which differ between source and target are pasted. See the Wwise Objects Reference for more information on the properties, references and lists available on each object type.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.pasteProperties`.
     pub async fn paste_properties(
         &mut self,
         args: CoreObjectPastePropertiesArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_pasteProperties,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_pasteProperties, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.getPropertyAndReferenceNames`.
+    /// Retrieves the list of property and reference names for an object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.getPropertyAndReferenceNames`.
     pub async fn get_property_and_reference_names(
         &mut self,
         args: CoreObjectGetPropertyAndReferenceNamesArgs,
     ) -> WaapiResult<CoreObjectGetPropertyAndReferenceNamesResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_object_getPropertyAndReferenceNames,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_getPropertyAndReferenceNames, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.getPropertyInfo`.
+    /// Retrieves information about an object property. Note that this function does not return the value of a property. To retrieve the value of a property, see `ak.wwise.core.object.get` and the WAAPI query return options documentation.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.getPropertyInfo`.
     pub async fn get_property_info(
         &mut self,
         args: CoreObjectGetPropertyInfoArgs,
     ) -> WaapiResult<CoreObjectGetPropertyInfoResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_object_getPropertyInfo,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_getPropertyInfo, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.getTypes`.
-    pub async fn get_types(&mut self) -> WaapiResult<CoreObjectGetTypesResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_object_getTypes, None, None)
-            .await
+    /// Retrieves the list of all object types registered in Wwise's object model. This function returns the equivalent of the Wwise Objects Reference.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.getTypes`.
+    pub async fn get_types(
+        &mut self,
+    ) -> WaapiResult<CoreObjectGetTypesResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_object_getTypes, None, None).await
     }
 
-    /// `ak.wwise.core.object.isLinked`.
+    /// Indicates whether a property, reference, or object list is bound to a particular platform or to all platforms.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.isLinked`.
     pub async fn is_linked(
         &mut self,
         args: CoreObjectIsLinkedArgs,
     ) -> WaapiResult<CoreObjectIsLinkedResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_object_isLinked,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_isLinked, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.isPropertyEnabled`.
+    /// Returns true if a property is enabled based on the values of the properties it depends on.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.isPropertyEnabled`.
     pub async fn is_property_enabled(
         &mut self,
         args: CoreObjectIsPropertyEnabledArgs,
     ) -> WaapiResult<CoreObjectIsPropertyEnabledResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_object_isPropertyEnabled,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_object_isPropertyEnabled, Some(args), None).await
     }
 
-    /// `ak.wwise.core.object.setLinked`.
-    pub async fn set_linked(&mut self, args: CoreObjectSetLinkedArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setLinked,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Link or unlink a property/reference or object list to a particular platform.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setLinked`.
+    pub async fn set_linked(
+        &mut self,
+        args: CoreObjectSetLinkedArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setLinked, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setStateGroups`.
+    /// Sets the State Group objects associated with an object. Note, this will remove any previously associated State Group.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setStateGroups`.
     pub async fn set_state_groups(
         &mut self,
         args: CoreObjectSetStateGroupsArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setStateGroups,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setStateGroups, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.object.setStateProperties`.
+    /// Set the state properties of an object. Note, this will remove any previous state property, including the default ones.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.object.setStateProperties`.
     pub async fn set_state_properties(
         &mut self,
         args: CoreObjectSetStatePropertiesArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_object_setStateProperties,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_setStateProperties, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.object.created`.
+    /// Sent when an object is created. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.created` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_created(
         &mut self,
         options: Option<CoreObjectCreatedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectCreatedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_created, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_created, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.preDeleted`.
+    /// Sent prior to an object's deletion. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.preDeleted` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_pre_deleted(
         &mut self,
         options: Option<CoreObjectPreDeletedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPreDeletedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_preDeleted, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_preDeleted, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.postDeleted`.
+    /// Sent following an object's deletion. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.postDeleted` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_post_deleted(
         &mut self,
         options: Option<CoreObjectPostDeletedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPostDeletedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_postDeleted, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_postDeleted, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.childAdded`.
+    /// Sent when an object is added as a child to another object. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.childAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_child_added(
         &mut self,
         options: Option<CoreObjectChildAddedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectChildAddedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_childAdded, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_childAdded, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.childRemoved`.
+    /// Sent when an object is removed from the children of another object. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.childRemoved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_child_removed(
         &mut self,
         options: Option<CoreObjectChildRemovedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectChildRemovedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_childRemoved, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_childRemoved, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.nameChanged`.
+    /// Sent when an object is renamed. Publishes the renamed object. See `ak.wwise.core.object.structureChanged` to receive changes in batch.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.nameChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_name_changed(
         &mut self,
         options: Option<CoreObjectNameChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectNameChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_nameChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_nameChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.notesChanged`.
+    /// Sent when the object's notes are changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.notesChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_notes_changed(
         &mut self,
         options: Option<CoreObjectNotesChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectNotesChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_notesChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_notesChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.propertyChanged`.
+    /// Sent when the watched property of an object changes.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.propertyChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_property_changed(
         &mut self,
         options: Option<CoreObjectPropertyChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPropertyChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_propertyChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_propertyChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.referenceChanged`.
+    /// Sent when an object reference is changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.referenceChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_reference_changed(
         &mut self,
         options: Option<CoreObjectReferenceChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectReferenceChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_referenceChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_referenceChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.curveChanged`.
+    /// Sent when one or many curves are changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.curveChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_curve_changed(
         &mut self,
         options: Option<CoreObjectCurveChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectCurveChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_curveChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_curveChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.attenuationCurveChanged`.
+    /// Sent when an attenuation curve is changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.attenuationCurveChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_attenuation_curve_changed(
         &mut self,
         options: Option<CoreObjectAttenuationCurveChangedOptions>,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreObjectAttenuationCurveChangedPayload>,
-    )> {
-        self.client
-            .subscribe_payload(
-                WaapiTopic::ak_wwise_core_object_attenuationCurveChanged,
-                options,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectAttenuationCurveChangedPayload>)> {
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_attenuationCurveChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.attenuationCurveLinkChanged`.
+    /// Sent when an attenuation curve's link/unlink is changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.attenuationCurveLinkChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_attenuation_curve_link_changed(
         &mut self,
         options: Option<CoreObjectAttenuationCurveLinkChangedOptions>,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreObjectAttenuationCurveLinkChangedPayload>,
-    )> {
-        self.client
-            .subscribe_payload(
-                WaapiTopic::ak_wwise_core_object_attenuationCurveLinkChanged,
-                options,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectAttenuationCurveLinkChangedPayload>)> {
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_attenuationCurveLinkChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.object.structureChanged`.
+    /// Sent when the project structure changes. Publishes a summary of the changes. The publication is sent after the undo stack is modified. The changes are grouped in batch and redundant changes are collapsed.
+    ///
+    /// Subscribes to the `ak.wwise.core.object.structureChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_structure_changed(
         &mut self,
         options: Option<CoreObjectStructureChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectStructureChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_object_structureChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_object_structureChanged, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.profiler` WAAPI namespace.
 pub struct WwiseCoreProfilerClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreProfilerClient<'a> {
+    /// Access the `ak.wwise.core.profiler.captureLog` WAAPI namespace.
     pub fn capture_log(self) -> WwiseCoreProfilerCaptureLogClient<'a> {
-        WwiseCoreProfilerCaptureLogClient {
-            client: self.client,
-        }
+        WwiseCoreProfilerCaptureLogClient { client: self.client }
     }
 
-    /// `ak.wwise.core.profiler.moveCursor`.
+    /// Moves the user time cursor of the profiler to a specific position (first, last, next, previous), and returns the new time. This sets the cursor position in the profiler views.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.profiler.moveCursor`.
     pub async fn move_cursor(
         &mut self,
         args: CoreProfilerMoveCursorArgs,
     ) -> WaapiResult<CoreProfilerMoveCursorResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_profiler_moveCursor,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_profiler_moveCursor, Some(args), None).await
     }
 
-    /// `ak.wwise.core.profiler.setCursorTime`.
+    /// Sets the user time cursor of the profiler to the specified time, in milliseconds, and returns the new time. Use the time obtained from the other profiler functions. Note that the specified time will be snapped to a buffer interval (~10ms). This sets the cursor position in the profiler views. To synchronize the user time cursor to the latest capture time, use `ak.wwise.ui.commands.execute` with `ToggleFollowCapture`.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.profiler.setCursorTime`.
     pub async fn set_cursor_time(
         &mut self,
         args: CoreProfilerSetCursorTimeArgs,
     ) -> WaapiResult<CoreProfilerSetCursorTimeResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_profiler_setCursorTime,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_profiler_setCursorTime, Some(args), None).await
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.gameObjectRegistered`.
+    /// Sent when a game object has been registered.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.gameObjectRegistered` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_registered(
         &mut self,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreProfilerGameObjectRegisteredPayload>,
-    )> {
-        self.client
-            .subscribe_payload::<(), _>(
-                WaapiTopic::ak_wwise_core_profiler_gameObjectRegistered,
-                None,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerGameObjectRegisteredPayload>)> {
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_profiler_gameObjectRegistered, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.gameObjectUnregistered`.
+    /// Sent when a game object has been unregistered.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.gameObjectUnregistered` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_unregistered(
         &mut self,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreProfilerGameObjectUnregisteredPayload>,
-    )> {
-        self.client
-            .subscribe_payload::<(), _>(
-                WaapiTopic::ak_wwise_core_profiler_gameObjectUnregistered,
-                None,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerGameObjectUnregisteredPayload>)> {
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_profiler_gameObjectUnregistered, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.gameObjectReset`.
+    /// Sent when the game objects have been reset, such as closing a connection to a game while profiling.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.gameObjectReset` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_reset(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerGameObjectResetPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_profiler_gameObjectReset, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_profiler_gameObjectReset, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.stateChanged`.
+    /// Sent when a state group state has been changed. This subscription does not require the profiler capture log to be started.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.stateChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_state_changed(
         &mut self,
         options: Option<CoreProfilerStateChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerStateChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_profiler_stateChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_profiler_stateChanged, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.switchChanged`.
+    /// Sent when a switch group state has been changed. This function does not require the profiler capture log to be started.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.switchChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_switch_changed(
         &mut self,
         options: Option<CoreProfilerSwitchChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerSwitchChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_profiler_switchChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_profiler_switchChanged, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.project` WAAPI namespace.
 pub struct WwiseCoreProjectClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreProjectClient<'a> {
-    /// `ak.wwise.core.project.save`.
-    pub async fn save(&mut self, args: CoreProjectSaveArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
-            .await?;
+    /// Saves the current project.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.project.save`.
+    pub async fn save(
+        &mut self,
+        args: CoreProjectSaveArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.project.preClosed`.
+    /// Sent when the project begins closing.
+    ///
+    /// Subscribes to the `ak.wwise.core.project.preClosed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_pre_closed(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectPreClosedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_preClosed, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_preClosed, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.project.loaded`.
+    /// Sent when the project has been successfully loaded.
+    ///
+    /// Subscribes to the `ak.wwise.core.project.loaded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_loaded(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectLoadedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_loaded, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_loaded, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.project.postClosed`.
+    /// Sent when the after the project is completely closed.
+    ///
+    /// Subscribes to the `ak.wwise.core.project.postClosed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_post_closed(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectPostClosedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_postClosed, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_postClosed, None).await
     }
 
-    /// Subscribe to `ak.wwise.core.project.saved`.
+    /// Sent when the project has been saved.
+    ///
+    /// Subscribes to the `ak.wwise.core.project.saved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_saved(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectSavedPayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_saved, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_saved, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.sound` WAAPI namespace.
 pub struct WwiseCoreSoundClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreSoundClient<'a> {
-    /// `ak.wwise.core.sound.setActiveSource`.
+    /// Sets which version of the source is being used for the specified sound. Use `ak.wwise.core.object.get` with the 'activeSource' return option to get the active source of a sound.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.sound.setActiveSource`.
     pub async fn set_active_source(
         &mut self,
         args: CoreSoundSetActiveSourceArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_sound_setActiveSource,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_sound_setActiveSource, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.core.soundbank` WAAPI namespace.
 pub struct WwiseCoreSoundbankClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreSoundbankClient<'a> {
-    /// `ak.wwise.core.soundbank.convertExternalSources`.
+    /// Converts the external sources files for the project as detailed in the wsources file, and places them into either the default folder, or the folder specified by the output argument. External Sources are a special type of source that you can put in a Sound object in Wwise. It indicates that the real sound data will be provided at run time. While External Source conversion is also triggered by SoundBank generation, this operation can be used to process sources not contained in the Wwise Project. Please see Wwise SDK help page "Integrating External Sources".
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.soundbank.convertExternalSources`.
     pub async fn convert_external_sources(
         &mut self,
         args: CoreSoundbankConvertExternalSourcesArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_soundbank_convertExternalSources,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_soundbank_convertExternalSources, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.soundbank.generate`.
+    /// Generate a list of SoundBanks with the import definition specified in the WAAPI request. If you do not write the SoundBanks to disk, subscribe to `ak.wwise.core.soundbank.generated` to receive SoundBank structure info and the bank data as base64. Note: This is a synchronous operation.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.soundbank.generate`.
     pub async fn generate(
         &mut self,
         args: CoreSoundbankGenerateArgs,
     ) -> WaapiResult<CoreSoundbankGenerateResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_soundbank_generate,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_soundbank_generate, Some(args), None).await
     }
 
-    /// `ak.wwise.core.soundbank.getInclusions`.
+    /// Retrieves a SoundBank's inclusion list.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.soundbank.getInclusions`.
     pub async fn get_inclusions(
         &mut self,
         args: CoreSoundbankGetInclusionsArgs,
     ) -> WaapiResult<CoreSoundbankGetInclusionsResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_soundbank_getInclusions,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_soundbank_getInclusions, Some(args), None).await
     }
 
-    /// `ak.wwise.core.soundbank.processDefinitionFiles`.
+    /// Imports SoundBank definitions from the specified file. Multiple files can be specified. See the WAAPI log for status messages.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.soundbank.processDefinitionFiles`.
     pub async fn process_definition_files(
         &mut self,
         args: CoreSoundbankProcessDefinitionFilesArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_soundbank_processDefinitionFiles,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_soundbank_processDefinitionFiles, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.soundbank.setInclusions`.
+    /// Modifies a SoundBank's inclusion list. The 'operation' argument determines how the 'inclusions' argument modifies the SoundBank's inclusion list; 'inclusions' may be added to / removed from / replace the SoundBank's inclusion list.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.soundbank.setInclusions`.
     pub async fn set_inclusions(
         &mut self,
         args: CoreSoundbankSetInclusionsArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_soundbank_setInclusions,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_soundbank_setInclusions, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.soundbank.generated`.
+    /// Sent when a single SoundBank is generated. This could be sent multiple times during SoundBank generation, for every SoundBank generated and for every platform. To generate SoundBanks, see `ak.wwise.core.soundbank.generate` or `ak.wwise.ui.commands.execute` with one of the SoundBank generation commands. See the Wwise global command IDs reference for the list of commands.
+    ///
+    /// Subscribes to the `ak.wwise.core.soundbank.generated` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_generated(
         &mut self,
         options: Option<CoreSoundbankGeneratedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreSoundbankGeneratedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_soundbank_generated, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_soundbank_generated, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.soundbank.generationDone`.
+    /// Sent when all SoundBanks are generated. Note: This notification is only sent when SoundBanks have been generated, it is not a reliable way to determine when `ak.wwise.core.soundbank.generate` has completed.
+    ///
+    /// Subscribes to the `ak.wwise.core.soundbank.generationDone` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_generation_done(
         &mut self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreSoundbankGenerationDonePayload>)> {
-        self.client
-            .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_soundbank_generationDone, None)
-            .await
+        self.client.subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_soundbank_generationDone, None).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.switchContainer` WAAPI namespace.
 pub struct WwiseCoreSwitchContainerClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreSwitchContainerClient<'a> {
-    /// `ak.wwise.core.switchContainer.addAssignment`.
+    /// Assigns a Switch Container's child to a Switch. This is the equivalent of doing a drag&drop of the child to a state in the Assigned Objects view. The child is always added at the end for each state.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.switchContainer.addAssignment`.
     pub async fn add_assignment(
         &mut self,
         args: CoreSwitchContainerAddAssignmentArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_switchContainer_addAssignment,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_switchContainer_addAssignment, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.switchContainer.getAssignments`.
+    /// Returns the list of assignments between a Switch Container's children and states.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.switchContainer.getAssignments`.
     pub async fn get_assignments(
         &mut self,
         args: CoreSwitchContainerGetAssignmentsArgs,
     ) -> WaapiResult<CoreSwitchContainerGetAssignmentsResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_switchContainer_getAssignments,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_switchContainer_getAssignments, Some(args), None).await
     }
 
-    /// `ak.wwise.core.switchContainer.removeAssignment`.
+    /// Removes an assignment between a Switch Container's child and a State.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.switchContainer.removeAssignment`.
     pub async fn remove_assignment(
         &mut self,
         args: CoreSwitchContainerRemoveAssignmentArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_switchContainer_removeAssignment,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_switchContainer_removeAssignment, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.switchContainer.assignmentAdded`.
+    /// Sent when an assignment is added to a Switch Container.
+    ///
+    /// Subscribes to the `ak.wwise.core.switchContainer.assignmentAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assignment_added(
         &mut self,
         options: Option<CoreSwitchContainerAssignmentAddedOptions>,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreSwitchContainerAssignmentAddedPayload>,
-    )> {
-        self.client
-            .subscribe_payload(
-                WaapiTopic::ak_wwise_core_switchContainer_assignmentAdded,
-                options,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreSwitchContainerAssignmentAddedPayload>)> {
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_switchContainer_assignmentAdded, options).await
     }
 
-    /// Subscribe to `ak.wwise.core.switchContainer.assignmentRemoved`.
+    /// Sent when an assignment is removed from a Switch Container.
+    ///
+    /// Subscribes to the `ak.wwise.core.switchContainer.assignmentRemoved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assignment_removed(
         &mut self,
         options: Option<CoreSwitchContainerAssignmentRemovedOptions>,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreSwitchContainerAssignmentRemovedPayload>,
-    )> {
-        self.client
-            .subscribe_payload(
-                WaapiTopic::ak_wwise_core_switchContainer_assignmentRemoved,
-                options,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreSwitchContainerAssignmentRemovedPayload>)> {
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_switchContainer_assignmentRemoved, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.transport` WAAPI namespace.
 pub struct WwiseCoreTransportClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreTransportClient<'a> {
-    /// `ak.wwise.core.transport.create`.
+    /// Creates a transport object for the given Wwise object. The return transport object can be used to play, stop, pause and resume the Wwise object via the other transport functions.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.create`.
     pub async fn create(
         &mut self,
         args: CoreTransportCreateArgs,
     ) -> WaapiResult<CoreTransportCreateResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_transport_create,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_transport_create, Some(args), None).await
     }
 
-    /// `ak.wwise.core.transport.destroy`.
-    pub async fn destroy(&mut self, args: CoreTransportDestroyArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_transport_destroy,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Destroys the given transport object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.destroy`.
+    pub async fn destroy(
+        &mut self,
+        args: CoreTransportDestroyArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_transport_destroy, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.transport.executeAction`.
+    /// Executes an action on the given transport object, or all transport objects if none is specified.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.executeAction`.
     pub async fn execute_action(
         &mut self,
         args: CoreTransportExecuteActionArgs,
     ) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_transport_executeAction,
-                Some(args),
-                None,
-            )
-            .await?;
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_transport_executeAction, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.transport.getState`.
+    /// Gets the state of the given transport object.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.getState`.
     pub async fn get_state(
         &mut self,
         args: CoreTransportGetStateArgs,
     ) -> WaapiResult<CoreTransportGetStateResponse> {
-        self.client
-            .call_typed::<_, (), _>(
-                WaapiFunction::ak_wwise_core_transport_getState,
-                Some(args),
-                None,
-            )
-            .await
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_transport_getState, Some(args), None).await
     }
 
-    /// `ak.wwise.core.transport.getList`.
-    pub async fn get_list(&mut self) -> WaapiResult<CoreTransportGetListResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_transport_getList, None, None)
-            .await
+    /// Returns the list of transport objects.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.getList`.
+    pub async fn get_list(
+        &mut self,
+    ) -> WaapiResult<CoreTransportGetListResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_transport_getList, None, None).await
     }
 
-    /// `ak.wwise.core.transport.prepare`.
-    pub async fn prepare(&mut self, args: CoreTransportPrepareArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_transport_prepare,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Prepare the object and its dependencies for playback. Use this function before calling PostEventSync or PostMIDIOnEventSync from IAkGlobalPluginContext.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.prepare`.
+    pub async fn prepare(
+        &mut self,
+        args: CoreTransportPrepareArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_transport_prepare, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.transport.useOriginals`.
-    pub async fn use_originals(&mut self, args: CoreTransportUseOriginalsArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_transport_useOriginals,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Sets the Original/Converted transport toggle globally. This allows playing the original or the converted sound files.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.transport.useOriginals`.
+    pub async fn use_originals(
+        &mut self,
+        args: CoreTransportUseOriginalsArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_transport_useOriginals, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.transport.stateChanged`.
+    /// Sent when the transport's state has changed.
+    ///
+    /// Subscribes to the `ak.wwise.core.transport.stateChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_state_changed(
         &mut self,
         options: Option<CoreTransportStateChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreTransportStateChangedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_core_transport_stateChanged, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_transport_stateChanged, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.undo` WAAPI namespace.
 pub struct WwiseCoreUndoClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreUndoClient<'a> {
-    /// `ak.wwise.core.undo.beginGroup`.
-    pub async fn begin_group(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_beginGroup, None, None)
-            .await?;
+    /// Begins an undo group. Make sure to call `ak.wwise.core.undo.endGroup` exactly once for every ak.wwise.core.beginUndoGroup call you make. Calls to ak.wwise.core.undo.beginGroup can be nested. When closing a WAMP session, a check is made to ensure that all undo groups are closed. If not, a cancelGroup is called for each of the groups still open.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.undo.beginGroup`.
+    pub async fn begin_group(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_beginGroup, None, None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.undo.endGroup`.
-    pub async fn end_group(&mut self, args: CoreUndoEndGroupArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_undo_endGroup, Some(args), None)
-            .await?;
+    /// Ends the last undo group.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.undo.endGroup`.
+    pub async fn end_group(
+        &mut self,
+        args: CoreUndoEndGroupArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_undo_endGroup, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.undo.cancelGroup`.
-    pub async fn cancel_group(&mut self, args: CoreUndoCancelGroupArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_undo_cancelGroup,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Cancels the last undo group.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.undo.cancelGroup`.
+    pub async fn cancel_group(
+        &mut self,
+        args: CoreUndoCancelGroupArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_undo_cancelGroup, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.undo.undo`.
-    pub async fn undo(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_undo, None, None)
-            .await?;
+    /// Undoes the last operation in the Undo stack.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.undo.undo`.
+    pub async fn undo(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_undo, None, None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.undo.redo`.
-    pub async fn redo(&mut self) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_redo, None, None)
-            .await?;
+    /// Redoes the last operation in the Undo stack.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.undo.redo`.
+    pub async fn redo(
+        &mut self,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_redo, None, None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.core.workUnit` WAAPI namespace.
 pub struct WwiseCoreWorkUnitClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreWorkUnitClient<'a> {
-    /// `ak.wwise.core.workUnit.load`.
-    pub async fn load(&mut self, args: CoreWorkUnitLoadArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_workUnit_load, Some(args), None)
-            .await?;
+    /// Load a Work Unit that was previously unloaded. The Undo history will be cleared.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.workUnit.load`.
+    pub async fn load(
+        &mut self,
+        args: CoreWorkUnitLoadArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_workUnit_load, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.core.workUnit.unload`.
-    pub async fn unload(&mut self, args: CoreWorkUnitUnloadArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_workUnit_unload,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Unload a Work Unit. No object contained in the Work Unit will be available after this call. If the Work Unit is modified and not saved, the function will return error. The Undo history will be cleared.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.workUnit.unload`.
+    pub async fn unload(
+        &mut self,
+        args: CoreWorkUnitUnloadArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_workUnit_unload, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.ui.commands` WAAPI namespace.
 pub struct WwiseUiCommandsClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseUiCommandsClient<'a> {
-    /// `ak.wwise.ui.commands.execute`.
-    pub async fn execute(&mut self, args: UiCommandsExecuteArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_ui_commands_execute,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Executes a command. Some commands can take a list of objects as parameters. See the Wwise global command IDs reference for the available commands.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.commands.execute`.
+    pub async fn execute(
+        &mut self,
+        args: UiCommandsExecuteArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_commands_execute, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.ui.commands.getCommands`.
-    pub async fn get_commands(&mut self) -> WaapiResult<UiCommandsGetCommandsResponse> {
-        self.client
-            .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_commands_getCommands, None, None)
-            .await
+    /// Gets the list of commands.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.commands.getCommands`.
+    pub async fn get_commands(
+        &mut self,
+    ) -> WaapiResult<UiCommandsGetCommandsResponse> {
+        self.client.call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_commands_getCommands, None, None).await
     }
 
-    /// Subscribe to `ak.wwise.ui.commands.executed`.
+    /// Sent when a command is executed. The objects for which the command is executed are sent in the publication.
+    ///
+    /// Subscribes to the `ak.wwise.ui.commands.executed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_executed(
         &mut self,
         options: Option<UiCommandsExecutedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiCommandsExecutedPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_ui_commands_executed, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_ui_commands_executed, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.ui.layout` WAAPI namespace.
 pub struct WwiseUiLayoutClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseUiLayoutClient<'a> {
-    /// `ak.wwise.ui.layout.closeView`.
-    pub async fn close_view(&mut self, args: UiLayoutCloseViewArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_ui_layout_closeView,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Requests to close a view by its unique id. The view might not yet be closed when returning from this function.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.layout.closeView`.
+    pub async fn close_view(
+        &mut self,
+        args: UiLayoutCloseViewArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_layout_closeView, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.ui.layout.resetLayouts`.
-    pub async fn reset_layouts(&mut self, args: UiLayoutResetLayoutsArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_ui_layout_resetLayouts,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Reset layouts to their default state.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.layout.resetLayouts`.
+    pub async fn reset_layouts(
+        &mut self,
+        args: UiLayoutResetLayoutsArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_layout_resetLayouts, Some(args), None).await?;
         Ok(())
     }
 }
 
+/// Typed client for the `ak.wwise.ui.project` WAAPI namespace.
 pub struct WwiseUiProjectClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseUiProjectClient<'a> {
-    /// `ak.wwise.ui.project.open`.
-    pub async fn open(&mut self, args: UiProjectOpenArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_project_open, Some(args), None)
-            .await?;
+    /// Opens a project, specified by path. Please see `ak.wwise.core.project.loaded` for further explanations on how to be notified when the operation has completed.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.project.open`.
+    pub async fn open(
+        &mut self,
+        args: UiProjectOpenArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_project_open, Some(args), None).await?;
         Ok(())
     }
 
-    /// `ak.wwise.ui.project.close`.
-    pub async fn close(&mut self, args: UiProjectCloseArgs) -> WaapiResult<UiProjectCloseResponse> {
-        self.client
-            .call_typed::<_, (), _>(WaapiFunction::ak_wwise_ui_project_close, Some(args), None)
-            .await
+    /// Closes the current project.
+    ///
+    /// WAAPI endpoint: `ak.wwise.ui.project.close`.
+    pub async fn close(
+        &mut self,
+        args: UiProjectCloseArgs,
+    ) -> WaapiResult<UiProjectCloseResponse> {
+        self.client.call_typed::<_, (), _>(WaapiFunction::ak_wwise_ui_project_close, Some(args), None).await
     }
 }
 
+/// Typed client for the `ak.wwise.ui.signal` WAAPI namespace.
 pub struct WwiseUiSignalClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseUiSignalClient<'a> {
-    /// Subscribe to `ak.wwise.ui.signal.click`.
+    /// Emitted when a push button or a radio button gets clicked.
+    ///
+    /// Subscribes to the `ak.wwise.ui.signal.click` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_click(
         &mut self,
         options: Option<UiSignalClickOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSignalClickPayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_ui_signal_click, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_ui_signal_click, options).await
     }
 
-    /// Subscribe to `ak.wwise.ui.signal.toggle`.
+    /// Emitted when a toggle button or a checkbox gets toggled.
+    ///
+    /// Subscribes to the `ak.wwise.ui.signal.toggle` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_toggle(
         &mut self,
         options: Option<UiSignalToggleOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSignalTogglePayload>)> {
-        self.client
-            .subscribe_payload(WaapiTopic::ak_wwise_ui_signal_toggle, options)
-            .await
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_ui_signal_toggle, options).await
     }
 }
 
+/// Typed client for the `ak.wwise.core.profiler.captureLog` WAAPI namespace.
 pub struct WwiseCoreProfilerCaptureLogClient<'a> {
     client: &'a mut WaapiClient,
 }
 
 impl<'a> WwiseCoreProfilerCaptureLogClient<'a> {
-    /// `ak.wwise.core.profiler.captureLog.save`.
-    pub async fn save(&mut self, args: CoreProfilerCaptureLogSaveArgs) -> WaapiResult<()> {
-        self.client
-            .call_typed_void::<_, ()>(
-                WaapiFunction::ak_wwise_core_profiler_captureLog_save,
-                Some(args),
-                None,
-            )
-            .await?;
+    /// Saves the content of the capture log to a text file according to the given file path.
+    ///
+    /// WAAPI endpoint: `ak.wwise.core.profiler.captureLog.save`.
+    pub async fn save(
+        &mut self,
+        args: CoreProfilerCaptureLogSaveArgs,
+    ) -> WaapiResult<()> {
+        self.client.call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_profiler_captureLog_save, Some(args), None).await?;
         Ok(())
     }
 
-    /// Subscribe to `ak.wwise.core.profiler.captureLog.itemAdded`.
+    /// Sent when a new entry is added to the capture log. Note that all entries are being sent. No filtering is applied as opposed to the Capture Log view.
+    ///
+    /// Subscribes to the `ak.wwise.core.profiler.captureLog.itemAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_item_added(
         &mut self,
         options: Option<CoreProfilerCaptureLogItemAddedOptions>,
-    ) -> WaapiResult<(
-        u64,
-        UnboundedReceiver<CoreProfilerCaptureLogItemAddedPayload>,
-    )> {
-        self.client
-            .subscribe_payload(
-                WaapiTopic::ak_wwise_core_profiler_captureLog_itemAdded,
-                options,
-            )
-            .await
+    ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerCaptureLogItemAddedPayload>)> {
+        self.client.subscribe_payload(WaapiTopic::ak_wwise_core_profiler_captureLog_itemAdded, options).await
     }
 }
 

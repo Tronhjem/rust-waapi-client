@@ -1,11 +1,20 @@
 // Generated bindings for ak.soundengine.executeActionOnEvent
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.executeActionOnEvent`.
+///
+/// Executes an action on all nodes that are referenced in the specified event in a Play action. See `AK::SoundEngine::ExecuteActionOnEvent`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineExecuteActionOnEventArgs {
     /// Associated game object ID.
@@ -13,25 +22,20 @@ pub struct SoundengineExecuteActionOnEventArgs {
     pub game_object: GameObjectRef,
     /// Either the ID (GUID), name or Short ID of the event.
     pub event: SoundEngineObjectRef,
-    /// Action to execute on all the elements that were played using the specified event. Uses values from <tt>AK::SoundEngine::AkActionOnEventType</tt>.
+    /// Action to execute on all the elements that were played using the specified event. Uses values from `AK::SoundEngine::AkActionOnEventType`.
     #[serde(rename = "actionType")]
     pub action_type: ActionOnEventType,
     /// Fade duration (ms).
     #[serde(rename = "transitionDuration")]
     pub transition_duration: i32,
-    /// Use values from .
+    /// Use values from `AkCurveInterpolation`.
     #[serde(rename = "fadeCurve")]
     pub fade_curve: AkCurveInterpolation,
 }
 
 impl SoundengineExecuteActionOnEventArgs {
-    pub fn new(
-        event: SoundEngineObjectRef,
-        action_type: ActionOnEventType,
-        game_object: GameObjectRef,
-        transition_duration: i32,
-        fade_curve: AkCurveInterpolation,
-    ) -> Self {
+    /// Creates a new [`SoundengineExecuteActionOnEventArgs`] with the required fields.
+    pub fn new(event: SoundEngineObjectRef, action_type: ActionOnEventType, game_object: GameObjectRef, transition_duration: i32, fade_curve: AkCurveInterpolation) -> Self {
         Self {
             event,
             action_type,

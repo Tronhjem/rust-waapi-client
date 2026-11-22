@@ -1,11 +1,20 @@
 // Generated bindings for ak.soundengine.setRTPCValue
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.setRTPCValue`.
+///
+/// Sets the value of a Game Parameter for real-time parameter control. See `AK::SoundEngine::SetRTPCValue`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetRtpcValueArgs {
     /// Value to set for the specified Game Parameter.
@@ -18,6 +27,7 @@ pub struct SoundengineSetRtpcValueArgs {
 }
 
 impl SoundengineSetRtpcValueArgs {
+    /// Creates a new [`SoundengineSetRtpcValueArgs`] with the required fields.
     pub fn new(rtpc: SoundEngineObjectRef, value: f64) -> Self {
         Self {
             rtpc,
@@ -26,6 +36,7 @@ impl SoundengineSetRtpcValueArgs {
         }
     }
 
+    /// Associated game object ID. The default value is transport game object.
     pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
         self.game_object = Some(game_object.into());
         self

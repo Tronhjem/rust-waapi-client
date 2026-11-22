@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.getProjectInfo
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Response from `ak.wwise.core.getProjectInfo`.
+///
+/// Retrieve information about the current project opened, including platforms, languages and project directories.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreGetProjectInfoResponse {
     /// Project id.
@@ -45,3 +54,4 @@ pub struct CoreGetProjectInfoResponse {
     #[serde(rename = "defaultImportWorkUnit", default)]
     pub default_import_work_unit: Option<WwiseObjectRef>,
 }
+

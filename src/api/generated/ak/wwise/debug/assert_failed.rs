@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.debug.assertFailed
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.debug.assertFailed`.
+///
+/// Sent when an assert has failed. This is only available in Debug builds.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DebugAssertFailedPayload {
     /// An optional explanatory message accomapnying the assert.
@@ -22,3 +31,4 @@ pub struct DebugAssertFailedPayload {
     /// The callstack from the location of the assert.
     pub callstack: String,
 }
+

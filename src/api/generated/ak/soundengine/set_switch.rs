@@ -1,11 +1,20 @@
 // Generated bindings for ak.soundengine.setSwitch
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.setSwitch`.
+///
+/// Sets the State of a Switch Group. See `AK::SoundEngine::SetSwitch`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetSwitchArgs {
     /// Associated game object ID. Its default value is the transport game object.
@@ -20,6 +29,7 @@ pub struct SoundengineSetSwitchArgs {
 }
 
 impl SoundengineSetSwitchArgs {
+    /// Creates a new [`SoundengineSetSwitchArgs`] with the required fields.
     pub fn new(switch_group: SoundEngineObjectRef, switch_state: SoundEngineObjectRef) -> Self {
         Self {
             switch_group,
@@ -28,6 +38,7 @@ impl SoundengineSetSwitchArgs {
         }
     }
 
+    /// Associated game object ID. Its default value is the transport game object.
     pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
         self.game_object = Some(game_object.into());
         self

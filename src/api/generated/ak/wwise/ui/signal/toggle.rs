@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.ui.signal.toggle
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.ui.signal.toggle`.
+///
+/// Emitted when a toggle button or a checkbox gets toggled.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiSignalTogglePayload {
     /// The ID of the handle.
@@ -16,7 +25,10 @@ pub struct UiSignalTogglePayload {
     pub widget_id: String,
 }
 
+
 /// Subscription options for `ak.wwise.ui.signal.toggle`.
+///
+/// Emitted when a toggle button or a checkbox gets toggled.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiSignalToggleOptions {
     /// The ID of the handle.
@@ -28,6 +40,7 @@ pub struct UiSignalToggleOptions {
 }
 
 impl UiSignalToggleOptions {
+    /// Creates a new [`UiSignalToggleOptions`] with the required fields.
     pub fn new(handle_id: String, widget_id: String) -> Self {
         Self {
             handle_id,

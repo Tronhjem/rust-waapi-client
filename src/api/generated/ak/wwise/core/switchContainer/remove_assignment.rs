@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.switchContainer.removeAssignment
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.switchContainer.removeAssignment`.
+///
+/// Removes an assignment between a Switch Container's child and a State.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreSwitchContainerRemoveAssignmentArgs {
     /// The ID (GUID), name, or path of the object assigned to a State. This object must be the child of a Switch Container and must be currently assigned to a State.
@@ -16,6 +25,7 @@ pub struct CoreSwitchContainerRemoveAssignmentArgs {
 }
 
 impl CoreSwitchContainerRemoveAssignmentArgs {
+    /// Creates a new [`CoreSwitchContainerRemoveAssignmentArgs`] with the required fields.
     pub fn new(child: ObjectRef, state_or_switch: ObjectRef) -> Self {
         Self {
             child,

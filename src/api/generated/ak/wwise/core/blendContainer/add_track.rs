@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.blendContainer.addTrack
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.blendContainer.addTrack`.
+///
+/// Adds a new Blend Track to a Blend Container. Equivalent to clicking New Blend Track in the Blend Track Editor. To get the list of Blend Tracks, use the function ak.wwise.core.object.get with {return = "blendTracks"}.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreBlendContainerAddTrackArgs {
     /// For internal use only! The ID (GUID) to assign to the newly created Object.
@@ -18,6 +27,7 @@ pub struct CoreBlendContainerAddTrackArgs {
 }
 
 impl CoreBlendContainerAddTrackArgs {
+    /// Creates a new [`CoreBlendContainerAddTrackArgs`] with the required fields.
     pub fn new(object: ObjectRef, name: String) -> Self {
         Self {
             object,
@@ -26,6 +36,7 @@ impl CoreBlendContainerAddTrackArgs {
         }
     }
 
+    /// For internal use only! The ID (GUID) to assign to the newly created Object.
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.id = Some(id.into());
         self
@@ -33,6 +44,8 @@ impl CoreBlendContainerAddTrackArgs {
 }
 
 /// Response from `ak.wwise.core.blendContainer.addTrack`.
+///
+/// Adds a new Blend Track to a Blend Container. Equivalent to clicking New Blend Track in the Blend Track Editor. To get the list of Blend Tracks, use the function ak.wwise.core.object.get with {return = "blendTracks"}.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreBlendContainerAddTrackResponse {
     /// The ID (GUID) of the Blend Track.
@@ -41,10 +54,11 @@ pub struct CoreBlendContainerAddTrackResponse {
     /// The name of the Blend Track.
     #[serde(default)]
     pub name: Option<String>,
-    /// The type of the object. See for more information on the types available.
+    /// The type of the object. See the Wwise Objects Reference for more information on the types available.
     #[serde(rename = "type", default)]
     pub object_type: Option<ObjectType>,
     /// The Short ID of the object.
     #[serde(rename = "shortId", default)]
     pub short_id: Option<i64>,
 }
+

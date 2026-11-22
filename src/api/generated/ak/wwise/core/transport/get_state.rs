@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.transport.getState
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.transport.getState`.
+///
+/// Gets the state of the given transport object.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreTransportGetStateArgs {
     /// The transport object ID to be used with all other ak.wwise.core.transport functions.
@@ -13,14 +22,20 @@ pub struct CoreTransportGetStateArgs {
 }
 
 impl CoreTransportGetStateArgs {
+    /// Creates a new [`CoreTransportGetStateArgs`] with the required fields.
     pub fn new(transport: u32) -> Self {
-        Self { transport }
+        Self {
+            transport,
+        }
     }
 }
 
 /// Response from `ak.wwise.core.transport.getState`.
+///
+/// Gets the state of the given transport object.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreTransportGetStateResponse {
     /// The state of the transport object.
     pub state: TransportState,
 }
+

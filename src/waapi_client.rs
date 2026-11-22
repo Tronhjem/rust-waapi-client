@@ -8,13 +8,19 @@ use crate::waapi_topics_api::WaapiTopic;
 pub use crate::wamp::Event;
 use crate::wamp::{WampClient, WampError};
 
+/// Result alias for WAAPI client operations.
 pub type WaapiResult<T> = Result<T, WaapiError>;
 
+/// Errors returned by [`WaapiClient`] operations.
 #[derive(Debug)]
 pub enum WaapiError {
+    /// Failed to establish or maintain the WebSocket/WAMP connection.
     Connection(String),
+    /// Failed to serialize request arguments/options or deserialize a response.
     Serialization(serde_json::Error),
+    /// WAAPI returned a WAMP call/subscribe/unsubscribe error.
     Call(String),
+    /// Low-level WAMP transport error.
     Wamp(WampError),
 }
 

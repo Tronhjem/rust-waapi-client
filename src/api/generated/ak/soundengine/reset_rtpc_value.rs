@@ -1,11 +1,20 @@
 // Generated bindings for ak.soundengine.resetRTPCValue
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.resetRTPCValue`.
+///
+/// Resets the value of a real-time parameter control to its default value, as specified in the Wwise project. See `AK::SoundEngine::ResetRTPCValue`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineResetRtpcValueArgs {
     /// Associated game object ID. The default value is transport game object.
@@ -16,6 +25,7 @@ pub struct SoundengineResetRtpcValueArgs {
 }
 
 impl SoundengineResetRtpcValueArgs {
+    /// Creates a new [`SoundengineResetRtpcValueArgs`] with the required fields.
     pub fn new(rtpc: SoundEngineObjectRef) -> Self {
         Self {
             rtpc,
@@ -23,6 +33,7 @@ impl SoundengineResetRtpcValueArgs {
         }
     }
 
+    /// Associated game object ID. The default value is transport game object.
     pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
         self.game_object = Some(game_object.into());
         self

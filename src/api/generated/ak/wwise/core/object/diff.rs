@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.diff
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.diff`.
+///
+/// Compares properties and lists of the source object with those in the target object.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectDiffArgs {
     /// The ID (GUID), name, or path of the source object.
@@ -15,12 +24,18 @@ pub struct CoreObjectDiffArgs {
 }
 
 impl CoreObjectDiffArgs {
+    /// Creates a new [`CoreObjectDiffArgs`] with the required fields.
     pub fn new(source: ObjectRef, target: ObjectRef) -> Self {
-        Self { source, target }
+        Self {
+            source,
+            target,
+        }
     }
 }
 
 /// Response from `ak.wwise.core.object.diff`.
+///
+/// Compares properties and lists of the source object with those in the target object.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectDiffResponse {
     /// Array of names of properties and references that differ.
@@ -30,3 +45,4 @@ pub struct CoreObjectDiffResponse {
     #[serde(default)]
     pub lists: Vec<String>,
 }
+

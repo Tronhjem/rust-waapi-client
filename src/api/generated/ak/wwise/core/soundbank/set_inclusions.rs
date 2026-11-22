@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.soundbank.setInclusions
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.soundbank.setInclusions`.
+///
+/// Modifies a SoundBank's inclusion list. The 'operation' argument determines how the 'inclusions' argument modifies the SoundBank's inclusion list; 'inclusions' may be added to / removed from / replace the SoundBank's inclusion list.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreSoundbankSetInclusionsArgs {
     /// Determines how the 'inclusions' argument is used to modify the SoundBank's inclusion list; 'inclusions' may be used to add to / remove from / replace the SoundBank's inclusion list.
@@ -17,11 +26,8 @@ pub struct CoreSoundbankSetInclusionsArgs {
 }
 
 impl CoreSoundbankSetInclusionsArgs {
-    pub fn new(
-        soundbank: ObjectRef,
-        inclusions: Vec<SoundBankInclusion>,
-        operation: SoundBankInclusionOperation,
-    ) -> Self {
+    /// Creates a new [`CoreSoundbankSetInclusionsArgs`] with the required fields.
+    pub fn new(soundbank: ObjectRef, inclusions: Vec<SoundBankInclusion>, operation: SoundBankInclusionOperation) -> Self {
         Self {
             soundbank,
             inclusions,

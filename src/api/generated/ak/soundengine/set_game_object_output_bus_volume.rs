@@ -1,11 +1,20 @@
 // Generated bindings for ak.soundengine.setGameObjectOutputBusVolume
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.soundengine.setGameObjectOutputBusVolume`.
+///
+/// Set the output bus volume (direct) to be used for the specified game object. See `AK::SoundEngine::SetGameObjectOutputBusVolume`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct SoundengineSetGameObjectOutputBusVolumeArgs {
     /// Associated listener game object ID.
@@ -18,6 +27,7 @@ pub struct SoundengineSetGameObjectOutputBusVolumeArgs {
 }
 
 impl SoundengineSetGameObjectOutputBusVolumeArgs {
+    /// Creates a new [`SoundengineSetGameObjectOutputBusVolumeArgs`] with the required fields.
     pub fn new(emitter: GameObjectRef, listener: GameObjectRef, control_value: f64) -> Self {
         Self {
             emitter,

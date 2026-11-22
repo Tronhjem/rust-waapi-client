@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.getInfo
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Response from `ak.wwise.core.getInfo`.
+///
+/// Retrieve global Wwise information.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreGetInfoResponse {
     /// Collection of directories used by Wwise.
@@ -39,3 +48,4 @@ pub struct CoreGetInfoResponse {
     #[serde(rename = "processPath")]
     pub process_path: String,
 }
+

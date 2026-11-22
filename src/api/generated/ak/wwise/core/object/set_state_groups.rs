@@ -1,11 +1,20 @@
 // Generated bindings for ak.wwise.core.object.setStateGroups
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Arguments for `ak.wwise.core.object.setStateGroups`.
+///
+/// Sets the State Group objects associated with an object. Note, this will remove any previously associated State Group.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreObjectSetStateGroupsArgs {
     /// An array of State Group objects to set.
@@ -16,6 +25,7 @@ pub struct CoreObjectSetStateGroupsArgs {
 }
 
 impl CoreObjectSetStateGroupsArgs {
+    /// Creates a new [`CoreObjectSetStateGroupsArgs`] with the required fields.
     pub fn new(object: ObjectRef, state_groups: Vec<ObjectRef>) -> Self {
         Self {
             object,

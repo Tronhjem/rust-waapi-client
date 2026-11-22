@@ -16,9 +16,12 @@ use tokio_tungstenite::tungstenite::protocol::Message as WsMessage;
 pub use error::{WampError, WampResult};
 pub use message::{Message, RequestId, SubscriptionId};
 
+/// A raw WAMP event received from a subscribed WAAPI topic.
 #[derive(Debug, Clone)]
 pub struct Event {
+    /// Positional WAMP event arguments.
     pub args: Vec<Value>,
+    /// Keyword WAMP event payload (JSON object delivered by WAAPI topics).
     pub kwargs: Value,
 }
 

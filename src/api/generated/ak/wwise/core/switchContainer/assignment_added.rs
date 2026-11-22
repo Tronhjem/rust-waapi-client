@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.switchContainer.assignmentAdded
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.switchContainer.assignmentAdded`.
+///
+/// Sent when an assignment is added to a Switch Container.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSwitchContainerAssignmentAddedPayload {
     /// The child object that was assigned.
@@ -18,7 +27,10 @@ pub struct CoreSwitchContainerAssignmentAddedPayload {
     pub switch_container: WwiseObject,
 }
 
+
 /// Subscription options for `ak.wwise.core.switchContainer.assignmentAdded`.
+///
+/// Sent when an assignment is added to a Switch Container.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreSwitchContainerAssignmentAddedOptions {
     /// Data to be returned for the Switch Container and the assignment (pair of objects).
@@ -27,10 +39,12 @@ pub struct CoreSwitchContainerAssignmentAddedOptions {
 }
 
 impl CoreSwitchContainerAssignmentAddedOptions {
+    /// Creates a new [`CoreSwitchContainerAssignmentAddedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Data to be returned for the Switch Container and the assignment (pair of objects).
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
         self

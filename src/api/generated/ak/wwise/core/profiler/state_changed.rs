@@ -1,11 +1,20 @@
 // Generated bindings for topic ak.wwise.core.profiler.stateChanged
 
+
+
 #![allow(unused_imports)]
+
 #![allow(dead_code)]
+
+
 
 use crate::api::generated::primitives::*;
 
+
+
 /// Payload for `ak.wwise.core.profiler.stateChanged`.
+///
+/// Sent when a state group state has been changed. This subscription does not require the profiler capture log to be started.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerStateChangedPayload {
     /// The state object that changed. Default return is id and name.
@@ -15,7 +24,10 @@ pub struct CoreProfilerStateChangedPayload {
     pub state_group: WwiseObject,
 }
 
+
 /// Subscription options for `ak.wwise.core.profiler.stateChanged`.
+///
+/// Sent when a state group state has been changed. This subscription does not require the profiler capture log to be started.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct CoreProfilerStateChangedOptions {
     /// Data to be returned for every object.
@@ -27,15 +39,18 @@ pub struct CoreProfilerStateChangedOptions {
 }
 
 impl CoreProfilerStateChangedOptions {
+    /// Creates a new [`CoreProfilerStateChangedOptions`] with all fields unset.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Data to be returned for every object.
     pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_ = Some(return_.into());
         self
     }
 
+    /// The ID (GUID) of the platform.
     pub fn platform(mut self, platform: impl Into<String>) -> Self {
         self.platform = Some(platform.into());
         self
