@@ -61,6 +61,18 @@ pub struct CoreBlendContainerAddTrackResponse {
     pub short_id: Option<i64>,
 }
 
+impl CoreBlendContainerAddTrackResponse {
+    /// Returns the object GUID string (`id`), if present in the response.
+    pub fn id(&self) -> Option<&str> {
+        self.id.as_deref()
+    }
+
+    /// Returns the object name (`name`), if present in the response.
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+}
+
 /// Module-scoped alias for [`CoreBlendContainerAddTrackArgs`].
 pub type AddTrackArgs = CoreBlendContainerAddTrackArgs;
 

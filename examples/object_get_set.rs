@@ -18,7 +18,7 @@ use wwise_waapi::prelude::*;
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
 
-    let mut client = WaapiClient::connect().await?;
+    let client = WaapiClient::connect().await?;
 
     // 1. Get an object by path. The Default Work Unit exists in every project.
     let get = client
@@ -83,9 +83,9 @@ async fn main() -> WaapiResult<()> {
             for obj in &response.objects {
                 println!(
                     "set: {:?} ({:?}) @Volume is now {:?}",
-                    obj.name,
-                    obj.id,
-                    obj.property(Property::Volume)
+                    obj.name(),
+                    obj.id(),
+                    obj.property_f64(Property::Volume)
                 );
             }
         }

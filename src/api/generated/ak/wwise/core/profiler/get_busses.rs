@@ -46,7 +46,7 @@ impl From<serde_json::Value> for CoreProfilerGetBussesArgs {
 pub struct CoreProfilerGetBussesOptions {
     /// Members to return for each bus. Defaults to Pipeline ID, Game Object ID, and Object GUID.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<BusReturnField>>,
+    pub return_fields: Option<Vec<BusReturnField>>,
 }
 
 impl CoreProfilerGetBussesOptions {
@@ -56,9 +56,40 @@ impl CoreProfilerGetBussesOptions {
     }
 
     /// Members to return for each bus. Defaults to Pipeline ID, Game Object ID, and Object GUID.
-    pub fn return_(mut self, return_: impl Into<Vec<BusReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<BusReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<BusReturnField>,
+    {
+        self.return_fields(return_fields)
+    }
+}
+
+impl From<()> for CoreProfilerGetBussesOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[BusReturnField; N]> for CoreProfilerGetBussesOptions {
+    fn from(return_fields: [BusReturnField; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<BusReturnField>> for CoreProfilerGetBussesOptions {
+    fn from(return_fields: Vec<BusReturnField>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

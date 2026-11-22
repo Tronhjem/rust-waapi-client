@@ -22,7 +22,7 @@ async fn recv<T>(rx: &mut tokio::sync::mpsc::UnboundedReceiver<T>) -> T {
 #[tokio::test]
 async fn typed_topic_payload_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 

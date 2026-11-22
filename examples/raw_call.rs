@@ -11,7 +11,7 @@ use wwise_waapi::{WaapiClient, WaapiFunction, json};
 async fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::connect()
+    let client = WaapiClient::connect()
         .await
         .expect("Failed to connect to WAAPI");
 

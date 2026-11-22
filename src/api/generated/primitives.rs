@@ -21,19 +21,49 @@ pub enum SoundEngineObjectRef {
     ShortId(u32),
 }
 
+impl SoundEngineObjectRef {
+    /// Reference an object by its Wwise name.
+    pub fn name(s: impl Into<String>) -> Self {
+        SoundEngineObjectRef::Name(s.into())
+    }
+
+    /// Reference an object by its GUID string (`{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`).
+    pub fn guid(s: impl Into<String>) -> Self {
+        SoundEngineObjectRef::Guid(s.into())
+    }
+
+    /// Reference an object by its 32-bit Short ID.
+    pub fn short_id(id: u32) -> Self {
+        SoundEngineObjectRef::ShortId(id)
+    }
+
+    /// Alias for [`Self::short_id`].
+    pub fn short(id: u32) -> Self {
+        SoundEngineObjectRef::ShortId(id)
+    }
+}
+
 impl From<&str> for SoundEngineObjectRef {
     fn from(s: &str) -> Self {
-        SoundEngineObjectRef::Name(s.to_string())
+        if s.starts_with('{') && s.ends_with('}') {
+            SoundEngineObjectRef::Guid(s.to_string())
+        } else {
+            SoundEngineObjectRef::Name(s.to_string())
+        }
     }
 }
 impl From<String> for SoundEngineObjectRef {
     fn from(s: String) -> Self {
-        SoundEngineObjectRef::Name(s)
+        if s.starts_with('{') && s.ends_with('}') {
+            SoundEngineObjectRef::Guid(s)
+        } else {
+            SoundEngineObjectRef::Name(s)
+        }
     }
 }
 impl From<&String> for SoundEngineObjectRef {
     fn from(s: &String) -> Self {
-        SoundEngineObjectRef::Name(s.clone())
+        Self::from(s.as_str())
     }
 }
 impl From<u32> for SoundEngineObjectRef {
@@ -57,6 +87,16 @@ pub enum GameObjectRef {
 }
 
 impl GameObjectRef {
+    /// Creates a [`GameObjectRef`] from a 64-bit game object ID.
+    pub fn new(id: u64) -> Self {
+        GameObjectRef::Id(id)
+    }
+
+    /// Creates a [`GameObjectRef`] from a 64-bit game object ID.
+    pub fn id(id: u64) -> Self {
+        GameObjectRef::Id(id)
+    }
+
     /// Creates a [`GameObjectRef`] from a 64-bit game object ID.
     pub fn game_object(id: u64) -> Self {
         GameObjectRef::Id(id)
@@ -84,19 +124,39 @@ pub enum LanguageRef {
     Guid(String),
 }
 
+impl LanguageRef {
+    /// Reference a language by name.
+    pub fn name(s: impl Into<String>) -> Self {
+        LanguageRef::Name(s.into())
+    }
+
+    /// Reference a language by GUID string (`{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`).
+    pub fn guid(s: impl Into<String>) -> Self {
+        LanguageRef::Guid(s.into())
+    }
+}
+
 impl From<&str> for LanguageRef {
     fn from(s: &str) -> Self {
-        LanguageRef::Name(s.to_string())
+        if s.starts_with('{') && s.ends_with('}') {
+            LanguageRef::Guid(s.to_string())
+        } else {
+            LanguageRef::Name(s.to_string())
+        }
     }
 }
 impl From<String> for LanguageRef {
     fn from(s: String) -> Self {
-        LanguageRef::Name(s)
+        if s.starts_with('{') && s.ends_with('}') {
+            LanguageRef::Guid(s)
+        } else {
+            LanguageRef::Name(s)
+        }
     }
 }
 impl From<&String> for LanguageRef {
     fn from(s: &String) -> Self {
-        LanguageRef::Name(s.clone())
+        Self::from(s.as_str())
     }
 }
 
@@ -348,6 +408,17 @@ impl serde::Serialize for ObjectReturnField {
     }
 }
 
+impl ObjectReturnField {
+    /// Request a Wwise object property, reference, or list (`@Property`).
+    pub fn property(prop: Property) -> Self {
+        ObjectReturnField::Property(prop)
+    }
+    /// Request a custom accessor, e.g. `@Property` or a dot-separated query.
+    pub fn custom(s: impl Into<String>) -> Self {
+        ObjectReturnField::Custom(s.into())
+    }
+}
+
 impl From<Property> for ObjectReturnField {
     fn from(prop: Property) -> Self {
         ObjectReturnField::Property(prop)
@@ -361,6 +432,11 @@ impl From<&str> for ObjectReturnField {
 impl From<String> for ObjectReturnField {
     fn from(s: String) -> Self {
         ObjectReturnField::Custom(s)
+    }
+}
+impl From<&String> for ObjectReturnField {
+    fn from(s: &String) -> Self {
+        ObjectReturnField::Custom(s.clone())
     }
 }
 
@@ -384,6 +460,17 @@ impl ObjectReturnOptions {
         Self::default()
     }
 
+    /// Creates an [`ObjectReturnOptions`] requesting the four standard object fields
+    /// (`Id`, `Name`, `Type`, and `Path`).
+    pub fn basic() -> Self {
+        Self::new().return_fields([
+            ObjectReturnField::Id,
+            ObjectReturnField::Name,
+            ObjectReturnField::Type,
+            ObjectReturnField::Path,
+        ])
+    }
+
     /// Specifies the fields or `@Property` expressions to return for each object.
     pub fn return_fields<I, T>(mut self, fields: I) -> Self
     where
@@ -392,6 +479,15 @@ impl ObjectReturnOptions {
     {
         self.return_fields = Some(fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields(fields)
     }
 
     /// Specifies the platform to use when querying properties.
@@ -404,6 +500,36 @@ impl ObjectReturnOptions {
     pub fn language(mut self, language: impl Into<LanguageRef>) -> Self {
         self.language = Some(language.into());
         self
+    }
+}
+
+impl From<()> for ObjectReturnOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[ObjectReturnField; N]> for ObjectReturnOptions {
+    fn from(fields: [ObjectReturnField; N]) -> Self {
+        Self::new().return_fields(fields)
+    }
+}
+
+impl From<Vec<ObjectReturnField>> for ObjectReturnOptions {
+    fn from(fields: Vec<ObjectReturnField>) -> Self {
+        Self::new().return_fields(fields)
+    }
+}
+
+impl From<&[ObjectReturnField]> for ObjectReturnOptions {
+    fn from(fields: &[ObjectReturnField]) -> Self {
+        Self::new().return_fields(fields.iter().cloned())
+    }
+}
+
+impl From<ObjectReturnField> for ObjectReturnOptions {
+    fn from(field: ObjectReturnField) -> Self {
+        Self::new().return_fields([field])
     }
 }
 
@@ -948,6 +1074,26 @@ impl WwiseObject {
             .get(prop.as_at_str())
             .or_else(|| self.extra.get(prop.as_str()))
     }
+
+    /// Look up a numeric (`f64`) property value in `extra`.
+    pub fn property_f64(&self, prop: Property) -> Option<f64> {
+        self.property(prop).and_then(serde_json::Value::as_f64)
+    }
+
+    /// Look up an integer (`i64`) property value in `extra`.
+    pub fn property_i64(&self, prop: Property) -> Option<i64> {
+        self.property(prop).and_then(serde_json::Value::as_i64)
+    }
+
+    /// Look up a boolean (`bool`) property value in `extra`.
+    pub fn property_bool(&self, prop: Property) -> Option<bool> {
+        self.property(prop).and_then(serde_json::Value::as_bool)
+    }
+
+    /// Look up a string (`&str`) property value in `extra`.
+    pub fn property_str(&self, prop: Property) -> Option<&str> {
+        self.property(prop).and_then(serde_json::Value::as_str)
+    }
 }
 
 /// A lightweight object reference returned inside other objects.
@@ -959,6 +1105,18 @@ pub struct WwiseObjectRef {
     /// Object name.
     #[serde(default)]
     pub name: Option<String>,
+}
+
+impl WwiseObjectRef {
+    /// Returns the object GUID string (`id`), if present in the response.
+    pub fn id(&self) -> Option<&str> {
+        self.id.as_deref()
+    }
+
+    /// Returns the object name (`name`), if present in the response.
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
 }
 
 /// Argument to the `from` field of `object.get`.
@@ -982,6 +1140,74 @@ pub enum ObjectQuery {
     /// An array of query object ID.
     #[serde(rename = "query")]
     Query(Vec<String>),
+}
+
+impl ObjectQuery {
+    /// Query a single object by GUID or Short ID.
+    pub fn id(id: impl Into<String>) -> Self {
+        ObjectQuery::Id(vec![serde_json::Value::String(id.into())])
+    }
+
+    /// Query multiple objects by GUID strings.
+    pub fn ids<I, S>(ids: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        ObjectQuery::Id(
+            ids.into_iter()
+                .map(|s| serde_json::Value::String(s.into()))
+                .collect(),
+        )
+    }
+
+    /// Query a single object by backslash-separated hierarchy path.
+    pub fn path(path: impl Into<String>) -> Self {
+        ObjectQuery::Path(vec![path.into()])
+    }
+
+    /// Query multiple objects by backslash-separated hierarchy paths.
+    pub fn paths<I, S>(paths: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        ObjectQuery::Path(paths.into_iter().map(Into::into).collect())
+    }
+
+    /// Query a single object by unique qualified name (`Type:Name`).
+    pub fn name(name: impl Into<String>) -> Self {
+        ObjectQuery::Name(vec![name.into()])
+    }
+
+    /// Query multiple objects by unique qualified names (`Type:Name`).
+    pub fn names<I, S>(names: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        ObjectQuery::Name(names.into_iter().map(Into::into).collect())
+    }
+
+    /// Search objects by name or notes text.
+    pub fn search(text: impl Into<String>) -> Self {
+        ObjectQuery::Search(vec![text.into()])
+    }
+
+    /// Query all objects of a single [`ObjectType`].
+    pub fn of_type(object_type: ObjectType) -> Self {
+        ObjectQuery::OfType(vec![object_type])
+    }
+
+    /// Query all objects matching any of the given [`ObjectType`] values.
+    pub fn of_types(object_types: impl IntoIterator<Item = ObjectType>) -> Self {
+        ObjectQuery::OfType(object_types.into_iter().collect())
+    }
+
+    /// Run a saved Wwise Query object by GUID.
+    pub fn query(guid: impl Into<String>) -> Self {
+        ObjectQuery::Query(vec![guid.into()])
+    }
 }
 
 impl From<String> for ObjectQuery {
@@ -1769,6 +1995,16 @@ pub struct SwitchContainerAssignment {
     pub state_or_switch: String,
 }
 
+impl SwitchContainerAssignment {
+    /// Creates a new [`SwitchContainerAssignment`].
+    pub fn new(child: impl Into<String>, state_or_switch: impl Into<String>) -> Self {
+        Self {
+            child: child.into(),
+            state_or_switch: state_or_switch.into(),
+        }
+    }
+}
+
 /// Action when opening a project that requires migration.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ProjectMigrationAction {
@@ -1973,14 +2209,24 @@ pub struct MultiPosition {
 
 impl MultiPosition {
     /// Creates a new [`MultiPosition`].
-    pub fn new(position: Position) -> Self {
-        Self { position }
+    pub fn new(position: impl Into<Position>) -> Self {
+        Self {
+            position: position.into(),
+        }
     }
 }
 
 impl From<Position> for MultiPosition {
     fn from(position: Position) -> Self {
         Self { position }
+    }
+}
+
+impl From<Vector3> for MultiPosition {
+    fn from(position: Vector3) -> Self {
+        Self {
+            position: Position::new(position),
+        }
     }
 }
 
@@ -2061,6 +2307,24 @@ pub struct BlendEdge {
         skip_serializing_if = "Option::is_none"
     )]
     pub fade_position: Option<f64>,
+}
+
+impl BlendEdge {
+    /// Creates a new [`BlendEdge`].
+    pub fn new(fade_mode: BlendFadeMode, fade_shape: CurveShape, edge_position: f64) -> Self {
+        Self {
+            fade_mode,
+            fade_shape,
+            edge_position,
+            fade_position: None,
+        }
+    }
+
+    /// Sets the position where the fade starts or ends along the blend track X axis.
+    pub fn fade_position(mut self, fade_position: f64) -> Self {
+        self.fade_position = Some(fade_position);
+        self
+    }
 }
 
 /// A blend track assignment (`blendContainer.getAssignments`).
@@ -2187,20 +2451,28 @@ impl SoundBankInfo {
     }
 
     /// Sets the inclusion types for the SoundBank.
-    pub fn inclusions(mut self, inclusions: Vec<SoundBankInclusionType>) -> Self {
-        self.inclusions = Some(inclusions);
+    pub fn inclusions(mut self, inclusions: impl Into<Vec<SoundBankInclusionType>>) -> Self {
+        self.inclusions = Some(inclusions.into());
         self
     }
 
     /// Sets the events to include in the SoundBank.
-    pub fn events(mut self, events: Vec<ObjectRef>) -> Self {
-        self.events = Some(events);
+    pub fn events<I, T>(mut self, events: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectRef>,
+    {
+        self.events = Some(events.into_iter().map(Into::into).collect());
         self
     }
 
     /// Sets the auxiliary busses to include in the SoundBank.
-    pub fn aux_busses(mut self, aux_busses: Vec<ObjectRef>) -> Self {
-        self.aux_busses = Some(aux_busses);
+    pub fn aux_busses<I, T>(mut self, aux_busses: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectRef>,
+    {
+        self.aux_busses = Some(aux_busses.into_iter().map(Into::into).collect());
         self
     }
 

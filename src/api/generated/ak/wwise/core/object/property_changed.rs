@@ -29,7 +29,7 @@ pub struct CoreObjectPropertyChangedPayload {
 pub struct CoreObjectPropertyChangedOptions {
     /// Data to be returned for every change on "property" of "object". See the Wwise Objects Reference for more information on the properties available.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<ObjectReturnField>>,
+    pub return_fields: Option<Vec<ObjectReturnField>>,
     /// The ID (GUID), name, or path of the object to watch.
     pub object: ObjectRef,
     /// The property of the watched object to watch.
@@ -45,15 +45,28 @@ impl CoreObjectPropertyChangedOptions {
         Self {
             object: object.into(),
             property,
-            return_: None,
+            return_fields: None,
             platform: None,
         }
     }
 
     /// Data to be returned for every change on "property" of "object". See the Wwise Objects Reference for more information on the properties available.
-    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields(return_fields)
     }
 
     /// The ID (GUID) of the platform.

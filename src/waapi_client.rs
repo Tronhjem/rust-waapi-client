@@ -11,25 +11,117 @@ use crate::wamp::{WampClient, WampError};
 /// Result alias for WAAPI client operations.
 pub type WaapiResult<T> = Result<T, WaapiError>;
 
+/// Structured details of a WAAPI RPC or subscription error returned over WAMP.
+#[derive(Debug, Clone, PartialEq)]
+pub struct WaapiCallError {
+    /// WAAPI error URI (e.g. `"ak.wwise.invalid_arguments"`, `"ak.wwise.locked"`).
+    pub uri: String,
+    /// Human-readable error message extracted from `kwargs["message"]` (or the first string argument), if present.
+    pub message: Option<String>,
+    /// Positional WAMP error arguments (`Arguments`).
+    pub args: Vec<Value>,
+    /// Keyword WAMP error arguments / details (`ArgumentsKw`).
+    pub kwargs: Value,
+}
+
+impl WaapiCallError {
+    /// Construct a [`WaapiCallError`] from the raw WAMP `ERROR` fields.
+    pub fn new(uri: impl Into<String>, args: Vec<Value>, kwargs: Value) -> Self {
+        let message = kwargs
+            .get("message")
+            .and_then(Value::as_str)
+            .map(ToOwned::to_owned)
+            .or_else(|| args.first().and_then(Value::as_str).map(ToOwned::to_owned));
+        Self {
+            uri: uri.into(),
+            message,
+            args,
+            kwargs,
+        }
+    }
+
+    /// Returns the WAAPI error URI (e.g. `"ak.wwise.invalid_arguments"`).
+    pub fn uri(&self) -> &str {
+        &self.uri
+    }
+
+    /// Returns the human-readable WAAPI error message, if present.
+    pub fn message(&self) -> Option<&str> {
+        self.message.as_deref()
+    }
+
+    /// Returns the structured error details (`kwargs.details` if present, otherwise `&self.kwargs`).
+    pub fn details(&self) -> &Value {
+        self.kwargs.get("details").unwrap_or(&self.kwargs)
+    }
+}
+
+impl fmt::Display for WaapiCallError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(msg) = &self.message {
+            write!(f, "{}: {msg}", self.uri)?;
+            if let Some(details) = self.kwargs.get("details")
+                && !details.is_null()
+            {
+                write!(f, " ({details})")?;
+            }
+            Ok(())
+        } else if !self.args.is_empty() || !self.kwargs.is_null() {
+            write!(
+                f,
+                "{} args={:?} kwargs={}",
+                self.uri, self.args, self.kwargs
+            )
+        } else {
+            write!(f, "{}", self.uri)
+        }
+    }
+}
+
+impl std::error::Error for WaapiCallError {}
+
 /// Errors returned by [`WaapiClient`] operations.
 #[derive(Debug)]
 pub enum WaapiError {
-    /// Failed to establish or maintain the WebSocket/WAMP connection.
+    /// Failed to establish the WebSocket/WAMP connection to WAAPI.
     Connection(String),
+    /// Operation attempted on a [`WaapiClient`] that has already been shut down.
+    ClientShutdown,
     /// Failed to serialize request arguments/options or deserialize a response.
     Serialization(serde_json::Error),
-    /// WAAPI returned a WAMP call/subscribe/unsubscribe error.
-    Call(String),
+    /// WAAPI returned a structured WAMP call/subscribe/unsubscribe error.
+    Call(WaapiCallError),
     /// Low-level WAMP transport error.
     Wamp(WampError),
+}
+
+impl WaapiError {
+    /// If this is a [`WaapiError::Call`], returns the underlying [`WaapiCallError`].
+    pub fn as_call_error(&self) -> Option<&WaapiCallError> {
+        match self {
+            WaapiError::Call(err) => Some(err),
+            _ => None,
+        }
+    }
+
+    /// If this is a [`WaapiError::Call`], returns the WAAPI error URI (e.g. `"ak.wwise.invalid_arguments"`).
+    pub fn error_uri(&self) -> Option<&str> {
+        self.as_call_error().map(WaapiCallError::uri)
+    }
+
+    /// If this is a [`WaapiError::Call`], returns the human-readable WAAPI error message.
+    pub fn waapi_message(&self) -> Option<&str> {
+        self.as_call_error().and_then(WaapiCallError::message)
+    }
 }
 
 impl fmt::Display for WaapiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             WaapiError::Connection(msg) => write!(f, "connection error: {msg}"),
+            WaapiError::ClientShutdown => write!(f, "connection error: client already shut down"),
             WaapiError::Serialization(e) => write!(f, "serialization error: {e}"),
-            WaapiError::Call(msg) => write!(f, "call error: {msg}"),
+            WaapiError::Call(err) => write!(f, "call error: {err}"),
             WaapiError::Wamp(e) => write!(f, "{e}"),
         }
     }
@@ -47,19 +139,10 @@ impl From<WampError> for WaapiError {
     fn from(err: WampError) -> Self {
         match err {
             WampError::CallError { uri, args, kwargs } => {
-                let detail = format_args(&uri, &args, &kwargs);
-                WaapiError::Call(detail)
+                WaapiError::Call(WaapiCallError::new(uri, args, kwargs))
             }
             other => WaapiError::Wamp(other),
         }
-    }
-}
-
-fn format_args(uri: &str, args: &[Value], kwargs: &Value) -> String {
-    if !args.is_empty() || !kwargs.is_null() {
-        format!("{uri} args={args:?} kwargs={kwargs}")
-    } else {
-        uri.to_string()
     }
 }
 
@@ -107,7 +190,7 @@ impl WaapiClient {
     /// `args` is passed as the WAMP `CALL` keyword arguments (`ArgumentsKw`), and
     /// `options` is passed as the WAMP `CALL` `Options` dictionary (e.g. `{"return": ["id", "name"]}`).
     pub async fn call(
-        &mut self,
+        &self,
         uri: WaapiFunction,
         args: Option<Value>,
         options: Option<Value>,
@@ -120,7 +203,7 @@ impl WaapiClient {
     /// Prefer [`WaapiClient::call`] or the typed endpoint methods when calling
     /// known WAAPI endpoints.
     pub async fn call_raw(
-        &mut self,
+        &self,
         uri: &str,
         args: Option<Value>,
         options: Option<Value>,
@@ -128,7 +211,7 @@ impl WaapiClient {
         let result = self
             .wamp
             .as_ref()
-            .ok_or_else(|| WaapiError::Connection("client shutdown".to_string()))?
+            .ok_or(WaapiError::ClientShutdown)?
             .call(uri, options, None, args)
             .await
             .map_err(WaapiError::from)?;
@@ -139,7 +222,7 @@ impl WaapiClient {
     ///
     /// Serializes typed args/options and deserializes the response.
     pub async fn call_typed<Args, Options, Response>(
-        &mut self,
+        &self,
         uri: WaapiFunction,
         args: Option<Args>,
         options: Option<Options>,
@@ -159,7 +242,7 @@ impl WaapiClient {
     ///
     /// Use for endpoints that return no useful data.
     pub async fn call_typed_void<Args, Options>(
-        &mut self,
+        &self,
         uri: WaapiFunction,
         args: Option<Args>,
         options: Option<Options>,
@@ -180,7 +263,7 @@ impl WaapiClient {
     /// receiver does not unsubscribe on the server; call [`WaapiClient::unsubscribe`]
     /// with the returned subscription id when done.
     pub async fn subscribe(
-        &mut self,
+        &self,
         topic: WaapiTopic,
         options: Option<Value>,
     ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)> {
@@ -192,7 +275,7 @@ impl WaapiClient {
     /// Prefer [`WaapiClient::subscribe`] or [`WaapiClient::subscribe_typed`] when
     /// subscribing to known WAAPI topics.
     pub async fn subscribe_raw(
-        &mut self,
+        &self,
         topic: &str,
         options: Option<Value>,
     ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)> {
@@ -200,7 +283,7 @@ impl WaapiClient {
         let id = self
             .wamp
             .as_ref()
-            .ok_or_else(|| WaapiError::Connection("client shutdown".to_string()))?
+            .ok_or(WaapiError::ClientShutdown)?
             .subscribe(topic, options, tx)
             .await
             .map_err(WaapiError::from)?;
@@ -211,7 +294,7 @@ impl WaapiClient {
     ///
     /// Serializes typed options before subscribing.
     pub async fn subscribe_typed<Options>(
-        &mut self,
+        &self,
         topic: WaapiTopic,
         options: Option<Options>,
     ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Event>)>
@@ -229,7 +312,7 @@ impl WaapiClient {
     /// deserialized into `Payload`. Events whose payload fails to deserialize
     /// are logged and skipped rather than propagated.
     pub async fn subscribe_payload<Options, Payload>(
-        &mut self,
+        &self,
         topic: WaapiTopic,
         options: Option<Options>,
     ) -> WaapiResult<(u64, mpsc::UnboundedReceiver<Payload>)>
@@ -262,10 +345,10 @@ impl WaapiClient {
     }
 
     /// Unsubscribe from a previously subscribed topic.
-    pub async fn unsubscribe(&mut self, subscription_id: u64) -> WaapiResult<()> {
+    pub async fn unsubscribe(&self, subscription_id: u64) -> WaapiResult<()> {
         self.wamp
             .as_ref()
-            .ok_or_else(|| WaapiError::Connection("client shutdown".to_string()))?
+            .ok_or(WaapiError::ClientShutdown)?
             .unsubscribe(subscription_id)
             .await
             .map_err(WaapiError::from)

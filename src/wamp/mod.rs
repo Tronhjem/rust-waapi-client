@@ -486,7 +486,7 @@ mod tests {
             assert!(matches!(goodbye, Message::Goodbye(_, _)));
         });
 
-        let mut client = crate::WaapiClient::new(Some(&addr.to_string()))
+        let client = crate::WaapiClient::new(Some(&addr.to_string()))
             .await
             .unwrap();
 
@@ -543,7 +543,7 @@ mod tests {
             let _ = read.next().await;
         });
 
-        let mut client = crate::WaapiClient::new(Some(&addr.to_string()))
+        let client = crate::WaapiClient::new(Some(&addr.to_string()))
             .await
             .unwrap();
         let err = client
@@ -625,7 +625,7 @@ mod tests {
             assert!(matches!(goodbye, Message::Goodbye(_, _)));
         });
 
-        let mut client = crate::WaapiClient::new(Some(&addr.to_string()))
+        let client = crate::WaapiClient::new(Some(&addr.to_string()))
             .await
             .unwrap();
 
@@ -644,6 +644,11 @@ mod tests {
             .await
             .expect_err("Expected WaapiError::Call from WAMP ERROR response");
         assert!(matches!(err, crate::WaapiError::Call(_)));
+        assert_eq!(err.error_uri(), Some("ak.wwise.invalid_arguments"));
+        assert_eq!(
+            err.waapi_message(),
+            Some("'parent' already has child with same name.")
+        );
 
         // Verify the same session remains healthy for subsequent typed calls
         let got = client

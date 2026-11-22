@@ -261,7 +261,7 @@ async fn object_references_and_event_wiring_sequence() {
 #[tokio::test]
 async fn conflict_strategies_and_list_modes_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 

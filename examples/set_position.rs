@@ -6,17 +6,17 @@
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example set_position
 
-use wwise_waapi::api::generated::ak::soundengine::SoundengineSetPositionArgs;
-use wwise_waapi::{GameObjectRef, Position, Vector3, WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::soundengine::SetPositionArgs;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(None).await?;
+    let client = WaapiClient::connect().await?;
 
-    let args = SoundengineSetPositionArgs::new(
-        GameObjectRef::game_object(1122334),
+    let args = SetPositionArgs::new(
+        GameObjectRef::id(1122334),
         Position::with_orientations(
             Vector3::new(5.0, 10.0, 100.0),
             Vector3::new(100.0, 200.0, 0.0),

@@ -8,34 +8,32 @@
 //! Sound object in the current project.
 //! Run with: cargo run --example object_get_properties
 
-use wwise_waapi::api::generated::ak::wwise::core::object::{
-    CoreObjectGetArgs, CoreObjectGetOptions,
-};
-use wwise_waapi::api::generated::primitives::ObjectReturnField;
-use wwise_waapi::{Property, WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::wwise::core::object::GetArgs;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(None).await?;
+    let client = WaapiClient::connect().await?;
 
     // `$ from type Sound` returns every Sound object in the project.
-    let args = CoreObjectGetArgs::from_waql("$ from type Sound");
+    let args = GetArgs::from_waql("$ from type Sound");
 
-    // Request the @Volume property and @OutputBus reference for each result.
-    let options = CoreObjectGetOptions::new().return_fields([
-        ObjectReturnField::Property(Property::Volume),
-        ObjectReturnField::Property(Property::OutputBus),
-    ]);
+    // Request the name, @Volume property, and @OutputBus reference for each result.
+    let options = [
+        ObjectReturnField::Name,
+        ObjectReturnField::property(Property::Volume),
+        ObjectReturnField::property(Property::OutputBus),
+    ];
 
-    let response = client.wwise().core().object().get(args, options).await?;
+    let response = client.object().get(args, options).await?;
 
     for obj in &response.objects {
         println!(
             "{:?}: Volume = {:?}, OutputBus = {:?}",
-            obj.name,
-            obj.property(Property::Volume),
+            obj.name(),
+            obj.property_f64(Property::Volume),
             obj.property(Property::OutputBus),
         );
     }

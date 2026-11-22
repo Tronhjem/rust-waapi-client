@@ -7,16 +7,16 @@
 //! parent GUID with a GUID (or path) from your own project.
 //! Run with: cargo run --example create_object
 
-use wwise_waapi::api::generated::ak::wwise::core::object::CoreObjectCreateArgs;
-use wwise_waapi::{ChildObject, ObjectRef, ObjectType, WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::wwise::core::object::CreateArgs;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(None).await?;
+    let client = WaapiClient::connect().await?;
 
-    let args = CoreObjectCreateArgs::new(
+    let args = CreateArgs::new(
         ObjectRef::guid("{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"),
         ObjectType::RandomSequenceContainer,
         "Boom",
@@ -27,11 +27,11 @@ async fn main() -> WaapiResult<()> {
         ChildObject::new(ObjectType::Sound, "B"),
     ]);
 
-    let response = client.wwise().core().object().create(args).await?;
+    let response = client.object().create(args).await?;
 
-    println!("Created: {:?} ({:?})", response.name, response.id);
+    println!("Created: {:?} ({:?})", response.name(), response.id());
     for child in &response.children {
-        println!("  child: {:?} ({:?})", child.name, child.id);
+        println!("  child: {:?} ({:?})", child.name(), child.id());
     }
 
     client.shutdown().await?;

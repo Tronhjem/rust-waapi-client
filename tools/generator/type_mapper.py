@@ -229,6 +229,8 @@ class Field:
 def field_name(uri: str, wire: str, kind: str) -> str:
     if kind == "response" and (uri, wire) in RESULT_FIELD_NAMES:
         return RESULT_FIELD_NAMES[(uri, wire)]
+    if kind == "options" and wire == "return":
+        return "return_fields"
     if wire in FIELD_NAME_OVERRIDES:
         return FIELD_NAME_OVERRIDES[wire]
     return snake_case(wire)

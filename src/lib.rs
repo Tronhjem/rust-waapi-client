@@ -7,9 +7,10 @@
 //! # Quick Start (Chained Typed API)
 //!
 //! The chained API on [`WaapiClient`] mirrors WAAPI URI dot-notation
-//! (e.g., `ak.wwise.core.object.get` -> `client.wwise().core().object().get(...)`).
-//! Intermediate namespace clients borrow `&mut self`, so they can be stored and
-//! reused across multiple calls:
+//! (e.g., `ak.wwise.core.object.get` -> `client.object().get(...)` or
+//! `client.wwise().core().object().get(...)`).
+//! Intermediate namespace clients borrow `&self` and implement `Copy`, so they
+//! can be stored, copied, and reused concurrently across multiple calls:
 //!
 //! ```no_run
 //! use wwise_waapi::api::ak::wwise::core::object::{CreateArgs, GetOptions};
@@ -17,7 +18,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::connect().await?;
+//!     let client = WaapiClient::connect().await?;
 //!
 //!     // Top-level shortcuts (`client.core()`, `client.object()`, `client.ui()`, `client.soundengine()`):
 //!     let info = client.core().get_info().await?;
@@ -54,7 +55,7 @@
 //!             .property(Property::Volume, -6.0),
 //!         )
 //!         .await?;
-//!     println!("Created sound id: {:?}", created.id);
+//!     println!("Created sound id: {:?}", created.id());
 //!
 //!     client.shutdown().await?;
 //!     Ok(())
@@ -72,13 +73,13 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::connect().await?;
+//!     let client = WaapiClient::connect().await?;
 //!
 //!     let (sub_id, mut rx) = client
 //!         .object()
 //!         .subscribe_created(Some(
 //!             CreatedOptions::new()
-//!                 .return_(vec![ObjectReturnField::Id, ObjectReturnField::Name]),
+//!                 .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]),
 //!         ))
 //!         .await?;
 //!
@@ -103,7 +104,7 @@
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let mut client = WaapiClient::connect().await?;
+//!     let client = WaapiClient::connect().await?;
 //!     let res = client
 //!         .call(
 //!             WaapiFunction::ak_wwise_core_object_get,
@@ -131,7 +132,7 @@ mod waapi_client;
 mod wamp;
 
 pub use serde_json;
-pub use waapi_client::{Event, WaapiClient, WaapiError, WaapiResult};
+pub use waapi_client::{Event, WaapiCallError, WaapiClient, WaapiError, WaapiResult};
 
 /// Convenience wrapper around `serde_json::json!`.
 ///
@@ -160,5 +161,7 @@ pub mod prelude {
         Property, PropertyValue, RtpcRef, SoundEngineObjectRef, Transform, TransformSelect,
         Vector3, WwiseObject, WwiseObjectRef,
     };
-    pub use crate::{Event, WaapiClient, WaapiError, WaapiFunction, WaapiResult, WaapiTopic};
+    pub use crate::{
+        Event, WaapiCallError, WaapiClient, WaapiError, WaapiFunction, WaapiResult, WaapiTopic,
+    };
 }

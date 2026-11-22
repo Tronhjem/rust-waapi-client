@@ -21,7 +21,7 @@ pub struct CoreObjectCreatedPayload {
 pub struct CoreObjectCreatedOptions {
     /// Data to be returned for every object being created.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<ObjectReturnField>>,
+    pub return_fields: Option<Vec<ObjectReturnField>>,
     /// The ID (GUID) of the platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<String>,
@@ -34,15 +34,46 @@ impl CoreObjectCreatedOptions {
     }
 
     /// Data to be returned for every object being created.
-    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields(return_fields)
     }
 
     /// The ID (GUID) of the platform.
     pub fn platform(mut self, platform: impl Into<String>) -> Self {
         self.platform = Some(platform.into());
         self
+    }
+}
+
+impl From<()> for CoreObjectCreatedOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[ObjectReturnField; N]> for CoreObjectCreatedOptions {
+    fn from(return_fields: [ObjectReturnField; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<ObjectReturnField>> for CoreObjectCreatedOptions {
+    fn from(return_fields: Vec<ObjectReturnField>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

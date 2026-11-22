@@ -376,20 +376,21 @@ use crate::api::generated::ak::wwise::waapi::WaapiGetTopicsResponse;
 use crate::api::generated::ak::wwise::waapi::{WaapiGetSchemaArgs, WaapiGetSchemaResponse};
 
 /// Typed client for the `ak` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct AkClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> AkClient<'a> {
     /// Access the `ak.soundengine` WAAPI namespace.
-    pub fn soundengine(&mut self) -> SoundengineClient<'_> {
+    pub fn soundengine(&self) -> SoundengineClient<'a> {
         SoundengineClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise` WAAPI namespace.
-    pub fn wwise(&mut self) -> WwiseClient<'_> {
+    pub fn wwise(&self) -> WwiseClient<'a> {
         WwiseClient {
             client: self.client,
         }
@@ -397,8 +398,9 @@ impl<'a> AkClient<'a> {
 }
 
 /// Typed client for the `ak.soundengine` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct SoundengineClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> SoundengineClient<'a> {
@@ -406,7 +408,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.executeActionOnEvent`.
     pub async fn execute_action_on_event(
-        &mut self,
+        &self,
         args: impl Into<SoundengineExecuteActionOnEventArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineExecuteActionOnEventArgs = args.into();
@@ -424,11 +426,12 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.getState`.
     pub async fn get_state(
-        &mut self,
+        &self,
         args: impl Into<SoundengineGetStateArgs>,
-        options: SoundengineGetStateOptions,
+        options: impl Into<SoundengineGetStateOptions>,
     ) -> WaapiResult<SoundengineGetStateResponse> {
         let args: SoundengineGetStateArgs = args.into();
+        let options: SoundengineGetStateOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_soundengine_getState,
@@ -442,11 +445,12 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.getSwitch`.
     pub async fn get_switch(
-        &mut self,
+        &self,
         args: impl Into<SoundengineGetSwitchArgs>,
-        options: SoundengineGetSwitchOptions,
+        options: impl Into<SoundengineGetSwitchOptions>,
     ) -> WaapiResult<SoundengineGetSwitchResponse> {
         let args: SoundengineGetSwitchArgs = args.into();
+        let options: SoundengineGetSwitchOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_soundengine_getSwitch,
@@ -459,7 +463,7 @@ impl<'a> SoundengineClient<'a> {
     /// Load a SoundBank. See `AK::SoundEngine::LoadBank`.
     ///
     /// WAAPI endpoint: `ak.soundengine.loadBank`.
-    pub async fn load_bank(&mut self, args: impl Into<SoundengineLoadBankArgs>) -> WaapiResult<()> {
+    pub async fn load_bank(&self, args: impl Into<SoundengineLoadBankArgs>) -> WaapiResult<()> {
         let args: SoundengineLoadBankArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_loadBank, Some(args), None)
@@ -471,7 +475,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.postEvent`.
     pub async fn post_event(
-        &mut self,
+        &self,
         args: impl Into<SoundenginePostEventArgs>,
     ) -> WaapiResult<SoundenginePostEventResponse> {
         let args: SoundenginePostEventArgs = args.into();
@@ -484,7 +488,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.postMsgMonitor`.
     pub async fn post_msg_monitor(
-        &mut self,
+        &self,
         args: impl Into<SoundenginePostMsgMonitorArgs>,
     ) -> WaapiResult<()> {
         let args: SoundenginePostMsgMonitorArgs = args.into();
@@ -502,7 +506,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.postTrigger`.
     pub async fn post_trigger(
-        &mut self,
+        &self,
         args: impl Into<SoundenginePostTriggerArgs>,
     ) -> WaapiResult<()> {
         let args: SoundenginePostTriggerArgs = args.into();
@@ -516,7 +520,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.registerGameObj`.
     pub async fn register_game_obj(
-        &mut self,
+        &self,
         args: impl Into<SoundengineRegisterGameObjArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineRegisterGameObjArgs = args.into();
@@ -534,7 +538,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.resetRTPCValue`.
     pub async fn reset_rtpc_value(
-        &mut self,
+        &self,
         args: impl Into<SoundengineResetRtpcValueArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineResetRtpcValueArgs = args.into();
@@ -552,7 +556,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.seekOnEvent`.
     pub async fn seek_on_event(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSeekOnEventArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSeekOnEventArgs = args.into();
@@ -566,7 +570,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setDefaultListeners`.
     pub async fn set_default_listeners(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetDefaultListenersArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetDefaultListenersArgs = args.into();
@@ -584,7 +588,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setGameObjectAuxSendValues`.
     pub async fn set_game_object_aux_send_values(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetGameObjectAuxSendValuesArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetGameObjectAuxSendValuesArgs = args.into();
@@ -602,7 +606,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setGameObjectOutputBusVolume`.
     pub async fn set_game_object_output_bus_volume(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetGameObjectOutputBusVolumeArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetGameObjectOutputBusVolumeArgs = args.into();
@@ -620,7 +624,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setListenerSpatialization`.
     pub async fn set_listener_spatialization(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetListenerSpatializationArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetListenerSpatializationArgs = args.into();
@@ -638,7 +642,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setListeners`.
     pub async fn set_listeners(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetListenersArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetListenersArgs = args.into();
@@ -652,7 +656,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setMultiplePositions`.
     pub async fn set_multiple_positions(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetMultiplePositionsArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetMultiplePositionsArgs = args.into();
@@ -670,7 +674,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setObjectObstructionAndOcclusion`.
     pub async fn set_object_obstruction_and_occlusion(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetObjectObstructionAndOcclusionArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetObjectObstructionAndOcclusionArgs = args.into();
@@ -688,7 +692,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setPosition`.
     pub async fn set_position(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetPositionArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetPositionArgs = args.into();
@@ -702,7 +706,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setRTPCValue`.
     pub async fn set_rtpc_value(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetRtpcValueArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetRtpcValueArgs = args.into();
@@ -716,7 +720,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.setScalingFactor`.
     pub async fn set_scaling_factor(
-        &mut self,
+        &self,
         args: impl Into<SoundengineSetScalingFactorArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineSetScalingFactorArgs = args.into();
@@ -733,7 +737,7 @@ impl<'a> SoundengineClient<'a> {
     /// Sets the State of a State Group. See `AK::SoundEngine::SetState`.
     ///
     /// WAAPI endpoint: `ak.soundengine.setState`.
-    pub async fn set_state(&mut self, args: impl Into<SoundengineSetStateArgs>) -> WaapiResult<()> {
+    pub async fn set_state(&self, args: impl Into<SoundengineSetStateArgs>) -> WaapiResult<()> {
         let args: SoundengineSetStateArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setState, Some(args), None)
@@ -744,10 +748,7 @@ impl<'a> SoundengineClient<'a> {
     /// Sets the State of a Switch Group. See `AK::SoundEngine::SetSwitch`.
     ///
     /// WAAPI endpoint: `ak.soundengine.setSwitch`.
-    pub async fn set_switch(
-        &mut self,
-        args: impl Into<SoundengineSetSwitchArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn set_switch(&self, args: impl Into<SoundengineSetSwitchArgs>) -> WaapiResult<()> {
         let args: SoundengineSetSwitchArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_setSwitch, Some(args), None)
@@ -758,7 +759,7 @@ impl<'a> SoundengineClient<'a> {
     /// Stop playing the current content associated to the specified game object ID. If no game object is specified, all sounds are stopped. See `AK::SoundEngine::StopAll`.
     ///
     /// WAAPI endpoint: `ak.soundengine.stopAll`.
-    pub async fn stop_all(&mut self, args: impl Into<SoundengineStopAllArgs>) -> WaapiResult<()> {
+    pub async fn stop_all(&self, args: impl Into<SoundengineStopAllArgs>) -> WaapiResult<()> {
         let args: SoundengineStopAllArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_stopAll, Some(args), None)
@@ -770,7 +771,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.stopPlayingID`.
     pub async fn stop_playing_id(
-        &mut self,
+        &self,
         args: impl Into<SoundengineStopPlayingIdArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineStopPlayingIdArgs = args.into();
@@ -787,10 +788,7 @@ impl<'a> SoundengineClient<'a> {
     /// Unload a SoundBank. See `AK::SoundEngine::UnloadBank`.
     ///
     /// WAAPI endpoint: `ak.soundengine.unloadBank`.
-    pub async fn unload_bank(
-        &mut self,
-        args: impl Into<SoundengineUnloadBankArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn unload_bank(&self, args: impl Into<SoundengineUnloadBankArgs>) -> WaapiResult<()> {
         let args: SoundengineUnloadBankArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_soundengine_unloadBank, Some(args), None)
@@ -802,7 +800,7 @@ impl<'a> SoundengineClient<'a> {
     ///
     /// WAAPI endpoint: `ak.soundengine.unregisterGameObj`.
     pub async fn unregister_game_obj(
-        &mut self,
+        &self,
         args: impl Into<SoundengineUnregisterGameObjArgs>,
     ) -> WaapiResult<()> {
         let args: SoundengineUnregisterGameObjArgs = args.into();
@@ -818,34 +816,35 @@ impl<'a> SoundengineClient<'a> {
 }
 
 /// Typed client for the `ak.wwise` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseClient<'a> {
     /// Access the `ak.wwise.core` WAAPI namespace.
-    pub fn core(&mut self) -> WwiseCoreClient<'_> {
+    pub fn core(&self) -> WwiseCoreClient<'a> {
         WwiseCoreClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.debug` WAAPI namespace.
-    pub fn debug(&mut self) -> WwiseDebugClient<'_> {
+    pub fn debug(&self) -> WwiseDebugClient<'a> {
         WwiseDebugClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui` WAAPI namespace.
-    pub fn ui(&mut self) -> WwiseUiClient<'_> {
+    pub fn ui(&self) -> WwiseUiClient<'a> {
         WwiseUiClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.waapi` WAAPI namespace.
-    pub fn waapi(&mut self) -> WwiseWaapiClient<'_> {
+    pub fn waapi(&self) -> WwiseWaapiClient<'a> {
         WwiseWaapiClient {
             client: self.client,
         }
@@ -853,125 +852,126 @@ impl<'a> WwiseClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreClient<'a> {
     /// Access the `ak.wwise.core.audio` WAAPI namespace.
-    pub fn audio(&mut self) -> WwiseCoreAudioClient<'_> {
+    pub fn audio(&self) -> WwiseCoreAudioClient<'a> {
         WwiseCoreAudioClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.audioSourcePeaks` WAAPI namespace.
-    pub fn audio_source_peaks(&mut self) -> WwiseCoreAudioSourcePeaksClient<'_> {
+    pub fn audio_source_peaks(&self) -> WwiseCoreAudioSourcePeaksClient<'a> {
         WwiseCoreAudioSourcePeaksClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.blendContainer` WAAPI namespace.
-    pub fn blend_container(&mut self) -> WwiseCoreBlendContainerClient<'_> {
+    pub fn blend_container(&self) -> WwiseCoreBlendContainerClient<'a> {
         WwiseCoreBlendContainerClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.gameParameter` WAAPI namespace.
-    pub fn game_parameter(&mut self) -> WwiseCoreGameParameterClient<'_> {
+    pub fn game_parameter(&self) -> WwiseCoreGameParameterClient<'a> {
         WwiseCoreGameParameterClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.log` WAAPI namespace.
-    pub fn log(&mut self) -> WwiseCoreLogClient<'_> {
+    pub fn log(&self) -> WwiseCoreLogClient<'a> {
         WwiseCoreLogClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.mediaPool` WAAPI namespace.
-    pub fn media_pool(&mut self) -> WwiseCoreMediaPoolClient<'_> {
+    pub fn media_pool(&self) -> WwiseCoreMediaPoolClient<'a> {
         WwiseCoreMediaPoolClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.object` WAAPI namespace.
-    pub fn object(&mut self) -> WwiseCoreObjectClient<'_> {
+    pub fn object(&self) -> WwiseCoreObjectClient<'a> {
         WwiseCoreObjectClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.profiler` WAAPI namespace.
-    pub fn profiler(&mut self) -> WwiseCoreProfilerClient<'_> {
+    pub fn profiler(&self) -> WwiseCoreProfilerClient<'a> {
         WwiseCoreProfilerClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.project` WAAPI namespace.
-    pub fn project(&mut self) -> WwiseCoreProjectClient<'_> {
+    pub fn project(&self) -> WwiseCoreProjectClient<'a> {
         WwiseCoreProjectClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.remote` WAAPI namespace.
-    pub fn remote(&mut self) -> WwiseCoreRemoteClient<'_> {
+    pub fn remote(&self) -> WwiseCoreRemoteClient<'a> {
         WwiseCoreRemoteClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.sound` WAAPI namespace.
-    pub fn sound(&mut self) -> WwiseCoreSoundClient<'_> {
+    pub fn sound(&self) -> WwiseCoreSoundClient<'a> {
         WwiseCoreSoundClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.soundbank` WAAPI namespace.
-    pub fn soundbank(&mut self) -> WwiseCoreSoundbankClient<'_> {
+    pub fn soundbank(&self) -> WwiseCoreSoundbankClient<'a> {
         WwiseCoreSoundbankClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.sourceControl` WAAPI namespace.
-    pub fn source_control(&mut self) -> WwiseCoreSourceControlClient<'_> {
+    pub fn source_control(&self) -> WwiseCoreSourceControlClient<'a> {
         WwiseCoreSourceControlClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.switchContainer` WAAPI namespace.
-    pub fn switch_container(&mut self) -> WwiseCoreSwitchContainerClient<'_> {
+    pub fn switch_container(&self) -> WwiseCoreSwitchContainerClient<'a> {
         WwiseCoreSwitchContainerClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.transport` WAAPI namespace.
-    pub fn transport(&mut self) -> WwiseCoreTransportClient<'_> {
+    pub fn transport(&self) -> WwiseCoreTransportClient<'a> {
         WwiseCoreTransportClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.undo` WAAPI namespace.
-    pub fn undo(&mut self) -> WwiseCoreUndoClient<'_> {
+    pub fn undo(&self) -> WwiseCoreUndoClient<'a> {
         WwiseCoreUndoClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.core.workUnit` WAAPI namespace.
-    pub fn work_unit(&mut self) -> WwiseCoreWorkUnitClient<'_> {
+    pub fn work_unit(&self) -> WwiseCoreWorkUnitClient<'a> {
         WwiseCoreWorkUnitClient {
             client: self.client,
         }
@@ -981,7 +981,7 @@ impl<'a> WwiseCoreClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.executeLuaScript`.
     pub async fn execute_lua_script(
-        &mut self,
+        &self,
         args: impl Into<CoreExecuteLuaScriptArgs>,
     ) -> WaapiResult<CoreExecuteLuaScriptResponse> {
         let args: CoreExecuteLuaScriptArgs = args.into();
@@ -997,7 +997,7 @@ impl<'a> WwiseCoreClient<'a> {
     /// Retrieve global Wwise information.
     ///
     /// WAAPI endpoint: `ak.wwise.core.getInfo`.
-    pub async fn get_info(&mut self) -> WaapiResult<CoreGetInfoResponse> {
+    pub async fn get_info(&self) -> WaapiResult<CoreGetInfoResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getInfo, None, None)
             .await
@@ -1006,7 +1006,7 @@ impl<'a> WwiseCoreClient<'a> {
     /// Retrieve information about the current project opened, including platforms, languages and project directories.
     ///
     /// WAAPI endpoint: `ak.wwise.core.getProjectInfo`.
-    pub async fn get_project_info(&mut self) -> WaapiResult<CoreGetProjectInfoResponse> {
+    pub async fn get_project_info(&self) -> WaapiResult<CoreGetProjectInfoResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_getProjectInfo, None, None)
             .await
@@ -1015,7 +1015,7 @@ impl<'a> WwiseCoreClient<'a> {
     /// Verify if WAAPI is currently available.
     ///
     /// WAAPI endpoint: `ak.wwise.core.ping`.
-    pub async fn ping(&mut self) -> WaapiResult<CorePingResponse> {
+    pub async fn ping(&self) -> WaapiResult<CorePingResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_ping, None, None)
             .await
@@ -1023,18 +1023,16 @@ impl<'a> WwiseCoreClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.debug` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseDebugClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseDebugClient<'a> {
     /// Enables debug assertions. Every call to enableAsserts with 'false' increments the ref count. Calling with true decrements the ref count. This is only available with Debug builds.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.enableAsserts`.
-    pub async fn enable_asserts(
-        &mut self,
-        args: impl Into<DebugEnableAssertsArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn enable_asserts(&self, args: impl Into<DebugEnableAssertsArgs>) -> WaapiResult<()> {
         let args: DebugEnableAssertsArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -1050,7 +1048,7 @@ impl<'a> WwiseDebugClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.debug.enableAutomationMode`.
     pub async fn enable_automation_mode(
-        &mut self,
+        &self,
         args: impl Into<DebugEnableAutomationModeArgs>,
     ) -> WaapiResult<()> {
         let args: DebugEnableAutomationModeArgs = args.into();
@@ -1068,7 +1066,7 @@ impl<'a> WwiseDebugClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.debug.generateToneWAV`.
     pub async fn generate_tone_wav(
-        &mut self,
+        &self,
         args: impl Into<DebugGenerateToneWavArgs>,
     ) -> WaapiResult<()> {
         let args: DebugGenerateToneWavArgs = args.into();
@@ -1085,7 +1083,7 @@ impl<'a> WwiseDebugClient<'a> {
     /// Retrieves the WAL tree, which describes the nodes that are synchronized in the Sound Engine. Private use only.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.getWalTree`.
-    pub async fn get_wal_tree(&mut self) -> WaapiResult<DebugGetWalTreeResponse> {
+    pub async fn get_wal_tree(&self) -> WaapiResult<DebugGetWalTreeResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_debug_getWalTree, None, None)
             .await
@@ -1094,7 +1092,7 @@ impl<'a> WwiseDebugClient<'a> {
     /// Restart WAAPI servers. For internal use only.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.restartWaapiServers`.
-    pub async fn restart_waapi_servers(&mut self) -> WaapiResult<()> {
+    pub async fn restart_waapi_servers(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(
                 WaapiFunction::ak_wwise_debug_restartWaapiServers,
@@ -1108,7 +1106,7 @@ impl<'a> WwiseDebugClient<'a> {
     /// Private use only.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.testAssert`.
-    pub async fn test_assert(&mut self) -> WaapiResult<()> {
+    pub async fn test_assert(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_debug_testAssert, None, None)
             .await?;
@@ -1118,7 +1116,7 @@ impl<'a> WwiseDebugClient<'a> {
     /// Private use only.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.testCrash`.
-    pub async fn test_crash(&mut self) -> WaapiResult<()> {
+    pub async fn test_crash(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_debug_testCrash, None, None)
             .await?;
@@ -1128,10 +1126,7 @@ impl<'a> WwiseDebugClient<'a> {
     /// Validate the arguments, options and result of a WAAPI function call. Does not actually call the function. This is only available with Debug builds.
     ///
     /// WAAPI endpoint: `ak.wwise.debug.validateCall`.
-    pub async fn validate_call(
-        &mut self,
-        args: impl Into<DebugValidateCallArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn validate_call(&self, args: impl Into<DebugValidateCallArgs>) -> WaapiResult<()> {
         let args: DebugValidateCallArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_debug_validateCall, Some(args), None)
@@ -1143,7 +1138,7 @@ impl<'a> WwiseDebugClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.debug.assertFailed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assert_failed(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<DebugAssertFailedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_debug_assertFailed, None)
@@ -1152,55 +1147,56 @@ impl<'a> WwiseDebugClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiClient<'a> {
     /// Access the `ak.wwise.ui.cli` WAAPI namespace.
-    pub fn cli(&mut self) -> WwiseUiCliClient<'_> {
+    pub fn cli(&self) -> WwiseUiCliClient<'a> {
         WwiseUiCliClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.commands` WAAPI namespace.
-    pub fn commands(&mut self) -> WwiseUiCommandsClient<'_> {
+    pub fn commands(&self) -> WwiseUiCommandsClient<'a> {
         WwiseUiCommandsClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.layout` WAAPI namespace.
-    pub fn layout(&mut self) -> WwiseUiLayoutClient<'_> {
+    pub fn layout(&self) -> WwiseUiLayoutClient<'a> {
         WwiseUiLayoutClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.model` WAAPI namespace.
-    pub fn model(&mut self) -> WwiseUiModelClient<'_> {
+    pub fn model(&self) -> WwiseUiModelClient<'a> {
         WwiseUiModelClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.project` WAAPI namespace.
-    pub fn project(&mut self) -> WwiseUiProjectClient<'_> {
+    pub fn project(&self) -> WwiseUiProjectClient<'a> {
         WwiseUiProjectClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.signal` WAAPI namespace.
-    pub fn signal(&mut self) -> WwiseUiSignalClient<'_> {
+    pub fn signal(&self) -> WwiseUiSignalClient<'a> {
         WwiseUiSignalClient {
             client: self.client,
         }
     }
 
     /// Access the `ak.wwise.ui.window` WAAPI namespace.
-    pub fn window(&mut self) -> WwiseUiWindowClient<'_> {
+    pub fn window(&self) -> WwiseUiWindowClient<'a> {
         WwiseUiWindowClient {
             client: self.client,
         }
@@ -1209,7 +1205,7 @@ impl<'a> WwiseUiClient<'a> {
     /// Bring Wwise main window to foreground. See SetForegroundWindow and AllowSetForegroundWindow on MSDN for more information on the restrictions. See ak.wwise.core.getInfo to obtain the Wwise process ID for AllowSetForegroundWindow.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.bringToForeground`.
-    pub async fn bring_to_foreground(&mut self) -> WaapiResult<()> {
+    pub async fn bring_to_foreground(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_ui_bringToForeground, None, None)
             .await?;
@@ -1220,7 +1216,7 @@ impl<'a> WwiseUiClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.captureScreen`.
     pub async fn capture_screen(
-        &mut self,
+        &self,
         args: impl Into<UiCaptureScreenArgs>,
     ) -> WaapiResult<UiCaptureScreenResponse> {
         let args: UiCaptureScreenArgs = args.into();
@@ -1232,7 +1228,7 @@ impl<'a> WwiseUiClient<'a> {
     /// Retrieves the list of files currently selected by the user in the active view. Note that this function is not available in WwiseConsole.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.getSelectedFiles`.
-    pub async fn get_selected_files(&mut self) -> WaapiResult<UiGetSelectedFilesResponse> {
+    pub async fn get_selected_files(&self) -> WaapiResult<UiGetSelectedFilesResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_getSelectedFiles, None, None)
             .await
@@ -1242,9 +1238,10 @@ impl<'a> WwiseUiClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.getSelectedObjects`.
     pub async fn get_selected_objects(
-        &mut self,
-        options: UiGetSelectedObjectsOptions,
+        &self,
+        options: impl Into<UiGetSelectedObjectsOptions>,
     ) -> WaapiResult<UiGetSelectedObjectsResponse> {
+        let options: UiGetSelectedObjectsOptions = options.into();
         self.client
             .call_typed::<(), _, _>(
                 WaapiFunction::ak_wwise_ui_getSelectedObjects,
@@ -1258,7 +1255,7 @@ impl<'a> WwiseUiClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.ui.selectionChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_selection_changed(
-        &mut self,
+        &self,
         options: Option<UiSelectionChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSelectionChangedPayload>)> {
         self.client
@@ -1268,15 +1265,16 @@ impl<'a> WwiseUiClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.waapi` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseWaapiClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseWaapiClient<'a> {
     /// Retrieves the list of functions.
     ///
     /// WAAPI endpoint: `ak.wwise.waapi.getFunctions`.
-    pub async fn get_functions(&mut self) -> WaapiResult<WaapiGetFunctionsResponse> {
+    pub async fn get_functions(&self) -> WaapiResult<WaapiGetFunctionsResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_waapi_getFunctions, None, None)
             .await
@@ -1286,7 +1284,7 @@ impl<'a> WwiseWaapiClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.waapi.getSchema`.
     pub async fn get_schema(
-        &mut self,
+        &self,
         args: impl Into<WaapiGetSchemaArgs>,
     ) -> WaapiResult<WaapiGetSchemaResponse> {
         let args: WaapiGetSchemaArgs = args.into();
@@ -1298,7 +1296,7 @@ impl<'a> WwiseWaapiClient<'a> {
     /// Retrieves the list of topics to which a client can subscribe.
     ///
     /// WAAPI endpoint: `ak.wwise.waapi.getTopics`.
-    pub async fn get_topics(&mut self) -> WaapiResult<WaapiGetTopicsResponse> {
+    pub async fn get_topics(&self) -> WaapiResult<WaapiGetTopicsResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_waapi_getTopics, None, None)
             .await
@@ -1306,8 +1304,9 @@ impl<'a> WwiseWaapiClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.audio` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreAudioClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreAudioClient<'a> {
@@ -1315,7 +1314,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.convert`.
     pub async fn convert(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioConvertArgs>,
     ) -> WaapiResult<CoreAudioConvertResponse> {
         let args: CoreAudioConvertArgs = args.into();
@@ -1328,11 +1327,12 @@ impl<'a> WwiseCoreAudioClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.import`.
     pub async fn import(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioImportArgs>,
-        options: CoreAudioImportOptions,
+        options: impl Into<CoreAudioImportOptions>,
     ) -> WaapiResult<CoreAudioImportResponse> {
         let args: CoreAudioImportArgs = args.into();
+        let options: CoreAudioImportOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_audio_import,
@@ -1346,11 +1346,12 @@ impl<'a> WwiseCoreAudioClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.importTabDelimited`.
     pub async fn import_tab_delimited(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioImportTabDelimitedArgs>,
-        options: CoreAudioImportTabDelimitedOptions,
+        options: impl Into<CoreAudioImportTabDelimitedOptions>,
     ) -> WaapiResult<CoreAudioImportTabDelimitedResponse> {
         let args: CoreAudioImportTabDelimitedArgs = args.into();
+        let options: CoreAudioImportTabDelimitedOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_audio_importTabDelimited,
@@ -1363,7 +1364,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     /// Mutes an object.
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.mute`.
-    pub async fn mute(&mut self, args: impl Into<CoreAudioMuteArgs>) -> WaapiResult<()> {
+    pub async fn mute(&self, args: impl Into<CoreAudioMuteArgs>) -> WaapiResult<()> {
         let args: CoreAudioMuteArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_mute, Some(args), None)
@@ -1374,7 +1375,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     /// Unmute all muted objects.
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.resetMute`.
-    pub async fn reset_mute(&mut self) -> WaapiResult<()> {
+    pub async fn reset_mute(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetMute, None, None)
             .await?;
@@ -1384,7 +1385,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     /// Unsolo all soloed objects.
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.resetSolo`.
-    pub async fn reset_solo(&mut self) -> WaapiResult<()> {
+    pub async fn reset_solo(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_audio_resetSolo, None, None)
             .await?;
@@ -1395,7 +1396,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.setConversionPlugin`.
     pub async fn set_conversion_plugin(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioSetConversionPluginArgs>,
     ) -> WaapiResult<()> {
         let args: CoreAudioSetConversionPluginArgs = args.into();
@@ -1412,7 +1413,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     /// Solos an object.
     ///
     /// WAAPI endpoint: `ak.wwise.core.audio.solo`.
-    pub async fn solo(&mut self, args: impl Into<CoreAudioSoloArgs>) -> WaapiResult<()> {
+    pub async fn solo(&self, args: impl Into<CoreAudioSoloArgs>) -> WaapiResult<()> {
         let args: CoreAudioSoloArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_audio_solo, Some(args), None)
@@ -1424,7 +1425,7 @@ impl<'a> WwiseCoreAudioClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.audio.imported` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_imported(
-        &mut self,
+        &self,
         options: Option<CoreAudioImportedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreAudioImportedPayload>)> {
         self.client
@@ -1434,8 +1435,9 @@ impl<'a> WwiseCoreAudioClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.audioSourcePeaks` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreAudioSourcePeaksClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreAudioSourcePeaksClient<'a> {
@@ -1443,7 +1445,7 @@ impl<'a> WwiseCoreAudioSourcePeaksClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInRegion`.
     pub async fn get_min_max_peaks_in_region(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs>,
     ) -> WaapiResult<CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse> {
         let args: CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs = args.into();
@@ -1460,7 +1462,7 @@ impl<'a> WwiseCoreAudioSourcePeaksClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInTrimmedRegion`.
     pub async fn get_min_max_peaks_in_trimmed_region(
-        &mut self,
+        &self,
         args: impl Into<CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs>,
     ) -> WaapiResult<CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse> {
         let args: CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs = args.into();
@@ -1475,8 +1477,9 @@ impl<'a> WwiseCoreAudioSourcePeaksClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.blendContainer` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreBlendContainerClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreBlendContainerClient<'a> {
@@ -1484,7 +1487,7 @@ impl<'a> WwiseCoreBlendContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.blendContainer.addAssignment`.
     pub async fn add_assignment(
-        &mut self,
+        &self,
         args: impl Into<CoreBlendContainerAddAssignmentArgs>,
     ) -> WaapiResult<CoreBlendContainerAddAssignmentResponse> {
         let args: CoreBlendContainerAddAssignmentArgs = args.into();
@@ -1501,7 +1504,7 @@ impl<'a> WwiseCoreBlendContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.blendContainer.addTrack`.
     pub async fn add_track(
-        &mut self,
+        &self,
         args: impl Into<CoreBlendContainerAddTrackArgs>,
     ) -> WaapiResult<CoreBlendContainerAddTrackResponse> {
         let args: CoreBlendContainerAddTrackArgs = args.into();
@@ -1518,7 +1521,7 @@ impl<'a> WwiseCoreBlendContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.blendContainer.getAssignments`.
     pub async fn get_assignments(
-        &mut self,
+        &self,
         args: impl Into<CoreBlendContainerGetAssignmentsArgs>,
     ) -> WaapiResult<CoreBlendContainerGetAssignmentsResponse> {
         let args: CoreBlendContainerGetAssignmentsArgs = args.into();
@@ -1535,7 +1538,7 @@ impl<'a> WwiseCoreBlendContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.blendContainer.removeAssignment`.
     pub async fn remove_assignment(
-        &mut self,
+        &self,
         args: impl Into<CoreBlendContainerRemoveAssignmentArgs>,
     ) -> WaapiResult<()> {
         let args: CoreBlendContainerRemoveAssignmentArgs = args.into();
@@ -1551,8 +1554,9 @@ impl<'a> WwiseCoreBlendContainerClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.gameParameter` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreGameParameterClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreGameParameterClient<'a> {
@@ -1560,7 +1564,7 @@ impl<'a> WwiseCoreGameParameterClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.gameParameter.setRange`.
     pub async fn set_range(
-        &mut self,
+        &self,
         args: impl Into<CoreGameParameterSetRangeArgs>,
     ) -> WaapiResult<()> {
         let args: CoreGameParameterSetRangeArgs = args.into();
@@ -1576,15 +1580,16 @@ impl<'a> WwiseCoreGameParameterClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.log` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreLogClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreLogClient<'a> {
     /// Adds a new item to the logs on the specified channel.
     ///
     /// WAAPI endpoint: `ak.wwise.core.log.addItem`.
-    pub async fn add_item(&mut self, args: impl Into<CoreLogAddItemArgs>) -> WaapiResult<()> {
+    pub async fn add_item(&self, args: impl Into<CoreLogAddItemArgs>) -> WaapiResult<()> {
         let args: CoreLogAddItemArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_log_addItem, Some(args), None)
@@ -1595,7 +1600,7 @@ impl<'a> WwiseCoreLogClient<'a> {
     /// Clears the logs on the specified channel.
     ///
     /// WAAPI endpoint: `ak.wwise.core.log.clear`.
-    pub async fn clear(&mut self, args: impl Into<CoreLogClearArgs>) -> WaapiResult<()> {
+    pub async fn clear(&self, args: impl Into<CoreLogClearArgs>) -> WaapiResult<()> {
         let args: CoreLogClearArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_log_clear, Some(args), None)
@@ -1606,10 +1611,7 @@ impl<'a> WwiseCoreLogClient<'a> {
     /// Retrieves the latest log for a specific channel. See `ak.wwise.core.log.itemAdded` to be notified when an item is added to the log. The log is empty when used in WwiseConsole.
     ///
     /// WAAPI endpoint: `ak.wwise.core.log.get`.
-    pub async fn get(
-        &mut self,
-        args: impl Into<CoreLogGetArgs>,
-    ) -> WaapiResult<CoreLogGetResponse> {
+    pub async fn get(&self, args: impl Into<CoreLogGetArgs>) -> WaapiResult<CoreLogGetResponse> {
         let args: CoreLogGetArgs = args.into();
         self.client
             .call_typed::<_, (), _>(WaapiFunction::ak_wwise_core_log_get, Some(args), None)
@@ -1620,7 +1622,7 @@ impl<'a> WwiseCoreLogClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.log.itemAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_item_added(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreLogItemAddedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_log_itemAdded, None)
@@ -1629,8 +1631,9 @@ impl<'a> WwiseCoreLogClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.mediaPool` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreMediaPoolClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreMediaPoolClient<'a> {
@@ -1638,11 +1641,12 @@ impl<'a> WwiseCoreMediaPoolClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.mediaPool.get`.
     pub async fn get(
-        &mut self,
+        &self,
         args: impl Into<CoreMediaPoolGetArgs>,
-        options: CoreMediaPoolGetOptions,
+        options: impl Into<CoreMediaPoolGetOptions>,
     ) -> WaapiResult<CoreMediaPoolGetResponse> {
         let args: CoreMediaPoolGetArgs = args.into();
+        let options: CoreMediaPoolGetOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_mediaPool_get,
@@ -1655,7 +1659,7 @@ impl<'a> WwiseCoreMediaPoolClient<'a> {
     /// Retrieve all fields present in the Media Pool. You can then use the fields to query the Media Pool. The Media Pool discovers some fields when it scans audio files. Others, such as WAV fields, are always available.
     ///
     /// WAAPI endpoint: `ak.wwise.core.mediaPool.getFields`.
-    pub async fn get_fields(&mut self) -> WaapiResult<CoreMediaPoolGetFieldsResponse> {
+    pub async fn get_fields(&self) -> WaapiResult<CoreMediaPoolGetFieldsResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_mediaPool_getFields, None, None)
             .await
@@ -1663,8 +1667,9 @@ impl<'a> WwiseCoreMediaPoolClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.object` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreObjectClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreObjectClient<'a> {
@@ -1672,11 +1677,12 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.copy`.
     pub async fn copy(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectCopyArgs>,
-        options: CoreObjectCopyOptions,
+        options: impl Into<CoreObjectCopyOptions>,
     ) -> WaapiResult<CoreObjectCopyResponse> {
         let args: CoreObjectCopyArgs = args.into();
+        let options: CoreObjectCopyOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_object_copy,
@@ -1690,7 +1696,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.create`.
     pub async fn create(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectCreateArgs>,
     ) -> WaapiResult<CoreObjectCreateResponse> {
         let args: CoreObjectCreateArgs = args.into();
@@ -1702,7 +1708,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// Deletes the specified object. Note that if a Work Unit is deleted, the operation cannot be undone and the project will be saved.
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.delete`.
-    pub async fn delete(&mut self, args: impl Into<CoreObjectDeleteArgs>) -> WaapiResult<()> {
+    pub async fn delete(&self, args: impl Into<CoreObjectDeleteArgs>) -> WaapiResult<()> {
         let args: CoreObjectDeleteArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_object_delete, Some(args), None)
@@ -1714,7 +1720,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.diff`.
     pub async fn diff(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectDiffArgs>,
     ) -> WaapiResult<CoreObjectDiffResponse> {
         let args: CoreObjectDiffArgs = args.into();
@@ -1727,11 +1733,12 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.get`.
     pub async fn get(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectGetArgs>,
-        options: CoreObjectGetOptions,
+        options: impl Into<CoreObjectGetOptions>,
     ) -> WaapiResult<CoreObjectGetResponse> {
         let args: CoreObjectGetArgs = args.into();
+        let options: CoreObjectGetOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_object_get,
@@ -1745,7 +1752,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.getAttenuationCurve`.
     pub async fn get_attenuation_curve(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectGetAttenuationCurveArgs>,
     ) -> WaapiResult<CoreObjectGetAttenuationCurveResponse> {
         let args: CoreObjectGetAttenuationCurveArgs = args.into();
@@ -1762,7 +1769,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.getPropertyAndReferenceNames`.
     pub async fn get_property_and_reference_names(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectGetPropertyAndReferenceNamesArgs>,
     ) -> WaapiResult<CoreObjectGetPropertyAndReferenceNamesResponse> {
         let args: CoreObjectGetPropertyAndReferenceNamesArgs = args.into();
@@ -1779,7 +1786,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.getPropertyInfo`.
     pub async fn get_property_info(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectGetPropertyInfoArgs>,
     ) -> WaapiResult<CoreObjectGetPropertyInfoResponse> {
         let args: CoreObjectGetPropertyInfoArgs = args.into();
@@ -1795,7 +1802,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// Retrieves the list of all object types registered in Wwise's object model. This function returns the equivalent of the Wwise Objects Reference.
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.getTypes`.
-    pub async fn get_types(&mut self) -> WaapiResult<CoreObjectGetTypesResponse> {
+    pub async fn get_types(&self) -> WaapiResult<CoreObjectGetTypesResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_object_getTypes, None, None)
             .await
@@ -1805,7 +1812,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.isLinked`.
     pub async fn is_linked(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectIsLinkedArgs>,
     ) -> WaapiResult<CoreObjectIsLinkedResponse> {
         let args: CoreObjectIsLinkedArgs = args.into();
@@ -1822,7 +1829,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.isPropertyEnabled`.
     pub async fn is_property_enabled(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectIsPropertyEnabledArgs>,
     ) -> WaapiResult<CoreObjectIsPropertyEnabledResponse> {
         let args: CoreObjectIsPropertyEnabledArgs = args.into();
@@ -1839,7 +1846,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.move`.
     pub async fn move_(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectMoveArgs>,
     ) -> WaapiResult<CoreObjectMoveResponse> {
         let args: CoreObjectMoveArgs = args.into();
@@ -1852,7 +1859,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.pasteProperties`.
     pub async fn paste_properties(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectPastePropertiesArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectPastePropertiesArgs = args.into();
@@ -1870,11 +1877,12 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.set`.
     pub async fn set(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetArgs>,
-        options: CoreObjectSetOptions,
+        options: impl Into<CoreObjectSetOptions>,
     ) -> WaapiResult<CoreObjectSetResponse> {
         let args: CoreObjectSetArgs = args.into();
+        let options: CoreObjectSetOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_object_set,
@@ -1888,7 +1896,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setAttenuationCurve`.
     pub async fn set_attenuation_curve(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetAttenuationCurveArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetAttenuationCurveArgs = args.into();
@@ -1905,10 +1913,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// Link or unlink a property/reference or object list to a particular platform.
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setLinked`.
-    pub async fn set_linked(
-        &mut self,
-        args: impl Into<CoreObjectSetLinkedArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn set_linked(&self, args: impl Into<CoreObjectSetLinkedArgs>) -> WaapiResult<()> {
         let args: CoreObjectSetLinkedArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -1923,7 +1928,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// Renames an object.
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setName`.
-    pub async fn set_name(&mut self, args: impl Into<CoreObjectSetNameArgs>) -> WaapiResult<()> {
+    pub async fn set_name(&self, args: impl Into<CoreObjectSetNameArgs>) -> WaapiResult<()> {
         let args: CoreObjectSetNameArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -1938,7 +1943,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     /// Sets the object's notes.
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setNotes`.
-    pub async fn set_notes(&mut self, args: impl Into<CoreObjectSetNotesArgs>) -> WaapiResult<()> {
+    pub async fn set_notes(&self, args: impl Into<CoreObjectSetNotesArgs>) -> WaapiResult<()> {
         let args: CoreObjectSetNotesArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -1954,7 +1959,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setProperty`.
     pub async fn set_property(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetPropertyArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetPropertyArgs = args.into();
@@ -1972,7 +1977,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setRandomizer`.
     pub async fn set_randomizer(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetRandomizerArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetRandomizerArgs = args.into();
@@ -1990,7 +1995,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setReference`.
     pub async fn set_reference(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetReferenceArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetReferenceArgs = args.into();
@@ -2008,7 +2013,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setStateGroups`.
     pub async fn set_state_groups(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetStateGroupsArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetStateGroupsArgs = args.into();
@@ -2026,7 +2031,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.object.setStateProperties`.
     pub async fn set_state_properties(
-        &mut self,
+        &self,
         args: impl Into<CoreObjectSetStatePropertiesArgs>,
     ) -> WaapiResult<()> {
         let args: CoreObjectSetStatePropertiesArgs = args.into();
@@ -2044,7 +2049,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.attenuationCurveChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_attenuation_curve_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectAttenuationCurveChangedOptions>,
     ) -> WaapiResult<(
         u64,
@@ -2062,7 +2067,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.attenuationCurveLinkChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_attenuation_curve_link_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectAttenuationCurveLinkChangedOptions>,
     ) -> WaapiResult<(
         u64,
@@ -2080,7 +2085,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.childAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_child_added(
-        &mut self,
+        &self,
         options: Option<CoreObjectChildAddedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectChildAddedPayload>)> {
         self.client
@@ -2092,7 +2097,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.childRemoved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_child_removed(
-        &mut self,
+        &self,
         options: Option<CoreObjectChildRemovedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectChildRemovedPayload>)> {
         self.client
@@ -2104,7 +2109,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.created` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_created(
-        &mut self,
+        &self,
         options: Option<CoreObjectCreatedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectCreatedPayload>)> {
         self.client
@@ -2116,7 +2121,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.curveChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_curve_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectCurveChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectCurveChangedPayload>)> {
         self.client
@@ -2128,7 +2133,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.nameChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_name_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectNameChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectNameChangedPayload>)> {
         self.client
@@ -2140,7 +2145,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.notesChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_notes_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectNotesChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectNotesChangedPayload>)> {
         self.client
@@ -2152,7 +2157,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.postDeleted` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_post_deleted(
-        &mut self,
+        &self,
         options: Option<CoreObjectPostDeletedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPostDeletedPayload>)> {
         self.client
@@ -2164,7 +2169,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.preDeleted` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_pre_deleted(
-        &mut self,
+        &self,
         options: Option<CoreObjectPreDeletedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPreDeletedPayload>)> {
         self.client
@@ -2176,7 +2181,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.propertyChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_property_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectPropertyChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectPropertyChangedPayload>)> {
         self.client
@@ -2188,7 +2193,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.referenceChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_reference_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectReferenceChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectReferenceChangedPayload>)> {
         self.client
@@ -2200,7 +2205,7 @@ impl<'a> WwiseCoreObjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.object.structureChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_structure_changed(
-        &mut self,
+        &self,
         options: Option<CoreObjectStructureChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreObjectStructureChangedPayload>)> {
         self.client
@@ -2210,13 +2215,14 @@ impl<'a> WwiseCoreObjectClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.profiler` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreProfilerClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreProfilerClient<'a> {
     /// Access the `ak.wwise.core.profiler.captureLog` WAAPI namespace.
-    pub fn capture_log(&mut self) -> WwiseCoreProfilerCaptureLogClient<'_> {
+    pub fn capture_log(&self) -> WwiseCoreProfilerCaptureLogClient<'a> {
         WwiseCoreProfilerCaptureLogClient {
             client: self.client,
         }
@@ -2226,7 +2232,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.enableProfilerData`.
     pub async fn enable_profiler_data(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerEnableProfilerDataArgs>,
     ) -> WaapiResult<()> {
         let args: CoreProfilerEnableProfilerDataArgs = args.into();
@@ -2244,11 +2250,12 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getAudioObjects`.
     pub async fn get_audio_objects(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetAudioObjectsArgs>,
-        options: CoreProfilerGetAudioObjectsOptions,
+        options: impl Into<CoreProfilerGetAudioObjectsOptions>,
     ) -> WaapiResult<CoreProfilerGetAudioObjectsResponse> {
         let args: CoreProfilerGetAudioObjectsArgs = args.into();
+        let options: CoreProfilerGetAudioObjectsOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_profiler_getAudioObjects,
@@ -2262,11 +2269,12 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getBusses`.
     pub async fn get_busses(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetBussesArgs>,
-        options: CoreProfilerGetBussesOptions,
+        options: impl Into<CoreProfilerGetBussesOptions>,
     ) -> WaapiResult<CoreProfilerGetBussesResponse> {
         let args: CoreProfilerGetBussesArgs = args.into();
+        let options: CoreProfilerGetBussesOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_profiler_getBusses,
@@ -2280,7 +2288,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getCpuUsage`.
     pub async fn get_cpu_usage(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetCpuUsageArgs>,
     ) -> WaapiResult<CoreProfilerGetCpuUsageResponse> {
         let args: CoreProfilerGetCpuUsageArgs = args.into();
@@ -2297,7 +2305,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getCursorTime`.
     pub async fn get_cursor_time(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetCursorTimeArgs>,
     ) -> WaapiResult<CoreProfilerGetCursorTimeResponse> {
         let args: CoreProfilerGetCursorTimeArgs = args.into();
@@ -2314,7 +2322,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getGameObjects`.
     pub async fn get_game_objects(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetGameObjectsArgs>,
     ) -> WaapiResult<CoreProfilerGetGameObjectsResponse> {
         let args: CoreProfilerGetGameObjectsArgs = args.into();
@@ -2331,7 +2339,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getLoadedMedia`.
     pub async fn get_loaded_media(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetLoadedMediaArgs>,
     ) -> WaapiResult<CoreProfilerGetLoadedMediaResponse> {
         let args: CoreProfilerGetLoadedMediaArgs = args.into();
@@ -2348,11 +2356,12 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getMeters`.
     pub async fn get_meters(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetMetersArgs>,
-        options: CoreProfilerGetMetersOptions,
+        options: impl Into<CoreProfilerGetMetersOptions>,
     ) -> WaapiResult<CoreProfilerGetMetersResponse> {
         let args: CoreProfilerGetMetersArgs = args.into();
+        let options: CoreProfilerGetMetersOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_profiler_getMeters,
@@ -2366,7 +2375,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getPerformanceMonitor`.
     pub async fn get_performance_monitor(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetPerformanceMonitorArgs>,
     ) -> WaapiResult<CoreProfilerGetPerformanceMonitorResponse> {
         let args: CoreProfilerGetPerformanceMonitorArgs = args.into();
@@ -2383,7 +2392,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getRTPCs`.
     pub async fn get_rtp_cs(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetRtpCsArgs>,
     ) -> WaapiResult<CoreProfilerGetRtpCsResponse> {
         let args: CoreProfilerGetRtpCsArgs = args.into();
@@ -2400,7 +2409,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getStreamedMedia`.
     pub async fn get_streamed_media(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetStreamedMediaArgs>,
     ) -> WaapiResult<CoreProfilerGetStreamedMediaResponse> {
         let args: CoreProfilerGetStreamedMediaArgs = args.into();
@@ -2417,7 +2426,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getVoiceContributions`.
     pub async fn get_voice_contributions(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetVoiceContributionsArgs>,
     ) -> WaapiResult<CoreProfilerGetVoiceContributionsResponse> {
         let args: CoreProfilerGetVoiceContributionsArgs = args.into();
@@ -2434,11 +2443,12 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.getVoices`.
     pub async fn get_voices(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerGetVoicesArgs>,
-        options: CoreProfilerGetVoicesOptions,
+        options: impl Into<CoreProfilerGetVoicesOptions>,
     ) -> WaapiResult<CoreProfilerGetVoicesResponse> {
         let args: CoreProfilerGetVoicesArgs = args.into();
+        let options: CoreProfilerGetVoicesOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_profiler_getVoices,
@@ -2452,7 +2462,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.moveCursor`.
     pub async fn move_cursor(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerMoveCursorArgs>,
     ) -> WaapiResult<CoreProfilerMoveCursorResponse> {
         let args: CoreProfilerMoveCursorArgs = args.into();
@@ -2469,7 +2479,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.registerMeter`.
     pub async fn register_meter(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerRegisterMeterArgs>,
     ) -> WaapiResult<()> {
         let args: CoreProfilerRegisterMeterArgs = args.into();
@@ -2487,7 +2497,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.saveCapture`.
     pub async fn save_capture(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerSaveCaptureArgs>,
     ) -> WaapiResult<()> {
         let args: CoreProfilerSaveCaptureArgs = args.into();
@@ -2505,7 +2515,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.setCursorTime`.
     pub async fn set_cursor_time(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerSetCursorTimeArgs>,
     ) -> WaapiResult<CoreProfilerSetCursorTimeResponse> {
         let args: CoreProfilerSetCursorTimeArgs = args.into();
@@ -2521,7 +2531,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     /// Starts the profiler capture and returns the time at the beginning of the capture, in milliseconds.
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.startCapture`.
-    pub async fn start_capture(&mut self) -> WaapiResult<CoreProfilerStartCaptureResponse> {
+    pub async fn start_capture(&self) -> WaapiResult<CoreProfilerStartCaptureResponse> {
         self.client
             .call_typed::<(), (), _>(
                 WaapiFunction::ak_wwise_core_profiler_startCapture,
@@ -2534,7 +2544,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     /// Stops the profiler capture and returns the time at the end of the capture, in milliseconds.
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.stopCapture`.
-    pub async fn stop_capture(&mut self) -> WaapiResult<CoreProfilerStopCaptureResponse> {
+    pub async fn stop_capture(&self) -> WaapiResult<CoreProfilerStopCaptureResponse> {
         self.client
             .call_typed::<(), (), _>(
                 WaapiFunction::ak_wwise_core_profiler_stopCapture,
@@ -2548,7 +2558,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.unregisterMeter`.
     pub async fn unregister_meter(
-        &mut self,
+        &self,
         args: impl Into<CoreProfilerUnregisterMeterArgs>,
     ) -> WaapiResult<()> {
         let args: CoreProfilerUnregisterMeterArgs = args.into();
@@ -2566,7 +2576,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.gameObjectRegistered` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_registered(
-        &mut self,
+        &self,
     ) -> WaapiResult<(
         u64,
         UnboundedReceiver<CoreProfilerGameObjectRegisteredPayload>,
@@ -2583,7 +2593,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.gameObjectReset` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_reset(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerGameObjectResetPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_profiler_gameObjectReset, None)
@@ -2594,7 +2604,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.gameObjectUnregistered` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_game_object_unregistered(
-        &mut self,
+        &self,
     ) -> WaapiResult<(
         u64,
         UnboundedReceiver<CoreProfilerGameObjectUnregisteredPayload>,
@@ -2611,7 +2621,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.stateChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_state_changed(
-        &mut self,
+        &self,
         options: Option<CoreProfilerStateChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerStateChangedPayload>)> {
         self.client
@@ -2623,7 +2633,7 @@ impl<'a> WwiseCoreProfilerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.switchChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_switch_changed(
-        &mut self,
+        &self,
         options: Option<CoreProfilerSwitchChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProfilerSwitchChangedPayload>)> {
         self.client
@@ -2633,15 +2643,16 @@ impl<'a> WwiseCoreProfilerClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.project` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreProjectClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreProjectClient<'a> {
     /// Saves the current project.
     ///
     /// WAAPI endpoint: `ak.wwise.core.project.save`.
-    pub async fn save(&mut self, args: impl Into<CoreProjectSaveArgs>) -> WaapiResult<()> {
+    pub async fn save(&self, args: impl Into<CoreProjectSaveArgs>) -> WaapiResult<()> {
         let args: CoreProjectSaveArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_project_save, Some(args), None)
@@ -2653,7 +2664,7 @@ impl<'a> WwiseCoreProjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.project.loaded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_loaded(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectLoadedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_loaded, None)
@@ -2664,7 +2675,7 @@ impl<'a> WwiseCoreProjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.project.postClosed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_post_closed(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectPostClosedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_postClosed, None)
@@ -2675,7 +2686,7 @@ impl<'a> WwiseCoreProjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.project.preClosed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_pre_closed(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectPreClosedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_preClosed, None)
@@ -2686,7 +2697,7 @@ impl<'a> WwiseCoreProjectClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.project.saved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_saved(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreProjectSavedPayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_project_saved, None)
@@ -2695,15 +2706,16 @@ impl<'a> WwiseCoreProjectClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.remote` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreRemoteClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreRemoteClient<'a> {
     /// Connects the Wwise Authoring application to a Wwise Sound Engine running executable or to a saved profile file. The host must be running code with communication enabled. If only "host" is provided, Wwise connects to the first Sound Engine instance found. To distinguish between different instances, you can also provide the name of the application to connect to.
     ///
     /// WAAPI endpoint: `ak.wwise.core.remote.connect`.
-    pub async fn connect(&mut self, args: impl Into<CoreRemoteConnectArgs>) -> WaapiResult<()> {
+    pub async fn connect(&self, args: impl Into<CoreRemoteConnectArgs>) -> WaapiResult<()> {
         let args: CoreRemoteConnectArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -2718,7 +2730,7 @@ impl<'a> WwiseCoreRemoteClient<'a> {
     /// Disconnects the Wwise Authoring application from a connected Wwise Sound Engine running executable.
     ///
     /// WAAPI endpoint: `ak.wwise.core.remote.disconnect`.
-    pub async fn disconnect(&mut self) -> WaapiResult<()> {
+    pub async fn disconnect(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_remote_disconnect, None, None)
             .await?;
@@ -2729,7 +2741,7 @@ impl<'a> WwiseCoreRemoteClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.remote.getAvailableConsoles`.
     pub async fn get_available_consoles(
-        &mut self,
+        &self,
     ) -> WaapiResult<CoreRemoteGetAvailableConsolesResponse> {
         self.client
             .call_typed::<(), (), _>(
@@ -2744,7 +2756,7 @@ impl<'a> WwiseCoreRemoteClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.remote.getConnectionStatus`.
     pub async fn get_connection_status(
-        &mut self,
+        &self,
     ) -> WaapiResult<CoreRemoteGetConnectionStatusResponse> {
         self.client
             .call_typed::<(), (), _>(
@@ -2757,8 +2769,9 @@ impl<'a> WwiseCoreRemoteClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.sound` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreSoundClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreSoundClient<'a> {
@@ -2766,7 +2779,7 @@ impl<'a> WwiseCoreSoundClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sound.setActiveSource`.
     pub async fn set_active_source(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundSetActiveSourceArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSoundSetActiveSourceArgs = args.into();
@@ -2782,8 +2795,9 @@ impl<'a> WwiseCoreSoundClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.soundbank` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreSoundbankClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreSoundbankClient<'a> {
@@ -2791,7 +2805,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.soundbank.convertExternalSources`.
     pub async fn convert_external_sources(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundbankConvertExternalSourcesArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSoundbankConvertExternalSourcesArgs = args.into();
@@ -2809,7 +2823,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.soundbank.generate`.
     pub async fn generate(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundbankGenerateArgs>,
     ) -> WaapiResult<CoreSoundbankGenerateResponse> {
         let args: CoreSoundbankGenerateArgs = args.into();
@@ -2826,7 +2840,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.soundbank.getInclusions`.
     pub async fn get_inclusions(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundbankGetInclusionsArgs>,
     ) -> WaapiResult<CoreSoundbankGetInclusionsResponse> {
         let args: CoreSoundbankGetInclusionsArgs = args.into();
@@ -2843,7 +2857,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.soundbank.processDefinitionFiles`.
     pub async fn process_definition_files(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundbankProcessDefinitionFilesArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSoundbankProcessDefinitionFilesArgs = args.into();
@@ -2861,7 +2875,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.soundbank.setInclusions`.
     pub async fn set_inclusions(
-        &mut self,
+        &self,
         args: impl Into<CoreSoundbankSetInclusionsArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSoundbankSetInclusionsArgs = args.into();
@@ -2879,7 +2893,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.soundbank.generated` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_generated(
-        &mut self,
+        &self,
         options: Option<CoreSoundbankGeneratedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreSoundbankGeneratedPayload>)> {
         self.client
@@ -2891,7 +2905,7 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.soundbank.generationDone` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_generation_done(
-        &mut self,
+        &self,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreSoundbankGenerationDonePayload>)> {
         self.client
             .subscribe_payload::<(), _>(WaapiTopic::ak_wwise_core_soundbank_generationDone, None)
@@ -2900,8 +2914,9 @@ impl<'a> WwiseCoreSoundbankClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.sourceControl` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreSourceControlClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreSourceControlClient<'a> {
@@ -2909,7 +2924,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.add`.
     pub async fn add(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlAddArgs>,
     ) -> WaapiResult<CoreSourceControlAddResponse> {
         let args: CoreSourceControlAddArgs = args.into();
@@ -2926,7 +2941,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.checkOut`.
     pub async fn check_out(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlCheckOutArgs>,
     ) -> WaapiResult<CoreSourceControlCheckOutResponse> {
         let args: CoreSourceControlCheckOutArgs = args.into();
@@ -2943,7 +2958,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.commit`.
     pub async fn commit(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlCommitArgs>,
     ) -> WaapiResult<CoreSourceControlCommitResponse> {
         let args: CoreSourceControlCommitArgs = args.into();
@@ -2960,7 +2975,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.delete`.
     pub async fn delete(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlDeleteArgs>,
     ) -> WaapiResult<CoreSourceControlDeleteResponse> {
         let args: CoreSourceControlDeleteArgs = args.into();
@@ -2977,11 +2992,12 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.getSourceFiles`.
     pub async fn get_source_files(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlGetSourceFilesArgs>,
-        options: CoreSourceControlGetSourceFilesOptions,
+        options: impl Into<CoreSourceControlGetSourceFilesOptions>,
     ) -> WaapiResult<CoreSourceControlGetSourceFilesResponse> {
         let args: CoreSourceControlGetSourceFilesArgs = args.into();
+        let options: CoreSourceControlGetSourceFilesOptions = options.into();
         self.client
             .call_typed(
                 WaapiFunction::ak_wwise_core_sourceControl_getSourceFiles,
@@ -2995,7 +3011,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.getStatus`.
     pub async fn get_status(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlGetStatusArgs>,
     ) -> WaapiResult<CoreSourceControlGetStatusResponse> {
         let args: CoreSourceControlGetStatusArgs = args.into();
@@ -3012,7 +3028,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.move`.
     pub async fn move_(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlMoveArgs>,
     ) -> WaapiResult<CoreSourceControlMoveResponse> {
         let args: CoreSourceControlMoveArgs = args.into();
@@ -3029,7 +3045,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.revert`.
     pub async fn revert(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlRevertArgs>,
     ) -> WaapiResult<CoreSourceControlRevertResponse> {
         let args: CoreSourceControlRevertArgs = args.into();
@@ -3046,7 +3062,7 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.sourceControl.setProvider`.
     pub async fn set_provider(
-        &mut self,
+        &self,
         args: impl Into<CoreSourceControlSetProviderArgs>,
     ) -> WaapiResult<CoreSourceControlSetProviderResponse> {
         let args: CoreSourceControlSetProviderArgs = args.into();
@@ -3061,8 +3077,9 @@ impl<'a> WwiseCoreSourceControlClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.switchContainer` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreSwitchContainerClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreSwitchContainerClient<'a> {
@@ -3070,7 +3087,7 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.switchContainer.addAssignment`.
     pub async fn add_assignment(
-        &mut self,
+        &self,
         args: impl Into<CoreSwitchContainerAddAssignmentArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSwitchContainerAddAssignmentArgs = args.into();
@@ -3088,7 +3105,7 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.switchContainer.getAssignments`.
     pub async fn get_assignments(
-        &mut self,
+        &self,
         args: impl Into<CoreSwitchContainerGetAssignmentsArgs>,
     ) -> WaapiResult<CoreSwitchContainerGetAssignmentsResponse> {
         let args: CoreSwitchContainerGetAssignmentsArgs = args.into();
@@ -3105,7 +3122,7 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.switchContainer.removeAssignment`.
     pub async fn remove_assignment(
-        &mut self,
+        &self,
         args: impl Into<CoreSwitchContainerRemoveAssignmentArgs>,
     ) -> WaapiResult<()> {
         let args: CoreSwitchContainerRemoveAssignmentArgs = args.into();
@@ -3123,7 +3140,7 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.switchContainer.assignmentAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assignment_added(
-        &mut self,
+        &self,
         options: Option<CoreSwitchContainerAssignmentAddedOptions>,
     ) -> WaapiResult<(
         u64,
@@ -3141,7 +3158,7 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.switchContainer.assignmentRemoved` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_assignment_removed(
-        &mut self,
+        &self,
         options: Option<CoreSwitchContainerAssignmentRemovedOptions>,
     ) -> WaapiResult<(
         u64,
@@ -3157,8 +3174,9 @@ impl<'a> WwiseCoreSwitchContainerClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.transport` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreTransportClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreTransportClient<'a> {
@@ -3166,7 +3184,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.create`.
     pub async fn create(
-        &mut self,
+        &self,
         args: impl Into<CoreTransportCreateArgs>,
     ) -> WaapiResult<CoreTransportCreateResponse> {
         let args: CoreTransportCreateArgs = args.into();
@@ -3182,7 +3200,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     /// Destroys the given transport object.
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.destroy`.
-    pub async fn destroy(&mut self, args: impl Into<CoreTransportDestroyArgs>) -> WaapiResult<()> {
+    pub async fn destroy(&self, args: impl Into<CoreTransportDestroyArgs>) -> WaapiResult<()> {
         let args: CoreTransportDestroyArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3198,7 +3216,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.executeAction`.
     pub async fn execute_action(
-        &mut self,
+        &self,
         args: impl Into<CoreTransportExecuteActionArgs>,
     ) -> WaapiResult<()> {
         let args: CoreTransportExecuteActionArgs = args.into();
@@ -3215,7 +3233,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     /// Returns the list of transport objects.
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.getList`.
-    pub async fn get_list(&mut self) -> WaapiResult<CoreTransportGetListResponse> {
+    pub async fn get_list(&self) -> WaapiResult<CoreTransportGetListResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_core_transport_getList, None, None)
             .await
@@ -3225,7 +3243,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.getState`.
     pub async fn get_state(
-        &mut self,
+        &self,
         args: impl Into<CoreTransportGetStateArgs>,
     ) -> WaapiResult<CoreTransportGetStateResponse> {
         let args: CoreTransportGetStateArgs = args.into();
@@ -3241,7 +3259,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     /// Prepare the object and its dependencies for playback. Use this function before calling PostEventSync or PostMIDIOnEventSync from IAkGlobalPluginContext.
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.prepare`.
-    pub async fn prepare(&mut self, args: impl Into<CoreTransportPrepareArgs>) -> WaapiResult<()> {
+    pub async fn prepare(&self, args: impl Into<CoreTransportPrepareArgs>) -> WaapiResult<()> {
         let args: CoreTransportPrepareArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3257,7 +3275,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.core.transport.useOriginals`.
     pub async fn use_originals(
-        &mut self,
+        &self,
         args: impl Into<CoreTransportUseOriginalsArgs>,
     ) -> WaapiResult<()> {
         let args: CoreTransportUseOriginalsArgs = args.into();
@@ -3275,7 +3293,7 @@ impl<'a> WwiseCoreTransportClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.transport.stateChanged` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_state_changed(
-        &mut self,
+        &self,
         options: Option<CoreTransportStateChangedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<CoreTransportStateChangedPayload>)> {
         self.client
@@ -3285,15 +3303,16 @@ impl<'a> WwiseCoreTransportClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.undo` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreUndoClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreUndoClient<'a> {
     /// Begins an undo group. Make sure to call `ak.wwise.core.undo.endGroup` exactly once for every ak.wwise.core.beginUndoGroup call you make. Calls to ak.wwise.core.undo.beginGroup can be nested. When closing a WAMP session, a check is made to ensure that all undo groups are closed. If not, a cancelGroup is called for each of the groups still open.
     ///
     /// WAAPI endpoint: `ak.wwise.core.undo.beginGroup`.
-    pub async fn begin_group(&mut self) -> WaapiResult<()> {
+    pub async fn begin_group(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_beginGroup, None, None)
             .await?;
@@ -3303,10 +3322,7 @@ impl<'a> WwiseCoreUndoClient<'a> {
     /// Cancels the last undo group.
     ///
     /// WAAPI endpoint: `ak.wwise.core.undo.cancelGroup`.
-    pub async fn cancel_group(
-        &mut self,
-        args: impl Into<CoreUndoCancelGroupArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn cancel_group(&self, args: impl Into<CoreUndoCancelGroupArgs>) -> WaapiResult<()> {
         let args: CoreUndoCancelGroupArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3321,7 +3337,7 @@ impl<'a> WwiseCoreUndoClient<'a> {
     /// Ends the last undo group.
     ///
     /// WAAPI endpoint: `ak.wwise.core.undo.endGroup`.
-    pub async fn end_group(&mut self, args: impl Into<CoreUndoEndGroupArgs>) -> WaapiResult<()> {
+    pub async fn end_group(&self, args: impl Into<CoreUndoEndGroupArgs>) -> WaapiResult<()> {
         let args: CoreUndoEndGroupArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_undo_endGroup, Some(args), None)
@@ -3332,7 +3348,7 @@ impl<'a> WwiseCoreUndoClient<'a> {
     /// Redoes the last operation in the Undo stack.
     ///
     /// WAAPI endpoint: `ak.wwise.core.undo.redo`.
-    pub async fn redo(&mut self) -> WaapiResult<()> {
+    pub async fn redo(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_redo, None, None)
             .await?;
@@ -3342,7 +3358,7 @@ impl<'a> WwiseCoreUndoClient<'a> {
     /// Undoes the last operation in the Undo stack.
     ///
     /// WAAPI endpoint: `ak.wwise.core.undo.undo`.
-    pub async fn undo(&mut self) -> WaapiResult<()> {
+    pub async fn undo(&self) -> WaapiResult<()> {
         self.client
             .call_typed_void::<(), ()>(WaapiFunction::ak_wwise_core_undo_undo, None, None)
             .await?;
@@ -3351,15 +3367,16 @@ impl<'a> WwiseCoreUndoClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.workUnit` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreWorkUnitClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreWorkUnitClient<'a> {
     /// Load a Work Unit that was previously unloaded. The Undo history will be cleared.
     ///
     /// WAAPI endpoint: `ak.wwise.core.workUnit.load`.
-    pub async fn load(&mut self, args: impl Into<CoreWorkUnitLoadArgs>) -> WaapiResult<()> {
+    pub async fn load(&self, args: impl Into<CoreWorkUnitLoadArgs>) -> WaapiResult<()> {
         let args: CoreWorkUnitLoadArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_core_workUnit_load, Some(args), None)
@@ -3370,7 +3387,7 @@ impl<'a> WwiseCoreWorkUnitClient<'a> {
     /// Unload a Work Unit. No object contained in the Work Unit will be available after this call. If the Work Unit is modified and not saved, the function will return error. The Undo history will be cleared.
     ///
     /// WAAPI endpoint: `ak.wwise.core.workUnit.unload`.
-    pub async fn unload(&mut self, args: impl Into<CoreWorkUnitUnloadArgs>) -> WaapiResult<()> {
+    pub async fn unload(&self, args: impl Into<CoreWorkUnitUnloadArgs>) -> WaapiResult<()> {
         let args: CoreWorkUnitUnloadArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3384,8 +3401,9 @@ impl<'a> WwiseCoreWorkUnitClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.cli` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiCliClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiCliClient<'a> {
@@ -3393,7 +3411,7 @@ impl<'a> WwiseUiCliClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.cli.executeLuaScript`.
     pub async fn execute_lua_script(
-        &mut self,
+        &self,
         args: impl Into<UiCliExecuteLuaScriptArgs>,
     ) -> WaapiResult<UiCliExecuteLuaScriptResponse> {
         let args: UiCliExecuteLuaScriptArgs = args.into();
@@ -3409,7 +3427,7 @@ impl<'a> WwiseUiCliClient<'a> {
     /// Launch the main window of WwiseXP.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.cli.launch`.
-    pub async fn launch(&mut self, args: impl Into<UiCliLaunchArgs>) -> WaapiResult<()> {
+    pub async fn launch(&self, args: impl Into<UiCliLaunchArgs>) -> WaapiResult<()> {
         let args: UiCliLaunchArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_cli_launch, Some(args), None)
@@ -3419,15 +3437,16 @@ impl<'a> WwiseUiCliClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.commands` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiCommandsClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiCommandsClient<'a> {
     /// Executes a command. Some commands can take a list of objects as parameters. See the Wwise global command IDs reference for the available commands.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.commands.execute`.
-    pub async fn execute(&mut self, args: impl Into<UiCommandsExecuteArgs>) -> WaapiResult<()> {
+    pub async fn execute(&self, args: impl Into<UiCommandsExecuteArgs>) -> WaapiResult<()> {
         let args: UiCommandsExecuteArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3442,7 +3461,7 @@ impl<'a> WwiseUiCommandsClient<'a> {
     /// Gets the list of commands.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.commands.getCommands`.
-    pub async fn get_commands(&mut self) -> WaapiResult<UiCommandsGetCommandsResponse> {
+    pub async fn get_commands(&self) -> WaapiResult<UiCommandsGetCommandsResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_commands_getCommands, None, None)
             .await
@@ -3451,7 +3470,7 @@ impl<'a> WwiseUiCommandsClient<'a> {
     /// Registers an array of add-on commands. Registered commands remain until the Wwise process is terminated. See the Wwise custom commands documentation for more information about registering commands. Also see `ak.wwise.ui.commands.executed`.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.commands.register`.
-    pub async fn register(&mut self, args: impl Into<UiCommandsRegisterArgs>) -> WaapiResult<()> {
+    pub async fn register(&self, args: impl Into<UiCommandsRegisterArgs>) -> WaapiResult<()> {
         let args: UiCommandsRegisterArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3466,10 +3485,7 @@ impl<'a> WwiseUiCommandsClient<'a> {
     /// Unregisters an array of add-on UI commands.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.commands.unregister`.
-    pub async fn unregister(
-        &mut self,
-        args: impl Into<UiCommandsUnregisterArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn unregister(&self, args: impl Into<UiCommandsUnregisterArgs>) -> WaapiResult<()> {
         let args: UiCommandsUnregisterArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3485,7 +3501,7 @@ impl<'a> WwiseUiCommandsClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.ui.commands.executed` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_executed(
-        &mut self,
+        &self,
         options: Option<UiCommandsExecutedOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiCommandsExecutedPayload>)> {
         self.client
@@ -3495,15 +3511,16 @@ impl<'a> WwiseUiCommandsClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.layout` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiLayoutClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiLayoutClient<'a> {
     /// Requests to close a view by its unique id. The view might not yet be closed when returning from this function.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.closeView`.
-    pub async fn close_view(&mut self, args: impl Into<UiLayoutCloseViewArgs>) -> WaapiResult<()> {
+    pub async fn close_view(&self, args: impl Into<UiLayoutCloseViewArgs>) -> WaapiResult<()> {
         let args: UiLayoutCloseViewArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3518,7 +3535,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     /// Dock a floating view into a layout.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.dockView`.
-    pub async fn dock_view(&mut self, args: impl Into<UiLayoutDockViewArgs>) -> WaapiResult<()> {
+    pub async fn dock_view(&self, args: impl Into<UiLayoutDockViewArgs>) -> WaapiResult<()> {
         let args: UiLayoutDockViewArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_layout_dockView, Some(args), None)
@@ -3530,7 +3547,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getCurrentLayoutName`.
     pub async fn get_current_layout_name(
-        &mut self,
+        &self,
     ) -> WaapiResult<UiLayoutGetCurrentLayoutNameResponse> {
         self.client
             .call_typed::<(), (), _>(
@@ -3545,7 +3562,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getElementRectangle`.
     pub async fn get_element_rectangle(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutGetElementRectangleArgs>,
     ) -> WaapiResult<UiLayoutGetElementRectangleResponse> {
         let args: UiLayoutGetElementRectangleArgs = args.into();
@@ -3562,7 +3579,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getLayout`.
     pub async fn get_layout(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutGetLayoutArgs>,
     ) -> WaapiResult<UiLayoutGetLayoutResponse> {
         let args: UiLayoutGetLayoutArgs = args.into();
@@ -3578,7 +3595,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     /// Retrieves a list of the factory layout names.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getLayoutNames`.
-    pub async fn get_layout_names(&mut self) -> WaapiResult<UiLayoutGetLayoutNamesResponse> {
+    pub async fn get_layout_names(&self) -> WaapiResult<UiLayoutGetLayoutNamesResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_layout_getLayoutNames, None, None)
             .await
@@ -3588,7 +3605,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getOrCreateView`.
     pub async fn get_or_create_view(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutGetOrCreateViewArgs>,
     ) -> WaapiResult<UiLayoutGetOrCreateViewResponse> {
         let args: UiLayoutGetOrCreateViewArgs = args.into();
@@ -3605,7 +3622,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getViewHandle`.
     pub async fn get_view_handle(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutGetViewHandleArgs>,
     ) -> WaapiResult<()> {
         let args: UiLayoutGetViewHandleArgs = args.into();
@@ -3623,7 +3640,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getViewInstances`.
     pub async fn get_view_instances(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutGetViewInstancesArgs>,
     ) -> WaapiResult<UiLayoutGetViewInstancesResponse> {
         let args: UiLayoutGetViewInstancesArgs = args.into();
@@ -3639,7 +3656,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     /// Retrieves a list of all view types registered in Wwise.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.getViewTypes`.
-    pub async fn get_view_types(&mut self) -> WaapiResult<UiLayoutGetViewTypesResponse> {
+    pub async fn get_view_types(&self) -> WaapiResult<UiLayoutGetViewTypesResponse> {
         self.client
             .call_typed::<(), (), _>(WaapiFunction::ak_wwise_ui_layout_getViewTypes, None, None)
             .await
@@ -3649,7 +3666,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.moveSplitter`.
     pub async fn move_splitter(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutMoveSplitterArgs>,
     ) -> WaapiResult<()> {
         let args: UiLayoutMoveSplitterArgs = args.into();
@@ -3667,7 +3684,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.removeLayout`.
     pub async fn remove_layout(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutRemoveLayoutArgs>,
     ) -> WaapiResult<()> {
         let args: UiLayoutRemoveLayoutArgs = args.into();
@@ -3685,7 +3702,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.resetLayouts`.
     pub async fn reset_layouts(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutResetLayoutsArgs>,
     ) -> WaapiResult<()> {
         let args: UiLayoutResetLayoutsArgs = args.into();
@@ -3702,7 +3719,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     /// Registers a new layout from a JSON format.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.setLayout`.
-    pub async fn set_layout(&mut self, args: impl Into<UiLayoutSetLayoutArgs>) -> WaapiResult<()> {
+    pub async fn set_layout(&self, args: impl Into<UiLayoutSetLayoutArgs>) -> WaapiResult<()> {
         let args: UiLayoutSetLayoutArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3718,7 +3735,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.switchLayout`.
     pub async fn switch_layout(
-        &mut self,
+        &self,
         args: impl Into<UiLayoutSwitchLayoutArgs>,
     ) -> WaapiResult<()> {
         let args: UiLayoutSwitchLayoutArgs = args.into();
@@ -3735,10 +3752,7 @@ impl<'a> WwiseUiLayoutClient<'a> {
     /// Undock a view from a layout.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.layout.undockView`.
-    pub async fn undock_view(
-        &mut self,
-        args: impl Into<UiLayoutUndockViewArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn undock_view(&self, args: impl Into<UiLayoutUndockViewArgs>) -> WaapiResult<()> {
         let args: UiLayoutUndockViewArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3752,8 +3766,9 @@ impl<'a> WwiseUiLayoutClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.model` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiModelClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiModelClient<'a> {
@@ -3761,7 +3776,7 @@ impl<'a> WwiseUiModelClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.model.createHandle`.
     pub async fn create_handle(
-        &mut self,
+        &self,
         args: impl Into<UiModelCreateHandleArgs>,
     ) -> WaapiResult<UiModelCreateHandleResponse> {
         let args: UiModelCreateHandleArgs = args.into();
@@ -3778,7 +3793,7 @@ impl<'a> WwiseUiModelClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.model.destroyHandle`.
     pub async fn destroy_handle(
-        &mut self,
+        &self,
         args: impl Into<UiModelDestroyHandleArgs>,
     ) -> WaapiResult<()> {
         let args: UiModelDestroyHandleArgs = args.into();
@@ -3795,7 +3810,7 @@ impl<'a> WwiseUiModelClient<'a> {
     /// Gets the state of widgets.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.model.getState`.
-    pub async fn get_state(&mut self, args: impl Into<UiModelGetStateArgs>) -> WaapiResult<()> {
+    pub async fn get_state(&self, args: impl Into<UiModelGetStateArgs>) -> WaapiResult<()> {
         let args: UiModelGetStateArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_model_getState, Some(args), None)
@@ -3807,7 +3822,7 @@ impl<'a> WwiseUiModelClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.model.registerWafm`.
     pub async fn register_wafm(
-        &mut self,
+        &self,
         args: impl Into<UiModelRegisterWafmArgs>,
     ) -> WaapiResult<UiModelRegisterWafmResponse> {
         let args: UiModelRegisterWafmArgs = args.into();
@@ -3823,7 +3838,7 @@ impl<'a> WwiseUiModelClient<'a> {
     /// Sets the state of widgets.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.model.setState`.
-    pub async fn set_state(&mut self, args: impl Into<UiModelSetStateArgs>) -> WaapiResult<()> {
+    pub async fn set_state(&self, args: impl Into<UiModelSetStateArgs>) -> WaapiResult<()> {
         let args: UiModelSetStateArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_model_setState, Some(args), None)
@@ -3833,8 +3848,9 @@ impl<'a> WwiseUiModelClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.project` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiProjectClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiProjectClient<'a> {
@@ -3842,7 +3858,7 @@ impl<'a> WwiseUiProjectClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.project.close`.
     pub async fn close(
-        &mut self,
+        &self,
         args: impl Into<UiProjectCloseArgs>,
     ) -> WaapiResult<UiProjectCloseResponse> {
         let args: UiProjectCloseArgs = args.into();
@@ -3854,7 +3870,7 @@ impl<'a> WwiseUiProjectClient<'a> {
     /// Creates, saves and opens new empty project, specified by path and platform. The project has no factory setting WorkUnit. Please see `ak.wwise.core.project.loaded` for further explanations on how to be notified when the operation has completed.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.project.create`.
-    pub async fn create(&mut self, args: impl Into<UiProjectCreateArgs>) -> WaapiResult<()> {
+    pub async fn create(&self, args: impl Into<UiProjectCreateArgs>) -> WaapiResult<()> {
         let args: UiProjectCreateArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_project_create, Some(args), None)
@@ -3865,7 +3881,7 @@ impl<'a> WwiseUiProjectClient<'a> {
     /// Opens a project, specified by path. Please see `ak.wwise.core.project.loaded` for further explanations on how to be notified when the operation has completed.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.project.open`.
-    pub async fn open(&mut self, args: impl Into<UiProjectOpenArgs>) -> WaapiResult<()> {
+    pub async fn open(&self, args: impl Into<UiProjectOpenArgs>) -> WaapiResult<()> {
         let args: UiProjectOpenArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_project_open, Some(args), None)
@@ -3875,15 +3891,16 @@ impl<'a> WwiseUiProjectClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.signal` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiSignalClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiSignalClient<'a> {
     /// Emits a signal on a widget.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.signal.emit`.
-    pub async fn emit(&mut self, args: impl Into<UiSignalEmitArgs>) -> WaapiResult<()> {
+    pub async fn emit(&self, args: impl Into<UiSignalEmitArgs>) -> WaapiResult<()> {
         let args: UiSignalEmitArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_signal_emit, Some(args), None)
@@ -3895,7 +3912,7 @@ impl<'a> WwiseUiSignalClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.ui.signal.click` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_click(
-        &mut self,
+        &self,
         options: Option<UiSignalClickOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSignalClickPayload>)> {
         self.client
@@ -3907,7 +3924,7 @@ impl<'a> WwiseUiSignalClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.ui.signal.toggle` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_toggle(
-        &mut self,
+        &self,
         options: Option<UiSignalToggleOptions>,
     ) -> WaapiResult<(u64, UnboundedReceiver<UiSignalTogglePayload>)> {
         self.client
@@ -3917,15 +3934,16 @@ impl<'a> WwiseUiSignalClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.ui.window` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseUiWindowClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseUiWindowClient<'a> {
     /// Closes a window and unrealizes its widgets.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.window.close`.
-    pub async fn close(&mut self, args: impl Into<UiWindowCloseArgs>) -> WaapiResult<()> {
+    pub async fn close(&self, args: impl Into<UiWindowCloseArgs>) -> WaapiResult<()> {
         let args: UiWindowCloseArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_window_close, Some(args), None)
@@ -3937,7 +3955,7 @@ impl<'a> WwiseUiWindowClient<'a> {
     ///
     /// WAAPI endpoint: `ak.wwise.ui.window.create`.
     pub async fn create(
-        &mut self,
+        &self,
         args: impl Into<UiWindowCreateArgs>,
     ) -> WaapiResult<UiWindowCreateResponse> {
         let args: UiWindowCreateArgs = args.into();
@@ -3949,7 +3967,7 @@ impl<'a> WwiseUiWindowClient<'a> {
     /// Presents a window and realizes its widgets.
     ///
     /// WAAPI endpoint: `ak.wwise.ui.window.present`.
-    pub async fn present(&mut self, args: impl Into<UiWindowPresentArgs>) -> WaapiResult<()> {
+    pub async fn present(&self, args: impl Into<UiWindowPresentArgs>) -> WaapiResult<()> {
         let args: UiWindowPresentArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(WaapiFunction::ak_wwise_ui_window_present, Some(args), None)
@@ -3959,18 +3977,16 @@ impl<'a> WwiseUiWindowClient<'a> {
 }
 
 /// Typed client for the `ak.wwise.core.profiler.captureLog` WAAPI namespace.
+#[derive(Clone, Copy)]
 pub struct WwiseCoreProfilerCaptureLogClient<'a> {
-    client: &'a mut WaapiClient,
+    client: &'a WaapiClient,
 }
 
 impl<'a> WwiseCoreProfilerCaptureLogClient<'a> {
     /// Saves the content of the capture log to a text file according to the given file path.
     ///
     /// WAAPI endpoint: `ak.wwise.core.profiler.captureLog.save`.
-    pub async fn save(
-        &mut self,
-        args: impl Into<CoreProfilerCaptureLogSaveArgs>,
-    ) -> WaapiResult<()> {
+    pub async fn save(&self, args: impl Into<CoreProfilerCaptureLogSaveArgs>) -> WaapiResult<()> {
         let args: CoreProfilerCaptureLogSaveArgs = args.into();
         self.client
             .call_typed_void::<_, ()>(
@@ -3986,7 +4002,7 @@ impl<'a> WwiseCoreProfilerCaptureLogClient<'a> {
     ///
     /// Subscribes to the `ak.wwise.core.profiler.captureLog.itemAdded` WAAPI topic and returns `(subscription_id, receiver)`.
     pub async fn subscribe_item_added(
-        &mut self,
+        &self,
         options: Option<CoreProfilerCaptureLogItemAddedOptions>,
     ) -> WaapiResult<(
         u64,
@@ -4003,32 +4019,32 @@ impl<'a> WwiseCoreProfilerCaptureLogClient<'a> {
 
 impl WaapiClient {
     /// Chained namespace access starting at `ak`.
-    pub fn ak(&mut self) -> AkClient<'_> {
+    pub fn ak(&self) -> AkClient<'_> {
         AkClient { client: self }
     }
 
     /// Shortcut for `client.ak().wwise()`.
-    pub fn wwise(&mut self) -> WwiseClient<'_> {
+    pub fn wwise(&self) -> WwiseClient<'_> {
         WwiseClient { client: self }
     }
 
     /// Shortcut for `client.ak().soundengine()`.
-    pub fn soundengine(&mut self) -> SoundengineClient<'_> {
+    pub fn soundengine(&self) -> SoundengineClient<'_> {
         SoundengineClient { client: self }
     }
 
     /// Shortcut for `client.wwise().core()`.
-    pub fn core(&mut self) -> WwiseCoreClient<'_> {
+    pub fn core(&self) -> WwiseCoreClient<'_> {
         WwiseCoreClient { client: self }
     }
 
     /// Shortcut for `client.wwise().core().object()`.
-    pub fn object(&mut self) -> WwiseCoreObjectClient<'_> {
+    pub fn object(&self) -> WwiseCoreObjectClient<'_> {
         WwiseCoreObjectClient { client: self }
     }
 
     /// Shortcut for `client.wwise().ui()`.
-    pub fn ui(&mut self) -> WwiseUiClient<'_> {
+    pub fn ui(&self) -> WwiseUiClient<'_> {
         WwiseUiClient { client: self }
     }
 }

@@ -289,6 +289,12 @@ impl Position {
     }
 }
 
+impl From<Vector3> for Position {
+    fn from(position: Vector3) -> Self {
+        Self::new(position)
+    }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared enums
 // ─────────────────────────────────────────────────────────────────────────────
@@ -484,6 +490,42 @@ pub enum PropertyValue {
     Object(Box<ChildObject>),
     /// Create new objects and insert them into this named list.
     ObjectList(Vec<ChildObject>),
+}
+
+impl PropertyValue {
+    /// Creates a [`PropertyValue::Number`].
+    pub fn number(n: impl Into<f64>) -> Self {
+        PropertyValue::Number(n.into())
+    }
+
+    /// Creates a [`PropertyValue::Boolean`].
+    pub fn boolean(b: bool) -> Self {
+        PropertyValue::Boolean(b)
+    }
+
+    /// Creates a [`PropertyValue::String`] from a string or `&str`.
+    pub fn string(s: impl Into<String>) -> Self {
+        PropertyValue::String(s.into())
+    }
+
+    /// Creates a [`PropertyValue::StringList`] from an iterator of strings or `&str` slices.
+    pub fn string_list<I, S>(list: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        PropertyValue::StringList(list.into_iter().map(Into::into).collect())
+    }
+
+    /// Creates a [`PropertyValue::Object`] from a [`ChildObject`].
+    pub fn object(obj: ChildObject) -> Self {
+        PropertyValue::Object(Box::new(obj))
+    }
+
+    /// Creates a [`PropertyValue::ObjectList`] from a list of [`ChildObject`] entries.
+    pub fn object_list(list: impl Into<Vec<ChildObject>>) -> Self {
+        PropertyValue::ObjectList(list.into())
+    }
 }
 
 impl From<f64> for PropertyValue {

@@ -10,7 +10,7 @@ use wwise_waapi::prelude::*;
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::connect().await?;
+    let client = WaapiClient::connect().await?;
     info!("Connected. Calling ak.wwise.core.getInfo...");
 
     let info = client.core().get_info().await?;

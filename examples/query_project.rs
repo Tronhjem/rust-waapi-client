@@ -6,32 +6,29 @@
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example query_project
 
-use wwise_waapi::api::generated::ak::wwise::core::object::{
-    CoreObjectGetArgs, CoreObjectGetOptions,
-};
-use wwise_waapi::api::generated::primitives::ObjectReturnField;
-use wwise_waapi::{WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::wwise::core::object::GetArgs;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(None).await?;
+    let client = WaapiClient::connect().await?;
 
     // The WAQL query `"\""` (a string containing a single backslash) selects the
     // project root itself, rather than any object inside it.
-    let args = CoreObjectGetArgs::from_waql(r#""\""#);
+    let args = GetArgs::from_waql(r#""\""#);
 
-    let options = CoreObjectGetOptions::new().return_fields([
+    let options = [
         ObjectReturnField::Name,
         ObjectReturnField::FilePath,
         ObjectReturnField::WorkunitIsDirty,
-    ]);
+    ];
 
-    let response = client.wwise().core().object().get(args, options).await?;
+    let response = client.object().get(args, options).await?;
 
     for project in &response.objects {
-        println!("Project: {:?}", project.name);
+        println!("Project: {:?}", project.name());
         println!("File:    {:?}", project.file_path);
         println!("Dirty:   {:?}", project.workunit_is_dirty);
     }

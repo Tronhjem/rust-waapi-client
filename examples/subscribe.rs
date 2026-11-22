@@ -14,10 +14,10 @@ async fn main() -> WaapiResult<()> {
     let address = "127.0.0.1:8080";
     info!("Connecting to WAAPI at {address}");
 
-    let mut client = WaapiClient::connect_to(address).await?;
+    let client = WaapiClient::connect_to(address).await?;
     info!("Successfully connected to WAAPI");
 
-    let options = CreatedOptions::new().return_(vec![
+    let options = CreatedOptions::new().return_fields([
         ObjectReturnField::Id,
         ObjectReturnField::Name,
         ObjectReturnField::Type,

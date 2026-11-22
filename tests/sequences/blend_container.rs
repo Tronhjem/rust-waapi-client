@@ -12,7 +12,7 @@ const ACTOR_MIXER_WU: &str = r"\Actor-Mixer Hierarchy\Default Work Unit";
 #[tokio::test]
 async fn blend_container_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 

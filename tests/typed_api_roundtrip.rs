@@ -2381,11 +2381,354 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
     );
 
     // Short topic aliases
-    let _created_opts = CreatedOptions::new().return_(vec![ObjectReturnField::Id]);
+    let _created_opts = CreatedOptions::new().return_fields([ObjectReturnField::Id]);
     let created_payload: CreatedPayload =
         serde_json::from_value(json!({"object": {"id": parent_guid}})).unwrap();
     assert_eq!(
         created_payload.object.id(),
         Some("{11111111-1111-1111-1111-111111111111}")
+    );
+}
+
+#[test]
+fn unified_return_fields_options_accessors_and_errors_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::mediaPool::CoreMediaPoolGetOptions;
+    use wwise_waapi::api::ak::wwise::core::object::{
+        CoreObjectCreateResponse, CoreObjectSetObject, CreatedOptions, GetOptions,
+        PropertyChangedOptions,
+    };
+    use wwise_waapi::api::ak::wwise::core::profiler::{
+        CoreProfilerGetAudioObjectsOptions, CoreProfilerGetBussesOptions,
+        CoreProfilerGetVoicesOptions,
+    };
+    use wwise_waapi::api::generated::primitives::{
+        AudioObjectReturnField, BusReturnField, VoiceReturnField,
+    };
+    use wwise_waapi::prelude::*;
+
+    // 1. Unified .return_fields(...) accepting arrays across all Options structs
+    let created_opts =
+        CreatedOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+    assert_eq!(
+        serde_json::to_value(&created_opts).unwrap(),
+        json!({"return": ["id", "name"]})
+    );
+    let created_from_arr = CreatedOptions::from([ObjectReturnField::Id, ObjectReturnField::Type]);
+    assert_eq!(
+        serde_json::to_value(created_from_arr).unwrap(),
+        json!({"return": ["id", "type"]})
+    );
+    let created_from_unit = CreatedOptions::from(());
+    assert_eq!(serde_json::to_value(created_from_unit).unwrap(), json!({}));
+
+    let prop_changed_opts = PropertyChangedOptions::new("{OBJ-1}", Property::Volume)
+        .return_fields([ObjectReturnField::Id, "path".into()]);
+    assert_eq!(
+        serde_json::to_value(prop_changed_opts).unwrap(),
+        json!({"object": "{OBJ-1}", "property": "Volume", "return": ["id", "path"]})
+    );
+
+    let busses_opts = CoreProfilerGetBussesOptions::new()
+        .return_fields([BusReturnField::ObjectGuid, BusReturnField::ObjectName]);
+    assert_eq!(
+        serde_json::to_value(busses_opts).unwrap(),
+        json!({"return": ["objectGUID", "objectName"]})
+    );
+    let voices_opts = CoreProfilerGetVoicesOptions::from([
+        VoiceReturnField::ObjectGuid,
+        VoiceReturnField::GameObjectName,
+    ]);
+    assert_eq!(
+        serde_json::to_value(voices_opts).unwrap(),
+        json!({"return": ["objectGUID", "gameObjectName"]})
+    );
+    let audio_objs_opts = CoreProfilerGetAudioObjectsOptions::new()
+        .return_fields([AudioObjectReturnField::AudioObjectName]);
+    assert_eq!(
+        serde_json::to_value(audio_objs_opts).unwrap(),
+        json!({"return": ["audioObjectName"]})
+    );
+    let media_opts = CoreMediaPoolGetOptions::new().return_fields(["Path", "WAV/Duration"]);
+    assert_eq!(
+        serde_json::to_value(media_opts).unwrap(),
+        json!({"return": ["Path", "WAV/Duration"]})
+    );
+
+    // 2. ObjectReturnOptions::basic() and From conversions
+    let basic = ObjectReturnOptions::basic();
+    assert_eq!(
+        serde_json::to_value(basic).unwrap(),
+        json!({"return": ["id", "name", "type", "path"]})
+    );
+    let get_from_unit = GetOptions::from(());
+    assert_eq!(serde_json::to_value(get_from_unit).unwrap(), json!({}));
+    let get_from_arr = GetOptions::from([ObjectReturnField::Id, ObjectReturnField::Name]);
+    assert_eq!(
+        serde_json::to_value(get_from_arr).unwrap(),
+        json!({"return": ["id", "name"]})
+    );
+    let get_from_single = GetOptions::from(ObjectReturnField::Id);
+    assert_eq!(
+        serde_json::to_value(get_from_single).unwrap(),
+        json!({"return": ["id"]})
+    );
+
+    // 3. Consistent .id(), .name(), and typed property_* accessors on responses
+    let obj: WwiseObject = serde_json::from_value(json!({
+        "id": "{OBJ-1}",
+        "name": "Explosion",
+        "type": "Sound",
+        "@Volume": -4.5,
+        "@Pitch": 120,
+        "@IsLoopingEnabled": true,
+        "@UserAuxSendVolume0": "custom"
+    }))
+    .unwrap();
+    assert_eq!(obj.id(), Some("{OBJ-1}"));
+    assert_eq!(obj.name(), Some("Explosion"));
+    assert_eq!(obj.property_f64(Property::Volume), Some(-4.5));
+    assert_eq!(obj.property_i64(Property::Pitch), Some(120));
+    assert_eq!(obj.property_bool(Property::IsLoopingEnabled), Some(true));
+    assert_eq!(
+        obj.property_str(Property::UserAuxSendVolume0),
+        Some("custom")
+    );
+
+    let created_resp: CoreObjectCreateResponse = serde_json::from_value(json!({
+        "id": "{CREATED-1}",
+        "name": "NewSound",
+        "children": [{"id": "{CHILD-1}", "name": "ChildSound"}]
+    }))
+    .unwrap();
+    assert_eq!(created_resp.id(), Some("{CREATED-1}"));
+    assert_eq!(created_resp.name(), Some("NewSound"));
+    assert_eq!(created_resp.children[0].id(), Some("{CHILD-1}"));
+    assert_eq!(created_resp.children[0].name(), Some("ChildSound"));
+
+    let set_obj: CoreObjectSetObject = serde_json::from_value(json!({
+        "id": "{SET-1}",
+        "name": "ModifiedSound",
+        "@Volume": -9.0
+    }))
+    .unwrap();
+    assert_eq!(set_obj.id(), Some("{SET-1}"));
+    assert_eq!(set_obj.name(), Some("ModifiedSound"));
+    assert_eq!(set_obj.property_f64(Property::Volume), Some(-9.0));
+
+    // 4. Compile-time check that WaapiClient & namespace clients take &self and are Copy
+    fn _assert_immutable_and_copy(client: &WaapiClient) {
+        let wwise = client.wwise();
+        let wwise_copy = wwise;
+        let obj1 = wwise.core().object();
+        let obj2 = wwise_copy.core().object();
+        let se = client.soundengine();
+        let ui = client.ui();
+        let core = client.core();
+        let _ = (obj1, obj2, se, ui, core);
+    }
+
+    // 5. Structured WaapiCallError and WaapiError helpers
+    let call_err = WaapiCallError::new(
+        "ak.wwise.invalid_arguments",
+        vec![],
+        json!({
+            "message": "'parent' already has child with same name.",
+            "details": {"argumentName": "name"}
+        }),
+    );
+    assert_eq!(call_err.uri(), "ak.wwise.invalid_arguments");
+    assert_eq!(
+        call_err.message(),
+        Some("'parent' already has child with same name.")
+    );
+    assert_eq!(call_err.details(), &json!({"argumentName": "name"}));
+    let waapi_err = WaapiError::Call(call_err);
+    assert_eq!(waapi_err.error_uri(), Some("ak.wwise.invalid_arguments"));
+    assert_eq!(
+        waapi_err.waapi_message(),
+        Some("'parent' already has child with same name.")
+    );
+    assert!(waapi_err.as_call_error().is_some());
+    assert!(
+        waapi_err
+            .to_string()
+            .contains("ak.wwise.invalid_arguments: 'parent' already has child with same name.")
+    );
+    assert_eq!(
+        WaapiError::ClientShutdown.to_string(),
+        "connection error: client already shut down"
+    );
+}
+
+#[test]
+fn into_constructor_helpers_roundtrip() {
+    use wwise_waapi::api::{
+        BlendEdge, BlendFadeMode, CurveShape, LanguageRef, MultiPosition, SoundBankInclusionType,
+        SoundBankInfo, SwitchContainerAssignment,
+    };
+    use wwise_waapi::prelude::*;
+
+    // SoundEngineObjectRef::name / guid / short / short_id
+    assert_eq!(
+        serde_json::to_value(SoundEngineObjectRef::name("Play_TestSound")).unwrap(),
+        json!("Play_TestSound")
+    );
+    assert_eq!(
+        serde_json::to_value(SoundEngineObjectRef::guid(
+            "{F546017D-201A-49BD-8D4E-0A28F5DBB28D}"
+        ))
+        .unwrap(),
+        json!("{F546017D-201A-49BD-8D4E-0A28F5DBB28D}")
+    );
+    assert_eq!(
+        serde_json::to_value(SoundEngineObjectRef::short(2932040671)).unwrap(),
+        json!(2932040671u32)
+    );
+    assert_eq!(
+        serde_json::to_value(SoundEngineObjectRef::short_id(42)).unwrap(),
+        json!(42)
+    );
+
+    // LanguageRef::name / guid
+    assert_eq!(
+        serde_json::to_value(LanguageRef::name("English(US)")).unwrap(),
+        json!("English(US)")
+    );
+    assert_eq!(
+        serde_json::to_value(LanguageRef::guid("{LANG-1}")).unwrap(),
+        json!("{LANG-1}")
+    );
+
+    // GameObjectRef::new / id / game_object
+    assert_eq!(
+        serde_json::to_value(GameObjectRef::new(1001)).unwrap(),
+        json!(1001)
+    );
+    assert_eq!(
+        serde_json::to_value(GameObjectRef::id(1002)).unwrap(),
+        json!(1002)
+    );
+    assert_eq!(
+        serde_json::to_value(GameObjectRef::game_object(1003)).unwrap(),
+        json!(1003)
+    );
+
+    // ObjectQuery constructor helpers
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::id("{ID-1}")).unwrap(),
+        json!({"id": ["{ID-1}"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::ids(["{ID-1}", "{ID-2}"])).unwrap(),
+        json!({"id": ["{ID-1}", "{ID-2}"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::path(r"\Containers\Default Work Unit")).unwrap(),
+        json!({"path": [r"\Containers\Default Work Unit"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::paths([r"\Containers", r"\Busses"])).unwrap(),
+        json!({"path": [r"\Containers", r"\Busses"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::name("Sound:Laser")).unwrap(),
+        json!({"name": ["Sound:Laser"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::names(["Sound:Laser", "Event:Play_Laser"])).unwrap(),
+        json!({"name": ["Sound:Laser", "Event:Play_Laser"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::search("Laser")).unwrap(),
+        json!({"search": ["Laser"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::of_type(ObjectType::Sound)).unwrap(),
+        json!({"ofType": ["Sound"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::of_types([
+            ObjectType::Sound,
+            ObjectType::Event
+        ]))
+        .unwrap(),
+        json!({"ofType": ["Sound", "Event"]})
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectQuery::query("{QUERY-1}")).unwrap(),
+        json!({"query": ["{QUERY-1}"]})
+    );
+
+    // ObjectReturnField::property / custom
+    assert_eq!(
+        serde_json::to_value(ObjectReturnField::property(Property::Volume)).unwrap(),
+        json!("@Volume")
+    );
+    assert_eq!(
+        serde_json::to_value(ObjectReturnField::custom("parent.name")).unwrap(),
+        json!("parent.name")
+    );
+
+    // PropertyValue constructor helpers
+    assert_eq!(
+        serde_json::to_value(PropertyValue::number(-6.0)).unwrap(),
+        json!(-6.0)
+    );
+    assert_eq!(
+        serde_json::to_value(PropertyValue::boolean(true)).unwrap(),
+        json!(true)
+    );
+    assert_eq!(
+        serde_json::to_value(PropertyValue::string("hello")).unwrap(),
+        json!("hello")
+    );
+    assert_eq!(
+        serde_json::to_value(PropertyValue::string_list(["a", "b"])).unwrap(),
+        json!(["a", "b"])
+    );
+    let child = ChildObject::new(ObjectType::Sound, "ChildSound");
+    assert_eq!(
+        serde_json::to_value(PropertyValue::object(child.clone())).unwrap(),
+        json!({"type": "Sound", "name": "ChildSound"})
+    );
+    assert_eq!(
+        serde_json::to_value(PropertyValue::object_list([child])).unwrap(),
+        json!([{"type": "Sound", "name": "ChildSound"}])
+    );
+
+    // SwitchContainerAssignment::new, BlendEdge::new, MultiPosition::new, SoundBankInfo builders
+    let assign = SwitchContainerAssignment::new("{CHILD-1}", "{SWITCH-1}");
+    assert_eq!(
+        serde_json::to_value(assign).unwrap(),
+        json!({"child": "{CHILD-1}", "stateOrSwitch": "{SWITCH-1}"})
+    );
+    let edge =
+        BlendEdge::new(BlendFadeMode::Automatic, CurveShape::Linear, 0.25).fade_position(0.5);
+    assert_eq!(
+        serde_json::to_value(edge).unwrap(),
+        json!({
+            "fadeMode": "Automatic",
+            "fadeShape": "Linear",
+            "edgePosition": 0.25,
+            "fadePosition": 0.5
+        })
+    );
+    let mp = MultiPosition::new(Vector3::new(1.0, 2.0, 3.0));
+    assert_eq!(
+        serde_json::to_value(mp).unwrap()["position"]["position"],
+        json!({"x": 1.0, "y": 2.0, "z": 3.0})
+    );
+    let bank = SoundBankInfo::new("MainBank")
+        .inclusions([SoundBankInclusionType::Event, SoundBankInclusionType::Media])
+        .events(["Play_TestSound"])
+        .aux_busses([r"\Busses\Default Work Unit\Main Audio Bus"]);
+    assert_eq!(
+        serde_json::to_value(bank).unwrap(),
+        json!({
+            "name": "MainBank",
+            "inclusions": ["event", "media"],
+            "events": ["Play_TestSound"],
+            "auxBusses": [r"\Busses\Default Work Unit\Main Audio Bus"]
+        })
     );
 }

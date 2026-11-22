@@ -9,19 +9,63 @@ This crate ships with a small, private WAMP v2 client that speaks JSON over WebS
 
 ## Basic Usage
 
-`wwise-waapi` is async and built on `tokio`.
+`wwise-waapi` is async and built on `tokio`. Import `wwise_waapi::prelude::*` for the most common client, query, object, property, and SoundEngine types.
 
-### Connecting to WAAPI
+### Connecting & Calling the Typed API
+
+Typed endpoints are exposed via a **chained namespace API** on `WaapiClient` that mirrors WAAPI URI dot-notation (`client.ak().wwise()...`, plus top-level shortcuts `client.wwise()`, `client.core()`, `client.object()`, `client.ui()`, and `client.soundengine()`). All client and namespace handles take `&self` (`Copy`), so they can be stored and reused freely:
 
 ```rust
+use wwise_waapi::api::ak::wwise::core::object::{CreateArgs, GetOptions};
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     // Connect to WAAPI (default: ws://127.0.0.1:8080/waapi)
-    let mut client = WaapiClient::connect().await?;
+    let client = WaapiClient::connect().await?;
 
-    // Make calls...
+    let info = client.core().get_info().await?;
+    println!("Connected to {} ({})", info.display_name, info.version.display_name);
+
+    // Query objects by path, GUID, ObjectType, or ObjectQuery.
+    // Options accepts GetOptions (or ObjectReturnOptions::basic(), arrays of ObjectReturnField, or ()).
+    let response = client
+        .object()
+        .get(
+            r"\Containers\Default Work Unit",
+            GetOptions::new().return_fields([
+                ObjectReturnField::Id,
+                ObjectReturnField::Name,
+                ObjectReturnField::Type,
+                ObjectReturnField::Property(Property::Volume),
+            ]),
+        )
+        .await?;
+
+    for obj in &response.objects {
+        println!(
+            "{:?} ({:?}): id={:?} volume={:?}",
+            obj.name(),
+            obj.object_type(),
+            obj.id(),
+            obj.property_f64(Property::Volume),
+        );
+    }
+
+    // Create a Sound object
+    let created = client
+        .object()
+        .create(
+            CreateArgs::new(
+                r"\Containers\Default Work Unit",
+                ObjectType::Sound,
+                "MyNewSound",
+            )
+            .on_name_conflict(OnNameConflict::Replace)
+            .property(Property::Volume, -6.0),
+        )
+        .await?;
+    println!("Created sound id: {:?}", created.id());
 
     // Always shutdown when done
     client.shutdown().await?;
@@ -31,22 +75,59 @@ async fn main() -> WaapiResult<()> {
 
 Use `WaapiClient::connect()` for the default localhost endpoint (`ws://127.0.0.1:8080/waapi`), `WaapiClient::connect_to("127.0.0.1:8080")` for a custom host/port or WebSocket URL, or `WaapiClient::new(Option<&str>)`.
 
-### Making Simple Calls
+### Setting Object Properties
 
-The JSON value API works with `WaapiFunction` and `serde_json::Value` (use `call_raw` if you need to pass an arbitrary `&str`). The `json!` macro is re-exported from the crate root, so applications can build JSON kwargs without adding a direct `serde_json` dependency:
+See `examples/object_set.rs` for setting properties on Wwise objects using the generated builders:
 
 ```rust
-use wwise_waapi::{WaapiFunction, json};
+use wwise_waapi::api::ak::wwise::core::object::{SetItem, SetOptions};
+use wwise_waapi::prelude::*;
 
-let response = client
-    .call(WaapiFunction::ak_wwise_core_getInfo, None, None)
-    .await?;
-println!("{}", wwise_waapi::serde_json::to_string_pretty(&response)?);
+let client = WaapiClient::connect().await?;
+
+let item = SetItem::new(r"\Containers\Default Work Unit\MySound")
+    .name("MyRenamedSound")
+    .property(Property::Volume, -6.0);
+
+let options = SetOptions::new().return_fields([
+    ObjectReturnField::Id,
+    ObjectReturnField::Name,
+    ObjectReturnField::Property(Property::Volume),
+]);
+
+let response = client.object().set(item, options).await?;
+client.shutdown().await?;
 ```
 
-### Building Arguments
+### Typed Subscriptions
 
-Use `wwise_waapi::json!` to build WAAPI kwargs:
+Subscribe to WAAPI topics using the typed subscription methods (`subscribe_*`):
+
+```rust
+use wwise_waapi::api::ak::wwise::core::object::CreatedOptions;
+use wwise_waapi::prelude::*;
+
+let options = CreatedOptions::new()
+    .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+let (id, mut events) = client
+    .object()
+    .subscribe_created(Some(options))
+    .await?;
+
+while let Some(payload) = events.recv().await {
+    println!(
+        "Created: id={:?} name={:?}",
+        payload.object.id(),
+        payload.object.name()
+    );
+}
+
+client.unsubscribe(id).await?;
+```
+
+### Raw JSON Escape Hatch
+
+For dynamic queries or custom untyped payloads, use `client.call(WaapiFunction, args, options)` with `serde_json::Value` (or `call_raw` if you need to pass an arbitrary `&str` URI). The `json!` macro is re-exported from the crate root, so applications can build JSON kwargs without adding a direct `serde_json` dependency:
 
 ```rust
 use wwise_waapi::{WaapiFunction, json};
@@ -64,30 +145,7 @@ let options = json!({
 let response = client
     .call(WaapiFunction::ak_wwise_core_object_get, Some(args), Some(options))
     .await?;
-```
-
-### Typed API
-
-Typed endpoints are exposed via a **chained namespace API** on `WaapiClient` that mirrors WAAPI URI dot-notation (`client.ak().wwise()...`, plus top-level shortcuts `client.wwise()`, `client.core()`, `client.object()`, `client.ui()`, and `client.soundengine()`). Each chained method accepts `impl Into<Args>` and delegates to `WaapiClient::call_typed` or `WaapiClient::call_typed_void`:
-
-```rust
-use wwise_waapi::prelude::*;
-
-let info = client.core().get_info().await?;
-println!("Wwise version: {:?}", info.version.display_name);
-```
-
-```rust
-use wwise_waapi::api::ak::wwise::core::object::GetOptions;
-use wwise_waapi::prelude::*;
-
-let options = GetOptions::new()
-    .return_fields([ObjectReturnField::Id, ObjectReturnField::Name, ObjectReturnField::Type]);
-
-let response = client
-    .object()
-    .get(r"\Containers\Default Work Unit\MySound", options)
-    .await?;
+println!("{}", wwise_waapi::serde_json::to_string_pretty(&response)?);
 ```
 
 ---
@@ -153,7 +211,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 
 All **180 WAAPI functions** and **35 subscription topics** across the union of `tools/waapi_schemas/<version>/` (currently 2024.1.7 and 2025.1.12) are automatically discovered and generated into typed structs, chained call methods, and typed `subscribe_*` methods under `wwise_waapi::api::generated` (configured via `tools/overrides.json` and `tools/generator/`).
 
-> **Multi-version union & optionality.** The bindings are generated from the *union* of all Wwise schema versions under `tools/waapi_schemas/`, so a single API serves both Wwise 2024 and Wwise 2025+. Renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`, with `PropertyContainer` as the canonical `from_class_id` result), and 2024-only return fields (`ObjectReturnField::ColorRgb`/`TransitionObject`, `AudioObjectReturnField::PrevGain`/`NextGain`) are retained. Response fields on `WwiseObject` are `Option<T>` because WAAPI only populates the return fields requested via `ObjectReturnOptions` (and so older/newer Wwise versions remain compatible); `WwiseObject` provides `.id()`, `.name()`, `.object_type()`, `.path()`, and `.notes()` convenience accessors. Intermediate chained client handles (`let mut wwise = client.wwise();`) take `&mut self` and can be reused across multiple calls.
+> **Multi-version union & optionality.** The bindings are generated from the *union* of all Wwise schema versions under `tools/waapi_schemas/`, so a single API serves both Wwise 2024 and Wwise 2025+. Renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`, with `PropertyContainer` as the canonical `from_class_id` result), and 2024-only return fields (`ObjectReturnField::ColorRgb`/`TransitionObject`, `AudioObjectReturnField::PrevGain`/`NextGain`) are retained. Response fields on `WwiseObject` are `Option<T>` because WAAPI only populates the return fields requested via `ObjectReturnOptions` (and so older/newer Wwise versions remain compatible); `WwiseObject` provides `.id()`, `.name()`, `.object_type()`, `.path()`, `.notes()`, `.property(...)`, `.property_f64(...)`, `.property_i64(...)`, `.property_bool(...)`, and `.property_str(...)` convenience accessors. Intermediate chained client handles (`let wwise = client.wwise();`) take `&self` (`Copy`) and can be reused across multiple calls.
 
 Representative endpoints include (every remaining namespace — `profiler.*`, `remote.*`, `sourceControl.*`, `waapi.*`, `log.*`, `audioSourcePeaks.*`, `debug.*`, `ui.layout.*`, `ui.window.*`, `ui.model.*`, `ui.cli.*` — is also generated under `wwise_waapi::api::generated::ak`):
 
@@ -307,98 +365,28 @@ Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*`
 | `ak.wwise.ui.signal.click` | `client.wwise().ui().signal().subscribe_click(opts)` | `UiSignalClickPayload` |
 | `ak.wwise.ui.signal.toggle` | `client.wwise().ui().signal().subscribe_toggle(opts)` | `UiSignalTogglePayload` |
 
-Topic `opts` is `Option<XxxOptions>`; most options structs offer `.return_(Vec<ObjectReturnField>)` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
+Topic `opts` is `Option<XxxOptions>`; options structs offer `.return_fields([ObjectReturnField::...])` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
 
 If you ever need to send a custom or untyped payload, use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 
 ### Specifying Return Fields
 
-For escape-hatch calls, return fields are a plain `Vec<String>` in the options object:
+Typed endpoint and topic `Options` structs provide a `.return_fields(...)` builder that accepts any iterable (such as an array `[ObjectReturnField::Id, ObjectReturnField::Name]` or `Vec`). `ObjectReturnOptions::basic()` returns the common `[Id, Name, Type, Path]` preset, and RPC methods taking `impl Into<Options>` also accept `()` (default options) or an array of return fields directly:
+
+```rust
+// Pass ObjectReturnOptions::basic(), a custom GetOptions, an array of fields, or () for default options:
+let res = client
+    .object()
+    .get(r"\Containers\Default Work Unit", ObjectReturnOptions::basic())
+    .await?;
+```
+
+For raw JSON escape-hatch calls, return fields are a plain string array in the options object:
 
 ```rust
 let options = json!({
     "return": ["id", "name", "type", "path"]
 });
-```
-
-Typed endpoint `Options` structs provide a `.return_fields(...)` builder for the same purpose.
-
-### Complete Example
-
-```rust
-use wwise_waapi::prelude::*;
-use wwise_waapi::json;
-
-#[tokio::main]
-async fn main() -> WaapiResult<()> {
-    let mut client = WaapiClient::connect().await?;
-
-    let args = json!({
-        "from": { "path": [r"\Containers\Default Work Unit"] }
-    });
-    let options = json!({
-        "return": ["id", "name", "type"]
-    });
-
-    let response = client
-        .call(WaapiFunction::ak_wwise_core_object_get, Some(args), Some(options))
-        .await?;
-
-    println!("{}", wwise_waapi::serde_json::to_string_pretty(&response)?);
-
-    client.shutdown().await?;
-    Ok(())
-}
-```
-
-### Setting Object Properties
-
-See `examples/object_set.rs` for setting properties on Wwise objects using the generated builders:
-
-```rust
-use wwise_waapi::api::ak::wwise::core::object::{SetItem, SetOptions};
-use wwise_waapi::prelude::*;
-
-let mut client = WaapiClient::connect().await?;
-
-let item = SetItem::new(r"\Containers\Default Work Unit\MySound")
-    .name("MyRenamedSound")
-    .property(Property::Volume, -6.0);
-
-let options = SetOptions::new().return_fields([
-    ObjectReturnField::Id,
-    ObjectReturnField::Name,
-    ObjectReturnField::Property(Property::Volume),
-]);
-
-let response = client.object().set(item, options).await?;
-client.shutdown().await?;
-```
-
-### Subscriptions
-
-Subscribe to WAAPI topics using the typed subscription methods (`subscribe_*`) or raw `client.subscribe(...)`:
-
-```rust
-use wwise_waapi::api::ak::wwise::core::object::CreatedOptions;
-use wwise_waapi::prelude::*;
-
-let options = CreatedOptions::new()
-    .return_(vec![ObjectReturnField::Id, ObjectReturnField::Name]);
-let (id, mut events) = client
-    .object()
-    .subscribe_created(Some(options))
-    .await?;
-
-while let Some(payload) = events.recv().await {
-    println!(
-        "Created: id={:?} name={:?}",
-        payload.object.id(),
-        payload.object.name()
-    );
-}
-
-client.unsubscribe(id).await?;
 ```
 
 ## API Endpoints
@@ -450,9 +438,10 @@ See the [`examples/`](examples/) directory for more usage examples. Most example
 
 The library uses a custom `WaapiError` enum with the following variants:
 
-- `Connection(String)` - Failed to connect to WAAPI or client already shut down
+- `Connection(String)` - Failed to establish the WebSocket/WAMP connection to WAAPI
+- `ClientShutdown` - Operation attempted on a `WaapiClient` that has already been shut down
 - `Serialization(serde_json::Error)` - JSON serialization/deserialization failed
-- `Call(String)` - WAAPI call returned an error (includes the error URI, args, and kwargs)
+- `Call(WaapiCallError)` - WAAPI call returned a structured WAMP error (`err.uri()`, `err.message()`, `err.details()`, `err.args`, `err.kwargs`; also accessible via `waapi_err.error_uri()`, `waapi_err.waapi_message()`, and `waapi_err.as_call_error()`)
 - `Wamp(WampError)` - Underlying WAMP/WebSocket protocol error
 
 Always call `shutdown().await` before dropping the client to ensure clean disconnection.

@@ -35,7 +35,7 @@ async fn recv_matching_object_event(
 #[tokio::test]
 async fn object_events_subscription_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 

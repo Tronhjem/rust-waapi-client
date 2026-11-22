@@ -71,6 +71,13 @@ pub struct UiLayoutGetOrCreateViewResponse {
     pub id: Option<String>,
 }
 
+impl UiLayoutGetOrCreateViewResponse {
+    /// Returns the object GUID string (`id`), if present in the response.
+    pub fn id(&self) -> Option<&str> {
+        self.id.as_deref()
+    }
+}
+
 /// Module-scoped alias for [`UiLayoutGetOrCreateViewArgs`].
 pub type GetOrCreateViewArgs = UiLayoutGetOrCreateViewArgs;
 

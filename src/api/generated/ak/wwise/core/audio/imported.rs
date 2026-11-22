@@ -25,7 +25,7 @@ pub struct CoreAudioImportedPayload {
 pub struct CoreAudioImportedOptions {
     /// Data to be returned for every imported object.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<ObjectReturnField>>,
+    pub return_fields: Option<Vec<ObjectReturnField>>,
 }
 
 impl CoreAudioImportedOptions {
@@ -35,9 +35,40 @@ impl CoreAudioImportedOptions {
     }
 
     /// Data to be returned for every imported object.
-    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields(return_fields)
+    }
+}
+
+impl From<()> for CoreAudioImportedOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[ObjectReturnField; N]> for CoreAudioImportedOptions {
+    fn from(return_fields: [ObjectReturnField; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<ObjectReturnField>> for CoreAudioImportedOptions {
+    fn from(return_fields: Vec<ObjectReturnField>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

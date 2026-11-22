@@ -59,7 +59,7 @@ impl CoreSourceControlGetSourceFilesArgs {
 pub struct CoreSourceControlGetSourceFilesOptions {
     /// Array of fields to return for each file or folder found.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<String>>,
+    pub return_fields: Option<Vec<String>>,
     /// The array of return expressions defines which elements of the Wwise object is returned. This can include built-in accessors, such as the name or id, or object properties, such as the Volume or the Pitch.
     #[serde(rename = "objectReturn", skip_serializing_if = "Option::is_none")]
     pub object_return: Option<Vec<ObjectReturnField>>,
@@ -72,15 +72,46 @@ impl CoreSourceControlGetSourceFilesOptions {
     }
 
     /// Array of fields to return for each file or folder found.
-    pub fn return_(mut self, return_: impl Into<Vec<String>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<String>,
+    {
+        self.return_fields(return_fields)
     }
 
     /// The array of return expressions defines which elements of the Wwise object is returned. This can include built-in accessors, such as the name or id, or object properties, such as the Volume or the Pitch.
     pub fn object_return(mut self, object_return: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.object_return = Some(object_return.into());
         self
+    }
+}
+
+impl From<()> for CoreSourceControlGetSourceFilesOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[String; N]> for CoreSourceControlGetSourceFilesOptions {
+    fn from(return_fields: [String; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<String>> for CoreSourceControlGetSourceFilesOptions {
+    fn from(return_fields: Vec<String>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

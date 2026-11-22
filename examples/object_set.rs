@@ -13,7 +13,7 @@ use wwise_waapi::prelude::*;
 async fn main() {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("error")).init();
 
-    let mut client = WaapiClient::connect()
+    let client = WaapiClient::connect()
         .await
         .expect("Failed to connect to WAAPI");
 
@@ -29,8 +29,8 @@ async fn main() {
             for obj in response.objects {
                 println!(
                     "Modified: id={:?}  name={:?}  children={}",
-                    obj.id,
-                    obj.name,
+                    obj.id(),
+                    obj.name(),
                     obj.children.len()
                 );
             }

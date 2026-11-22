@@ -18,7 +18,7 @@ const GAME_PARAMS_WU: &str = r"\Game Parameters\Default Work Unit";
 #[tokio::test]
 async fn set_active_source_set_range_and_ping_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to Wwise WAAPI on ws://127.0.0.1:8080/waapi");
 

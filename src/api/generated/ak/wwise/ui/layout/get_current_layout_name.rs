@@ -15,5 +15,12 @@ pub struct UiLayoutGetCurrentLayoutNameResponse {
     pub name: Option<String>,
 }
 
+impl UiLayoutGetCurrentLayoutNameResponse {
+    /// Returns the object name (`name`), if present in the response.
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+}
+
 /// Module-scoped alias for [`UiLayoutGetCurrentLayoutNameResponse`].
 pub type GetCurrentLayoutNameResponse = UiLayoutGetCurrentLayoutNameResponse;

@@ -23,7 +23,7 @@ pub struct CoreObjectStructureChangedPayload {
 pub struct CoreObjectStructureChangedOptions {
     /// Data to be returned for the objects involved in the structure changes.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<ObjectReturnField>>,
+    pub return_fields: Option<Vec<ObjectReturnField>>,
     /// If true, all loaded or unloaded objects are provided when a Work Unit is loaded or unloaded. If false or not provided, only the Work Unit objects that are loaded or unloaded is provided. Note that several Work Unit objects could be provided in a single structure change operation since Work Unit objects can be children of other Work Unit objects.
     #[serde(
         rename = "includeLoadedAndUnloadedNestedObjects",
@@ -39,9 +39,22 @@ impl CoreObjectStructureChangedOptions {
     }
 
     /// Data to be returned for the objects involved in the structure changes.
-    pub fn return_(mut self, return_: impl Into<Vec<ObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<ObjectReturnField>,
+    {
+        self.return_fields(return_fields)
     }
 
     /// If true, all loaded or unloaded objects are provided when a Work Unit is loaded or unloaded. If false or not provided, only the Work Unit objects that are loaded or unloaded is provided. Note that several Work Unit objects could be provided in a single structure change operation since Work Unit objects can be children of other Work Unit objects.
@@ -52,6 +65,24 @@ impl CoreObjectStructureChangedOptions {
         self.include_loaded_and_unloaded_nested_objects =
             Some(include_loaded_and_unloaded_nested_objects.into());
         self
+    }
+}
+
+impl From<()> for CoreObjectStructureChangedOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[ObjectReturnField; N]> for CoreObjectStructureChangedOptions {
+    fn from(return_fields: [ObjectReturnField; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<ObjectReturnField>> for CoreObjectStructureChangedOptions {
+    fn from(return_fields: Vec<ObjectReturnField>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

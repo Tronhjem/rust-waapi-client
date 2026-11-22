@@ -83,6 +83,13 @@ pub struct CoreObjectGetPropertyInfoResponse {
     pub ui: Option<serde_json::Value>,
 }
 
+impl CoreObjectGetPropertyInfoResponse {
+    /// Returns the object name (`name`), if present in the response.
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+}
+
 /// Module-scoped alias for [`CoreObjectGetPropertyInfoArgs`].
 pub type GetPropertyInfoArgs = CoreObjectGetPropertyInfoArgs;
 

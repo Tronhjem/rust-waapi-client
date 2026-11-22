@@ -65,6 +65,12 @@ impl CoreProfilerCaptureLogItemAddedOptions {
     }
 }
 
+impl From<()> for CoreProfilerCaptureLogItemAddedOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
 /// Module-scoped alias for [`CoreProfilerCaptureLogItemAddedPayload`].
 pub type ItemAddedPayload = CoreProfilerCaptureLogItemAddedPayload;
 

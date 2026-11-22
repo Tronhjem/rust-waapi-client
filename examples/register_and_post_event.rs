@@ -14,8 +14,8 @@ const EVENT_NAME: &str = "Play_TestSound";
 async fn main() -> WaapiResult<()> {
     env_logger::init();
 
-    let mut client = WaapiClient::connect().await?;
-    let mut se = client.soundengine();
+    let client = WaapiClient::connect().await?;
+    let se = client.soundengine();
 
     // Register a listener and an emitter game object.
     se.register_game_obj((LISTENER_ID, "WaapiExampleListener"))
@@ -24,7 +24,8 @@ async fn main() -> WaapiResult<()> {
         .await?;
 
     // Make the listener the default listener for all emitters.
-    se.set_default_listeners(vec![LISTENER_ID.into()]).await?;
+    se.set_default_listeners(vec![GameObjectRef::id(LISTENER_ID)])
+        .await?;
 
     // Place the listener at the origin with default forward/up orientation.
     se.set_position((LISTENER_ID, Position::origin())).await?;

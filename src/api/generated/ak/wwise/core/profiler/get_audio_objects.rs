@@ -46,7 +46,7 @@ impl From<serde_json::Value> for CoreProfilerGetAudioObjectsArgs {
 pub struct CoreProfilerGetAudioObjectsOptions {
     /// Members to return for each Audio Object. Defaults to Audio Object ID, Bus Pipeline ID, Instigator Pipeline ID and Effect Class ID.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_: Option<Vec<AudioObjectReturnField>>,
+    pub return_fields: Option<Vec<AudioObjectReturnField>>,
 }
 
 impl CoreProfilerGetAudioObjectsOptions {
@@ -56,9 +56,40 @@ impl CoreProfilerGetAudioObjectsOptions {
     }
 
     /// Members to return for each Audio Object. Defaults to Audio Object ID, Bus Pipeline ID, Instigator Pipeline ID and Effect Class ID.
-    pub fn return_(mut self, return_: impl Into<Vec<AudioObjectReturnField>>) -> Self {
-        self.return_ = Some(return_.into());
+    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<AudioObjectReturnField>,
+    {
+        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
         self
+    }
+
+    /// Alias for [`Self::return_fields`].
+    pub fn return_<I, T>(self, return_fields: I) -> Self
+    where
+        I: IntoIterator<Item = T>,
+        T: Into<AudioObjectReturnField>,
+    {
+        self.return_fields(return_fields)
+    }
+}
+
+impl From<()> for CoreProfilerGetAudioObjectsOptions {
+    fn from((): ()) -> Self {
+        Self::default()
+    }
+}
+
+impl<const N: usize> From<[AudioObjectReturnField; N]> for CoreProfilerGetAudioObjectsOptions {
+    fn from(return_fields: [AudioObjectReturnField; N]) -> Self {
+        Self::new().return_fields(return_fields)
+    }
+}
+
+impl From<Vec<AudioObjectReturnField>> for CoreProfilerGetAudioObjectsOptions {
+    fn from(return_fields: Vec<AudioObjectReturnField>) -> Self {
+        Self::new().return_fields(return_fields)
     }
 }
 

@@ -236,11 +236,41 @@ pub struct CoreObjectSetObject {
 }
 
 impl CoreObjectSetObject {
+    /// Returns the object GUID string (`id`), if present in the response.
+    pub fn id(&self) -> Option<&str> {
+        self.id.as_deref()
+    }
+
+    /// Returns the object name (`name`), if present in the response.
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_deref()
+    }
+
     /// Look up a property value in `extra` (checks `"@Property"` first, then `"Property"`).
     pub fn property(&self, prop: Property) -> Option<&serde_json::Value> {
         self.extra
             .get(prop.as_at_str())
             .or_else(|| self.extra.get(prop.as_str()))
+    }
+
+    /// Look up a numeric (`f64`) property value in `extra`.
+    pub fn property_f64(&self, prop: Property) -> Option<f64> {
+        self.property(prop).and_then(serde_json::Value::as_f64)
+    }
+
+    /// Look up an integer (`i64`) property value in `extra`.
+    pub fn property_i64(&self, prop: Property) -> Option<i64> {
+        self.property(prop).and_then(serde_json::Value::as_i64)
+    }
+
+    /// Look up a boolean (`bool`) property value in `extra`.
+    pub fn property_bool(&self, prop: Property) -> Option<bool> {
+        self.property(prop).and_then(serde_json::Value::as_bool)
+    }
+
+    /// Look up a string (`&str`) property value in `extra`.
+    pub fn property_str(&self, prop: Property) -> Option<&str> {
+        self.property(prop).and_then(serde_json::Value::as_str)
     }
 }
 

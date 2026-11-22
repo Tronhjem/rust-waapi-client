@@ -7,27 +7,25 @@
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example post_event
 
-use wwise_waapi::api::SoundEngineObjectRef;
-use wwise_waapi::api::generated::ak::soundengine::SoundenginePostEventArgs;
-use wwise_waapi::{WaapiClient, WaapiResult};
+use wwise_waapi::api::ak::soundengine::PostEventArgs;
+use wwise_waapi::prelude::*;
 
 #[tokio::main]
 async fn main() -> WaapiResult<()> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
 
-    let mut client = WaapiClient::new(None).await?;
+    let client = WaapiClient::connect().await?;
 
     let game_object = 1122334u64;
 
     // The same Event can be addressed three ways. Post by name here; uncomment
     // one of the other two to post by Short ID or GUID instead.
     let args =
-        SoundenginePostEventArgs::new(SoundEngineObjectRef::Name("Play_TestSound".to_string()))
-            .game_object(game_object);
-    // let args = SoundenginePostEventArgs::new(SoundEngineObjectRef::ShortId(2932040671))
+        PostEventArgs::new(SoundEngineObjectRef::name("Play_TestSound")).game_object(game_object);
+    // let args = PostEventArgs::new(SoundEngineObjectRef::short(2932040671))
     //     .game_object(game_object);
-    // let args = SoundenginePostEventArgs::new(SoundEngineObjectRef::Guid(
-    //     "{F546017D-201A-49BD-8D4E-0A28F5DBB28D}".to_string(),
+    // let args = PostEventArgs::new(SoundEngineObjectRef::guid(
+    //     "{F546017D-201A-49BD-8D4E-0A28F5DBB28D}",
     // ))
     // .game_object(game_object);
 

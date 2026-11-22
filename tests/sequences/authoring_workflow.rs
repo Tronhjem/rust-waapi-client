@@ -425,7 +425,7 @@ async fn undo_and_object_helpers_sequence() {
 #[tokio::test]
 async fn attenuation_curves_and_switch_container_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to WAAPI on 127.0.0.1:8080; is Wwise open with a project?");
 
@@ -659,7 +659,7 @@ async fn attenuation_curves_and_switch_container_sequence() {
 #[tokio::test]
 async fn transport_project_info_and_ui_commands_sequence() {
     let _guard = sequence_lock().await;
-    let mut client = connect_client()
+    let client = connect_client()
         .await
         .expect("Failed to connect to WAAPI on 127.0.0.1:8080; is Wwise open with a project?");
 

@@ -13,7 +13,7 @@ def endpoint_call_shape(info):
     if has_args:
         params.append(("args", f"impl Into<{info['base']}Args>"))
     if has_options:
-        params.append(("options", f"{info['base']}Options"))
+        params.append(("options", f"impl Into<{info['base']}Options>"))
     return params, has_response
 
 
@@ -36,7 +36,11 @@ def emit_call_body(uri, info, target="self.client"):
     uri_variant = f"WaapiFunction::{uri.replace('.', '_')}"
     call = f"{target}.{method}{turbofish}({uri_variant}, {args_expr}, {options_expr}).await"
 
-    prefix = [f"let args: {info['base']}Args = args.into();"] if has_args else []
+    prefix = []
+    if has_args:
+        prefix.append(f"let args: {info['base']}Args = args.into();")
+    if has_options:
+        prefix.append(f"let options: {info['base']}Options = options.into();")
     if has_response:
         return [*prefix, call]
     else:
@@ -118,14 +122,15 @@ def gen_clients(endpoints, topics):
 
     for struct_name, prefix, children in build_chain_tree(all_uris):
         lines.append(f"/// Typed client for the `{prefix}` WAAPI namespace.")
+        lines.append("#[derive(Clone, Copy)]")
         lines.append(f"pub struct {struct_name}<'a> {{")
-        lines.append("    client: &'a mut WaapiClient,")
+        lines.append("    client: &'a WaapiClient,")
         lines.append("}")
         lines.append("")
         lines.append(f"impl<'a> {struct_name}<'a> {{")
         for method, child, child_prefix in children:
             lines.append(f"    /// Access the `{child_prefix}` WAAPI namespace.")
-            lines.append(f"    pub fn {method}(&mut self) -> {child}<'_> {{")
+            lines.append(f"    pub fn {method}(&self) -> {child}<'a> {{")
             lines.append(f"        {child} {{ client: self.client }}")
             lines.append("    }")
             lines.append("")
@@ -134,7 +139,7 @@ def gen_clients(endpoints, topics):
             params, has_response = endpoint_call_shape(info)
             ret = f"WaapiResult<{info['base']}Response>" if has_response else "WaapiResult<()>"
             param_list = ",\n        ".join(f"{n}: {t}" for n, t in params)
-            sig = f"        &mut self,\n        {param_list}," if params else "        &mut self,"
+            sig = f"        &self,\n        {param_list}," if params else "        &self,"
             desc = clean_doc(info["ctx"].doc.get("description", ""))
             if desc:
                 lines.extend(doc_lines(desc, "    "))
@@ -159,14 +164,14 @@ def gen_clients(endpoints, topics):
             if info["has_options"]:
                 opts = f"{info['base']}Options"
                 lines.append(f"    pub async fn {method}(")
-                lines.append(f"        &mut self,")
+                lines.append(f"        &self,")
                 lines.append(f"        options: Option<{opts}>,")
                 lines.append(f"    ) -> WaapiResult<(u64, UnboundedReceiver<{payload}>)> {{")
                 lines.append(f"        self.client.subscribe_payload(WaapiTopic::{uri.replace('.', '_')}, options).await")
                 lines.append("    }")
             else:
                 lines.append(f"    pub async fn {method}(")
-                lines.append(f"        &mut self,")
+                lines.append(f"        &self,")
                 lines.append(f"    ) -> WaapiResult<(u64, UnboundedReceiver<{payload}>)> {{")
                 lines.append(f"        self.client.subscribe_payload::<(), _>(WaapiTopic::{uri.replace('.', '_')}, None).await")
                 lines.append("    }")
@@ -178,32 +183,32 @@ def gen_clients(endpoints, topics):
 
     lines.append("impl WaapiClient {")
     lines.append("    /// Chained namespace access starting at `ak`.")
-    lines.append("    pub fn ak(&mut self) -> AkClient<'_> {")
+    lines.append("    pub fn ak(&self) -> AkClient<'_> {")
     lines.append("        AkClient { client: self }")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Shortcut for `client.ak().wwise()`.")
-    lines.append("    pub fn wwise(&mut self) -> WwiseClient<'_> {")
+    lines.append("    pub fn wwise(&self) -> WwiseClient<'_> {")
     lines.append("        WwiseClient { client: self }")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Shortcut for `client.ak().soundengine()`.")
-    lines.append("    pub fn soundengine(&mut self) -> SoundengineClient<'_> {")
+    lines.append("    pub fn soundengine(&self) -> SoundengineClient<'_> {")
     lines.append("        SoundengineClient { client: self }")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Shortcut for `client.wwise().core()`.")
-    lines.append("    pub fn core(&mut self) -> WwiseCoreClient<'_> {")
+    lines.append("    pub fn core(&self) -> WwiseCoreClient<'_> {")
     lines.append("        WwiseCoreClient { client: self }")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Shortcut for `client.wwise().core().object()`.")
-    lines.append("    pub fn object(&mut self) -> WwiseCoreObjectClient<'_> {")
+    lines.append("    pub fn object(&self) -> WwiseCoreObjectClient<'_> {")
     lines.append("        WwiseCoreObjectClient { client: self }")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Shortcut for `client.wwise().ui()`.")
-    lines.append("    pub fn ui(&mut self) -> WwiseUiClient<'_> {")
+    lines.append("    pub fn ui(&self) -> WwiseUiClient<'_> {")
     lines.append("        WwiseUiClient { client: self }")
     lines.append("    }")
     lines.append("}")
