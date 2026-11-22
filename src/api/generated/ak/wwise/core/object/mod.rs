@@ -3,174 +3,86 @@
 
 mod attenuation_curve_changed;
 pub use attenuation_curve_changed::{
-    CoreObjectAttenuationCurveChangedPayload,
-    CoreObjectAttenuationCurveChangedOptions,
+    CoreObjectAttenuationCurveChangedOptions, CoreObjectAttenuationCurveChangedPayload,
 };
 mod attenuation_curve_link_changed;
 pub use attenuation_curve_link_changed::{
-    CoreObjectAttenuationCurveLinkChangedPayload,
-    CoreObjectAttenuationCurveLinkChangedOptions,
+    CoreObjectAttenuationCurveLinkChangedOptions, CoreObjectAttenuationCurveLinkChangedPayload,
 };
 mod child_added;
-pub use child_added::{
-    CoreObjectChildAddedPayload,
-    CoreObjectChildAddedOptions,
-};
+pub use child_added::{CoreObjectChildAddedOptions, CoreObjectChildAddedPayload};
 mod child_removed;
-pub use child_removed::{
-    CoreObjectChildRemovedPayload,
-    CoreObjectChildRemovedOptions,
-};
+pub use child_removed::{CoreObjectChildRemovedOptions, CoreObjectChildRemovedPayload};
 mod copy;
-pub use copy::{
-    CoreObjectCopyArgs,
-    CoreObjectCopyOptions,
-    CoreObjectCopyResponse,
-};
+pub use copy::{CoreObjectCopyArgs, CoreObjectCopyOptions, CoreObjectCopyResponse};
 mod create;
-pub use create::{
-    CoreObjectCreateArgs,
-    CoreObjectCreateResponse,
-};
+pub use create::{CoreObjectCreateArgs, CoreObjectCreateResponse};
 mod created;
-pub use created::{
-    CoreObjectCreatedPayload,
-    CoreObjectCreatedOptions,
-};
+pub use created::{CoreObjectCreatedOptions, CoreObjectCreatedPayload};
 mod curve_changed;
-pub use curve_changed::{
-    CoreObjectCurveChangedPayload,
-    CoreObjectCurveChangedOptions,
-};
+pub use curve_changed::{CoreObjectCurveChangedOptions, CoreObjectCurveChangedPayload};
 mod delete;
-pub use delete::{
-    CoreObjectDeleteArgs,
-};
+pub use delete::CoreObjectDeleteArgs;
 mod diff;
-pub use diff::{
-    CoreObjectDiffArgs,
-    CoreObjectDiffResponse,
-};
+pub use diff::{CoreObjectDiffArgs, CoreObjectDiffResponse};
 mod get;
-pub use get::{
-    CoreObjectGetArgs,
-    CoreObjectGetOptions,
-    CoreObjectGetResponse,
-};
+pub use get::{CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectGetResponse};
 mod get_attenuation_curve;
 pub use get_attenuation_curve::{
-    CoreObjectGetAttenuationCurveArgs,
-    CoreObjectGetAttenuationCurveResponse,
+    CoreObjectGetAttenuationCurveArgs, CoreObjectGetAttenuationCurveResponse,
 };
 mod get_property_and_reference_names;
 pub use get_property_and_reference_names::{
-    CoreObjectGetPropertyAndReferenceNamesArgs,
-    CoreObjectGetPropertyAndReferenceNamesResponse,
+    CoreObjectGetPropertyAndReferenceNamesArgs, CoreObjectGetPropertyAndReferenceNamesResponse,
 };
 mod get_property_info;
-pub use get_property_info::{
-    CoreObjectGetPropertyInfoArgs,
-    CoreObjectGetPropertyInfoResponse,
-};
+pub use get_property_info::{CoreObjectGetPropertyInfoArgs, CoreObjectGetPropertyInfoResponse};
 mod get_types;
-pub use get_types::{
-    CoreObjectGetTypesResponse,
-};
+pub use get_types::CoreObjectGetTypesResponse;
 mod is_linked;
-pub use is_linked::{
-    CoreObjectIsLinkedArgs,
-    CoreObjectIsLinkedResponse,
-};
+pub use is_linked::{CoreObjectIsLinkedArgs, CoreObjectIsLinkedResponse};
 mod is_property_enabled;
 pub use is_property_enabled::{
-    CoreObjectIsPropertyEnabledArgs,
-    CoreObjectIsPropertyEnabledResponse,
+    CoreObjectIsPropertyEnabledArgs, CoreObjectIsPropertyEnabledResponse,
 };
 mod move_;
-pub use move_::{
-    CoreObjectMoveArgs,
-    CoreObjectMoveResponse,
-};
+pub use move_::{CoreObjectMoveArgs, CoreObjectMoveResponse};
 mod name_changed;
-pub use name_changed::{
-    CoreObjectNameChangedPayload,
-    CoreObjectNameChangedOptions,
-};
+pub use name_changed::{CoreObjectNameChangedOptions, CoreObjectNameChangedPayload};
 mod notes_changed;
-pub use notes_changed::{
-    CoreObjectNotesChangedPayload,
-    CoreObjectNotesChangedOptions,
-};
+pub use notes_changed::{CoreObjectNotesChangedOptions, CoreObjectNotesChangedPayload};
 mod paste_properties;
-pub use paste_properties::{
-    CoreObjectPastePropertiesArgs,
-};
+pub use paste_properties::CoreObjectPastePropertiesArgs;
 mod post_deleted;
-pub use post_deleted::{
-    CoreObjectPostDeletedPayload,
-    CoreObjectPostDeletedOptions,
-};
+pub use post_deleted::{CoreObjectPostDeletedOptions, CoreObjectPostDeletedPayload};
 mod pre_deleted;
-pub use pre_deleted::{
-    CoreObjectPreDeletedPayload,
-    CoreObjectPreDeletedOptions,
-};
+pub use pre_deleted::{CoreObjectPreDeletedOptions, CoreObjectPreDeletedPayload};
 mod property_changed;
-pub use property_changed::{
-    CoreObjectPropertyChangedPayload,
-    CoreObjectPropertyChangedOptions,
-};
+pub use property_changed::{CoreObjectPropertyChangedOptions, CoreObjectPropertyChangedPayload};
 mod reference_changed;
-pub use reference_changed::{
-    CoreObjectReferenceChangedPayload,
-    CoreObjectReferenceChangedOptions,
-};
+pub use reference_changed::{CoreObjectReferenceChangedOptions, CoreObjectReferenceChangedPayload};
 mod set;
 pub use set::{
-    CoreObjectSetArgs,
-    CoreObjectSetItem,
-    CoreObjectSetOptions,
+    CoreObjectSetArgs, CoreObjectSetItem, CoreObjectSetObject, CoreObjectSetOptions,
     CoreObjectSetResponse,
-    CoreObjectSetObject,
 };
 mod set_attenuation_curve;
-pub use set_attenuation_curve::{
-    CoreObjectSetAttenuationCurveArgs,
-};
+pub use set_attenuation_curve::CoreObjectSetAttenuationCurveArgs;
 mod set_linked;
-pub use set_linked::{
-    CoreObjectSetLinkedArgs,
-};
+pub use set_linked::CoreObjectSetLinkedArgs;
 mod set_name;
-pub use set_name::{
-    CoreObjectSetNameArgs,
-};
+pub use set_name::CoreObjectSetNameArgs;
 mod set_notes;
-pub use set_notes::{
-    CoreObjectSetNotesArgs,
-};
+pub use set_notes::CoreObjectSetNotesArgs;
 mod set_property;
-pub use set_property::{
-    CoreObjectSetPropertyArgs,
-};
+pub use set_property::CoreObjectSetPropertyArgs;
 mod set_randomizer;
-pub use set_randomizer::{
-    CoreObjectSetRandomizerArgs,
-};
+pub use set_randomizer::CoreObjectSetRandomizerArgs;
 mod set_reference;
-pub use set_reference::{
-    CoreObjectSetReferenceArgs,
-};
+pub use set_reference::CoreObjectSetReferenceArgs;
 mod set_state_groups;
-pub use set_state_groups::{
-    CoreObjectSetStateGroupsArgs,
-};
+pub use set_state_groups::CoreObjectSetStateGroupsArgs;
 mod set_state_properties;
-pub use set_state_properties::{
-    CoreObjectSetStatePropertiesArgs,
-};
+pub use set_state_properties::CoreObjectSetStatePropertiesArgs;
 mod structure_changed;
-pub use structure_changed::{
-    CoreObjectStructureChangedPayload,
-    CoreObjectStructureChangedOptions,
-};
+pub use structure_changed::{CoreObjectStructureChangedOptions, CoreObjectStructureChangedPayload};

@@ -9,6 +9,7 @@ Usage:
 
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -378,6 +379,7 @@ def main():
     print(f"Union of {len(version_dirs)} version(s): {len(functions)} functions, {len(topics)} topics")
     generate_api_file(functions, src_dir / "waapi_function_api.rs", "WaapiFunction", descriptions)
     generate_api_file(topics, src_dir / "waapi_topics_api.rs", "WaapiTopic", descriptions)
+    subprocess.run(["cargo", "fmt"], cwd=script_dir.parent, check=False)
 
 
 if __name__ == '__main__':

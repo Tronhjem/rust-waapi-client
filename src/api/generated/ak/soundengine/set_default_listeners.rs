@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setDefaultListeners
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setDefaultListeners`.
 ///
@@ -24,8 +17,6 @@ pub struct SoundengineSetDefaultListenersArgs {
 impl SoundengineSetDefaultListenersArgs {
     /// Creates a new [`SoundengineSetDefaultListenersArgs`] with the required fields.
     pub fn new(listeners: Vec<GameObjectRef>) -> Self {
-        Self {
-            listeners,
-        }
+        Self { listeners }
     }
 }

@@ -1404,9 +1404,13 @@ impl Property {
             Self::SoundBankIncludeSoundbankNamesStrings => "SoundBankIncludeSoundbankNamesStrings",
             Self::SoundBankPathUserOverride => "SoundBankPathUserOverride",
             Self::SoundBankPaths => "SoundBankPaths",
-            Self::SoundBankPostGenerateCustomCmdDescription => "SoundBankPostGenerateCustomCmdDescription",
+            Self::SoundBankPostGenerateCustomCmdDescription => {
+                "SoundBankPostGenerateCustomCmdDescription"
+            }
             Self::SoundBankPostGenerateCustomCmdLines => "SoundBankPostGenerateCustomCmdLines",
-            Self::SoundBankPreGenerateCustomCmdDescription => "SoundBankPreGenerateCustomCmdDescription",
+            Self::SoundBankPreGenerateCustomCmdDescription => {
+                "SoundBankPreGenerateCustomCmdDescription"
+            }
             Self::SoundBankPreGenerateCustomCmdLines => "SoundBankPreGenerateCustomCmdLines",
             Self::SoundBankUpdateAudioFiles => "SoundBankUpdateAudioFiles",
             Self::SoundType => "SoundType",
@@ -1902,9 +1906,13 @@ impl Property {
             Self::SoundBankIncludeSoundbankNamesStrings => "@SoundBankIncludeSoundbankNamesStrings",
             Self::SoundBankPathUserOverride => "@SoundBankPathUserOverride",
             Self::SoundBankPaths => "@SoundBankPaths",
-            Self::SoundBankPostGenerateCustomCmdDescription => "@SoundBankPostGenerateCustomCmdDescription",
+            Self::SoundBankPostGenerateCustomCmdDescription => {
+                "@SoundBankPostGenerateCustomCmdDescription"
+            }
             Self::SoundBankPostGenerateCustomCmdLines => "@SoundBankPostGenerateCustomCmdLines",
-            Self::SoundBankPreGenerateCustomCmdDescription => "@SoundBankPreGenerateCustomCmdDescription",
+            Self::SoundBankPreGenerateCustomCmdDescription => {
+                "@SoundBankPreGenerateCustomCmdDescription"
+            }
             Self::SoundBankPreGenerateCustomCmdLines => "@SoundBankPreGenerateCustomCmdLines",
             Self::SoundBankUpdateAudioFiles => "@SoundBankUpdateAudioFiles",
             Self::SoundType => "@SoundType",
@@ -2069,7 +2077,9 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Bypass" => Ok(Self::Bypass),
             "BypassEffect" => Ok(Self::BypassEffect),
             "BypassFlag" => Ok(Self::BypassFlag),
-            "BypassGameParameterInternalTransition" => Ok(Self::BypassGameParameterInternalTransition),
+            "BypassGameParameterInternalTransition" => {
+                Ok(Self::BypassGameParameterInternalTransition)
+            }
             "CenterPercentage" => Ok(Self::CenterPercentage),
             "ChannelConfigOverride" => Ok(Self::ChannelConfigOverride),
             "Channels" => Ok(Self::Channels),
@@ -2345,14 +2355,18 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Platform" => Ok(Self::Platform),
             "PlayAt" => Ok(Self::PlayAt),
             "PlayDestinationPreEntry" => Ok(Self::PlayDestinationPreEntry),
-            "PlayMechanismInfiniteOrNumberOfLoops" => Ok(Self::PlayMechanismInfiniteOrNumberOfLoops),
+            "PlayMechanismInfiniteOrNumberOfLoops" => {
+                Ok(Self::PlayMechanismInfiniteOrNumberOfLoops)
+            }
             "PlayMechanismLoop" => Ok(Self::PlayMechanismLoop),
             "PlayMechanismLoopCount" => Ok(Self::PlayMechanismLoopCount),
             "PlayMechanismRandomOrSequence" => Ok(Self::PlayMechanismRandomOrSequence),
             "PlayMechanismResetPlaylistEachPlay" => Ok(Self::PlayMechanismResetPlaylistEachPlay),
             "PlayMechanismSpecialTransitions" => Ok(Self::PlayMechanismSpecialTransitions),
             "PlayMechanismSpecialTransitionsType" => Ok(Self::PlayMechanismSpecialTransitionsType),
-            "PlayMechanismSpecialTransitionsValue" => Ok(Self::PlayMechanismSpecialTransitionsValue),
+            "PlayMechanismSpecialTransitionsValue" => {
+                Ok(Self::PlayMechanismSpecialTransitionsValue)
+            }
             "PlayMechanismStepOrContinuous" => Ok(Self::PlayMechanismStepOrContinuous),
             "PlayMechanismTransitionTime" => Ok(Self::PlayMechanismTransitionTime),
             "PlayMechanismTransitionUse" => Ok(Self::PlayMechanismTransitionUse),
@@ -2430,12 +2444,18 @@ impl<'de> serde::Deserialize<'de> for Property {
             "SoundBankGeneratePrintPath" => Ok(Self::SoundBankGeneratePrintPath),
             "SoundBankGenerateReadableFile" => Ok(Self::SoundBankGenerateReadableFile),
             "SoundBankHeaderFilePath" => Ok(Self::SoundBankHeaderFilePath),
-            "SoundBankIncludeSoundbankNamesStrings" => Ok(Self::SoundBankIncludeSoundbankNamesStrings),
+            "SoundBankIncludeSoundbankNamesStrings" => {
+                Ok(Self::SoundBankIncludeSoundbankNamesStrings)
+            }
             "SoundBankPathUserOverride" => Ok(Self::SoundBankPathUserOverride),
             "SoundBankPaths" => Ok(Self::SoundBankPaths),
-            "SoundBankPostGenerateCustomCmdDescription" => Ok(Self::SoundBankPostGenerateCustomCmdDescription),
+            "SoundBankPostGenerateCustomCmdDescription" => {
+                Ok(Self::SoundBankPostGenerateCustomCmdDescription)
+            }
             "SoundBankPostGenerateCustomCmdLines" => Ok(Self::SoundBankPostGenerateCustomCmdLines),
-            "SoundBankPreGenerateCustomCmdDescription" => Ok(Self::SoundBankPreGenerateCustomCmdDescription),
+            "SoundBankPreGenerateCustomCmdDescription" => {
+                Ok(Self::SoundBankPreGenerateCustomCmdDescription)
+            }
             "SoundBankPreGenerateCustomCmdLines" => Ok(Self::SoundBankPreGenerateCustomCmdLines),
             "SoundBankUpdateAudioFiles" => Ok(Self::SoundBankUpdateAudioFiles),
             "SoundType" => Ok(Self::SoundType),
@@ -2520,7 +2540,9 @@ impl<'de> serde::Deserialize<'de> for Property {
             "Weight" => Ok(Self::Weight),
             "WwiseConsoleLoadUserSettings" => Ok(Self::WwiseConsoleLoadUserSettings),
             "WwiseVersionWhenCreated" => Ok(Self::WwiseVersionWhenCreated),
-            _ => Err(serde::de::Error::custom(format!("unknown Wwise Property: {s}"))),
+            _ => Err(serde::de::Error::custom(format!(
+                "unknown Wwise Property: {s}"
+            ))),
         }
     }
 }

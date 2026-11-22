@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.audio.importTabDelimited
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.audio.importTabDelimited`.
 ///
@@ -18,10 +11,16 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreAudioImportTabDelimitedArgs {
     /// Determines if Wwise automatically performs a source control Add operation on the imported files. Defaults to true.
-    #[serde(rename = "autoAddToSourceControl", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "autoAddToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_add_to_source_control: Option<bool>,
     /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files. Defaults to true.
-    #[serde(rename = "autoCheckOutToSourceControl", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "autoCheckOutToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_check_out_to_source_control: Option<bool>,
     /// Imports language for audio file import (taken from the project's defined languages, found in the WPROJ file LanguageList).
     #[serde(rename = "importLanguage")]
@@ -54,13 +53,19 @@ impl CoreAudioImportTabDelimitedArgs {
     }
 
     /// Determines if Wwise automatically performs a source control Add operation on the imported files. Defaults to true.
-    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_add_to_source_control(
+        mut self,
+        auto_add_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
         self
     }
 
     /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files. Defaults to true.
-    pub fn auto_check_out_to_source_control(mut self, auto_check_out_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_check_out_to_source_control(
+        mut self,
+        auto_check_out_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
         self
     }
@@ -86,4 +91,3 @@ pub struct CoreAudioImportTabDelimitedResponse {
     #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.ui.project.open
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.ui.project.open`.
 ///
@@ -23,13 +16,19 @@ pub struct UiProjectOpenArgs {
     #[serde(rename = "onUpgrade", skip_serializing_if = "Option::is_none")]
     pub on_upgrade: Option<ProjectMigrationAction>,
     /// The action to be executed when opening a project that needs to be migrated.
-    #[serde(rename = "onMigrationRequired", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "onMigrationRequired",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub on_migration_required: Option<ProjectMigrationAction>,
     /// Indicates if the user should not be prompted to save the current project. Defaults to true.
     #[serde(rename = "bypassSave", skip_serializing_if = "Option::is_none")]
     pub bypass_save: Option<bool>,
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
-    #[serde(rename = "autoCheckOutToSourceControl", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "autoCheckOutToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_check_out_to_source_control: Option<bool>,
 }
 
@@ -52,7 +51,10 @@ impl UiProjectOpenArgs {
     }
 
     /// The action to be executed when opening a project that needs to be migrated.
-    pub fn on_migration_required(mut self, on_migration_required: impl Into<ProjectMigrationAction>) -> Self {
+    pub fn on_migration_required(
+        mut self,
+        on_migration_required: impl Into<ProjectMigrationAction>,
+    ) -> Self {
         self.on_migration_required = Some(on_migration_required.into());
         self
     }
@@ -64,7 +66,10 @@ impl UiProjectOpenArgs {
     }
 
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
-    pub fn auto_check_out_to_source_control(mut self, auto_check_out_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_check_out_to_source_control(
+        mut self,
+        auto_check_out_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
         self
     }

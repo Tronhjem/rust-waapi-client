@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.ui.layout.resetLayouts
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.ui.layout.resetLayouts`.
 ///

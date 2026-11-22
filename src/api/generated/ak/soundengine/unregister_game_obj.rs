@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.unregisterGameObj
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.unregisterGameObj`.
 ///
@@ -25,8 +18,6 @@ pub struct SoundengineUnregisterGameObjArgs {
 impl SoundengineUnregisterGameObjArgs {
     /// Creates a new [`SoundengineUnregisterGameObjArgs`] with the required fields.
     pub fn new(game_object: GameObjectRef) -> Self {
-        Self {
-            game_object,
-        }
+        Self { game_object }
     }
 }

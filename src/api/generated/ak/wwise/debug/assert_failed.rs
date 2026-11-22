@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.debug.assertFailed
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.debug.assertFailed`.
 ///
@@ -31,4 +24,3 @@ pub struct DebugAssertFailedPayload {
     /// The callstack from the location of the assert.
     pub callstack: String,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setMultiplePositions
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setMultiplePositions`.
 ///
@@ -29,7 +22,11 @@ pub struct SoundengineSetMultiplePositionsArgs {
 
 impl SoundengineSetMultiplePositionsArgs {
     /// Creates a new [`SoundengineSetMultiplePositionsArgs`] with the required fields.
-    pub fn new(game_object: GameObjectRef, positions: Vec<MultiPosition>, multi_position_type: MultiPositionType) -> Self {
+    pub fn new(
+        game_object: GameObjectRef,
+        positions: Vec<MultiPosition>,
+        multi_position_type: MultiPositionType,
+    ) -> Self {
         Self {
             game_object,
             positions,

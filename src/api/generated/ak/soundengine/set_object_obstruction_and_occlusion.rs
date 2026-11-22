@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setObjectObstructionAndOcclusion
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setObjectObstructionAndOcclusion`.
 ///
@@ -31,7 +24,12 @@ pub struct SoundengineSetObjectObstructionAndOcclusionArgs {
 
 impl SoundengineSetObjectObstructionAndOcclusionArgs {
     /// Creates a new [`SoundengineSetObjectObstructionAndOcclusionArgs`] with the required fields.
-    pub fn new(emitter: GameObjectRef, listener: GameObjectRef, obstruction_level: f64, occlusion_level: f64) -> Self {
+    pub fn new(
+        emitter: GameObjectRef,
+        listener: GameObjectRef,
+        obstruction_level: f64,
+        occlusion_level: f64,
+    ) -> Self {
         Self {
             emitter,
             listener,

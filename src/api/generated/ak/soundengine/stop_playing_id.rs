@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.stopPlayingID
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.stopPlayingID`.
 ///
@@ -30,7 +23,11 @@ pub struct SoundengineStopPlayingIdArgs {
 
 impl SoundengineStopPlayingIdArgs {
     /// Creates a new [`SoundengineStopPlayingIdArgs`] with the required fields.
-    pub fn new(playing_id: u32, transition_duration: i32, fade_curve: AkCurveInterpolation) -> Self {
+    pub fn new(
+        playing_id: u32,
+        transition_duration: i32,
+        fade_curve: AkCurveInterpolation,
+    ) -> Self {
         Self {
             playing_id,
             transition_duration,

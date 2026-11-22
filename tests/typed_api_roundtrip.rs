@@ -16,11 +16,13 @@ use waapi_client::api::generated::ak::wwise::ui::{
     UiGetSelectedObjectsOptions, UiGetSelectedObjectsResponse,
 };
 use waapi_client::api::generated::primitives::{
-    ChildObject, GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery,
-    ObjectReturnField, ObjectType, OnNameConflict, PlatformRef, Position, Property, PropertyValue,
-    RtpcRef, Transform, TransformSelect, Vector3,
+    GameObjectRef, ImportDefaults, ImportItem, ImportOperation, ObjectQuery, ObjectReturnField,
+    RtpcRef, Transform, TransformSelect,
 };
-use waapi_client::api::primitives::ObjectRef;
+use waapi_client::api::primitives::{
+    ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
+};
+use waapi_client::{ObjectType, Property};
 
 #[test]
 fn object_get_args_serializes_to_expected_shape() {
@@ -365,7 +367,7 @@ fn object_set_args_serializes_to_expected_shape() {
             r"\Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus",
         ),
     ])
-    .list_mode(waapi_client::api::generated::primitives::ListMode::Append);
+    .list_mode(ListMode::Append);
 
     let value = serde_json::to_value(&args).unwrap();
     let item = &value["objects"][0];
@@ -2101,4 +2103,168 @@ fn new_2025_endpoints_roundtrip() {
     .unwrap();
     assert_eq!(structure.summary, "Paste");
     assert_eq!(structure.objects.len(), 1);
+}
+
+#[test]
+fn wwise_object_convenience_accessors_roundtrip() {
+    use waapi_client::api::generated::primitives::WwiseObject;
+
+    let obj: WwiseObject = serde_json::from_value(json!({
+        "id": "{12345678-1234-1234-1234-123456789012}",
+        "name": "PlayerFootstep",
+        "type": "Sound",
+        "path": r"\Containers\Default Work Unit\PlayerFootstep",
+        "notes": "Footstep SFX",
+        "@Volume": -3.5
+    }))
+    .unwrap();
+
+    assert_eq!(obj.id(), Some("{12345678-1234-1234-1234-123456789012}"));
+    assert_eq!(obj.name(), Some("PlayerFootstep"));
+    assert_eq!(obj.object_type(), Some(ObjectType::Sound));
+    assert_eq!(
+        obj.path(),
+        Some(r"\Containers\Default Work Unit\PlayerFootstep")
+    );
+    assert_eq!(obj.notes(), Some("Footstep SFX"));
+    assert_eq!(obj.property(Property::Volume), Some(&json!(-3.5)));
+}
+
+#[test]
+fn schema_discovered_endpoints_roundtrip() {
+    use waapi_client::api::generated::ak::wwise::core::audioSourcePeaks::{
+        CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs,
+        CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::core::log::{
+        CoreLogClearArgs, CoreLogGetArgs, CoreLogGetResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::core::profiler::{
+        CoreProfilerGetAudioObjectsArgs, CoreProfilerGetAudioObjectsOptions,
+        CoreProfilerGetBussesArgs, CoreProfilerGetBussesOptions, CoreProfilerGetVoicesArgs,
+        CoreProfilerGetVoicesOptions,
+    };
+    use waapi_client::api::generated::ak::wwise::core::remote::{
+        CoreRemoteGetAvailableConsolesResponse, CoreRemoteGetConnectionStatusResponse,
+    };
+    use waapi_client::api::generated::ak::wwise::debug::DebugEnableAssertsArgs;
+    use waapi_client::api::generated::ak::wwise::waapi::{
+        WaapiGetFunctionsResponse, WaapiGetSchemaArgs, WaapiGetTopicsResponse,
+    };
+    use waapi_client::api::generated::primitives::{
+        AudioObjectReturnField, BusReturnField, LogChannel, VoiceReturnField,
+    };
+
+    // waapi meta endpoints
+    let funcs: WaapiGetFunctionsResponse =
+        serde_json::from_value(json!({"functions": ["ak.wwise.core.getInfo"]})).unwrap();
+    assert_eq!(funcs.functions, vec!["ak.wwise.core.getInfo"]);
+
+    let topics: WaapiGetTopicsResponse =
+        serde_json::from_value(json!({"topics": ["ak.wwise.core.object.created"]})).unwrap();
+    assert_eq!(topics.topics, vec!["ak.wwise.core.object.created"]);
+
+    let get_schema = WaapiGetSchemaArgs::new("ak.wwise.core.getInfo".to_string());
+    assert_eq!(
+        serde_json::to_value(get_schema).unwrap(),
+        json!({"uri": "ak.wwise.core.getInfo"})
+    );
+
+    // log.get & log.clear
+    let log_get = CoreLogGetArgs::new(LogChannel::General);
+    assert_eq!(
+        serde_json::to_value(log_get).unwrap(),
+        json!({"channel": "general"})
+    );
+    let log_clear = CoreLogClearArgs::new().channel(LogChannel::Waapi);
+    assert_eq!(
+        serde_json::to_value(log_clear).unwrap(),
+        json!({"channel": "waapi"})
+    );
+    let log_resp: CoreLogGetResponse = serde_json::from_value(json!({"items": []})).unwrap();
+    assert!(log_resp.items.is_empty());
+
+    // remote.getAvailableConsoles & getConnectionStatus
+    let consoles: CoreRemoteGetAvailableConsolesResponse =
+        serde_json::from_value(json!({"consoles": [{"name": "Local", "host": "127.0.0.1"}]}))
+            .unwrap();
+    assert_eq!(consoles.consoles.len(), 1);
+    let conn_status: CoreRemoteGetConnectionStatusResponse =
+        serde_json::from_value(json!({"isConnected": false, "status": "Disconnected"})).unwrap();
+    assert!(!conn_status.is_connected);
+
+    // profiler getBusses / getVoices / getAudioObjects with typed return field enums
+    let busses_args = CoreProfilerGetBussesArgs::new(json!("user")).bus_pipeline_id(42u32);
+    assert_eq!(
+        serde_json::to_value(busses_args).unwrap(),
+        json!({"time": "user", "busPipelineID": 42})
+    );
+    let busses_opts = CoreProfilerGetBussesOptions::new()
+        .return_(vec![BusReturnField::ObjectGuid, BusReturnField::ObjectName]);
+    assert_eq!(
+        serde_json::to_value(busses_opts).unwrap(),
+        json!({"return": ["objectGUID", "objectName"]})
+    );
+
+    let voices_args = CoreProfilerGetVoicesArgs::new(json!(1000));
+    assert_eq!(
+        serde_json::to_value(voices_args).unwrap(),
+        json!({"time": 1000})
+    );
+    let voices_opts = CoreProfilerGetVoicesOptions::new().return_(vec![
+        VoiceReturnField::ObjectGuid,
+        VoiceReturnField::GameObjectName,
+    ]);
+    assert_eq!(
+        serde_json::to_value(voices_opts).unwrap(),
+        json!({"return": ["objectGUID", "gameObjectName"]})
+    );
+
+    let audio_objs_args = CoreProfilerGetAudioObjectsArgs::new(json!("capture"));
+    assert_eq!(
+        serde_json::to_value(audio_objs_args).unwrap(),
+        json!({"time": "capture"})
+    );
+    let audio_objs_opts = CoreProfilerGetAudioObjectsOptions::new().return_(vec![
+        AudioObjectReturnField::AudioObjectName,
+        AudioObjectReturnField::InstigatorPipelineId,
+    ]);
+    assert_eq!(
+        serde_json::to_value(audio_objs_opts).unwrap(),
+        json!({"return": ["audioObjectName", "instigatorPipelineID"]})
+    );
+
+    // audioSourcePeaks.getMinMaxPeaksInRegion
+    let peaks_args = CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs::new(
+        ObjectRef::guid("{SRC-1}"),
+        0.0,
+        1.5,
+        10,
+    )
+    .get_cross_channel_peaks(true);
+    assert_eq!(
+        serde_json::to_value(peaks_args).unwrap(),
+        json!({
+            "numPeaks": 10,
+            "object": "{SRC-1}",
+            "timeFrom": 0.0,
+            "timeTo": 1.5,
+            "getCrossChannelPeaks": true
+        })
+    );
+    let peaks_resp: CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse =
+        serde_json::from_value(json!({
+            "peaks": ["AAAA"],
+            "maxAbsValue": 0.85,
+            "numChannels": 2.0
+        }))
+        .unwrap();
+    assert_eq!(peaks_resp.num_channels, Some(2.0));
+
+    // debug.enableAsserts
+    let asserts = DebugEnableAssertsArgs::new(true);
+    assert_eq!(
+        serde_json::to_value(asserts).unwrap(),
+        json!({"enable": true})
+    );
 }

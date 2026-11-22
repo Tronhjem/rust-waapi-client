@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.transport.prepare
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.transport.prepare`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreTransportPrepareArgs {
 impl CoreTransportPrepareArgs {
     /// Creates a new [`CoreTransportPrepareArgs`] with the required fields.
     pub fn new(object: ObjectRef) -> Self {
-        Self {
-            object,
-        }
+        Self { object }
     }
 }

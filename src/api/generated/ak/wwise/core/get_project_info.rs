@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.getProjectInfo
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Response from `ak.wwise.core.getProjectInfo`.
 ///
@@ -54,4 +47,3 @@ pub struct CoreGetProjectInfoResponse {
     #[serde(rename = "defaultImportWorkUnit", default)]
     pub default_import_work_unit: Option<WwiseObjectRef>,
 }
-

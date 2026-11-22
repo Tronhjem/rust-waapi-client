@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.ui.signal.toggle
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.ui.signal.toggle`.
 ///
@@ -24,7 +17,6 @@ pub struct UiSignalTogglePayload {
     #[serde(rename = "widgetID")]
     pub widget_id: String,
 }
-
 
 /// Subscription options for `ak.wwise.ui.signal.toggle`.
 ///

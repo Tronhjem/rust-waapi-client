@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.getAttenuationCurve
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.getAttenuationCurve`.
 ///
@@ -58,4 +51,3 @@ pub struct CoreObjectGetAttenuationCurveResponse {
     #[serde(rename = "use")]
     pub use_: AttenuationCurveUse,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setState
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setState`.
 ///
@@ -27,9 +20,6 @@ pub struct SoundengineSetStateArgs {
 impl SoundengineSetStateArgs {
     /// Creates a new [`SoundengineSetStateArgs`] with the required fields.
     pub fn new(state_group: SoundEngineObjectRef, state: SoundEngineObjectRef) -> Self {
-        Self {
-            state_group,
-            state,
-        }
+        Self { state_group, state }
     }
 }

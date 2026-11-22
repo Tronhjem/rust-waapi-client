@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setPosition
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setPosition`.
 ///

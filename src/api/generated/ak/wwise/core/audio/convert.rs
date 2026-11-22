@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.audio.convert
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.audio.convert`.
 ///
@@ -27,7 +20,11 @@ pub struct CoreAudioConvertArgs {
 
 impl CoreAudioConvertArgs {
     /// Creates a new [`CoreAudioConvertArgs`] with the required fields.
-    pub fn new(objects: Vec<ObjectRef>, platforms: Vec<PlatformRef>, languages: Vec<LanguageRef>) -> Self {
+    pub fn new(
+        objects: Vec<ObjectRef>,
+        platforms: Vec<PlatformRef>,
+        languages: Vec<LanguageRef>,
+    ) -> Self {
         Self {
             objects,
             platforms,
@@ -45,4 +42,3 @@ pub struct CoreAudioConvertResponse {
     #[serde(default)]
     pub errors: Vec<AudioConvertError>,
 }
-

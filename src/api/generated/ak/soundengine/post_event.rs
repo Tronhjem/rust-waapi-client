@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.postEvent
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.postEvent`.
 ///
@@ -49,4 +42,3 @@ pub struct SoundenginePostEventResponse {
     #[serde(rename = "return")]
     pub playing_id: u32,
 }
-

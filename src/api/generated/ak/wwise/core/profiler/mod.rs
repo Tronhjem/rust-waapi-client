@@ -4,35 +4,68 @@
 /// Typed bindings for the `ak.wwise.core.profiler.captureLog` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod captureLog;
+mod enable_profiler_data;
+pub use enable_profiler_data::CoreProfilerEnableProfilerDataArgs;
 mod game_object_registered;
-pub use game_object_registered::{
-    CoreProfilerGameObjectRegisteredPayload,
-};
+pub use game_object_registered::CoreProfilerGameObjectRegisteredPayload;
 mod game_object_reset;
-pub use game_object_reset::{
-    CoreProfilerGameObjectResetPayload,
-};
+pub use game_object_reset::CoreProfilerGameObjectResetPayload;
 mod game_object_unregistered;
-pub use game_object_unregistered::{
-    CoreProfilerGameObjectUnregisteredPayload,
+pub use game_object_unregistered::CoreProfilerGameObjectUnregisteredPayload;
+mod get_audio_objects;
+pub use get_audio_objects::{
+    CoreProfilerGetAudioObjectsArgs, CoreProfilerGetAudioObjectsOptions,
+    CoreProfilerGetAudioObjectsResponse,
+};
+mod get_busses;
+pub use get_busses::{
+    CoreProfilerGetBussesArgs, CoreProfilerGetBussesOptions, CoreProfilerGetBussesResponse,
+};
+mod get_cpu_usage;
+pub use get_cpu_usage::{CoreProfilerGetCpuUsageArgs, CoreProfilerGetCpuUsageResponse};
+mod get_cursor_time;
+pub use get_cursor_time::{CoreProfilerGetCursorTimeArgs, CoreProfilerGetCursorTimeResponse};
+mod get_game_objects;
+pub use get_game_objects::{CoreProfilerGetGameObjectsArgs, CoreProfilerGetGameObjectsResponse};
+mod get_loaded_media;
+pub use get_loaded_media::{CoreProfilerGetLoadedMediaArgs, CoreProfilerGetLoadedMediaResponse};
+mod get_meters;
+pub use get_meters::{
+    CoreProfilerGetMetersArgs, CoreProfilerGetMetersOptions, CoreProfilerGetMetersResponse,
+};
+mod get_performance_monitor;
+pub use get_performance_monitor::{
+    CoreProfilerGetPerformanceMonitorArgs, CoreProfilerGetPerformanceMonitorResponse,
+};
+mod get_rtp_cs;
+pub use get_rtp_cs::{CoreProfilerGetRtpCsArgs, CoreProfilerGetRtpCsResponse};
+mod get_streamed_media;
+pub use get_streamed_media::{
+    CoreProfilerGetStreamedMediaArgs, CoreProfilerGetStreamedMediaResponse,
+};
+mod get_voice_contributions;
+pub use get_voice_contributions::{
+    CoreProfilerGetVoiceContributionsArgs, CoreProfilerGetVoiceContributionsResponse,
+};
+mod get_voices;
+pub use get_voices::{
+    CoreProfilerGetVoicesArgs, CoreProfilerGetVoicesOptions, CoreProfilerGetVoicesResponse,
 };
 mod move_cursor;
-pub use move_cursor::{
-    CoreProfilerMoveCursorArgs,
-    CoreProfilerMoveCursorResponse,
-};
+pub use move_cursor::{CoreProfilerMoveCursorArgs, CoreProfilerMoveCursorResponse};
+mod register_meter;
+pub use register_meter::CoreProfilerRegisterMeterArgs;
+mod save_capture;
+pub use save_capture::CoreProfilerSaveCaptureArgs;
 mod set_cursor_time;
-pub use set_cursor_time::{
-    CoreProfilerSetCursorTimeArgs,
-    CoreProfilerSetCursorTimeResponse,
-};
+pub use set_cursor_time::{CoreProfilerSetCursorTimeArgs, CoreProfilerSetCursorTimeResponse};
+mod start_capture;
+pub use start_capture::CoreProfilerStartCaptureResponse;
 mod state_changed;
-pub use state_changed::{
-    CoreProfilerStateChangedPayload,
-    CoreProfilerStateChangedOptions,
-};
+pub use state_changed::{CoreProfilerStateChangedOptions, CoreProfilerStateChangedPayload};
+mod stop_capture;
+pub use stop_capture::CoreProfilerStopCaptureResponse;
 mod switch_changed;
-pub use switch_changed::{
-    CoreProfilerSwitchChangedPayload,
-    CoreProfilerSwitchChangedOptions,
-};
+pub use switch_changed::{CoreProfilerSwitchChangedOptions, CoreProfilerSwitchChangedPayload};
+mod unregister_meter;
+pub use unregister_meter::CoreProfilerUnregisterMeterArgs;

@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.created
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.created`.
 ///
@@ -20,7 +13,6 @@ pub struct CoreObjectCreatedPayload {
     /// The newly created object.
     pub object: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.created`.
 ///

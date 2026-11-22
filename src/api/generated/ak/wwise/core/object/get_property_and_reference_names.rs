@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.getPropertyAndReferenceNames
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.getPropertyAndReferenceNames`.
 ///
@@ -53,4 +46,3 @@ pub struct CoreObjectGetPropertyAndReferenceNamesResponse {
     #[serde(rename = "return", default)]
     pub names: Vec<String>,
 }
-

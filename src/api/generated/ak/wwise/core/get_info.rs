@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.getInfo
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Response from `ak.wwise.core.getInfo`.
 ///
@@ -48,4 +41,3 @@ pub struct CoreGetInfoResponse {
     #[serde(rename = "processPath")]
     pub process_path: String,
 }
-

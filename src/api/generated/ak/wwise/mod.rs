@@ -7,3 +7,5 @@ pub mod core;
 pub mod debug;
 /// Typed bindings for the `ak.wwise.ui` WAAPI namespace.
 pub mod ui;
+/// Typed bindings for the `ak.wwise.waapi` WAAPI namespace.
+pub mod waapi;

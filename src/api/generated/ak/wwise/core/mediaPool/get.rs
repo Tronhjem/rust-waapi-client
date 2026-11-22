@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.mediaPool.get
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.mediaPool.get`.
 ///
@@ -94,4 +87,3 @@ pub struct CoreMediaPoolGetResponse {
     #[serde(rename = "return", default)]
     pub return_: Vec<serde_json::Value>,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.isLinked
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.isLinked`.
 ///
@@ -45,4 +38,3 @@ pub struct CoreObjectIsLinkedResponse {
     #[serde(default)]
     pub linked: Option<bool>,
 }
-

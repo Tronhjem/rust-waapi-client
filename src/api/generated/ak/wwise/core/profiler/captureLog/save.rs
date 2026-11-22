@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.profiler.captureLog.save
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.profiler.captureLog.save`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreProfilerCaptureLogSaveArgs {
 impl CoreProfilerCaptureLogSaveArgs {
     /// Creates a new [`CoreProfilerCaptureLogSaveArgs`] with the required fields.
     pub fn new(file: String) -> Self {
-        Self {
-            file,
-        }
+        Self { file }
     }
 }

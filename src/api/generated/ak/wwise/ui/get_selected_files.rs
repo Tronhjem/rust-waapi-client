@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.ui.getSelectedFiles
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Response from `ak.wwise.ui.getSelectedFiles`.
 ///
@@ -20,4 +13,3 @@ pub struct UiGetSelectedFilesResponse {
     /// The selected files. Can be empty if no file is selected.
     pub files: Vec<String>,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.notesChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.notesChanged`.
 ///
@@ -26,7 +19,6 @@ pub struct CoreObjectNotesChangedPayload {
     #[serde(rename = "oldNotes")]
     pub old_notes: String,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.notesChanged`.
 ///

@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.curveChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.curveChanged`.
 ///
@@ -24,7 +17,6 @@ pub struct CoreObjectCurveChangedPayload {
     /// The curve object that was modified.
     pub curve: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.curveChanged`.
 ///

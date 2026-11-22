@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.blendContainer.addTrack
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.blendContainer.addTrack`.
 ///
@@ -61,4 +54,3 @@ pub struct CoreBlendContainerAddTrackResponse {
     #[serde(rename = "shortId", default)]
     pub short_id: Option<i64>,
 }
-

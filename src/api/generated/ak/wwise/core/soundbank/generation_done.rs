@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.soundbank.generationDone
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.soundbank.generationDone`.
 ///
@@ -24,4 +17,3 @@ pub struct CoreSoundbankGenerationDonePayload {
     #[serde(default)]
     pub logs: Vec<LogCentralItem>,
 }
-

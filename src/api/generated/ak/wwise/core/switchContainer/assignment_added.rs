@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.switchContainer.assignmentAdded
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.switchContainer.assignmentAdded`.
 ///
@@ -26,7 +19,6 @@ pub struct CoreSwitchContainerAssignmentAddedPayload {
     #[serde(rename = "switchContainer")]
     pub switch_container: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.switchContainer.assignmentAdded`.
 ///

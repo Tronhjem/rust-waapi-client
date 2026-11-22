@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.diff
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.diff`.
 ///
@@ -26,10 +19,7 @@ pub struct CoreObjectDiffArgs {
 impl CoreObjectDiffArgs {
     /// Creates a new [`CoreObjectDiffArgs`] with the required fields.
     pub fn new(source: ObjectRef, target: ObjectRef) -> Self {
-        Self {
-            source,
-            target,
-        }
+        Self { source, target }
     }
 }
 
@@ -45,4 +35,3 @@ pub struct CoreObjectDiffResponse {
     #[serde(default)]
     pub lists: Vec<String>,
 }
-

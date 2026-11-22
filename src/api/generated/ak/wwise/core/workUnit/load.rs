@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.workUnit.load
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.workUnit.load`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreWorkUnitLoadArgs {
 impl CoreWorkUnitLoadArgs {
     /// Creates a new [`CoreWorkUnitLoadArgs`] with the required fields.
     pub fn new(object: ObjectRef) -> Self {
-        Self {
-            object,
-        }
+        Self { object }
     }
 }

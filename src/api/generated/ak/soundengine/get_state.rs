@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.getState
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.getState`.
 ///
@@ -25,9 +18,7 @@ pub struct SoundengineGetStateArgs {
 impl SoundengineGetStateArgs {
     /// Creates a new [`SoundengineGetStateArgs`] with the required fields.
     pub fn new(state_group: ObjectRef) -> Self {
-        Self {
-            state_group,
-        }
+        Self { state_group }
     }
 }
 
@@ -45,4 +36,3 @@ pub struct SoundengineGetStateResponse {
     #[serde(rename = "return")]
     pub state: WwiseObject,
 }
-

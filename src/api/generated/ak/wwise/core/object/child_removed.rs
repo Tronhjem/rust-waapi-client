@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.childRemoved
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.childRemoved`.
 ///
@@ -22,7 +15,6 @@ pub struct CoreObjectChildRemovedPayload {
     /// The child object that is removed.
     pub child: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.childRemoved`.
 ///

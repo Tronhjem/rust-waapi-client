@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.nameChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.nameChanged`.
 ///
@@ -26,7 +19,6 @@ pub struct CoreObjectNameChangedPayload {
     #[serde(rename = "oldName")]
     pub old_name: String,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.nameChanged`.
 ///

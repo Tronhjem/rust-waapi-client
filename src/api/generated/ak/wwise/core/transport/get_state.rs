@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.transport.getState
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.transport.getState`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreTransportGetStateArgs {
 impl CoreTransportGetStateArgs {
     /// Creates a new [`CoreTransportGetStateArgs`] with the required fields.
     pub fn new(transport: u32) -> Self {
-        Self {
-            transport,
-        }
+        Self { transport }
     }
 }
 
@@ -38,4 +29,3 @@ pub struct CoreTransportGetStateResponse {
     /// The state of the transport object.
     pub state: TransportState,
 }
-

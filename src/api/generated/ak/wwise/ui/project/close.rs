@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.ui.project.close
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.ui.project.close`.
 ///
@@ -44,4 +37,3 @@ pub struct UiProjectCloseResponse {
     #[serde(rename = "hadProjectOpen")]
     pub had_project_open: bool,
 }
-

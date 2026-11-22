@@ -1592,12 +1592,20 @@ impl WaapiFunction {
             Self::ak_soundengine_resetRTPCValue => ak::soundengine::resetRTPCValue,
             Self::ak_soundengine_seekOnEvent => ak::soundengine::seekOnEvent,
             Self::ak_soundengine_setDefaultListeners => ak::soundengine::setDefaultListeners,
-            Self::ak_soundengine_setGameObjectAuxSendValues => ak::soundengine::setGameObjectAuxSendValues,
-            Self::ak_soundengine_setGameObjectOutputBusVolume => ak::soundengine::setGameObjectOutputBusVolume,
-            Self::ak_soundengine_setListenerSpatialization => ak::soundengine::setListenerSpatialization,
+            Self::ak_soundengine_setGameObjectAuxSendValues => {
+                ak::soundengine::setGameObjectAuxSendValues
+            }
+            Self::ak_soundengine_setGameObjectOutputBusVolume => {
+                ak::soundengine::setGameObjectOutputBusVolume
+            }
+            Self::ak_soundengine_setListenerSpatialization => {
+                ak::soundengine::setListenerSpatialization
+            }
             Self::ak_soundengine_setListeners => ak::soundengine::setListeners,
             Self::ak_soundengine_setMultiplePositions => ak::soundengine::setMultiplePositions,
-            Self::ak_soundengine_setObjectObstructionAndOcclusion => ak::soundengine::setObjectObstructionAndOcclusion,
+            Self::ak_soundengine_setObjectObstructionAndOcclusion => {
+                ak::soundengine::setObjectObstructionAndOcclusion
+            }
             Self::ak_soundengine_setPosition => ak::soundengine::setPosition,
             Self::ak_soundengine_setRTPCValue => ak::soundengine::setRTPCValue,
             Self::ak_soundengine_setScalingFactor => ak::soundengine::setScalingFactor,
@@ -1609,18 +1617,34 @@ impl WaapiFunction {
             Self::ak_soundengine_unregisterGameObj => ak::soundengine::unregisterGameObj,
             Self::ak_wwise_core_audio_convert => ak::wwise::core::audio::convert,
             Self::ak_wwise_core_audio_import => ak::wwise::core::audio::import,
-            Self::ak_wwise_core_audio_importTabDelimited => ak::wwise::core::audio::importTabDelimited,
+            Self::ak_wwise_core_audio_importTabDelimited => {
+                ak::wwise::core::audio::importTabDelimited
+            }
             Self::ak_wwise_core_audio_mute => ak::wwise::core::audio::mute,
             Self::ak_wwise_core_audio_resetMute => ak::wwise::core::audio::resetMute,
             Self::ak_wwise_core_audio_resetSolo => ak::wwise::core::audio::resetSolo,
-            Self::ak_wwise_core_audio_setConversionPlugin => ak::wwise::core::audio::setConversionPlugin,
+            Self::ak_wwise_core_audio_setConversionPlugin => {
+                ak::wwise::core::audio::setConversionPlugin
+            }
             Self::ak_wwise_core_audio_solo => ak::wwise::core::audio::solo,
-            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInRegion => ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInRegion,
-            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInTrimmedRegion => ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInTrimmedRegion,
-            Self::ak_wwise_core_blendContainer_addAssignment => ak::wwise::core::blendContainer::addAssignment,
-            Self::ak_wwise_core_blendContainer_addTrack => ak::wwise::core::blendContainer::addTrack,
-            Self::ak_wwise_core_blendContainer_getAssignments => ak::wwise::core::blendContainer::getAssignments,
-            Self::ak_wwise_core_blendContainer_removeAssignment => ak::wwise::core::blendContainer::removeAssignment,
+            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInRegion => {
+                ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInRegion
+            }
+            Self::ak_wwise_core_audioSourcePeaks_getMinMaxPeaksInTrimmedRegion => {
+                ak::wwise::core::audioSourcePeaks::getMinMaxPeaksInTrimmedRegion
+            }
+            Self::ak_wwise_core_blendContainer_addAssignment => {
+                ak::wwise::core::blendContainer::addAssignment
+            }
+            Self::ak_wwise_core_blendContainer_addTrack => {
+                ak::wwise::core::blendContainer::addTrack
+            }
+            Self::ak_wwise_core_blendContainer_getAssignments => {
+                ak::wwise::core::blendContainer::getAssignments
+            }
+            Self::ak_wwise_core_blendContainer_removeAssignment => {
+                ak::wwise::core::blendContainer::removeAssignment
+            }
             Self::ak_wwise_core_executeLuaScript => ak::wwise::core::executeLuaScript,
             Self::ak_wwise_core_gameParameter_setRange => ak::wwise::core::gameParameter::setRange,
             Self::ak_wwise_core_getInfo => ak::wwise::core::getInfo,
@@ -1635,16 +1659,24 @@ impl WaapiFunction {
             Self::ak_wwise_core_object_delete => ak::wwise::core::object::delete,
             Self::ak_wwise_core_object_diff => ak::wwise::core::object::diff,
             Self::ak_wwise_core_object_get => ak::wwise::core::object::get,
-            Self::ak_wwise_core_object_getAttenuationCurve => ak::wwise::core::object::getAttenuationCurve,
-            Self::ak_wwise_core_object_getPropertyAndReferenceNames => ak::wwise::core::object::getPropertyAndReferenceNames,
+            Self::ak_wwise_core_object_getAttenuationCurve => {
+                ak::wwise::core::object::getAttenuationCurve
+            }
+            Self::ak_wwise_core_object_getPropertyAndReferenceNames => {
+                ak::wwise::core::object::getPropertyAndReferenceNames
+            }
             Self::ak_wwise_core_object_getPropertyInfo => ak::wwise::core::object::getPropertyInfo,
             Self::ak_wwise_core_object_getTypes => ak::wwise::core::object::getTypes,
             Self::ak_wwise_core_object_isLinked => ak::wwise::core::object::isLinked,
-            Self::ak_wwise_core_object_isPropertyEnabled => ak::wwise::core::object::isPropertyEnabled,
+            Self::ak_wwise_core_object_isPropertyEnabled => {
+                ak::wwise::core::object::isPropertyEnabled
+            }
             Self::ak_wwise_core_object_move => ak::wwise::core::object::move_,
             Self::ak_wwise_core_object_pasteProperties => ak::wwise::core::object::pasteProperties,
             Self::ak_wwise_core_object_set => ak::wwise::core::object::set,
-            Self::ak_wwise_core_object_setAttenuationCurve => ak::wwise::core::object::setAttenuationCurve,
+            Self::ak_wwise_core_object_setAttenuationCurve => {
+                ak::wwise::core::object::setAttenuationCurve
+            }
             Self::ak_wwise_core_object_setLinked => ak::wwise::core::object::setLinked,
             Self::ak_wwise_core_object_setName => ak::wwise::core::object::setName,
             Self::ak_wwise_core_object_setNotes => ak::wwise::core::object::setNotes,
@@ -1652,21 +1684,39 @@ impl WaapiFunction {
             Self::ak_wwise_core_object_setRandomizer => ak::wwise::core::object::setRandomizer,
             Self::ak_wwise_core_object_setReference => ak::wwise::core::object::setReference,
             Self::ak_wwise_core_object_setStateGroups => ak::wwise::core::object::setStateGroups,
-            Self::ak_wwise_core_object_setStateProperties => ak::wwise::core::object::setStateProperties,
+            Self::ak_wwise_core_object_setStateProperties => {
+                ak::wwise::core::object::setStateProperties
+            }
             Self::ak_wwise_core_ping => ak::wwise::core::ping,
-            Self::ak_wwise_core_profiler_captureLog_save => ak::wwise::core::profiler::captureLog::save,
-            Self::ak_wwise_core_profiler_enableProfilerData => ak::wwise::core::profiler::enableProfilerData,
-            Self::ak_wwise_core_profiler_getAudioObjects => ak::wwise::core::profiler::getAudioObjects,
+            Self::ak_wwise_core_profiler_captureLog_save => {
+                ak::wwise::core::profiler::captureLog::save
+            }
+            Self::ak_wwise_core_profiler_enableProfilerData => {
+                ak::wwise::core::profiler::enableProfilerData
+            }
+            Self::ak_wwise_core_profiler_getAudioObjects => {
+                ak::wwise::core::profiler::getAudioObjects
+            }
             Self::ak_wwise_core_profiler_getBusses => ak::wwise::core::profiler::getBusses,
             Self::ak_wwise_core_profiler_getCpuUsage => ak::wwise::core::profiler::getCpuUsage,
             Self::ak_wwise_core_profiler_getCursorTime => ak::wwise::core::profiler::getCursorTime,
-            Self::ak_wwise_core_profiler_getGameObjects => ak::wwise::core::profiler::getGameObjects,
-            Self::ak_wwise_core_profiler_getLoadedMedia => ak::wwise::core::profiler::getLoadedMedia,
+            Self::ak_wwise_core_profiler_getGameObjects => {
+                ak::wwise::core::profiler::getGameObjects
+            }
+            Self::ak_wwise_core_profiler_getLoadedMedia => {
+                ak::wwise::core::profiler::getLoadedMedia
+            }
             Self::ak_wwise_core_profiler_getMeters => ak::wwise::core::profiler::getMeters,
-            Self::ak_wwise_core_profiler_getPerformanceMonitor => ak::wwise::core::profiler::getPerformanceMonitor,
+            Self::ak_wwise_core_profiler_getPerformanceMonitor => {
+                ak::wwise::core::profiler::getPerformanceMonitor
+            }
             Self::ak_wwise_core_profiler_getRTPCs => ak::wwise::core::profiler::getRTPCs,
-            Self::ak_wwise_core_profiler_getStreamedMedia => ak::wwise::core::profiler::getStreamedMedia,
-            Self::ak_wwise_core_profiler_getVoiceContributions => ak::wwise::core::profiler::getVoiceContributions,
+            Self::ak_wwise_core_profiler_getStreamedMedia => {
+                ak::wwise::core::profiler::getStreamedMedia
+            }
+            Self::ak_wwise_core_profiler_getVoiceContributions => {
+                ak::wwise::core::profiler::getVoiceContributions
+            }
             Self::ak_wwise_core_profiler_getVoices => ak::wwise::core::profiler::getVoices,
             Self::ak_wwise_core_profiler_moveCursor => ak::wwise::core::profiler::moveCursor,
             Self::ak_wwise_core_profiler_registerMeter => ak::wwise::core::profiler::registerMeter,
@@ -1674,33 +1724,61 @@ impl WaapiFunction {
             Self::ak_wwise_core_profiler_setCursorTime => ak::wwise::core::profiler::setCursorTime,
             Self::ak_wwise_core_profiler_startCapture => ak::wwise::core::profiler::startCapture,
             Self::ak_wwise_core_profiler_stopCapture => ak::wwise::core::profiler::stopCapture,
-            Self::ak_wwise_core_profiler_unregisterMeter => ak::wwise::core::profiler::unregisterMeter,
+            Self::ak_wwise_core_profiler_unregisterMeter => {
+                ak::wwise::core::profiler::unregisterMeter
+            }
             Self::ak_wwise_core_project_save => ak::wwise::core::project::save,
             Self::ak_wwise_core_remote_connect => ak::wwise::core::remote::connect,
             Self::ak_wwise_core_remote_disconnect => ak::wwise::core::remote::disconnect,
-            Self::ak_wwise_core_remote_getAvailableConsoles => ak::wwise::core::remote::getAvailableConsoles,
-            Self::ak_wwise_core_remote_getConnectionStatus => ak::wwise::core::remote::getConnectionStatus,
+            Self::ak_wwise_core_remote_getAvailableConsoles => {
+                ak::wwise::core::remote::getAvailableConsoles
+            }
+            Self::ak_wwise_core_remote_getConnectionStatus => {
+                ak::wwise::core::remote::getConnectionStatus
+            }
             Self::ak_wwise_core_sound_setActiveSource => ak::wwise::core::sound::setActiveSource,
-            Self::ak_wwise_core_soundbank_convertExternalSources => ak::wwise::core::soundbank::convertExternalSources,
+            Self::ak_wwise_core_soundbank_convertExternalSources => {
+                ak::wwise::core::soundbank::convertExternalSources
+            }
             Self::ak_wwise_core_soundbank_generate => ak::wwise::core::soundbank::generate,
-            Self::ak_wwise_core_soundbank_getInclusions => ak::wwise::core::soundbank::getInclusions,
-            Self::ak_wwise_core_soundbank_processDefinitionFiles => ak::wwise::core::soundbank::processDefinitionFiles,
-            Self::ak_wwise_core_soundbank_setInclusions => ak::wwise::core::soundbank::setInclusions,
+            Self::ak_wwise_core_soundbank_getInclusions => {
+                ak::wwise::core::soundbank::getInclusions
+            }
+            Self::ak_wwise_core_soundbank_processDefinitionFiles => {
+                ak::wwise::core::soundbank::processDefinitionFiles
+            }
+            Self::ak_wwise_core_soundbank_setInclusions => {
+                ak::wwise::core::soundbank::setInclusions
+            }
             Self::ak_wwise_core_sourceControl_add => ak::wwise::core::sourceControl::add,
             Self::ak_wwise_core_sourceControl_checkOut => ak::wwise::core::sourceControl::checkOut,
             Self::ak_wwise_core_sourceControl_commit => ak::wwise::core::sourceControl::commit,
             Self::ak_wwise_core_sourceControl_delete => ak::wwise::core::sourceControl::delete,
-            Self::ak_wwise_core_sourceControl_getSourceFiles => ak::wwise::core::sourceControl::getSourceFiles,
-            Self::ak_wwise_core_sourceControl_getStatus => ak::wwise::core::sourceControl::getStatus,
+            Self::ak_wwise_core_sourceControl_getSourceFiles => {
+                ak::wwise::core::sourceControl::getSourceFiles
+            }
+            Self::ak_wwise_core_sourceControl_getStatus => {
+                ak::wwise::core::sourceControl::getStatus
+            }
             Self::ak_wwise_core_sourceControl_move => ak::wwise::core::sourceControl::move_,
             Self::ak_wwise_core_sourceControl_revert => ak::wwise::core::sourceControl::revert,
-            Self::ak_wwise_core_sourceControl_setProvider => ak::wwise::core::sourceControl::setProvider,
-            Self::ak_wwise_core_switchContainer_addAssignment => ak::wwise::core::switchContainer::addAssignment,
-            Self::ak_wwise_core_switchContainer_getAssignments => ak::wwise::core::switchContainer::getAssignments,
-            Self::ak_wwise_core_switchContainer_removeAssignment => ak::wwise::core::switchContainer::removeAssignment,
+            Self::ak_wwise_core_sourceControl_setProvider => {
+                ak::wwise::core::sourceControl::setProvider
+            }
+            Self::ak_wwise_core_switchContainer_addAssignment => {
+                ak::wwise::core::switchContainer::addAssignment
+            }
+            Self::ak_wwise_core_switchContainer_getAssignments => {
+                ak::wwise::core::switchContainer::getAssignments
+            }
+            Self::ak_wwise_core_switchContainer_removeAssignment => {
+                ak::wwise::core::switchContainer::removeAssignment
+            }
             Self::ak_wwise_core_transport_create => ak::wwise::core::transport::create,
             Self::ak_wwise_core_transport_destroy => ak::wwise::core::transport::destroy,
-            Self::ak_wwise_core_transport_executeAction => ak::wwise::core::transport::executeAction,
+            Self::ak_wwise_core_transport_executeAction => {
+                ak::wwise::core::transport::executeAction
+            }
             Self::ak_wwise_core_transport_getList => ak::wwise::core::transport::getList,
             Self::ak_wwise_core_transport_getState => ak::wwise::core::transport::getState,
             Self::ak_wwise_core_transport_prepare => ak::wwise::core::transport::prepare,
@@ -1732,8 +1810,12 @@ impl WaapiFunction {
             Self::ak_wwise_ui_getSelectedObjects => ak::wwise::ui::getSelectedObjects,
             Self::ak_wwise_ui_layout_closeView => ak::wwise::ui::layout::closeView,
             Self::ak_wwise_ui_layout_dockView => ak::wwise::ui::layout::dockView,
-            Self::ak_wwise_ui_layout_getCurrentLayoutName => ak::wwise::ui::layout::getCurrentLayoutName,
-            Self::ak_wwise_ui_layout_getElementRectangle => ak::wwise::ui::layout::getElementRectangle,
+            Self::ak_wwise_ui_layout_getCurrentLayoutName => {
+                ak::wwise::ui::layout::getCurrentLayoutName
+            }
+            Self::ak_wwise_ui_layout_getElementRectangle => {
+                ak::wwise::ui::layout::getElementRectangle
+            }
             Self::ak_wwise_ui_layout_getLayout => ak::wwise::ui::layout::getLayout,
             Self::ak_wwise_ui_layout_getLayoutNames => ak::wwise::ui::layout::getLayoutNames,
             Self::ak_wwise_ui_layout_getOrCreateView => ak::wwise::ui::layout::getOrCreateView,

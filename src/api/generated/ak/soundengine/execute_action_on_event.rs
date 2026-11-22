@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.executeActionOnEvent
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.executeActionOnEvent`.
 ///
@@ -35,7 +28,13 @@ pub struct SoundengineExecuteActionOnEventArgs {
 
 impl SoundengineExecuteActionOnEventArgs {
     /// Creates a new [`SoundengineExecuteActionOnEventArgs`] with the required fields.
-    pub fn new(event: SoundEngineObjectRef, action_type: ActionOnEventType, game_object: GameObjectRef, transition_duration: i32, fade_curve: AkCurveInterpolation) -> Self {
+    pub fn new(
+        event: SoundEngineObjectRef,
+        action_type: ActionOnEventType,
+        game_object: GameObjectRef,
+        transition_duration: i32,
+        fade_curve: AkCurveInterpolation,
+    ) -> Self {
         Self {
             event,
             action_type,

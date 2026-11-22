@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.propertyChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.propertyChanged`.
 ///
@@ -28,7 +21,6 @@ pub struct CoreObjectPropertyChangedPayload {
     /// The new value.
     pub new: serde_json::Value,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.propertyChanged`.
 ///

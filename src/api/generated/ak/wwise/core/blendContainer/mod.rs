@@ -3,20 +3,13 @@
 
 mod add_assignment;
 pub use add_assignment::{
-    CoreBlendContainerAddAssignmentArgs,
-    CoreBlendContainerAddAssignmentResponse,
+    CoreBlendContainerAddAssignmentArgs, CoreBlendContainerAddAssignmentResponse,
 };
 mod add_track;
-pub use add_track::{
-    CoreBlendContainerAddTrackArgs,
-    CoreBlendContainerAddTrackResponse,
-};
+pub use add_track::{CoreBlendContainerAddTrackArgs, CoreBlendContainerAddTrackResponse};
 mod get_assignments;
 pub use get_assignments::{
-    CoreBlendContainerGetAssignmentsArgs,
-    CoreBlendContainerGetAssignmentsResponse,
+    CoreBlendContainerGetAssignmentsArgs, CoreBlendContainerGetAssignmentsResponse,
 };
 mod remove_assignment;
-pub use remove_assignment::{
-    CoreBlendContainerRemoveAssignmentArgs,
-};
+pub use remove_assignment::CoreBlendContainerRemoveAssignmentArgs;

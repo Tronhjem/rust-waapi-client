@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.ui.layout.closeView
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.ui.layout.closeView`.
 ///
@@ -25,8 +18,6 @@ pub struct UiLayoutCloseViewArgs {
 impl UiLayoutCloseViewArgs {
     /// Creates a new [`UiLayoutCloseViewArgs`] with the required fields.
     pub fn new(view_id: String) -> Self {
-        Self {
-            view_id,
-        }
+        Self { view_id }
     }
 }

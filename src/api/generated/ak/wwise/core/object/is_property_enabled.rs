@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.isPropertyEnabled
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.isPropertyEnabled`.
 ///
@@ -45,4 +38,3 @@ pub struct CoreObjectIsPropertyEnabledResponse {
     #[serde(rename = "return", default)]
     pub enabled: Option<bool>,
 }
-

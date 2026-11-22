@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.profiler.captureLog.itemAdded
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.profiler.captureLog.itemAdded`.
 ///
@@ -48,7 +41,6 @@ pub struct CoreProfilerCaptureLogItemAddedPayload {
     #[serde(rename = "errorCodeName", default)]
     pub error_code_name: Option<String>,
 }
-
 
 /// Subscription options for `ak.wwise.core.profiler.captureLog.itemAdded`.
 ///

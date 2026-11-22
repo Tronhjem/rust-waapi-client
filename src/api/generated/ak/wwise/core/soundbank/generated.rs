@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.soundbank.generated
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.soundbank.generated`.
 ///
@@ -37,7 +30,6 @@ pub struct CoreSoundbankGeneratedPayload {
     #[serde(rename = "bankInfo", default)]
     pub bank_info: Vec<serde_json::Value>,
 }
-
 
 /// Subscription options for `ak.wwise.core.soundbank.generated`.
 ///

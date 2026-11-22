@@ -349,8 +349,12 @@ impl WaapiTopic {
         match self {
             Self::ak_wwise_core_audio_imported => ak::wwise::core::audio::imported,
             Self::ak_wwise_core_log_itemAdded => ak::wwise::core::log::itemAdded,
-            Self::ak_wwise_core_object_attenuationCurveChanged => ak::wwise::core::object::attenuationCurveChanged,
-            Self::ak_wwise_core_object_attenuationCurveLinkChanged => ak::wwise::core::object::attenuationCurveLinkChanged,
+            Self::ak_wwise_core_object_attenuationCurveChanged => {
+                ak::wwise::core::object::attenuationCurveChanged
+            }
+            Self::ak_wwise_core_object_attenuationCurveLinkChanged => {
+                ak::wwise::core::object::attenuationCurveLinkChanged
+            }
             Self::ak_wwise_core_object_childAdded => ak::wwise::core::object::childAdded,
             Self::ak_wwise_core_object_childRemoved => ak::wwise::core::object::childRemoved,
             Self::ak_wwise_core_object_created => ak::wwise::core::object::created,
@@ -360,12 +364,24 @@ impl WaapiTopic {
             Self::ak_wwise_core_object_postDeleted => ak::wwise::core::object::postDeleted,
             Self::ak_wwise_core_object_preDeleted => ak::wwise::core::object::preDeleted,
             Self::ak_wwise_core_object_propertyChanged => ak::wwise::core::object::propertyChanged,
-            Self::ak_wwise_core_object_referenceChanged => ak::wwise::core::object::referenceChanged,
-            Self::ak_wwise_core_object_structureChanged => ak::wwise::core::object::structureChanged,
-            Self::ak_wwise_core_profiler_captureLog_itemAdded => ak::wwise::core::profiler::captureLog::itemAdded,
-            Self::ak_wwise_core_profiler_gameObjectRegistered => ak::wwise::core::profiler::gameObjectRegistered,
-            Self::ak_wwise_core_profiler_gameObjectReset => ak::wwise::core::profiler::gameObjectReset,
-            Self::ak_wwise_core_profiler_gameObjectUnregistered => ak::wwise::core::profiler::gameObjectUnregistered,
+            Self::ak_wwise_core_object_referenceChanged => {
+                ak::wwise::core::object::referenceChanged
+            }
+            Self::ak_wwise_core_object_structureChanged => {
+                ak::wwise::core::object::structureChanged
+            }
+            Self::ak_wwise_core_profiler_captureLog_itemAdded => {
+                ak::wwise::core::profiler::captureLog::itemAdded
+            }
+            Self::ak_wwise_core_profiler_gameObjectRegistered => {
+                ak::wwise::core::profiler::gameObjectRegistered
+            }
+            Self::ak_wwise_core_profiler_gameObjectReset => {
+                ak::wwise::core::profiler::gameObjectReset
+            }
+            Self::ak_wwise_core_profiler_gameObjectUnregistered => {
+                ak::wwise::core::profiler::gameObjectUnregistered
+            }
             Self::ak_wwise_core_profiler_stateChanged => ak::wwise::core::profiler::stateChanged,
             Self::ak_wwise_core_profiler_switchChanged => ak::wwise::core::profiler::switchChanged,
             Self::ak_wwise_core_project_loaded => ak::wwise::core::project::loaded,
@@ -373,9 +389,15 @@ impl WaapiTopic {
             Self::ak_wwise_core_project_preClosed => ak::wwise::core::project::preClosed,
             Self::ak_wwise_core_project_saved => ak::wwise::core::project::saved,
             Self::ak_wwise_core_soundbank_generated => ak::wwise::core::soundbank::generated,
-            Self::ak_wwise_core_soundbank_generationDone => ak::wwise::core::soundbank::generationDone,
-            Self::ak_wwise_core_switchContainer_assignmentAdded => ak::wwise::core::switchContainer::assignmentAdded,
-            Self::ak_wwise_core_switchContainer_assignmentRemoved => ak::wwise::core::switchContainer::assignmentRemoved,
+            Self::ak_wwise_core_soundbank_generationDone => {
+                ak::wwise::core::soundbank::generationDone
+            }
+            Self::ak_wwise_core_switchContainer_assignmentAdded => {
+                ak::wwise::core::switchContainer::assignmentAdded
+            }
+            Self::ak_wwise_core_switchContainer_assignmentRemoved => {
+                ak::wwise::core::switchContainer::assignmentRemoved
+            }
             Self::ak_wwise_core_transport_stateChanged => ak::wwise::core::transport::stateChanged,
             Self::ak_wwise_debug_assertFailed => ak::wwise::debug::assertFailed,
             Self::ak_wwise_ui_commands_executed => ak::wwise::ui::commands::executed,

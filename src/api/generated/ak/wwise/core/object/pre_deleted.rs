@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.preDeleted
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.preDeleted`.
 ///
@@ -20,7 +13,6 @@ pub struct CoreObjectPreDeletedPayload {
     /// The object to be deleted.
     pub object: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.preDeleted`.
 ///

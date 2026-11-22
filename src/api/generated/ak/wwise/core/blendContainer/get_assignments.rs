@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.blendContainer.getAssignments
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.blendContainer.getAssignments`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreBlendContainerGetAssignmentsArgs {
 impl CoreBlendContainerGetAssignmentsArgs {
     /// Creates a new [`CoreBlendContainerGetAssignmentsArgs`] with the required fields.
     pub fn new(object: String) -> Self {
-        Self {
-            object,
-        }
+        Self { object }
     }
 }
 
@@ -39,4 +30,3 @@ pub struct CoreBlendContainerGetAssignmentsResponse {
     #[serde(rename = "return", default)]
     pub assignments: Vec<BlendTrackAssignment>,
 }
-

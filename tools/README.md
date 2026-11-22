@@ -79,9 +79,12 @@ pub mod ak {
 
 ---
 
-### generate_typed_api.py
+### generate_typed_api.py (and `tools/generator/`, `tools/overrides.json`)
 
-Generates the typed Rust bindings under `src/api/generated/` from the union of all versioned schemas in `tools/waapi_schemas/<version>/`.
+Generates the typed Rust bindings under `src/api/generated/` by discovering all function and topic schemas across the union of `tools/waapi_schemas/<version>/`.
+
+- `tools/overrides.json` holds externalized schema overrides (`ctor_order`, `result_field_names`, `result_wrapped_object_return`, `response_required_overrides`, `field_name_overrides`, `prop_type_overrides`, `ref_types`, `excluded_endpoints`, `excluded_topics`).
+- `tools/generator/` contains the modular generator pipeline (`config.py`, `schema_loader.py`, `type_mapper.py`, `rust_emitter.py`, `client_emitter.py`).
 
 **Requirements:**
 - Python 3.6+
@@ -93,7 +96,7 @@ python tools/generate_typed_api.py
 ```
 
 **Output:**
-Overwrites `src/api/generated/` with typed argument, option, and response structs, the `ObjectType` (`object_types.rs`) and `Property` (`properties.rs`) enums (generated from the union of all `Definitions/WObjects.xml` files), shared primitives (`primitives.rs`), and chained namespace clients (`clients.rs`).
+Overwrites `src/api/generated/` with typed argument, option, response, and topic payload structs for all discovered endpoints (currently 180 functions and 35 topics), the `ObjectType` (`object_types.rs`) and `Property` (`properties.rs`) enums (generated from the union of all `Definitions/WObjects.xml` files), shared primitives (`primitives.rs`), and chained namespace clients (`clients.rs`), and prints a summary of any schema fields that fell back to `serde_json::Value`.
 
 ## Workflow
 

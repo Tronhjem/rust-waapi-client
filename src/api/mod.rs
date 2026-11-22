@@ -8,15 +8,17 @@ pub mod primitives;
 pub use generated::ak;
 pub use generated::primitives::{
     ActionOnEventType, AkCurveInterpolation, AttenuationCurveType, AttenuationCurveUse,
-    AudioConvertError, AuxSendValue, BlendEdge, BlendFadeMode, BlendTrackAssignment, CurvePoint2D,
-    CurveShape, EventRef, ExternalSourceInfo, GameObjectRef, ImportDefaults, ImportItem,
-    ImportOperation, LanguageRef, LogCentralItem, LogChannel, LogSeverity, MultiPosition,
-    MultiPositionType, ObjectQuery, ObjectReturnField, ObjectReturnOptions, OnCurveUpdate,
-    PasteMode, ProjectDirectoriesInfo, ProjectLanguageInfo, ProjectMigrationAction,
-    ProjectPlatformInfo, PropertyInfoSupports, RtpcRef, RtpcSupportMode, SoundBankInclusion,
-    SoundBankInclusionFilter, SoundBankInclusionOperation, SoundBankInclusionType, SoundBankInfo,
-    SoundEngineObjectRef, SwitchContainerAssignment, Transform, TransformSelect, TransportAction,
-    TransportObject, TransportState, WwiseObject, WwiseObjectRef, WwiseObjectTypeInfo,
+    AudioConvertError, AudioObjectReturnField, AuxSendValue, BlendEdge, BlendFadeMode,
+    BlendTrackAssignment, BusReturnField, CurvePoint2D, CurveShape, DirectoriesInfo, EventRef,
+    ExternalSourceInfo, GameObjectRef, ImportDefaults, ImportItem, ImportLogEntry, ImportOperation,
+    LanguageRef, LogCentralItem, LogChannel, LogSeverity, MultiPosition, MultiPositionType,
+    ObjectQuery, ObjectReturnField, ObjectReturnOptions, OnCurveUpdate, PasteMode,
+    ProjectDirectoriesInfo, ProjectLanguageInfo, ProjectMigrationAction, ProjectPlatformInfo,
+    PropertyInfoSupports, RtpcRef, RtpcSupportMode, SoundBankInclusion, SoundBankInclusionFilter,
+    SoundBankInclusionOperation, SoundBankInclusionType, SoundBankInfo, SoundEngineObjectRef,
+    SwitchContainerAssignment, Transform, TransformSelect, TransportAction, TransportObject,
+    TransportState, VersionInfo, VoiceReturnField, WwiseObject, WwiseObjectRef,
+    WwiseObjectTypeInfo,
 };
 pub use generated::{ObjectType, Property};
 pub use primitives::{

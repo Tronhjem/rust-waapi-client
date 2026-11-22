@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.attenuationCurveChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.attenuationCurveChanged`.
 ///
@@ -23,7 +16,6 @@ pub struct CoreObjectAttenuationCurveChangedPayload {
     /// The attenuation object owning the curve.
     pub attenuation: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.attenuationCurveChanged`.
 ///

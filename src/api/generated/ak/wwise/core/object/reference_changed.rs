@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.object.referenceChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.object.referenceChanged`.
 ///
@@ -29,7 +22,6 @@ pub struct CoreObjectReferenceChangedPayload {
     /// The new referenced object.
     pub new: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.object.referenceChanged`.
 ///

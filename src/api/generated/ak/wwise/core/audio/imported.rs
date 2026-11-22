@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.audio.imported
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.audio.imported`.
 ///
@@ -24,7 +17,6 @@ pub struct CoreAudioImportedPayload {
     /// The list of objects that have been created as part of the same import operation.
     pub objects: Vec<WwiseObject>,
 }
-
 
 /// Subscription options for `ak.wwise.core.audio.imported`.
 ///

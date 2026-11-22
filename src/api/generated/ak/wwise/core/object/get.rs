@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.get
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.get`. Specify either a WAQL query or
 /// a `from` query; both are optional in the schema but one is required in practice.
@@ -79,4 +72,3 @@ pub struct CoreObjectGetResponse {
     #[serde(rename = "return", default)]
     pub objects: Vec<WwiseObject>,
 }
-

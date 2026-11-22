@@ -146,11 +146,13 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 - **Dynamic `@Property` fields (`patternProperties`)**: Schemas that accept or return open-ended `@`-prefixed properties (such as `CoreObjectSetItem`, `CoreObjectCreateArgs`, `ImportItem`, `ImportDefaults`, `WwiseObject`, and `CoreObjectSetObject`) include `#[serde(flatten)] pub extra: HashMap<String, serde_json::Value>` along with `.property(Property::Volume, value)` / `.extra(key, value)` builder methods on request structs and `.property(Property::Volume) -> Option<&serde_json::Value>` lookup helpers on response structs.
 - **Field naming**: JSON `camelCase` wire names are converted to Rust `snake_case` with `#[serde(rename = "...")]` emitted automatically whenever the wire name differs (e.g. `type` → `object_type`, `return` → `objects` / `playing_id` / `return_fields`).
 
-### 5. Currently Generated Typed Endpoints
+### 5. Generated Typed Endpoints (180 Functions & 35 Topics)
 
-The following 103 functions and 35 topics currently have generated typed structs, chained call methods, and typed `subscribe_*` methods under `waapi_client::api::generated`:
+All **180 WAAPI functions** and **35 subscription topics** across the union of `tools/waapi_schemas/<version>/` (currently 2024.1.7 and 2025.1.12) are automatically discovered and generated into typed structs, chained call methods, and typed `subscribe_*` methods under `waapi_client::api::generated` (configured via `tools/overrides.json` and `tools/generator/`).
 
-> **Multi-version union.** The bindings are generated from the *union* of all Wwise schema versions under `tools/waapi_schemas/` (currently 2024.1.7 and 2025.1.12), so a single API serves both. Renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`, with `PropertyContainer` as the canonical `from_class_id` result), and 2024-only return fields (`ObjectReturnField::ColorRgb`/`TransitionObject`, `AudioObjectReturnField::PrevGain`/`NextGain`) are retained. The latest version's schema is canonical for field requiredness.
+> **Multi-version union & optionality.** The bindings are generated from the *union* of all Wwise schema versions under `tools/waapi_schemas/`, so a single API serves both Wwise 2024 and Wwise 2025+. Renamed object types are kept as aliases (`ObjectType::ActorMixer` and `ObjectType::PropertyContainer` share `class_id()` `524304`, with `PropertyContainer` as the canonical `from_class_id` result), and 2024-only return fields (`ObjectReturnField::ColorRgb`/`TransitionObject`, `AudioObjectReturnField::PrevGain`/`NextGain`) are retained. Response fields on `WwiseObject` are `Option<T>` because WAAPI only populates the return fields requested via `ObjectReturnOptions` (and so older/newer Wwise versions remain compatible); `WwiseObject` provides `.id()`, `.name()`, `.object_type()`, `.path()`, and `.notes()` convenience accessors. Intermediate chained client handles (`let mut wwise = client.wwise();`) take `&mut self` and can be reused across multiple calls.
+
+Representative endpoints include (every remaining namespace — `profiler.*`, `remote.*`, `sourceControl.*`, `waapi.*`, `log.*`, `audioSourcePeaks.*`, `debug.*`, `ui.layout.*`, `ui.window.*`, `ui.model.*`, `ui.cli.*` — is also generated under `waapi_client::api::generated::ak`):
 
 | WAAPI URI | Chained Method on `WaapiClient` | `Args` Type | `Options` Type | `Response` Type |
 |---|---|---|---|---|
@@ -304,7 +306,7 @@ Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*`
 
 Topic `opts` is `Option<XxxOptions>`; most options structs offer `.return_(Vec<ObjectReturnField>)` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
 
-For any of the 180 WAAPI functions not yet in the table above (the ~77 remaining raw-JSON endpoints, e.g. `ui.layout.*`, `debug.*`, `waapi.*`, `sourceControl.*`, `remote.*`, `profiler.*`, `audioSourcePeaks.*`, `log.*`), use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
+If you ever need to send a custom or untyped payload, use `client.call(WaapiFunction::..., ...)` / `client.call_typed(WaapiFunction::..., ...)` or `client.subscribe(WaapiTopic::..., ...)` / `client.subscribe_typed(WaapiTopic::..., ...)`.
 
 ### Specifying Return Fields
 

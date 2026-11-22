@@ -17,7 +17,7 @@ use waapi_client::{
 
 const LISTENER_ID: u64 = 1;
 const EMITTER_ID: u64 = 2;
-const EVENT_NAME: &str = "Play_EventTestSound";
+const EVENT_NAME: &str = "Play_TestSound";
 
 #[tokio::main]
 async fn main() -> waapi_client::WaapiResult<()> {

@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.ui.signal.click
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.ui.signal.click`.
 ///
@@ -24,7 +17,6 @@ pub struct UiSignalClickPayload {
     #[serde(rename = "widgetID")]
     pub widget_id: String,
 }
-
 
 /// Subscription options for `ak.wwise.ui.signal.click`.
 ///

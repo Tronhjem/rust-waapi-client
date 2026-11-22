@@ -3,9 +3,13 @@
 
 /// Typed bindings for the `ak.wwise.core.audio` WAAPI namespace.
 pub mod audio;
+/// Typed bindings for the `ak.wwise.core.audioSourcePeaks` WAAPI namespace.
+#[allow(non_snake_case)]
+pub mod audioSourcePeaks;
 /// Typed bindings for the `ak.wwise.core.blendContainer` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod blendContainer;
+mod execute_lua_script;
 /// Typed bindings for the `ak.wwise.core.gameParameter` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod gameParameter;
@@ -20,10 +24,15 @@ pub mod object;
 pub mod profiler;
 /// Typed bindings for the `ak.wwise.core.project` WAAPI namespace.
 pub mod project;
+/// Typed bindings for the `ak.wwise.core.remote` WAAPI namespace.
+pub mod remote;
 /// Typed bindings for the `ak.wwise.core.sound` WAAPI namespace.
 pub mod sound;
 /// Typed bindings for the `ak.wwise.core.soundbank` WAAPI namespace.
 pub mod soundbank;
+/// Typed bindings for the `ak.wwise.core.sourceControl` WAAPI namespace.
+#[allow(non_snake_case)]
+pub mod sourceControl;
 /// Typed bindings for the `ak.wwise.core.switchContainer` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod switchContainer;
@@ -34,15 +43,10 @@ pub mod undo;
 /// Typed bindings for the `ak.wwise.core.workUnit` WAAPI namespace.
 #[allow(non_snake_case)]
 pub mod workUnit;
+pub use execute_lua_script::{CoreExecuteLuaScriptArgs, CoreExecuteLuaScriptResponse};
 mod get_info;
-pub use get_info::{
-    CoreGetInfoResponse,
-};
+pub use get_info::CoreGetInfoResponse;
 mod get_project_info;
-pub use get_project_info::{
-    CoreGetProjectInfoResponse,
-};
+pub use get_project_info::CoreGetProjectInfoResponse;
 mod ping;
-pub use ping::{
-    CorePingResponse,
-};
+pub use ping::CorePingResponse;

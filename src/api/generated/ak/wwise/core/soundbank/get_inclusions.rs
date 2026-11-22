@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.soundbank.getInclusions
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.soundbank.getInclusions`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreSoundbankGetInclusionsArgs {
 impl CoreSoundbankGetInclusionsArgs {
     /// Creates a new [`CoreSoundbankGetInclusionsArgs`] with the required fields.
     pub fn new(soundbank: ObjectRef) -> Self {
-        Self {
-            soundbank,
-        }
+        Self { soundbank }
     }
 }
 
@@ -39,4 +30,3 @@ pub struct CoreSoundbankGetInclusionsResponse {
     #[serde(default)]
     pub inclusions: Vec<SoundBankInclusion>,
 }
-

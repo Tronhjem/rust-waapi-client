@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.soundbank.generate
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.soundbank.generate`.
 ///
@@ -36,7 +29,10 @@ pub struct CoreSoundbankGenerateArgs {
     #[serde(rename = "rebuildSoundBanks", skip_serializing_if = "Option::is_none")]
     pub rebuild_sound_banks: Option<bool>,
     /// Deletes the content of the Wwise audio file cache folder prior to converting source files and generating SoundBanks, which ensures that all source files are reconverted. Note that the whole cache is cleared, for all platforms, regardless of the platforms arguments. Default value: false.
-    #[serde(rename = "clearAudioFileCache", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "clearAudioFileCache",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub clear_audio_file_cache: Option<bool>,
     /// Use the normal SoundBank generation process and write the sound bank and info file to disk. Default value: false.
     #[serde(rename = "writeToDisk", skip_serializing_if = "Option::is_none")]
@@ -110,4 +106,3 @@ pub struct CoreSoundbankGenerateResponse {
     #[serde(default)]
     pub logs: Vec<LogCentralItem>,
 }
-

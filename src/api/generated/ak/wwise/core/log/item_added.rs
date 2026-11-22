@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.log.itemAdded
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.log.itemAdded`.
 ///
@@ -22,4 +15,3 @@ pub struct CoreLogItemAddedPayload {
     /// A log entry.
     pub item: LogCentralItem,
 }
-

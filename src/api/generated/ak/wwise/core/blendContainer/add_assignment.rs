@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.blendContainer.addAssignment
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.blendContainer.addAssignment`.
 ///
@@ -68,4 +61,3 @@ pub struct CoreBlendContainerAddAssignmentResponse {
     #[serde(default)]
     pub edges: Vec<BlendEdge>,
 }
-

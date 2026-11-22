@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.undo.endGroup
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.undo.endGroup`.
 ///
@@ -25,8 +18,6 @@ pub struct CoreUndoEndGroupArgs {
 impl CoreUndoEndGroupArgs {
     /// Creates a new [`CoreUndoEndGroupArgs`] with the required fields.
     pub fn new(display_name: String) -> Self {
-        Self {
-            display_name,
-        }
+        Self { display_name }
     }
 }

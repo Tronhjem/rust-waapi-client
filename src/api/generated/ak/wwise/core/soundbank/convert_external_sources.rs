@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.soundbank.convertExternalSources
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.soundbank.convertExternalSources`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreSoundbankConvertExternalSourcesArgs {
 impl CoreSoundbankConvertExternalSourcesArgs {
     /// Creates a new [`CoreSoundbankConvertExternalSourcesArgs`] with the required fields.
     pub fn new(sources: Vec<ExternalSourceInfo>) -> Self {
-        Self {
-            sources,
-        }
+        Self { sources }
     }
 }

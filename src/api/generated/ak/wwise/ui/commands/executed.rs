@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.ui.commands.executed
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.ui.commands.executed`.
 ///
@@ -24,7 +17,6 @@ pub struct UiCommandsExecutedPayload {
     /// The objects for which the command was executed. The objects are usually the selected objects. They are returned in the format specified in the options. Can be empty if no object is used.
     pub objects: Vec<WwiseObject>,
 }
-
 
 /// Subscription options for `ak.wwise.ui.commands.executed`.
 ///

@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.setAttenuationCurve
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.setAttenuationCurve`.
 ///
@@ -34,7 +27,12 @@ pub struct CoreObjectSetAttenuationCurveArgs {
 
 impl CoreObjectSetAttenuationCurveArgs {
     /// Creates a new [`CoreObjectSetAttenuationCurveArgs`] with the required fields.
-    pub fn new(object: ObjectRef, curve_type: AttenuationCurveType, use_: AttenuationCurveUse, points: Vec<CurvePoint2D>) -> Self {
+    pub fn new(
+        object: ObjectRef,
+        curve_type: AttenuationCurveType,
+        use_: AttenuationCurveUse,
+        points: Vec<CurvePoint2D>,
+    ) -> Self {
         Self {
             object,
             curve_type,

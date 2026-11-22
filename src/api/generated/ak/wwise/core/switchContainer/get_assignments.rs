@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.switchContainer.getAssignments
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.switchContainer.getAssignments`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreSwitchContainerGetAssignmentsArgs {
 impl CoreSwitchContainerGetAssignmentsArgs {
     /// Creates a new [`CoreSwitchContainerGetAssignmentsArgs`] with the required fields.
     pub fn new(id: ObjectRef) -> Self {
-        Self {
-            id,
-        }
+        Self { id }
     }
 }
 
@@ -39,4 +30,3 @@ pub struct CoreSwitchContainerGetAssignmentsResponse {
     #[serde(rename = "return", default)]
     pub assignments: Vec<SwitchContainerAssignment>,
 }
-

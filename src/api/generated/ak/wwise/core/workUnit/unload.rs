@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.workUnit.unload
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.workUnit.unload`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreWorkUnitUnloadArgs {
 impl CoreWorkUnitUnloadArgs {
     /// Creates a new [`CoreWorkUnitUnloadArgs`] with the required fields.
     pub fn new(object: ObjectRef) -> Self {
-        Self {
-            object,
-        }
+        Self { object }
     }
 }

@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.profiler.moveCursor
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.profiler.moveCursor`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreProfilerMoveCursorArgs {
 impl CoreProfilerMoveCursorArgs {
     /// Creates a new [`CoreProfilerMoveCursorArgs`] with the required fields.
     pub fn new(position: String) -> Self {
-        Self {
-            position,
-        }
+        Self { position }
     }
 }
 
@@ -39,4 +30,3 @@ pub struct CoreProfilerMoveCursorResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
-

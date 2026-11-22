@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.getPropertyInfo
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.getPropertyInfo`.
 ///
@@ -83,4 +76,3 @@ pub struct CoreObjectGetPropertyInfoResponse {
     #[serde(default)]
     pub ui: Option<serde_json::Value>,
 }
-

@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.setListenerSpatialization
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.setListenerSpatialization`.
 ///
@@ -31,7 +24,12 @@ pub struct SoundengineSetListenerSpatializationArgs {
 
 impl SoundengineSetListenerSpatializationArgs {
     /// Creates a new [`SoundengineSetListenerSpatializationArgs`] with the required fields.
-    pub fn new(listener: GameObjectRef, spatialized: bool, channel_config: u32, volume_offsets: Vec<f64>) -> Self {
+    pub fn new(
+        listener: GameObjectRef,
+        spatialized: bool,
+        channel_config: u32,
+        volume_offsets: Vec<f64>,
+    ) -> Self {
         Self {
             listener,
             spatialized,

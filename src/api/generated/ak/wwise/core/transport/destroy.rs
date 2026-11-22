@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.transport.destroy
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.transport.destroy`.
 ///
@@ -24,8 +17,6 @@ pub struct CoreTransportDestroyArgs {
 impl CoreTransportDestroyArgs {
     /// Creates a new [`CoreTransportDestroyArgs`] with the required fields.
     pub fn new(transport: u32) -> Self {
-        Self {
-            transport,
-        }
+        Self { transport }
     }
 }

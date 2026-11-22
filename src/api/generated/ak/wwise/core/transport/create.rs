@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.transport.create
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.transport.create`.
 ///
@@ -48,4 +41,3 @@ pub struct CoreTransportCreateResponse {
     /// Transport object ID to be used with all other ak.wwise.core.transport functions.
     pub transport: u32,
 }
-

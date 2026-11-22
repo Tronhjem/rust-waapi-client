@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.move
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.object.move`.
 ///
@@ -25,7 +18,10 @@ pub struct CoreObjectMoveArgs {
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
     pub on_name_conflict: Option<OnNameConflict>,
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
-    #[serde(rename = "autoCheckOutToSourceControl", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "autoCheckOutToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_check_out_to_source_control: Option<bool>,
 }
 
@@ -47,7 +43,10 @@ impl CoreObjectMoveArgs {
     }
 
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
-    pub fn auto_check_out_to_source_control(mut self, auto_check_out_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_check_out_to_source_control(
+        mut self,
+        auto_check_out_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
         self
     }

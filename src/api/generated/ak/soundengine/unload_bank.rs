@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.unloadBank
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.unloadBank`.
 ///
@@ -25,8 +18,6 @@ pub struct SoundengineUnloadBankArgs {
 impl SoundengineUnloadBankArgs {
     /// Creates a new [`SoundengineUnloadBankArgs`] with the required fields.
     pub fn new(sound_bank: SoundEngineObjectRef) -> Self {
-        Self {
-            sound_bank,
-        }
+        Self { sound_bank }
     }
 }

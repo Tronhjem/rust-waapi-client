@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.getSwitch
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.getSwitch`.
 ///
@@ -55,4 +48,3 @@ pub struct SoundengineGetSwitchResponse {
     #[serde(rename = "return")]
     pub switch: WwiseObject,
 }
-

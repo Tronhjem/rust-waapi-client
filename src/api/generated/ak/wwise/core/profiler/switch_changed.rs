@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.profiler.switchChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.profiler.switchChanged`.
 ///
@@ -26,7 +19,6 @@ pub struct CoreProfilerSwitchChangedPayload {
     /// The new switch used. Default return is id and name.
     pub switch: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.profiler.switchChanged`.
 ///

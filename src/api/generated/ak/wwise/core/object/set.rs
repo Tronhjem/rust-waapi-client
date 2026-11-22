@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.object.set
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// One object specification in the `objects` array of `object.set`.
 #[derive(Debug, Clone, serde::Serialize)]
@@ -129,7 +122,10 @@ pub struct CoreObjectSetArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<PlatformRef>,
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    #[serde(rename = "autoAddToSourceControl", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "autoAddToSourceControl",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub auto_add_to_source_control: Option<bool>,
     /// Unless overridden by an individual "object", the action to take if "object" already has a child with the same name. Default value is "fail". See the WAAPI object creation modes documentation for more information.
     #[serde(rename = "onNameConflict", skip_serializing_if = "Option::is_none")]
@@ -160,7 +156,10 @@ impl CoreObjectSetArgs {
     }
 
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: impl Into<bool>) -> Self {
+    pub fn auto_add_to_source_control(
+        mut self,
+        auto_add_to_source_control: impl Into<bool>,
+    ) -> Self {
         self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
         self
     }
@@ -218,4 +217,3 @@ pub struct CoreObjectSetResponse {
     #[serde(default)]
     pub objects: Vec<CoreObjectSetObject>,
 }
-

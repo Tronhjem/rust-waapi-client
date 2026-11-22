@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.profiler.setCursorTime
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.wwise.core.profiler.setCursorTime`.
 ///
@@ -24,9 +17,7 @@ pub struct CoreProfilerSetCursorTimeArgs {
 impl CoreProfilerSetCursorTimeArgs {
     /// Creates a new [`CoreProfilerSetCursorTimeArgs`] with the required fields.
     pub fn new(time: i64) -> Self {
-        Self {
-            time,
-        }
+        Self { time }
     }
 }
 
@@ -39,4 +30,3 @@ pub struct CoreProfilerSetCursorTimeResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
-

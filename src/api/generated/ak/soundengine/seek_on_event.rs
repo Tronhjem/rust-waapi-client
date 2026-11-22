@@ -1,16 +1,9 @@
 // Generated bindings for ak.soundengine.seekOnEvent
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Arguments for `ak.soundengine.seekOnEvent`.
 ///
@@ -38,7 +31,12 @@ pub struct SoundengineSeekOnEventArgs {
 
 impl SoundengineSeekOnEventArgs {
     /// Creates a new [`SoundengineSeekOnEventArgs`] with the required fields.
-    pub fn new(event: SoundEngineObjectRef, game_object: GameObjectRef, seek_to_nearest_marker: bool, playing_id: u32) -> Self {
+    pub fn new(
+        event: SoundEngineObjectRef,
+        game_object: GameObjectRef,
+        seek_to_nearest_marker: bool,
+        playing_id: u32,
+    ) -> Self {
         Self {
             event,
             game_object,

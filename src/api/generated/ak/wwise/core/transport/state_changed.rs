@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.transport.stateChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.transport.stateChanged`.
 ///
@@ -28,7 +21,6 @@ pub struct CoreTransportStateChangedPayload {
     pub state: TransportState,
 }
 
-
 /// Subscription options for `ak.wwise.core.transport.stateChanged`.
 ///
 /// Sent when the transport's state has changed.
@@ -41,8 +33,6 @@ pub struct CoreTransportStateChangedOptions {
 impl CoreTransportStateChangedOptions {
     /// Creates a new [`CoreTransportStateChangedOptions`] with the required fields.
     pub fn new(transport: u32) -> Self {
-        Self {
-            transport,
-        }
+        Self { transport }
     }
 }

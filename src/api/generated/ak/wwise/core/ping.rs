@@ -1,16 +1,9 @@
 // Generated bindings for ak.wwise.core.ping
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Response from `ak.wwise.core.ping`.
 ///
@@ -21,4 +14,3 @@ pub struct CorePingResponse {
     #[serde(rename = "isAvailable")]
     pub is_available: bool,
 }
-

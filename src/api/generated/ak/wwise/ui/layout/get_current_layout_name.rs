@@ -1,0 +1,16 @@
+// Generated bindings for ak.wwise.ui.layout.getCurrentLayoutName
+
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+use crate::api::generated::primitives::*;
+
+/// Response from `ak.wwise.ui.layout.getCurrentLayoutName`.
+///
+/// Retrieves the current layout name.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct UiLayoutGetCurrentLayoutNameResponse {
+    /// The current layout name, an empty string means no layout.
+    #[serde(default)]
+    pub name: Option<String>,
+}

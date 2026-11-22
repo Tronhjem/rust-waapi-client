@@ -1,16 +1,9 @@
 // Generated bindings for topic ak.wwise.core.profiler.stateChanged
 
-
-
 #![allow(unused_imports)]
-
 #![allow(dead_code)]
 
-
-
 use crate::api::generated::primitives::*;
-
-
 
 /// Payload for `ak.wwise.core.profiler.stateChanged`.
 ///
@@ -23,7 +16,6 @@ pub struct CoreProfilerStateChangedPayload {
     #[serde(rename = "stateGroup")]
     pub state_group: WwiseObject,
 }
-
 
 /// Subscription options for `ak.wwise.core.profiler.stateChanged`.
 ///
