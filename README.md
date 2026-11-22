@@ -2,6 +2,7 @@
 
 [![Docs (GitHub Pages)](https://img.shields.io/badge/docs-github%20pages-blue)](https://tronhjem.github.io/rust-waapi-client/wwise_waapi/)
 [![docs.rs](https://docs.rs/wwise-waapi/badge.svg)](https://docs.rs/wwise-waapi)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Async, typed Rust client for the Wwise Authoring API (WAAPI).
 - **API Documentation (Rustdoc):** https://tronhjem.github.io/rust-waapi-client/wwise_waapi/
@@ -464,6 +465,8 @@ cargo test --test wwise_sequences
 > **Note:** `tests/wwise_sequences.rs` (`tests/sequences/`) runs end-to-end command sequences against a live Wwise Authoring instance (`127.0.0.1:8080`) with an open project. Each sequence creates temporary objects under the default work units, exercises the API, verifies state, and deletes all temporary objects before shutting down.
 
 ## License
+
+Copyright (c) 2026 Christian Tronhjem.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
