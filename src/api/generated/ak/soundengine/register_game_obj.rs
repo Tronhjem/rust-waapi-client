@@ -19,19 +19,10 @@ pub struct SoundengineRegisterGameObjArgs {
 
 impl SoundengineRegisterGameObjArgs {
     /// Creates a new [`SoundengineRegisterGameObjArgs`] with the required fields.
-    pub fn new(game_object: impl Into<GameObjectRef>, name: impl Into<String>) -> Self {
+    pub fn new(game_object: GameObjectRef, name: impl Into<String>) -> Self {
         Self {
-            game_object: game_object.into(),
+            game_object,
             name: name.into(),
         }
     }
 }
-
-impl<T0: Into<GameObjectRef>, T1: Into<String>> From<(T0, T1)> for SoundengineRegisterGameObjArgs {
-    fn from((game_object, name): (T0, T1)) -> Self {
-        Self::new(game_object, name)
-    }
-}
-
-/// Module-scoped alias for [`SoundengineRegisterGameObjArgs`].
-pub type RegisterGameObjArgs = SoundengineRegisterGameObjArgs;

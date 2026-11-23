@@ -40,9 +40,3 @@ impl UiSignalToggleOptions {
         }
     }
 }
-
-/// Module-scoped alias for [`UiSignalTogglePayload`].
-pub type TogglePayload = UiSignalTogglePayload;
-
-/// Module-scoped alias for [`UiSignalToggleOptions`].
-pub type ToggleOptions = UiSignalToggleOptions;

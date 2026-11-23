@@ -47,6 +47,3 @@ pub struct CoreGetProjectInfoResponse {
     #[serde(rename = "defaultImportWorkUnit", default)]
     pub default_import_work_unit: Option<WwiseObjectRef>,
 }
-
-/// Module-scoped alias for [`CoreGetProjectInfoResponse`].
-pub type GetProjectInfoResponse = CoreGetProjectInfoResponse;

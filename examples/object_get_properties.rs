@@ -8,7 +8,7 @@
 //! Sound object in the current project.
 //! Run with: cargo run --example object_get_properties
 
-use wwise_waapi::api::ak::wwise::core::object::GetArgs;
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions};
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -18,14 +18,14 @@ async fn main() -> WaapiResult<()> {
     let client = WaapiClient::connect().await?;
 
     // `$ from type Sound` returns every Sound object in the project.
-    let args = GetArgs::from_waql("$ from type Sound");
+    let args = CoreObjectGetArgs::from_waql("$ from type Sound");
 
     // Request the name, @Volume property, and @OutputBus reference for each result.
-    let options = [
+    let options = CoreObjectGetOptions::new().return_fields([
         ObjectReturnField::Name,
         ObjectReturnField::property(Property::Volume),
         ObjectReturnField::property(Property::OutputBus),
-    ];
+    ]);
 
     let response = client.object().get(args, options).await?;
 

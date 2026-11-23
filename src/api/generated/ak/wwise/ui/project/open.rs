@@ -45,53 +45,29 @@ impl UiProjectOpenArgs {
     }
 
     /// (DEPRECATED) The action to be executed when opening a project that needs to be upgraded. Note, this is deprecated. Please use onMigrationRequired instead.
-    pub fn on_upgrade(mut self, on_upgrade: impl Into<ProjectMigrationAction>) -> Self {
-        self.on_upgrade = Some(on_upgrade.into());
+    pub fn on_upgrade(mut self, on_upgrade: ProjectMigrationAction) -> Self {
+        self.on_upgrade = Some(on_upgrade);
         self
     }
 
     /// The action to be executed when opening a project that needs to be migrated.
-    pub fn on_migration_required(
-        mut self,
-        on_migration_required: impl Into<ProjectMigrationAction>,
-    ) -> Self {
-        self.on_migration_required = Some(on_migration_required.into());
+    pub fn on_migration_required(mut self, on_migration_required: ProjectMigrationAction) -> Self {
+        self.on_migration_required = Some(on_migration_required);
         self
     }
 
     /// Indicates if the user should not be prompted to save the current project. Defaults to true.
-    pub fn bypass_save(mut self, bypass_save: impl Into<bool>) -> Self {
-        self.bypass_save = Some(bypass_save.into());
+    pub fn bypass_save(mut self, bypass_save: bool) -> Self {
+        self.bypass_save = Some(bypass_save);
         self
     }
 
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
     }
 }
-
-impl From<String> for UiProjectOpenArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiProjectOpenArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiProjectOpenArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiProjectOpenArgs`].
-pub type OpenArgs = UiProjectOpenArgs;

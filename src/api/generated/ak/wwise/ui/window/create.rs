@@ -26,12 +26,6 @@ impl UiWindowCreateArgs {
     }
 }
 
-impl<T0: Into<String>, T1: Into<serde_json::Value>> From<(T0, T1)> for UiWindowCreateArgs {
-    fn from((title, size): (T0, T1)) -> Self {
-        Self::new(title, size.into())
-    }
-}
-
 /// Response from `ak.wwise.ui.window.create`.
 ///
 /// Creates a window in which a frontend handle can be instantiated.
@@ -41,9 +35,3 @@ pub struct UiWindowCreateResponse {
     #[serde(rename = "windowID", default)]
     pub window_id: Option<String>,
 }
-
-/// Module-scoped alias for [`UiWindowCreateArgs`].
-pub type CreateArgs = UiWindowCreateArgs;
-
-/// Module-scoped alias for [`UiWindowCreateResponse`].
-pub type CreateResponse = UiWindowCreateResponse;

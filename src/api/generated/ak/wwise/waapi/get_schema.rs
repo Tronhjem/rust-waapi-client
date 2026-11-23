@@ -27,27 +27,9 @@ impl WaapiGetSchemaArgs {
     }
 
     /// Include the examples provided in the schema. Default value is false.
-    pub fn include_examples(mut self, include_examples: impl Into<bool>) -> Self {
-        self.include_examples = Some(include_examples.into());
+    pub fn include_examples(mut self, include_examples: bool) -> Self {
+        self.include_examples = Some(include_examples);
         self
-    }
-}
-
-impl From<String> for WaapiGetSchemaArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for WaapiGetSchemaArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for WaapiGetSchemaArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
     }
 }
 
@@ -75,9 +57,3 @@ pub struct WaapiGetSchemaResponse {
     #[serde(default)]
     pub examples: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`WaapiGetSchemaArgs`].
-pub type GetSchemaArgs = WaapiGetSchemaArgs;
-
-/// Module-scoped alias for [`WaapiGetSchemaResponse`].
-pub type GetSchemaResponse = WaapiGetSchemaResponse;

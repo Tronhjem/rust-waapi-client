@@ -70,7 +70,7 @@ async fn typed_topic_payload_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(ACTOR_MIXER_WU),
+                ObjectRef::path(ACTOR_MIXER_WU),
                 ObjectType::ActorMixer,
                 mixer_name.clone(),
             )
@@ -97,7 +97,7 @@ async fn typed_topic_payload_sequence() {
         .core()
         .object()
         .set_name(CoreObjectSetNameArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             mixer_renamed.clone(),
         ))
         .await
@@ -115,7 +115,7 @@ async fn typed_topic_payload_sequence() {
         .object()
         .subscribe_property_changed(Some(
             CoreObjectPropertyChangedOptions::new(
-                ObjectRef::from(mixer_id.as_str()),
+                ObjectRef::guid(mixer_id.as_str()),
                 Property::Volume,
             )
             .return_(id_name.clone()),
@@ -128,7 +128,7 @@ async fn typed_topic_payload_sequence() {
         .core()
         .object()
         .set_property(CoreObjectSetPropertyArgs::new(
-            &mixer_id,
+            ObjectRef::guid(&mixer_id),
             Property::Volume,
             -3.0,
         ))
@@ -145,7 +145,7 @@ async fn typed_topic_payload_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await

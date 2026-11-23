@@ -34,7 +34,7 @@ async fn object_references_and_event_wiring_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
                 ObjectType::ActorMixer,
                 REF_MIXER_NAME.to_string(),
             )
@@ -57,7 +57,7 @@ async fn object_references_and_event_wiring_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(ATTENUATIONS_WORK_UNIT_PATH),
+                ObjectRef::path(ATTENUATIONS_WORK_UNIT_PATH),
                 ObjectType::Attenuation,
                 REF_ATTENUATION_NAME.to_string(),
             )
@@ -71,7 +71,7 @@ async fn object_references_and_event_wiring_sequence() {
 
     // 3. Wire OutputBus and Attenuation references on the Sound via Property enum
     let set_refs_args = CoreObjectSetArgs::new(vec![
-        CoreObjectSetItem::new(ObjectRef::from(sound_id.as_str()))
+        CoreObjectSetItem::new(ObjectRef::guid(sound_id.as_str()))
             .property(Property::OverrideOutput, true)
             .property(Property::OutputBus, master_bus_id.as_str())
             .property(Property::OverridePositioning, true)
@@ -94,7 +94,7 @@ async fn object_references_and_event_wiring_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(EVENTS_WORK_UNIT_PATH),
+                ObjectRef::path(EVENTS_WORK_UNIT_PATH),
                 ObjectType::Event,
                 REF_EVENT_NAME.to_string(),
             )
@@ -119,7 +119,7 @@ async fn object_references_and_event_wiring_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(sound_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(sound_id.as_str())),
             CoreObjectGetOptions::new().return_fields(vec![
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
@@ -159,7 +159,7 @@ async fn object_references_and_event_wiring_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(action_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(action_id.as_str())),
             CoreObjectGetOptions::new().return_fields(vec![
                 ObjectReturnField::Id,
                 ObjectReturnField::Type,
@@ -190,7 +190,7 @@ async fn object_references_and_event_wiring_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(sound_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(sound_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::ReferencesTo],
                 },
@@ -218,7 +218,7 @@ async fn object_references_and_event_wiring_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(attenuation_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(attenuation_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::ReferencesTo],
                 },
@@ -247,7 +247,7 @@ async fn object_references_and_event_wiring_sequence() {
             .wwise()
             .core()
             .object()
-            .delete(CoreObjectDeleteArgs::new(ObjectRef::from(id.as_str())))
+            .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(id.as_str())))
             .await
             .expect("Failed to delete reference test object");
     }
@@ -287,7 +287,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
                 ObjectType::ActorMixer,
                 CONFLICT_MIXER_NAME.to_string(),
             )
@@ -303,7 +303,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .create(CoreObjectCreateArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             ObjectType::Sound,
             RENAME_SOUND_NAME.to_string(),
         ))
@@ -317,7 +317,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(mixer_id.as_str()),
+                ObjectRef::guid(mixer_id.as_str()),
                 ObjectType::Sound,
                 RENAME_SOUND_NAME.to_string(),
             )
@@ -333,7 +333,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(second_sound_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(second_sound_id.as_str())),
             base_opts.clone(),
         )
         .await
@@ -356,7 +356,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(mixer_id.as_str()),
+                ObjectRef::guid(mixer_id.as_str()),
                 ObjectType::RandomSequenceContainer,
                 MERGE_CONTAINER_NAME.to_string(),
             )
@@ -373,7 +373,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(mixer_id.as_str()),
+                ObjectRef::guid(mixer_id.as_str()),
                 ObjectType::RandomSequenceContainer,
                 MERGE_CONTAINER_NAME.to_string(),
             )
@@ -390,7 +390,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(merge_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(merge_id.as_str())),
             base_opts.clone(),
         )
         .await
@@ -414,7 +414,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(merge_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(merge_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Children],
                 },
@@ -432,7 +432,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .set(
             CoreObjectSetArgs::new(vec![
-                CoreObjectSetItem::new(ObjectRef::from(merge_id.as_str()))
+                CoreObjectSetItem::new(ObjectRef::guid(merge_id.as_str()))
                     .list_mode(ListMode::ReplaceAll)
                     .property(Property::OverrideEffect, true)
                     .property(
@@ -451,7 +451,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .set(
             CoreObjectSetArgs::new(vec![
-                CoreObjectSetItem::new(ObjectRef::from(merge_id.as_str()))
+                CoreObjectSetItem::new(ObjectRef::guid(merge_id.as_str()))
                     .list_mode(ListMode::Append)
                     .property(
                         Property::Effects,
@@ -468,7 +468,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(merge_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(merge_id.as_str())),
             base_opts.clone(),
         )
         .await
@@ -485,7 +485,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .object()
         .set(
             CoreObjectSetArgs::new(vec![
-                CoreObjectSetItem::new(ObjectRef::from(merge_id.as_str())).property(
+                CoreObjectSetItem::new(ObjectRef::guid(merge_id.as_str())).property(
                     Property::Effects,
                     vec![ChildObject::new(ObjectType::EffectSlot, "")],
                 ),
@@ -501,7 +501,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(merge_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(merge_id.as_str())),
             base_opts,
         )
         .await
@@ -517,7 +517,7 @@ async fn conflict_strategies_and_list_modes_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await

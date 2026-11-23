@@ -750,9 +750,9 @@ mod tests {
             .object()
             .create(
                 crate::api::ak::wwise::core::object::CoreObjectCreateArgs::new(
-                    crate::ObjectRef::from(r"\Actor-Mixer Hierarchy\Default Work Unit"),
+                    crate::ObjectRef::path(r"\Actor-Mixer Hierarchy\Default Work Unit"),
                     crate::ObjectType::Sound,
-                    "DuplicateSound".to_string(),
+                    "DuplicateSound",
                 )
                 .on_name_conflict(crate::api::OnNameConflict::Fail),
             )
@@ -772,7 +772,7 @@ mod tests {
             .object()
             .get(
                 crate::api::ak::wwise::core::object::CoreObjectGetArgs::new(
-                    crate::api::ObjectQuery::from("{1234}"),
+                    crate::api::ObjectQuery::id("{1234}"),
                 ),
                 crate::api::ak::wwise::core::object::CoreObjectGetOptions::new(),
             )

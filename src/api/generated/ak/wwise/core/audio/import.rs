@@ -34,9 +34,9 @@ pub struct CoreAudioImportArgs {
 
 impl CoreAudioImportArgs {
     /// Creates a new [`CoreAudioImportArgs`] with the required fields.
-    pub fn new(imports: Vec<ImportItem>) -> Self {
+    pub fn new(imports: impl Into<Vec<ImportItem>>) -> Self {
         Self {
-            imports,
+            imports: imports.into(),
             auto_add_to_source_control: None,
             auto_check_out_to_source_control: None,
             import_operation: None,
@@ -45,39 +45,30 @@ impl CoreAudioImportArgs {
     }
 
     /// Determines if Wwise automatically performs a source control Add operation on the imported files. Defaults to true.
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
-        self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: bool) -> Self {
+        self.auto_add_to_source_control = Some(auto_add_to_source_control);
         self
     }
 
     /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
     }
 
     /// Determines how imported objects are created.
-    pub fn import_operation(mut self, import_operation: impl Into<ImportOperation>) -> Self {
-        self.import_operation = Some(import_operation.into());
+    pub fn import_operation(mut self, import_operation: ImportOperation) -> Self {
+        self.import_operation = Some(import_operation);
         self
     }
 
     /// Default values for each item in "imports". Use this object to avoid repeating common properties of every imported element.
-    pub fn default(mut self, default: impl Into<ImportDefaults>) -> Self {
-        self.default = Some(default.into());
+    pub fn default(mut self, default: ImportDefaults) -> Self {
+        self.default = Some(default);
         self
-    }
-}
-
-impl From<Vec<ImportItem>> for CoreAudioImportArgs {
-    fn from(value: Vec<ImportItem>) -> Self {
-        Self::new(value)
     }
 }
 
@@ -98,12 +89,3 @@ pub struct CoreAudioImportResponse {
     /// Array of objects.
     pub objects: Vec<WwiseObject>,
 }
-
-/// Module-scoped alias for [`CoreAudioImportArgs`].
-pub type ImportArgs = CoreAudioImportArgs;
-
-/// Module-scoped alias for [`CoreAudioImportOptions`].
-pub type ImportOptions = CoreAudioImportOptions;
-
-/// Module-scoped alias for [`CoreAudioImportResponse`].
-pub type ImportResponse = CoreAudioImportResponse;

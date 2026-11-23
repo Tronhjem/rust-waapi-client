@@ -16,14 +16,10 @@ pub struct CoreSourceControlDeleteArgs {
 
 impl CoreSourceControlDeleteArgs {
     /// Creates a new [`CoreSourceControlDeleteArgs`] with the required fields.
-    pub fn new(files: Vec<String>) -> Self {
-        Self { files }
-    }
-}
-
-impl From<Vec<String>> for CoreSourceControlDeleteArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
+    pub fn new(files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+        }
     }
 }
 
@@ -35,9 +31,3 @@ pub struct CoreSourceControlDeleteResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlDeleteArgs`].
-pub type DeleteArgs = CoreSourceControlDeleteArgs;
-
-/// Module-scoped alias for [`CoreSourceControlDeleteResponse`].
-pub type DeleteResponse = CoreSourceControlDeleteResponse;

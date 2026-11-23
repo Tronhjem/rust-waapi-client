@@ -30,9 +30,9 @@ pub struct CoreObjectSetRandomizerArgs {
 
 impl CoreObjectSetRandomizerArgs {
     /// Creates a new [`CoreObjectSetRandomizerArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, property: Property) -> Self {
+    pub fn new(object: ObjectRef, property: Property) -> Self {
         Self {
-            object: object.into(),
+            object,
             property,
             min: None,
             max: None,
@@ -42,35 +42,26 @@ impl CoreObjectSetRandomizerArgs {
     }
 
     /// Minimum value that the randomizer can offset by.
-    pub fn min(mut self, min: impl Into<f64>) -> Self {
-        self.min = Some(min.into());
+    pub fn min(mut self, min: f64) -> Self {
+        self.min = Some(min);
         self
     }
 
     /// Maximum value that the randomizer can offset by.
-    pub fn max(mut self, max: impl Into<f64>) -> Self {
-        self.max = Some(max.into());
+    pub fn max(mut self, max: f64) -> Self {
+        self.max = Some(max);
         self
     }
 
     /// The ID (GUID) or unique name of the platform.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// Enabled state of the randomizer.
-    pub fn enabled(mut self, enabled: impl Into<bool>) -> Self {
-        self.enabled = Some(enabled.into());
+    pub fn enabled(mut self, enabled: bool) -> Self {
+        self.enabled = Some(enabled);
         self
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<Property>> From<(T0, T1)> for CoreObjectSetRandomizerArgs {
-    fn from((object, property): (T0, T1)) -> Self {
-        Self::new(object, property.into())
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectSetRandomizerArgs`].
-pub type SetRandomizerArgs = CoreObjectSetRandomizerArgs;

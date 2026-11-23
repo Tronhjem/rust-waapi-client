@@ -21,26 +21,17 @@ pub struct CoreSoundSetActiveSourceArgs {
 
 impl CoreSoundSetActiveSourceArgs {
     /// Creates a new [`CoreSoundSetActiveSourceArgs`] with the required fields.
-    pub fn new(sound: impl Into<ObjectRef>, source: impl Into<ObjectRef>) -> Self {
+    pub fn new(sound: ObjectRef, source: ObjectRef) -> Self {
         Self {
-            sound: sound.into(),
-            source: source.into(),
+            sound,
+            source,
             platform: None,
         }
     }
 
     /// Platform ID (GUID) or name. This is an optional argument. When not specified, the current platform is used.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreSoundSetActiveSourceArgs {
-    fn from((sound, source): (T0, T1)) -> Self {
-        Self::new(sound, source)
-    }
-}
-
-/// Module-scoped alias for [`CoreSoundSetActiveSourceArgs`].
-pub type SetActiveSourceArgs = CoreSoundSetActiveSourceArgs;

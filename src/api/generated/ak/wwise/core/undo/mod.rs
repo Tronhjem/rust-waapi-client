@@ -3,9 +3,9 @@
 
 mod begin_group;
 mod cancel_group;
-pub use cancel_group::{CancelGroupArgs, CoreUndoCancelGroupArgs};
+pub use cancel_group::CoreUndoCancelGroupArgs;
 mod end_group;
-pub use end_group::{CoreUndoEndGroupArgs, EndGroupArgs};
+pub use end_group::CoreUndoEndGroupArgs;
 mod redo;
 #[allow(clippy::module_inception)]
 mod undo;

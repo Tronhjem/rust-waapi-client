@@ -23,13 +23,9 @@ pub struct CoreObjectSetPropertyArgs {
 
 impl CoreObjectSetPropertyArgs {
     /// Creates a new [`CoreObjectSetPropertyArgs`] with the required fields.
-    pub fn new(
-        object: impl Into<ObjectRef>,
-        property: Property,
-        value: impl Into<PropertyValue>,
-    ) -> Self {
+    pub fn new(object: ObjectRef, property: Property, value: impl Into<PropertyValue>) -> Self {
         Self {
-            object: object.into(),
+            object,
             property,
             value: value.into(),
             platform: None,
@@ -37,19 +33,8 @@ impl CoreObjectSetPropertyArgs {
     }
 
     /// The ID (GUID) or unique name of the platform. This is used to set values for unlinked properties. This is an optional argument. When not specified, the current platform is used to set the property.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<Property>, T2: Into<PropertyValue>> From<(T0, T1, T2)>
-    for CoreObjectSetPropertyArgs
-{
-    fn from((object, property, value): (T0, T1, T2)) -> Self {
-        Self::new(object, property.into(), value)
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectSetPropertyArgs`].
-pub type SetPropertyArgs = CoreObjectSetPropertyArgs;

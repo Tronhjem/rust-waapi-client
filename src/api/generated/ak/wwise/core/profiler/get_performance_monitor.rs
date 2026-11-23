@@ -21,12 +21,6 @@ impl CoreProfilerGetPerformanceMonitorArgs {
     }
 }
 
-impl From<serde_json::Value> for CoreProfilerGetPerformanceMonitorArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.profiler.getPerformanceMonitor`.
 ///
 /// Retrieves the Performance Monitor statistics at a specific profiler capture time. See the Wwise global counter IDs reference for the available counters.
@@ -36,9 +30,3 @@ pub struct CoreProfilerGetPerformanceMonitorResponse {
     #[serde(rename = "return")]
     pub return_: Vec<WwiseObjectRef>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetPerformanceMonitorArgs`].
-pub type GetPerformanceMonitorArgs = CoreProfilerGetPerformanceMonitorArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetPerformanceMonitorResponse`].
-pub type GetPerformanceMonitorResponse = CoreProfilerGetPerformanceMonitorResponse;

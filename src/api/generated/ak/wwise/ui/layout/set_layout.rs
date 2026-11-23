@@ -25,12 +25,3 @@ impl UiLayoutSetLayoutArgs {
         }
     }
 }
-
-impl<T0: Into<String>, T1: Into<serde_json::Value>> From<(T0, T1)> for UiLayoutSetLayoutArgs {
-    fn from((name, layout): (T0, T1)) -> Self {
-        Self::new(name, layout.into())
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutSetLayoutArgs`].
-pub type SetLayoutArgs = UiLayoutSetLayoutArgs;

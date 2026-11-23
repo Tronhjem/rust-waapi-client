@@ -73,9 +73,3 @@ pub struct CoreExecuteLuaScriptResponse {
     #[serde(rename = "return")]
     pub return_: serde_json::Value,
 }
-
-/// Module-scoped alias for [`CoreExecuteLuaScriptArgs`].
-pub type ExecuteLuaScriptArgs = CoreExecuteLuaScriptArgs;
-
-/// Module-scoped alias for [`CoreExecuteLuaScriptResponse`].
-pub type ExecuteLuaScriptResponse = CoreExecuteLuaScriptResponse;

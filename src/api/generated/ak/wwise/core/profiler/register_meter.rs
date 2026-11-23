@@ -16,36 +16,7 @@ pub struct CoreProfilerRegisterMeterArgs {
 
 impl CoreProfilerRegisterMeterArgs {
     /// Creates a new [`CoreProfilerRegisterMeterArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
-        Self {
-            object: object.into(),
-        }
+    pub fn new(object: ObjectRef) -> Self {
+        Self { object }
     }
 }
-
-impl From<ObjectRef> for CoreProfilerRegisterMeterArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreProfilerRegisterMeterArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreProfilerRegisterMeterArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreProfilerRegisterMeterArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreProfilerRegisterMeterArgs`].
-pub type RegisterMeterArgs = CoreProfilerRegisterMeterArgs;

@@ -10,6 +10,3 @@ use crate::api::generated::primitives::*;
 /// Sent when the project has been successfully loaded.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct CoreProjectLoadedPayload {}
-
-/// Module-scoped alias for [`CoreProjectLoadedPayload`].
-pub type LoadedPayload = CoreProjectLoadedPayload;

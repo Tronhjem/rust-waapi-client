@@ -23,24 +23,3 @@ impl UiModelDestroyHandleArgs {
         }
     }
 }
-
-impl From<String> for UiModelDestroyHandleArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiModelDestroyHandleArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiModelDestroyHandleArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiModelDestroyHandleArgs`].
-pub type DestroyHandleArgs = UiModelDestroyHandleArgs;

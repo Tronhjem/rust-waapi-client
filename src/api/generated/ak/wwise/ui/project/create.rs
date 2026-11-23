@@ -31,8 +31,8 @@ impl UiProjectCreateArgs {
     }
 
     /// Specifies the platform or platforms supported by the new project. If not specified, only Windows is used.
-    pub fn platforms(mut self, platforms: impl Into<serde_json::Value>) -> Self {
-        self.platforms = Some(platforms.into());
+    pub fn platforms(mut self, platforms: serde_json::Value) -> Self {
+        self.platforms = Some(platforms);
         self
     }
 
@@ -42,24 +42,3 @@ impl UiProjectCreateArgs {
         self
     }
 }
-
-impl From<String> for UiProjectCreateArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiProjectCreateArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiProjectCreateArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiProjectCreateArgs`].
-pub type CreateArgs = UiProjectCreateArgs;

@@ -16,16 +16,9 @@ pub struct UiCommandsUnregisterArgs {
 
 impl UiCommandsUnregisterArgs {
     /// Creates a new [`UiCommandsUnregisterArgs`] with the required fields.
-    pub fn new(commands: Vec<String>) -> Self {
-        Self { commands }
+    pub fn new(commands: impl Into<Vec<String>>) -> Self {
+        Self {
+            commands: commands.into(),
+        }
     }
 }
-
-impl From<Vec<String>> for UiCommandsUnregisterArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiCommandsUnregisterArgs`].
-pub type UnregisterArgs = UiCommandsUnregisterArgs;

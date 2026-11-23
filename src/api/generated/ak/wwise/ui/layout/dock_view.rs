@@ -38,6 +38,3 @@ impl UiLayoutDockViewArgs {
         }
     }
 }
-
-/// Module-scoped alias for [`UiLayoutDockViewArgs`].
-pub type DockViewArgs = UiLayoutDockViewArgs;

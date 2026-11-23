@@ -40,9 +40,3 @@ impl UiSignalClickOptions {
         }
     }
 }
-
-/// Module-scoped alias for [`UiSignalClickPayload`].
-pub type ClickPayload = UiSignalClickPayload;
-
-/// Module-scoped alias for [`UiSignalClickOptions`].
-pub type ClickOptions = UiSignalClickOptions;

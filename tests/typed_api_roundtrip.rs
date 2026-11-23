@@ -26,7 +26,7 @@ use wwise_waapi::{ObjectType, Property};
 
 #[test]
 fn object_get_args_serializes_to_expected_shape() {
-    let args = CoreObjectGetArgs::new(ObjectQuery::from(
+    let args = CoreObjectGetArgs::new(ObjectQuery::path(
         r"\Actor-Mixer Hierarchy\Default Work Unit",
     ))
     .transform(vec![
@@ -68,8 +68,8 @@ fn object_get_args_serializes_to_expected_shape() {
 #[test]
 fn object_get_options_serializes_return_keyword() {
     let options = CoreObjectGetOptions::new()
-        .return_fields(vec!["id".to_string(), "name".to_string()])
-        .platform(PlatformRef::Name("Windows".to_string()));
+        .return_fields([ObjectReturnField::Id, ObjectReturnField::Name])
+        .platform(PlatformRef::name("Windows"));
 
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id", "name"]]);
@@ -121,7 +121,8 @@ fn object_delete_args_serializes_object_ref() {
 
 #[test]
 fn soundengine_post_event_args_serializes() {
-    let args = SoundenginePostEventArgs::new("Play_Test").game_object(42u64);
+    let args = SoundenginePostEventArgs::new(RtpcRef::name("Play_Test"))
+        .game_object(GameObjectRef::id(42));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["event"], "Play_Test");
@@ -130,7 +131,8 @@ fn soundengine_post_event_args_serializes() {
 
 #[test]
 fn soundengine_set_rtpc_value_args_serializes() {
-    let args = SoundengineSetRtpcValueArgs::new("Volume", 0.75).game_object(100u32);
+    let args = SoundengineSetRtpcValueArgs::new(RtpcRef::name("Volume"), 0.75)
+        .game_object(GameObjectRef::id(100));
 
     let value = serde_json::to_value(&args).unwrap();
     assert_eq!(value["rtpc"], "Volume");
@@ -140,7 +142,11 @@ fn soundengine_set_rtpc_value_args_serializes() {
 
 #[test]
 fn soundengine_register_position_and_listeners_serialize() {
-    let reg = serde_json::to_value(SoundengineRegisterGameObjArgs::new(1u64, "Listener")).unwrap();
+    let reg = serde_json::to_value(SoundengineRegisterGameObjArgs::new(
+        GameObjectRef::id(1),
+        "Listener",
+    ))
+    .unwrap();
     assert_eq!(reg, json!({ "gameObject": 1, "name": "Listener" }));
 
     let listeners = serde_json::to_value(SoundengineSetDefaultListenersArgs::new(vec![
@@ -201,8 +207,8 @@ fn audio_import_args_serializes_imports_and_defaults() {
 #[test]
 fn audio_import_options_serializes_return_and_platform() {
     let options = CoreAudioImportOptions::new()
-        .return_fields(vec!["id".to_string(), "name".to_string()])
-        .platform(PlatformRef::Guid("{GUID}".to_string()));
+        .return_fields([ObjectReturnField::Id, ObjectReturnField::Name])
+        .platform(PlatformRef::guid("{GUID}"));
 
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id", "name"]]);
@@ -218,7 +224,7 @@ fn project_save_args_serializes_empty_args() {
 
 #[test]
 fn ui_get_selected_objects_options_serializes() {
-    let options = UiGetSelectedObjectsOptions::new().return_fields(vec!["id".to_string()]);
+    let options = UiGetSelectedObjectsOptions::new().return_fields([ObjectReturnField::Id]);
     let value = serde_json::to_value(&options).unwrap();
     assert_eq!(value["return"], json![["id"]]);
 }
@@ -316,14 +322,17 @@ fn ui_get_selected_objects_response_deserializes() {
 #[test]
 fn rtpc_ref_serializes_name_guid_and_short_id() {
     assert_eq!(
-        serde_json::to_value(RtpcRef::from("Volume")).unwrap(),
+        serde_json::to_value(RtpcRef::name("Volume")).unwrap(),
         "Volume"
     );
     assert_eq!(
-        serde_json::to_value(RtpcRef::Guid("{GUID}".to_string())).unwrap(),
+        serde_json::to_value(RtpcRef::guid("{GUID}")).unwrap(),
         "{GUID}"
     );
-    assert_eq!(serde_json::to_value(RtpcRef::from(123u32)).unwrap(), 123);
+    assert_eq!(
+        serde_json::to_value(RtpcRef::short_id(123u32)).unwrap(),
+        123
+    );
 }
 
 #[test]
@@ -441,7 +450,7 @@ fn object_type_enum_maps_to_names_class_ids_and_queries() {
         ObjectType::ActorMixer
     );
 
-    let query = ObjectQuery::from(ObjectType::Sound);
+    let query = ObjectQuery::of_type(ObjectType::Sound);
     let value = serde_json::to_value(&query).unwrap();
     assert_eq!(value["ofType"], json!(["Sound"]));
 }
@@ -537,7 +546,7 @@ fn transport_args_and_responses_roundtrip() {
         "{00000000-0000-0000-0000-000000000001}"
     );
 
-    let prep = CoreTransportPrepareArgs::new(ObjectRef::from("Sound:MySound"));
+    let prep = CoreTransportPrepareArgs::new(ObjectRef::name("Sound:MySound"));
     assert_eq!(
         serde_json::to_value(prep).unwrap(),
         json!({"object": "Sound:MySound"})
@@ -898,16 +907,22 @@ fn soundengine_switch_and_state_roundtrip() {
         SoundengineGetStateArgs, SoundengineGetSwitchArgs, SoundengineSetStateArgs,
         SoundengineSetSwitchArgs,
     };
-    use wwise_waapi::api::generated::primitives::GameObjectRef;
+    use wwise_waapi::api::generated::primitives::{GameObjectRef, SoundEngineObjectRef};
 
-    let set_switch = SoundengineSetSwitchArgs::new("MySwitchGroup", "On")
-        .game_object(GameObjectRef::game_object(7));
+    let set_switch = SoundengineSetSwitchArgs::new(
+        SoundEngineObjectRef::name("MySwitchGroup"),
+        SoundEngineObjectRef::name("On"),
+    )
+    .game_object(GameObjectRef::game_object(7));
     assert_eq!(
         serde_json::to_value(set_switch).unwrap(),
         json!({"switchGroup": "MySwitchGroup", "switchState": "On", "gameObject": 7})
     );
 
-    let set_state = SoundengineSetStateArgs::new("MyStateGroup", "Combat");
+    let set_state = SoundengineSetStateArgs::new(
+        SoundEngineObjectRef::name("MyStateGroup"),
+        SoundEngineObjectRef::name("Combat"),
+    );
     assert_eq!(
         serde_json::to_value(set_state).unwrap(),
         json!({"stateGroup": "MyStateGroup", "state": "Combat"})
@@ -936,11 +951,11 @@ fn soundengine_actions_seek_and_events_roundtrip() {
         SoundengineSeekOnEventArgs, SoundengineStopPlayingIdArgs,
     };
     use wwise_waapi::api::generated::primitives::{
-        ActionOnEventType, AkCurveInterpolation, GameObjectRef,
+        ActionOnEventType, AkCurveInterpolation, GameObjectRef, SoundEngineObjectRef,
     };
 
     let exec = SoundengineExecuteActionOnEventArgs::new(
-        "Play_Test",
+        SoundEngineObjectRef::name("Play_Test"),
         ActionOnEventType::Stop,
         GameObjectRef::game_object(1),
         500,
@@ -963,10 +978,14 @@ fn soundengine_actions_seek_and_events_roundtrip() {
         json!({"playingId": 42, "transitionDuration": 100, "fadeCurve": 5})
     );
 
-    let seek =
-        SoundengineSeekOnEventArgs::new("Play_Test", GameObjectRef::game_object(1), true, 42)
-            .position(1000)
-            .percent(50.0);
+    let seek = SoundengineSeekOnEventArgs::new(
+        SoundEngineObjectRef::name("Play_Test"),
+        GameObjectRef::game_object(1),
+        true,
+        42,
+    )
+    .position(1000)
+    .percent(50.0);
     assert_eq!(
         serde_json::to_value(seek).unwrap(),
         json!({
@@ -979,8 +998,8 @@ fn soundengine_actions_seek_and_events_roundtrip() {
         })
     );
 
-    let trigger =
-        SoundenginePostTriggerArgs::new("MyTrigger").game_object(GameObjectRef::game_object(3));
+    let trigger = SoundenginePostTriggerArgs::new(SoundEngineObjectRef::name("MyTrigger"))
+        .game_object(GameObjectRef::game_object(3));
     assert_eq!(
         serde_json::to_value(trigger).unwrap(),
         json!({"trigger": "MyTrigger", "gameObject": 3})
@@ -997,12 +1016,16 @@ fn soundengine_positions_volume_and_listeners_roundtrip() {
         SoundengineSetScalingFactorArgs, SoundengineStopAllArgs, SoundengineUnloadBankArgs,
     };
     use wwise_waapi::api::generated::primitives::{
-        AuxSendValue, GameObjectRef, MultiPositionType, Position,
+        AuxSendValue, GameObjectRef, MultiPositionType, Position, SoundEngineObjectRef,
     };
 
     let aux = SoundengineSetGameObjectAuxSendValuesArgs::new(
         GameObjectRef::game_object(1),
-        vec![AuxSendValue::new(1u64, "MyAuxBus", -3.0)],
+        vec![AuxSendValue::new(
+            GameObjectRef::id(1),
+            SoundEngineObjectRef::name("MyAuxBus"),
+            -3.0,
+        )],
     );
     assert_eq!(
         serde_json::to_value(aux).unwrap(),
@@ -1079,20 +1102,20 @@ fn soundengine_positions_volume_and_listeners_roundtrip() {
         json!({"emitter": 1, "listener": 2, "controlValue": -6.0})
     );
 
-    let reset =
-        SoundengineResetRtpcValueArgs::new("Volume").game_object(GameObjectRef::game_object(1));
+    let reset = SoundengineResetRtpcValueArgs::new(SoundEngineObjectRef::name("Volume"))
+        .game_object(GameObjectRef::game_object(1));
     assert_eq!(
         serde_json::to_value(reset).unwrap(),
         json!({"rtpc": "Volume", "gameObject": 1})
     );
 
-    let load = SoundengineLoadBankArgs::new("Init");
+    let load = SoundengineLoadBankArgs::new(SoundEngineObjectRef::name("Init"));
     assert_eq!(
         serde_json::to_value(load).unwrap(),
         json!({"soundBank": "Init"})
     );
 
-    let unload = SoundengineUnloadBankArgs::new("Init");
+    let unload = SoundengineUnloadBankArgs::new(SoundEngineObjectRef::name("Init"));
     assert_eq!(
         serde_json::to_value(unload).unwrap(),
         json!({"soundBank": "Init"})
@@ -1367,7 +1390,7 @@ fn soundbank_roundtrip() {
 
     let generate = CoreSoundbankGenerateArgs::new()
         .platforms(vec!["Mac".to_string()])
-        .languages(vec!["English(US)".into()])
+        .languages(vec![wwise_waapi::api::LanguageRef::name("English(US)")])
         .soundbanks(vec![
             SoundBankInfo::new("Main")
                 .inclusions(vec![
@@ -1481,7 +1504,7 @@ fn audio_mute_convert_and_import_roundtrip() {
     let convert = CoreAudioConvertArgs::new(
         vec![ObjectRef::guid("{OBJ-1}")],
         vec![PlatformRef::Name("Mac".to_string())],
-        vec!["English(US)".into()],
+        vec![wwise_waapi::api::LanguageRef::name("English(US)")],
     );
     assert_eq!(
         serde_json::to_value(convert).unwrap(),
@@ -2256,18 +2279,20 @@ fn schema_discovered_endpoints_roundtrip() {
 #[test]
 fn ergonomic_constructors_aliases_and_from_roundtrip() {
     use wwise_waapi::api::ak::soundengine::{
-        PostEventArgs, RegisterGameObjArgs, SetPositionArgs, SetRtpcValueArgs,
-        UnregisterGameObjArgs,
+        SoundenginePostEventArgs, SoundengineRegisterGameObjArgs, SoundengineSetPositionArgs,
+        SoundengineSetRtpcValueArgs, SoundengineUnregisterGameObjArgs,
     };
     use wwise_waapi::api::ak::wwise::core::object::{
-        CreateArgs, CreatedOptions, CreatedPayload, DeleteArgs, GetArgs, GetOptions, SetArgs,
-        SetItem, SetNameArgs, SetPropertyArgs,
+        CoreObjectCreateArgs, CoreObjectCreatedOptions, CoreObjectCreatedPayload,
+        CoreObjectDeleteArgs, CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectSetArgs,
+        CoreObjectSetItem, CoreObjectSetNameArgs, CoreObjectSetPropertyArgs,
     };
     use wwise_waapi::prelude::*;
 
-    // 1. Short aliases + impl Into<T> in Args::new(...)
+    // 1. Canonical types + explicit domain constructors in Args::new(...)
     let parent_guid = String::from("{11111111-1111-1111-1111-111111111111}");
-    let create = CreateArgs::new(&parent_guid, ObjectType::Sound, "Laser");
+    let create =
+        CoreObjectCreateArgs::new(ObjectRef::guid(&parent_guid), ObjectType::Sound, "Laser");
     assert_eq!(
         serde_json::to_value(create).unwrap(),
         json!({
@@ -2277,31 +2302,19 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
         })
     );
 
-    // 3-tuple From for CreateArgs
-    let create_tuple = CreateArgs::from((&parent_guid, ObjectType::Sound, "Plasma"));
+    let delete_path =
+        CoreObjectDeleteArgs::new(ObjectRef::path(r"\Containers\Default Work Unit\Laser"));
     assert_eq!(
-        serde_json::to_value(create_tuple).unwrap(),
-        json!({
-            "parent": "{11111111-1111-1111-1111-111111111111}",
-            "type": "Sound",
-            "name": "Plasma"
-        })
-    );
-
-    // 1-required-field From for DeleteArgs (&str and &String)
-    let delete_str = DeleteArgs::from(r"\Containers\Default Work Unit\Laser");
-    assert_eq!(
-        serde_json::to_value(delete_str).unwrap(),
+        serde_json::to_value(delete_path).unwrap(),
         json!({"object": r"\Containers\Default Work Unit\Laser"})
     );
-    let delete_ref = DeleteArgs::from(&parent_guid);
+    let delete_guid = CoreObjectDeleteArgs::new(ObjectRef::guid(&parent_guid));
     assert_eq!(
-        serde_json::to_value(delete_ref).unwrap(),
+        serde_json::to_value(delete_guid).unwrap(),
         json!({"object": "{11111111-1111-1111-1111-111111111111}"})
     );
 
-    // 2-tuple From for SetNameArgs & 3-tuple From for SetPropertyArgs
-    let rename = SetNameArgs::from((&parent_guid, "LaserRenamed"));
+    let rename = CoreObjectSetNameArgs::new(ObjectRef::guid(&parent_guid), "LaserRenamed");
     assert_eq!(
         serde_json::to_value(rename).unwrap(),
         json!({
@@ -2309,7 +2322,8 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
             "value": "LaserRenamed"
         })
     );
-    let set_prop = SetPropertyArgs::from((&parent_guid, Property::Volume, -4.5));
+    let set_prop =
+        CoreObjectSetPropertyArgs::new(ObjectRef::guid(&parent_guid), Property::Volume, -4.5);
     assert_eq!(
         serde_json::to_value(set_prop).unwrap(),
         json!({
@@ -2319,29 +2333,30 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
         })
     );
 
-    // GetArgs From<&str>, From<&String>, From<ObjectType>, and GetArgs::new(impl Into<ObjectQuery>)
-    let get_path: GetArgs = r"\Containers\Default Work Unit".into();
+    // CoreObjectGetArgs::new(ObjectQuery) and CoreObjectGetArgs::from_waql
+    let get_path = CoreObjectGetArgs::new(ObjectQuery::path(r"\Containers\Default Work Unit"));
     assert_eq!(
         serde_json::to_value(get_path).unwrap(),
         json!({"from": {"path": [r"\Containers\Default Work Unit"]}})
     );
-    let get_id = GetArgs::new(&parent_guid);
+    let get_id = CoreObjectGetArgs::new(ObjectQuery::id(&parent_guid));
     assert_eq!(
         serde_json::to_value(get_id).unwrap(),
         json!({"from": {"id": ["{11111111-1111-1111-1111-111111111111}"]}})
     );
-    let get_type: GetArgs = ObjectType::Sound.into();
+    let get_type = CoreObjectGetArgs::new(ObjectQuery::of_type(ObjectType::Sound));
     assert_eq!(
         serde_json::to_value(get_type).unwrap(),
         json!({"from": {"ofType": ["Sound"]}})
     );
-    let _opts = GetOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+    let _opts =
+        CoreObjectGetOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
 
-    // SetArgs::from(SetItem) and SetArgs::item(SetItem)
-    let item = SetItem::new(&parent_guid)
+    // CoreObjectSetArgs::from_item(CoreObjectSetItem)
+    let item = CoreObjectSetItem::new(ObjectRef::guid(&parent_guid))
         .name("LaserV2")
         .property(Property::Volume, -6.0);
-    let set_from_item = SetArgs::from(item);
+    let set_from_item = CoreObjectSetArgs::from_item(item);
     assert_eq!(
         serde_json::to_value(set_from_item).unwrap(),
         json!({
@@ -2353,36 +2368,37 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
         })
     );
 
-    // SoundEngine ergonomic constructors & From impls
-    let reg = RegisterGameObjArgs::from((1001u64, "Listener"));
+    // SoundEngine explicit constructors
+    let reg = SoundengineRegisterGameObjArgs::new(GameObjectRef::id(1001), "Listener");
     assert_eq!(
         serde_json::to_value(reg).unwrap(),
         json!({"gameObject": 1001, "name": "Listener"})
     );
-    let unreg = UnregisterGameObjArgs::from(1001u64);
+    let unreg = SoundengineUnregisterGameObjArgs::new(GameObjectRef::id(1001));
     assert_eq!(
         serde_json::to_value(unreg).unwrap(),
         json!({"gameObject": 1001})
     );
-    let pos = SetPositionArgs::from((1001u64, Position::origin()));
+    let pos = SoundengineSetPositionArgs::new(GameObjectRef::id(1001), Position::origin());
     assert_eq!(
         serde_json::to_value(pos).unwrap()["gameObject"],
         json!(1001)
     );
-    let post = PostEventArgs::from("Play_Laser").game_object(1001u64);
+    let post = SoundenginePostEventArgs::new(EventRef::name("Play_Laser"))
+        .game_object(GameObjectRef::id(1001));
     assert_eq!(
         serde_json::to_value(post).unwrap(),
         json!({"event": "Play_Laser", "gameObject": 1001})
     );
-    let rtpc = SetRtpcValueArgs::from(("PlayerSpeed", 75.0));
+    let rtpc = SoundengineSetRtpcValueArgs::new(RtpcRef::name("PlayerSpeed"), 75.0);
     assert_eq!(
         serde_json::to_value(rtpc).unwrap(),
         json!({"rtpc": "PlayerSpeed", "value": 75.0})
     );
 
-    // Short topic aliases
-    let _created_opts = CreatedOptions::new().return_fields([ObjectReturnField::Id]);
-    let created_payload: CreatedPayload =
+    // Topic options and payload
+    let _created_opts = CoreObjectCreatedOptions::new().return_fields([ObjectReturnField::Id]);
+    let created_payload: CoreObjectCreatedPayload =
         serde_json::from_value(json!({"object": {"id": parent_guid}})).unwrap();
     assert_eq!(
         created_payload.object.id(),
@@ -2394,8 +2410,8 @@ fn ergonomic_constructors_aliases_and_from_roundtrip() {
 fn unified_return_fields_options_accessors_and_errors_roundtrip() {
     use wwise_waapi::api::ak::wwise::core::mediaPool::CoreMediaPoolGetOptions;
     use wwise_waapi::api::ak::wwise::core::object::{
-        CoreObjectCreateResponse, CoreObjectSetObject, CreatedOptions, GetOptions,
-        PropertyChangedOptions,
+        CoreObjectCreateResponse, CoreObjectCreatedOptions, CoreObjectPropertyChangedOptions,
+        CoreObjectSetObject,
     };
     use wwise_waapi::api::ak::wwise::core::profiler::{
         CoreProfilerGetAudioObjectsOptions, CoreProfilerGetBussesOptions,
@@ -2407,22 +2423,16 @@ fn unified_return_fields_options_accessors_and_errors_roundtrip() {
     use wwise_waapi::prelude::*;
 
     // 1. Unified .return_fields(...) accepting arrays across all Options structs
-    let created_opts =
-        CreatedOptions::new().return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+    let created_opts = CoreObjectCreatedOptions::new()
+        .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
     assert_eq!(
         serde_json::to_value(&created_opts).unwrap(),
         json!({"return": ["id", "name"]})
     );
-    let created_from_arr = CreatedOptions::from([ObjectReturnField::Id, ObjectReturnField::Type]);
-    assert_eq!(
-        serde_json::to_value(created_from_arr).unwrap(),
-        json!({"return": ["id", "type"]})
-    );
-    let created_from_unit = CreatedOptions::from(());
-    assert_eq!(serde_json::to_value(created_from_unit).unwrap(), json!({}));
 
-    let prop_changed_opts = PropertyChangedOptions::new("{OBJ-1}", Property::Volume)
-        .return_fields([ObjectReturnField::Id, "path".into()]);
+    let prop_changed_opts =
+        CoreObjectPropertyChangedOptions::new(ObjectRef::guid("{OBJ-1}"), Property::Volume)
+            .return_fields([ObjectReturnField::Id, ObjectReturnField::custom("path")]);
     assert_eq!(
         serde_json::to_value(prop_changed_opts).unwrap(),
         json!({"object": "{OBJ-1}", "property": "Volume", "return": ["id", "path"]})
@@ -2434,7 +2444,7 @@ fn unified_return_fields_options_accessors_and_errors_roundtrip() {
         serde_json::to_value(busses_opts).unwrap(),
         json!({"return": ["objectGUID", "objectName"]})
     );
-    let voices_opts = CoreProfilerGetVoicesOptions::from([
+    let voices_opts = CoreProfilerGetVoicesOptions::new().return_fields([
         VoiceReturnField::ObjectGuid,
         VoiceReturnField::GameObjectName,
     ]);
@@ -2448,29 +2458,18 @@ fn unified_return_fields_options_accessors_and_errors_roundtrip() {
         serde_json::to_value(audio_objs_opts).unwrap(),
         json!({"return": ["audioObjectName"]})
     );
-    let media_opts = CoreMediaPoolGetOptions::new().return_fields(["Path", "WAV/Duration"]);
+    let media_opts = CoreMediaPoolGetOptions::new()
+        .return_fields(vec!["Path".to_string(), "WAV/Duration".to_string()]);
     assert_eq!(
         serde_json::to_value(media_opts).unwrap(),
         json!({"return": ["Path", "WAV/Duration"]})
     );
 
-    // 2. ObjectReturnOptions::basic() and From conversions
+    // 2. ObjectReturnOptions::basic()
     let basic = ObjectReturnOptions::basic();
     assert_eq!(
         serde_json::to_value(basic).unwrap(),
         json!({"return": ["id", "name", "type", "path"]})
-    );
-    let get_from_unit = GetOptions::from(());
-    assert_eq!(serde_json::to_value(get_from_unit).unwrap(), json!({}));
-    let get_from_arr = GetOptions::from([ObjectReturnField::Id, ObjectReturnField::Name]);
-    assert_eq!(
-        serde_json::to_value(get_from_arr).unwrap(),
-        json!({"return": ["id", "name"]})
-    );
-    let get_from_single = GetOptions::from(ObjectReturnField::Id);
-    assert_eq!(
-        serde_json::to_value(get_from_single).unwrap(),
-        json!({"return": ["id"]})
     );
 
     // 3. Consistent .id(), .name(), and typed property_* accessors on responses
@@ -2713,15 +2712,15 @@ fn into_constructor_helpers_roundtrip() {
             "fadePosition": 0.5
         })
     );
-    let mp = MultiPosition::new(Vector3::new(1.0, 2.0, 3.0));
+    let mp = MultiPosition::new(Position::new(Vector3::new(1.0, 2.0, 3.0)));
     assert_eq!(
         serde_json::to_value(mp).unwrap()["position"]["position"],
         json!({"x": 1.0, "y": 2.0, "z": 3.0})
     );
     let bank = SoundBankInfo::new("MainBank")
         .inclusions([SoundBankInclusionType::Event, SoundBankInclusionType::Media])
-        .events(["Play_TestSound"])
-        .aux_busses([r"\Busses\Default Work Unit\Main Audio Bus"]);
+        .events([ObjectRef::name("Play_TestSound")])
+        .aux_busses([ObjectRef::path(r"\Busses\Default Work Unit\Main Audio Bus")]);
     assert_eq!(
         serde_json::to_value(bank).unwrap(),
         json!({

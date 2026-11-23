@@ -14,6 +14,3 @@ pub struct CoreProfilerStartCaptureResponse {
     #[serde(rename = "return", default)]
     pub return_: Option<i64>,
 }
-
-/// Module-scoped alias for [`CoreProfilerStartCaptureResponse`].
-pub type StartCaptureResponse = CoreProfilerStartCaptureResponse;

@@ -27,10 +27,10 @@ pub struct CoreObjectPastePropertiesArgs {
 
 impl CoreObjectPastePropertiesArgs {
     /// Creates a new [`CoreObjectPastePropertiesArgs`] with the required fields.
-    pub fn new(source: impl Into<ObjectRef>, targets: Vec<ObjectRef>) -> Self {
+    pub fn new(source: ObjectRef, targets: impl Into<Vec<ObjectRef>>) -> Self {
         Self {
-            source: source.into(),
-            targets,
+            source,
+            targets: targets.into(),
             paste_mode: None,
             exclusion: None,
             inclusion: None,
@@ -38,8 +38,8 @@ impl CoreObjectPastePropertiesArgs {
     }
 
     /// Paste mode for lists. Default value is "replaceEntire". With "replaceEntire" all elements in the lists of a target object are removed and all selected elements from the source's lists are copied. Conversely, with "addReplace" and "addKeep" elements in a target which are not in the source are not removed. Elements in the source's list which are not in a target's list are added to the target. For elements which are common to the source and a target "addReplace" will copy the one from the source, replacing the target's element, whereas "addKeep" will retain the element in the target.
-    pub fn paste_mode(mut self, paste_mode: impl Into<PasteMode>) -> Self {
-        self.paste_mode = Some(paste_mode.into());
+    pub fn paste_mode(mut self, paste_mode: PasteMode) -> Self {
+        self.paste_mode = Some(paste_mode);
         self
     }
 
@@ -55,14 +55,3 @@ impl CoreObjectPastePropertiesArgs {
         self
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<Vec<ObjectRef>>> From<(T0, T1)>
-    for CoreObjectPastePropertiesArgs
-{
-    fn from((source, targets): (T0, T1)) -> Self {
-        Self::new(source, targets.into())
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectPastePropertiesArgs`].
-pub type PastePropertiesArgs = CoreObjectPastePropertiesArgs;

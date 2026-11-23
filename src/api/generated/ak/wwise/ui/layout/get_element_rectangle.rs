@@ -21,24 +21,6 @@ impl UiLayoutGetElementRectangleArgs {
     }
 }
 
-impl From<String> for UiLayoutGetElementRectangleArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutGetElementRectangleArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutGetElementRectangleArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.ui.layout.getElementRectangle`.
 ///
 /// Retrieves the current allocated rectangle of a layout element. An empty rect is returned if the element is not found.
@@ -57,9 +39,3 @@ pub struct UiLayoutGetElementRectangleResponse {
     #[serde(default)]
     pub bottom: Option<f64>,
 }
-
-/// Module-scoped alias for [`UiLayoutGetElementRectangleArgs`].
-pub type GetElementRectangleArgs = UiLayoutGetElementRectangleArgs;
-
-/// Module-scoped alias for [`UiLayoutGetElementRectangleResponse`].
-pub type GetElementRectangleResponse = UiLayoutGetElementRectangleResponse;

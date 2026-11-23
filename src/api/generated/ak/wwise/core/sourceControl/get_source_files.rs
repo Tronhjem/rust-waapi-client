@@ -46,8 +46,8 @@ impl CoreSourceControlGetSourceFilesArgs {
     }
 
     /// Search in all subfolders of the base folder. Default to true.
-    pub fn recursive(mut self, recursive: impl Into<bool>) -> Self {
-        self.recursive = Some(recursive.into());
+    pub fn recursive(mut self, recursive: bool) -> Self {
+        self.recursive = Some(recursive);
         self
     }
 }
@@ -72,21 +72,13 @@ impl CoreSourceControlGetSourceFilesOptions {
     }
 
     /// Array of fields to return for each file or folder found.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<String>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<String>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<String>>) -> Self {
         self.return_fields(return_fields)
     }
 
@@ -94,24 +86,6 @@ impl CoreSourceControlGetSourceFilesOptions {
     pub fn object_return(mut self, object_return: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.object_return = Some(object_return.into());
         self
-    }
-}
-
-impl From<()> for CoreSourceControlGetSourceFilesOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[String; N]> for CoreSourceControlGetSourceFilesOptions {
-    fn from(return_fields: [String; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<String>> for CoreSourceControlGetSourceFilesOptions {
-    fn from(return_fields: Vec<String>) -> Self {
-        Self::new().return_fields(return_fields)
     }
 }
 
@@ -124,12 +98,3 @@ pub struct CoreSourceControlGetSourceFilesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlGetSourceFilesArgs`].
-pub type GetSourceFilesArgs = CoreSourceControlGetSourceFilesArgs;
-
-/// Module-scoped alias for [`CoreSourceControlGetSourceFilesOptions`].
-pub type GetSourceFilesOptions = CoreSourceControlGetSourceFilesOptions;
-
-/// Module-scoped alias for [`CoreSourceControlGetSourceFilesResponse`].
-pub type GetSourceFilesResponse = CoreSourceControlGetSourceFilesResponse;

@@ -22,26 +22,18 @@ pub struct CoreObjectGetAttenuationCurveArgs {
 
 impl CoreObjectGetAttenuationCurveArgs {
     /// Creates a new [`CoreObjectGetAttenuationCurveArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, curve_type: AttenuationCurveType) -> Self {
+    pub fn new(object: ObjectRef, curve_type: AttenuationCurveType) -> Self {
         Self {
-            object: object.into(),
+            object,
             curve_type,
             platform: None,
         }
     }
 
     /// The ID (GUID) or unique name of the platform to get curves. Set to null-guid for unlinked reference.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<AttenuationCurveType>> From<(T0, T1)>
-    for CoreObjectGetAttenuationCurveArgs
-{
-    fn from((object, curve_type): (T0, T1)) -> Self {
-        Self::new(object, curve_type.into())
     }
 }
 
@@ -59,9 +51,3 @@ pub struct CoreObjectGetAttenuationCurveResponse {
     #[serde(rename = "use")]
     pub use_: AttenuationCurveUse,
 }
-
-/// Module-scoped alias for [`CoreObjectGetAttenuationCurveArgs`].
-pub type GetAttenuationCurveArgs = CoreObjectGetAttenuationCurveArgs;
-
-/// Module-scoped alias for [`CoreObjectGetAttenuationCurveResponse`].
-pub type GetAttenuationCurveResponse = CoreObjectGetAttenuationCurveResponse;

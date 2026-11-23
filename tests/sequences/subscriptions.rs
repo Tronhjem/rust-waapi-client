@@ -46,7 +46,7 @@ async fn object_events_subscription_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
                 ObjectType::ActorMixer,
                 SUB_ACTOR_MIXER_NAME.to_string(),
             )
@@ -93,7 +93,7 @@ async fn object_events_subscription_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(mixer_id.as_str()),
+                ObjectRef::guid(mixer_id.as_str()),
                 ObjectType::Sound,
                 SUB_INITIAL_NAME.to_string(),
             )
@@ -127,7 +127,7 @@ async fn object_events_subscription_sequence() {
         .object()
         .set(
             CoreObjectSetArgs::new(vec![
-                CoreObjectSetItem::new(ObjectRef::from(sound_id.as_str()))
+                CoreObjectSetItem::new(ObjectRef::guid(sound_id.as_str()))
                     .name(SUB_RENAMED_NAME)
                     .property(Property::Volume, -9.0),
             ]),
@@ -152,7 +152,7 @@ async fn object_events_subscription_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             sound_id.as_str(),
         )))
         .await
@@ -185,7 +185,7 @@ async fn object_events_subscription_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await

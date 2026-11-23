@@ -48,13 +48,9 @@ pub struct CoreObjectCreateArgs {
 
 impl CoreObjectCreateArgs {
     /// Creates a new [`CoreObjectCreateArgs`] with the required fields.
-    pub fn new(
-        parent: impl Into<ObjectRef>,
-        object_type: ObjectType,
-        name: impl Into<String>,
-    ) -> Self {
+    pub fn new(parent: ObjectRef, object_type: ObjectType, name: impl Into<String>) -> Self {
         Self {
-            parent: parent.into(),
+            parent,
             object_type,
             name: name.into(),
             id: None,
@@ -93,23 +89,20 @@ impl CoreObjectCreateArgs {
     }
 
     /// The ID (GUID) or unique name of the platform used when setting properties via this command. Not specifying a platform sets the value for all linked platforms.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
-        self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: bool) -> Self {
+        self.auto_add_to_source_control = Some(auto_add_to_source_control);
         self
     }
 
     /// The action to take if "parent" already has a child with the same name. Default value is "fail". See the WAAPI object creation modes documentation for more information.
-    pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
-        self.on_name_conflict = Some(on_name_conflict.into());
+    pub fn on_name_conflict(mut self, on_name_conflict: OnNameConflict) -> Self {
+        self.on_name_conflict = Some(on_name_conflict);
         self
     }
 
@@ -129,14 +122,6 @@ impl CoreObjectCreateArgs {
     pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
         self.extra.insert(key.into(), value.into());
         self
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectType>, T2: Into<String>> From<(T0, T1, T2)>
-    for CoreObjectCreateArgs
-{
-    fn from((parent, object_type, name): (T0, T1, T2)) -> Self {
-        Self::new(parent, object_type.into(), name)
     }
 }
 
@@ -167,9 +152,3 @@ impl CoreObjectCreateResponse {
         self.name.as_deref()
     }
 }
-
-/// Module-scoped alias for [`CoreObjectCreateArgs`].
-pub type CreateArgs = CoreObjectCreateArgs;
-
-/// Module-scoped alias for [`CoreObjectCreateResponse`].
-pub type CreateResponse = CoreObjectCreateResponse;

@@ -61,7 +61,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(sound_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(sound_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Children],
                 },
@@ -88,8 +88,8 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .core()
         .sound()
         .set_active_source(CoreSoundSetActiveSourceArgs::new(
-            ObjectRef::from(sound_id.as_str()),
-            ObjectRef::from(source_id.as_str()),
+            ObjectRef::guid(sound_id.as_str()),
+            ObjectRef::guid(source_id.as_str()),
         ))
         .await
         .expect("set active source");
@@ -101,7 +101,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(GAME_PARAMS_WU),
+                ObjectRef::path(GAME_PARAMS_WU),
                 ObjectType::GameParameter,
                 "WaapiSeqRangeParam".to_string(),
             )
@@ -116,7 +116,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .core()
         .game_parameter()
         .set_range(CoreGameParameterSetRangeArgs::new(
-            ObjectRef::from(game_param_id.as_str()),
+            ObjectRef::guid(game_param_id.as_str()),
             0.0,
             100.0,
             OnCurveUpdate::Stretch,
@@ -129,7 +129,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(game_param_id.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::id(game_param_id.as_str())),
             ObjectReturnOptions::new().return_fields(vec![
                 ObjectReturnField::Property(Property::Min),
                 ObjectReturnField::Property(Property::Max),
@@ -155,7 +155,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             sound_id.as_str(),
         )))
         .await
@@ -164,7 +164,7 @@ async fn set_active_source_set_range_and_ping_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             game_param_id.as_str(),
         )))
         .await

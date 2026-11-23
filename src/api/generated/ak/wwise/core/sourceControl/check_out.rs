@@ -16,14 +16,10 @@ pub struct CoreSourceControlCheckOutArgs {
 
 impl CoreSourceControlCheckOutArgs {
     /// Creates a new [`CoreSourceControlCheckOutArgs`] with the required fields.
-    pub fn new(files: Vec<String>) -> Self {
-        Self { files }
-    }
-}
-
-impl From<Vec<String>> for CoreSourceControlCheckOutArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
+    pub fn new(files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+        }
     }
 }
 
@@ -35,9 +31,3 @@ pub struct CoreSourceControlCheckOutResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlCheckOutArgs`].
-pub type CheckOutArgs = CoreSourceControlCheckOutArgs;
-
-/// Module-scoped alias for [`CoreSourceControlCheckOutResponse`].
-pub type CheckOutResponse = CoreSourceControlCheckOutResponse;

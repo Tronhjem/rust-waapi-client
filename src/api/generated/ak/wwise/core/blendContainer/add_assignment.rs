@@ -24,18 +24,18 @@ pub struct CoreBlendContainerAddAssignmentArgs {
 
 impl CoreBlendContainerAddAssignmentArgs {
     /// Creates a new [`CoreBlendContainerAddAssignmentArgs`] with the required fields.
-    pub fn new(object: impl Into<String>, child: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: impl Into<String>, child: ObjectRef) -> Self {
         Self {
             object: object.into(),
-            child: child.into(),
+            child,
             index: None,
             edges: None,
         }
     }
 
     /// The index of the child among the Blend Track's assignments. If a value is provided, it will be clamped to the range `[0-n]`, where n is the current number of assignments. If a value is not provided, then the assignment will be added at the end.
-    pub fn index(mut self, index: impl Into<i64>) -> Self {
-        self.index = Some(index.into());
+    pub fn index(mut self, index: i64) -> Self {
+        self.index = Some(index);
         self
     }
 
@@ -43,12 +43,6 @@ impl CoreBlendContainerAddAssignmentArgs {
     pub fn edges(mut self, edges: impl Into<Vec<BlendEdge>>) -> Self {
         self.edges = Some(edges.into());
         self
-    }
-}
-
-impl<T0: Into<String>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreBlendContainerAddAssignmentArgs {
-    fn from((object, child): (T0, T1)) -> Self {
-        Self::new(object, child)
     }
 }
 
@@ -67,9 +61,3 @@ pub struct CoreBlendContainerAddAssignmentResponse {
     #[serde(default)]
     pub edges: Vec<BlendEdge>,
 }
-
-/// Module-scoped alias for [`CoreBlendContainerAddAssignmentArgs`].
-pub type AddAssignmentArgs = CoreBlendContainerAddAssignmentArgs;
-
-/// Module-scoped alias for [`CoreBlendContainerAddAssignmentResponse`].
-pub type AddAssignmentResponse = CoreBlendContainerAddAssignmentResponse;

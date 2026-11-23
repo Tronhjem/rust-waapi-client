@@ -22,8 +22,8 @@ impl UiProjectCloseArgs {
     }
 
     /// Indicates if the user should not be prompted to save the current project. Defaults to true.
-    pub fn bypass_save(mut self, bypass_save: impl Into<bool>) -> Self {
-        self.bypass_save = Some(bypass_save.into());
+    pub fn bypass_save(mut self, bypass_save: bool) -> Self {
+        self.bypass_save = Some(bypass_save);
         self
     }
 }
@@ -37,9 +37,3 @@ pub struct UiProjectCloseResponse {
     #[serde(rename = "hadProjectOpen")]
     pub had_project_open: bool,
 }
-
-/// Module-scoped alias for [`UiProjectCloseArgs`].
-pub type CloseArgs = UiProjectCloseArgs;
-
-/// Module-scoped alias for [`UiProjectCloseResponse`].
-pub type CloseResponse = UiProjectCloseResponse;

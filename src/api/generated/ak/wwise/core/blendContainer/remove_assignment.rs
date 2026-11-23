@@ -18,21 +18,10 @@ pub struct CoreBlendContainerRemoveAssignmentArgs {
 
 impl CoreBlendContainerRemoveAssignmentArgs {
     /// Creates a new [`CoreBlendContainerRemoveAssignmentArgs`] with the required fields.
-    pub fn new(object: impl Into<String>, child: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: impl Into<String>, child: ObjectRef) -> Self {
         Self {
             object: object.into(),
-            child: child.into(),
+            child,
         }
     }
 }
-
-impl<T0: Into<String>, T1: Into<ObjectRef>> From<(T0, T1)>
-    for CoreBlendContainerRemoveAssignmentArgs
-{
-    fn from((object, child): (T0, T1)) -> Self {
-        Self::new(object, child)
-    }
-}
-
-/// Module-scoped alias for [`CoreBlendContainerRemoveAssignmentArgs`].
-pub type RemoveAssignmentArgs = CoreBlendContainerRemoveAssignmentArgs;

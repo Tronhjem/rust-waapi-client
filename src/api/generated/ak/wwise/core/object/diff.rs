@@ -18,17 +18,8 @@ pub struct CoreObjectDiffArgs {
 
 impl CoreObjectDiffArgs {
     /// Creates a new [`CoreObjectDiffArgs`] with the required fields.
-    pub fn new(source: impl Into<ObjectRef>, target: impl Into<ObjectRef>) -> Self {
-        Self {
-            source: source.into(),
-            target: target.into(),
-        }
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectDiffArgs {
-    fn from((source, target): (T0, T1)) -> Self {
-        Self::new(source, target)
+    pub fn new(source: ObjectRef, target: ObjectRef) -> Self {
+        Self { source, target }
     }
 }
 
@@ -44,9 +35,3 @@ pub struct CoreObjectDiffResponse {
     #[serde(default)]
     pub lists: Vec<String>,
 }
-
-/// Module-scoped alias for [`CoreObjectDiffArgs`].
-pub type DiffArgs = CoreObjectDiffArgs;
-
-/// Module-scoped alias for [`CoreObjectDiffResponse`].
-pub type DiffResponse = CoreObjectDiffResponse;

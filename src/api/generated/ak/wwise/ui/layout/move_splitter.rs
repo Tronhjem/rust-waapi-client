@@ -25,12 +25,3 @@ impl UiLayoutMoveSplitterArgs {
         }
     }
 }
-
-impl<T0: Into<String>, T1: Into<i64>> From<(T0, T1)> for UiLayoutMoveSplitterArgs {
-    fn from((id, delta): (T0, T1)) -> Self {
-        Self::new(id, delta.into())
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutMoveSplitterArgs`].
-pub type MoveSplitterArgs = UiLayoutMoveSplitterArgs;

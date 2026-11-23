@@ -57,35 +57,24 @@ impl CoreAudioImportTabDelimitedArgs {
     }
 
     /// Determines if Wwise automatically performs a source control Add operation on the imported files. Defaults to true.
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
-        self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: bool) -> Self {
+        self.auto_add_to_source_control = Some(auto_add_to_source_control);
         self
     }
 
     /// Determines if Wwise automatically performs a source control Checkout operation (when applicable) on the modified files. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
     }
 
     /// Object ID (GUID), name, or path used as root relative object paths.
-    pub fn import_location(mut self, import_location: impl Into<ObjectRef>) -> Self {
-        self.import_location = Some(import_location.into());
+    pub fn import_location(mut self, import_location: ObjectRef) -> Self {
+        self.import_location = Some(import_location);
         self
-    }
-}
-
-impl<T0: Into<String>, T1: Into<String>, T2: Into<String>> From<(T0, T1, T2)>
-    for CoreAudioImportTabDelimitedArgs
-{
-    fn from((import_language, import_operation, import_file): (T0, T1, T2)) -> Self {
-        Self::new(import_language, import_operation, import_file)
     }
 }
 
@@ -103,12 +92,3 @@ pub struct CoreAudioImportTabDelimitedResponse {
     #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
-
-/// Module-scoped alias for [`CoreAudioImportTabDelimitedArgs`].
-pub type ImportTabDelimitedArgs = CoreAudioImportTabDelimitedArgs;
-
-/// Module-scoped alias for [`CoreAudioImportTabDelimitedOptions`].
-pub type ImportTabDelimitedOptions = CoreAudioImportTabDelimitedOptions;
-
-/// Module-scoped alias for [`CoreAudioImportTabDelimitedResponse`].
-pub type ImportTabDelimitedResponse = CoreAudioImportTabDelimitedResponse;

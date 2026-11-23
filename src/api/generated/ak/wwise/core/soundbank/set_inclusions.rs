@@ -21,25 +21,14 @@ pub struct CoreSoundbankSetInclusionsArgs {
 impl CoreSoundbankSetInclusionsArgs {
     /// Creates a new [`CoreSoundbankSetInclusionsArgs`] with the required fields.
     pub fn new(
-        soundbank: impl Into<ObjectRef>,
-        inclusions: Vec<SoundBankInclusion>,
+        soundbank: ObjectRef,
+        inclusions: impl Into<Vec<SoundBankInclusion>>,
         operation: SoundBankInclusionOperation,
     ) -> Self {
         Self {
-            soundbank: soundbank.into(),
-            inclusions,
+            soundbank,
+            inclusions: inclusions.into(),
             operation,
         }
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<Vec<SoundBankInclusion>>, T2: Into<SoundBankInclusionOperation>>
-    From<(T0, T1, T2)> for CoreSoundbankSetInclusionsArgs
-{
-    fn from((soundbank, inclusions, operation): (T0, T1, T2)) -> Self {
-        Self::new(soundbank, inclusions.into(), operation.into())
-    }
-}
-
-/// Module-scoped alias for [`CoreSoundbankSetInclusionsArgs`].
-pub type SetInclusionsArgs = CoreSoundbankSetInclusionsArgs;

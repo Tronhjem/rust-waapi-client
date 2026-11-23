@@ -21,23 +21,15 @@ pub struct CoreAudioConvertArgs {
 impl CoreAudioConvertArgs {
     /// Creates a new [`CoreAudioConvertArgs`] with the required fields.
     pub fn new(
-        objects: Vec<ObjectRef>,
-        platforms: Vec<PlatformRef>,
-        languages: Vec<LanguageRef>,
+        objects: impl Into<Vec<ObjectRef>>,
+        platforms: impl Into<Vec<PlatformRef>>,
+        languages: impl Into<Vec<LanguageRef>>,
     ) -> Self {
         Self {
-            objects,
-            platforms,
-            languages,
+            objects: objects.into(),
+            platforms: platforms.into(),
+            languages: languages.into(),
         }
-    }
-}
-
-impl<T0: Into<Vec<ObjectRef>>, T1: Into<Vec<PlatformRef>>, T2: Into<Vec<LanguageRef>>>
-    From<(T0, T1, T2)> for CoreAudioConvertArgs
-{
-    fn from((objects, platforms, languages): (T0, T1, T2)) -> Self {
-        Self::new(objects.into(), platforms.into(), languages.into())
     }
 }
 
@@ -50,9 +42,3 @@ pub struct CoreAudioConvertResponse {
     #[serde(default)]
     pub errors: Vec<AudioConvertError>,
 }
-
-/// Module-scoped alias for [`CoreAudioConvertArgs`].
-pub type ConvertArgs = CoreAudioConvertArgs;
-
-/// Module-scoped alias for [`CoreAudioConvertResponse`].
-pub type ConvertResponse = CoreAudioConvertResponse;

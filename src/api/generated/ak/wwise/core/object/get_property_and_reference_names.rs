@@ -25,14 +25,14 @@ impl CoreObjectGetPropertyAndReferenceNamesArgs {
     }
 
     /// The ID (class ID) of the object to retrieve the property and reference names from.
-    pub fn class_id(mut self, class_id: impl Into<u32>) -> Self {
-        self.class_id = Some(class_id.into());
+    pub fn class_id(mut self, class_id: u32) -> Self {
+        self.class_id = Some(class_id);
         self
     }
 
     /// The ID (GUID), name, or path of the object to watch.
-    pub fn object(mut self, object: impl Into<ObjectRef>) -> Self {
-        self.object = Some(object.into());
+    pub fn object(mut self, object: ObjectRef) -> Self {
+        self.object = Some(object);
         self
     }
 }
@@ -46,9 +46,3 @@ pub struct CoreObjectGetPropertyAndReferenceNamesResponse {
     #[serde(rename = "return", default)]
     pub names: Vec<String>,
 }
-
-/// Module-scoped alias for [`CoreObjectGetPropertyAndReferenceNamesArgs`].
-pub type GetPropertyAndReferenceNamesArgs = CoreObjectGetPropertyAndReferenceNamesArgs;
-
-/// Module-scoped alias for [`CoreObjectGetPropertyAndReferenceNamesResponse`].
-pub type GetPropertyAndReferenceNamesResponse = CoreObjectGetPropertyAndReferenceNamesResponse;

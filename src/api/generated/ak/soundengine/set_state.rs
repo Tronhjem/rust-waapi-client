@@ -19,24 +19,7 @@ pub struct SoundengineSetStateArgs {
 
 impl SoundengineSetStateArgs {
     /// Creates a new [`SoundengineSetStateArgs`] with the required fields.
-    pub fn new(
-        state_group: impl Into<SoundEngineObjectRef>,
-        state: impl Into<SoundEngineObjectRef>,
-    ) -> Self {
-        Self {
-            state_group: state_group.into(),
-            state: state.into(),
-        }
+    pub fn new(state_group: SoundEngineObjectRef, state: SoundEngineObjectRef) -> Self {
+        Self { state_group, state }
     }
 }
-
-impl<T0: Into<SoundEngineObjectRef>, T1: Into<SoundEngineObjectRef>> From<(T0, T1)>
-    for SoundengineSetStateArgs
-{
-    fn from((state_group, state): (T0, T1)) -> Self {
-        Self::new(state_group, state)
-    }
-}
-
-/// Module-scoped alias for [`SoundengineSetStateArgs`].
-pub type SetStateArgs = SoundengineSetStateArgs;

@@ -18,16 +18,10 @@ pub struct CoreAudioMuteArgs {
 
 impl CoreAudioMuteArgs {
     /// Creates a new [`CoreAudioMuteArgs`] with the required fields.
-    pub fn new(objects: Vec<ObjectRef>, value: bool) -> Self {
-        Self { objects, value }
+    pub fn new(objects: impl Into<Vec<ObjectRef>>, value: bool) -> Self {
+        Self {
+            objects: objects.into(),
+            value,
+        }
     }
 }
-
-impl<T0: Into<Vec<ObjectRef>>, T1: Into<bool>> From<(T0, T1)> for CoreAudioMuteArgs {
-    fn from((objects, value): (T0, T1)) -> Self {
-        Self::new(objects.into(), value.into())
-    }
-}
-
-/// Module-scoped alias for [`CoreAudioMuteArgs`].
-pub type MuteArgs = CoreAudioMuteArgs;

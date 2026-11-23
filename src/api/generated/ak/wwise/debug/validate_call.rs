@@ -35,41 +35,20 @@ impl DebugValidateCallArgs {
     }
 
     /// The result returned from the function.
-    pub fn result(mut self, result: impl Into<serde_json::Value>) -> Self {
-        self.result = Some(result.into());
+    pub fn result(mut self, result: serde_json::Value) -> Self {
+        self.result = Some(result);
         self
     }
 
     /// The arguments passed to the function.
-    pub fn args(mut self, args: impl Into<serde_json::Value>) -> Self {
-        self.args = Some(args.into());
+    pub fn args(mut self, args: serde_json::Value) -> Self {
+        self.args = Some(args);
         self
     }
 
     /// The options passed to the function.
-    pub fn options(mut self, options: impl Into<serde_json::Value>) -> Self {
-        self.options = Some(options.into());
+    pub fn options(mut self, options: serde_json::Value) -> Self {
+        self.options = Some(options);
         self
     }
 }
-
-impl From<String> for DebugValidateCallArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for DebugValidateCallArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for DebugValidateCallArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`DebugValidateCallArgs`].
-pub type ValidateCallArgs = DebugValidateCallArgs;

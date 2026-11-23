@@ -22,10 +22,10 @@ pub struct CoreObjectGetArgs {
 
 impl CoreObjectGetArgs {
     /// Creates a new [`CoreObjectGetArgs`] starting from a `from` [`ObjectQuery`].
-    pub fn new(from: impl Into<ObjectQuery>) -> Self {
+    pub fn new(from: ObjectQuery) -> Self {
         Self {
             waql: None,
-            from: Some(from.into()),
+            from: Some(from),
             transform: None,
         }
     }
@@ -46,8 +46,8 @@ impl CoreObjectGetArgs {
     }
 
     /// Sets the query starting point (`from`).
-    pub fn from(mut self, from: impl Into<ObjectQuery>) -> Self {
-        self.from = Some(from.into());
+    pub fn from(mut self, from: ObjectQuery) -> Self {
+        self.from = Some(from);
         self
     }
 
@@ -55,48 +55,6 @@ impl CoreObjectGetArgs {
     pub fn transform(mut self, transform: impl Into<Vec<Transform>>) -> Self {
         self.transform = Some(transform.into());
         self
-    }
-}
-
-impl From<ObjectQuery> for CoreObjectGetArgs {
-    fn from(from: ObjectQuery) -> Self {
-        Self::new(from)
-    }
-}
-
-impl From<&str> for CoreObjectGetArgs {
-    fn from(s: &str) -> Self {
-        Self::new(s)
-    }
-}
-
-impl From<String> for CoreObjectGetArgs {
-    fn from(s: String) -> Self {
-        Self::new(s)
-    }
-}
-
-impl From<&String> for CoreObjectGetArgs {
-    fn from(s: &String) -> Self {
-        Self::new(s)
-    }
-}
-
-impl From<ObjectType> for CoreObjectGetArgs {
-    fn from(object_type: ObjectType) -> Self {
-        Self::new(object_type)
-    }
-}
-
-impl From<Vec<ObjectType>> for CoreObjectGetArgs {
-    fn from(object_types: Vec<ObjectType>) -> Self {
-        Self::new(object_types)
-    }
-}
-
-impl From<Vec<String>> for CoreObjectGetArgs {
-    fn from(ids: Vec<String>) -> Self {
-        Self::new(ids)
     }
 }
 
@@ -114,12 +72,3 @@ pub struct CoreObjectGetResponse {
     #[serde(rename = "return", default)]
     pub objects: Vec<WwiseObject>,
 }
-
-/// Module-scoped alias for [`CoreObjectGetArgs`].
-pub type GetArgs = CoreObjectGetArgs;
-
-/// Module-scoped alias for [`CoreObjectGetOptions`].
-pub type GetOptions = CoreObjectGetOptions;
-
-/// Module-scoped alias for [`CoreObjectGetResponse`].
-pub type GetResponse = CoreObjectGetResponse;

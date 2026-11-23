@@ -23,24 +23,3 @@ impl UiWindowPresentArgs {
         }
     }
 }
-
-impl From<String> for UiWindowPresentArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiWindowPresentArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiWindowPresentArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiWindowPresentArgs`].
-pub type PresentArgs = UiWindowPresentArgs;

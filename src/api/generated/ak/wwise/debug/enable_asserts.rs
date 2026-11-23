@@ -20,12 +20,3 @@ impl DebugEnableAssertsArgs {
         Self { enable }
     }
 }
-
-impl From<bool> for DebugEnableAssertsArgs {
-    fn from(value: bool) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`DebugEnableAssertsArgs`].
-pub type EnableAssertsArgs = DebugEnableAssertsArgs;

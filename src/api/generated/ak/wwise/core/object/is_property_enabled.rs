@@ -20,24 +20,12 @@ pub struct CoreObjectIsPropertyEnabledArgs {
 
 impl CoreObjectIsPropertyEnabledArgs {
     /// Creates a new [`CoreObjectIsPropertyEnabledArgs`] with the required fields.
-    pub fn new(
-        object: impl Into<ObjectRef>,
-        platform: impl Into<PlatformRef>,
-        property: Property,
-    ) -> Self {
+    pub fn new(object: ObjectRef, platform: PlatformRef, property: Property) -> Self {
         Self {
-            object: object.into(),
-            platform: platform.into(),
+            object,
+            platform,
             property,
         }
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<PlatformRef>, T2: Into<Property>> From<(T0, T1, T2)>
-    for CoreObjectIsPropertyEnabledArgs
-{
-    fn from((object, platform, property): (T0, T1, T2)) -> Self {
-        Self::new(object, platform, property.into())
     }
 }
 
@@ -50,9 +38,3 @@ pub struct CoreObjectIsPropertyEnabledResponse {
     #[serde(rename = "return", default)]
     pub enabled: Option<bool>,
 }
-
-/// Module-scoped alias for [`CoreObjectIsPropertyEnabledArgs`].
-pub type IsPropertyEnabledArgs = CoreObjectIsPropertyEnabledArgs;
-
-/// Module-scoped alias for [`CoreObjectIsPropertyEnabledResponse`].
-pub type IsPropertyEnabledResponse = CoreObjectIsPropertyEnabledResponse;

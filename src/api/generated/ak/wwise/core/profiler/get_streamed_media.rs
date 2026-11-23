@@ -21,12 +21,6 @@ impl CoreProfilerGetStreamedMediaArgs {
     }
 }
 
-impl From<serde_json::Value> for CoreProfilerGetStreamedMediaArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.profiler.getStreamedMedia`.
 ///
 /// Retrieves the streaming media at a specific profiler capture time. This data can also be found in the Advanced Profiler, under the Streams tab. To ensure the Streams data is received, see `ak.wwise.core.profiler.enableProfilerData`.
@@ -36,9 +30,3 @@ pub struct CoreProfilerGetStreamedMediaResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetStreamedMediaArgs`].
-pub type GetStreamedMediaArgs = CoreProfilerGetStreamedMediaArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetStreamedMediaResponse`].
-pub type GetStreamedMediaResponse = CoreProfilerGetStreamedMediaResponse;

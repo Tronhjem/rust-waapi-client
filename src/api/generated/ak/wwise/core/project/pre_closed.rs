@@ -10,6 +10,3 @@ use crate::api::generated::primitives::*;
 /// Sent when the project begins closing.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct CoreProjectPreClosedPayload {}
-
-/// Module-scoped alias for [`CoreProjectPreClosedPayload`].
-pub type PreClosedPayload = CoreProjectPreClosedPayload;

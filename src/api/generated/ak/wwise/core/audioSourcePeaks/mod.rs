@@ -4,12 +4,10 @@
 mod get_min_max_peaks_in_region;
 pub use get_min_max_peaks_in_region::{
     CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs,
-    CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse, GetMinMaxPeaksInRegionArgs,
-    GetMinMaxPeaksInRegionResponse,
+    CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse,
 };
 mod get_min_max_peaks_in_trimmed_region;
 pub use get_min_max_peaks_in_trimmed_region::{
     CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs,
-    CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse, GetMinMaxPeaksInTrimmedRegionArgs,
-    GetMinMaxPeaksInTrimmedRegionResponse,
+    CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse,
 };

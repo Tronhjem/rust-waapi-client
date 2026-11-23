@@ -19,14 +19,11 @@ pub struct CoreSourceControlMoveArgs {
 
 impl CoreSourceControlMoveArgs {
     /// Creates a new [`CoreSourceControlMoveArgs`] with the required fields.
-    pub fn new(files: Vec<String>, new_files: Vec<String>) -> Self {
-        Self { files, new_files }
-    }
-}
-
-impl<T0: Into<Vec<String>>, T1: Into<Vec<String>>> From<(T0, T1)> for CoreSourceControlMoveArgs {
-    fn from((files, new_files): (T0, T1)) -> Self {
-        Self::new(files.into(), new_files.into())
+    pub fn new(files: impl Into<Vec<String>>, new_files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+            new_files: new_files.into(),
+        }
     }
 }
 
@@ -38,9 +35,3 @@ pub struct CoreSourceControlMoveResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlMoveArgs`].
-pub type MoveArgs = CoreSourceControlMoveArgs;
-
-/// Module-scoped alias for [`CoreSourceControlMoveResponse`].
-pub type MoveResponse = CoreSourceControlMoveResponse;

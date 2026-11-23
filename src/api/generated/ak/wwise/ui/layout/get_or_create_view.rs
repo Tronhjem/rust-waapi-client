@@ -31,33 +31,15 @@ impl UiLayoutGetOrCreateViewArgs {
     }
 
     /// Initial position of the created view on the horizontal axis. Defaults to -1.
-    pub fn pos_x(mut self, pos_x: impl Into<i64>) -> Self {
-        self.pos_x = Some(pos_x.into());
+    pub fn pos_x(mut self, pos_x: i64) -> Self {
+        self.pos_x = Some(pos_x);
         self
     }
 
     /// Initial position of the created view on the vertical axis. Defaults to -1.
-    pub fn pos_y(mut self, pos_y: impl Into<i64>) -> Self {
-        self.pos_y = Some(pos_y.into());
+    pub fn pos_y(mut self, pos_y: i64) -> Self {
+        self.pos_y = Some(pos_y);
         self
-    }
-}
-
-impl From<String> for UiLayoutGetOrCreateViewArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutGetOrCreateViewArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutGetOrCreateViewArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
     }
 }
 
@@ -77,9 +59,3 @@ impl UiLayoutGetOrCreateViewResponse {
         self.id.as_deref()
     }
 }
-
-/// Module-scoped alias for [`UiLayoutGetOrCreateViewArgs`].
-pub type GetOrCreateViewArgs = UiLayoutGetOrCreateViewArgs;
-
-/// Module-scoped alias for [`UiLayoutGetOrCreateViewResponse`].
-pub type GetOrCreateViewResponse = UiLayoutGetOrCreateViewResponse;

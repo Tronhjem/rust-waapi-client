@@ -16,16 +16,9 @@ pub struct UiCommandsRegisterArgs {
 
 impl UiCommandsRegisterArgs {
     /// Creates a new [`UiCommandsRegisterArgs`] with the required fields.
-    pub fn new(commands: Vec<serde_json::Value>) -> Self {
-        Self { commands }
+    pub fn new(commands: impl Into<Vec<serde_json::Value>>) -> Self {
+        Self {
+            commands: commands.into(),
+        }
     }
 }
-
-impl From<Vec<serde_json::Value>> for UiCommandsRegisterArgs {
-    fn from(value: Vec<serde_json::Value>) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiCommandsRegisterArgs`].
-pub type RegisterArgs = UiCommandsRegisterArgs;

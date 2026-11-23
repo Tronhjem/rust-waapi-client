@@ -49,8 +49,8 @@ impl CoreMediaPoolGetArgs {
     }
 
     /// The maximum number of results to return. If not specified, a maximum 1000 files are returned.
-    pub fn max_results(mut self, max_results: impl Into<i64>) -> Self {
-        self.max_results = Some(max_results.into());
+    pub fn max_results(mut self, max_results: i64) -> Self {
+        self.max_results = Some(max_results);
         self
     }
 }
@@ -72,40 +72,14 @@ impl CoreMediaPoolGetOptions {
     }
 
     /// The list of properties to return for each file. If not specified, the following properties are returned: 'Path', 'FileId', 'Db'.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<String>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<String>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<String>>) -> Self {
         self.return_fields(return_fields)
-    }
-}
-
-impl From<()> for CoreMediaPoolGetOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[String; N]> for CoreMediaPoolGetOptions {
-    fn from(return_fields: [String; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<String>> for CoreMediaPoolGetOptions {
-    fn from(return_fields: Vec<String>) -> Self {
-        Self::new().return_fields(return_fields)
     }
 }
 
@@ -118,12 +92,3 @@ pub struct CoreMediaPoolGetResponse {
     #[serde(rename = "return", default)]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreMediaPoolGetArgs`].
-pub type GetArgs = CoreMediaPoolGetArgs;
-
-/// Module-scoped alias for [`CoreMediaPoolGetOptions`].
-pub type GetOptions = CoreMediaPoolGetOptions;
-
-/// Module-scoped alias for [`CoreMediaPoolGetResponse`].
-pub type GetResponse = CoreMediaPoolGetResponse;

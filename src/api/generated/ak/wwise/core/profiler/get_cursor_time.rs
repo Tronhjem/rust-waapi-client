@@ -23,24 +23,6 @@ impl CoreProfilerGetCursorTimeArgs {
     }
 }
 
-impl From<String> for CoreProfilerGetCursorTimeArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreProfilerGetCursorTimeArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreProfilerGetCursorTimeArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.profiler.getCursorTime`.
 ///
 /// Returns the current time of the specified profiler cursor, in milliseconds.
@@ -50,9 +32,3 @@ pub struct CoreProfilerGetCursorTimeResponse {
     #[serde(rename = "return")]
     pub return_: i64,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetCursorTimeArgs`].
-pub type GetCursorTimeArgs = CoreProfilerGetCursorTimeArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetCursorTimeResponse`].
-pub type GetCursorTimeResponse = CoreProfilerGetCursorTimeResponse;

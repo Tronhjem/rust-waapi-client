@@ -41,35 +41,14 @@ impl CoreRemoteConnectArgs {
     }
 
     /// The command port. If you are running two or more Sound Engine instances that use the same application name, you can specify the command port to distinguish between different applications sharing the same name. You don't need to use this if the application name is unique. When using this, you must also provide appName. You can obtain this information from ak.wwise.core.remote.getAvailableConsoles.
-    pub fn command_port(mut self, command_port: impl Into<u16>) -> Self {
-        self.command_port = Some(command_port.into());
+    pub fn command_port(mut self, command_port: u16) -> Self {
+        self.command_port = Some(command_port);
         self
     }
 
     /// Unused.
-    pub fn notification_port(mut self, notification_port: impl Into<u16>) -> Self {
-        self.notification_port = Some(notification_port.into());
+    pub fn notification_port(mut self, notification_port: u16) -> Self {
+        self.notification_port = Some(notification_port);
         self
     }
 }
-
-impl From<String> for CoreRemoteConnectArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreRemoteConnectArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreRemoteConnectArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreRemoteConnectArgs`].
-pub type ConnectArgs = CoreRemoteConnectArgs;

@@ -21,22 +21,22 @@ Every WAAPI URI is split on `.`:
 
 ---
 
-## 2. Type Naming Convention (`<Base>{Args,Options,Response}` and Short Module Aliases)
+## 2. Type Naming Convention (`<Base>{Args,Options,Response,Payload}`)
 
-For each endpoint URI, the generator strips the leading `ak.wwise.` prefix (or `ak.` for non-`wwise` namespaces like `ak.soundengine`), splits camelCase words, joins all remaining segments in `PascalCase` as `<Base>`, and emits up to three types along with short module-scoped aliases based on the final URI segment:
-- `<Base>Args` (alias `<Leaf>Args`) — request keyword arguments (`ArgumentsKw`)
-- `<Base>Options` (alias `<Leaf>Options`) — request WAMP call/subscribe options (`Options`)
-- `<Base>Response` (alias `<Leaf>Response`) — deserialized response payload
-- `<Base>Payload` (alias `<Leaf>Payload`) — deserialized subscription topic payload
+For each endpoint URI, the generator strips the leading `ak.wwise.` prefix (or `ak.` for non-`wwise` namespaces like `ak.soundengine`), splits camelCase words, joins all remaining segments in `PascalCase` as `<Base>`, and emits canonical types:
+- `<Base>Args` — request keyword arguments (`ArgumentsKw`)
+- `<Base>Options` — request WAMP call/subscribe options (`Options`)
+- `<Base>Response` — deserialized response payload
+- `<Base>Payload` — deserialized subscription topic payload
 
 For example:
-- `ak.wwise.core.getInfo` -> `CoreGetInfoResponse` (or `core::GetInfoResponse`)
-- `ak.wwise.core.object.get` -> `CoreObjectGetArgs` / `object::GetArgs`, `CoreObjectGetOptions` / `object::GetOptions`, `CoreObjectGetResponse` / `object::GetResponse`
-- `ak.wwise.core.object.set` -> `CoreObjectSetArgs` / `object::SetArgs`, `CoreObjectSetItem` / `object::SetItem`, `CoreObjectSetOptions` / `object::SetOptions`, `CoreObjectSetResponse` / `object::SetResponse`
-- `ak.wwise.ui.getSelectedObjects` -> `UiGetSelectedObjectsOptions` / `ui::GetSelectedObjectsOptions`, `UiGetSelectedObjectsResponse` / `ui::GetSelectedObjectsResponse`
-- `ak.soundengine.setRTPCValue` -> `SoundengineSetRtpcValueArgs` / `soundengine::SetRtpcValueArgs`
+- `ak.wwise.core.getInfo` -> `CoreGetInfoResponse`
+- `ak.wwise.core.object.get` -> `CoreObjectGetArgs`, `CoreObjectGetOptions`, `CoreObjectGetResponse`
+- `ak.wwise.core.object.set` -> `CoreObjectSetArgs`, `CoreObjectSetItem`, `CoreObjectSetOptions`, `CoreObjectSetResponse`
+- `ak.wwise.ui.getSelectedObjects` -> `UiGetSelectedObjectsOptions`, `UiGetSelectedObjectsResponse`
+- `ak.soundengine.setRTPCValue` -> `SoundengineSetRtpcValueArgs`
 
-Constructors (`Args::new(...)`) accept `impl Into<T>` for string and reference types (`ObjectRef`, `GameObjectRef`, `SoundEngineObjectRef`, `PlatformRef`, `LanguageRef`, `PropertyValue`, `ObjectQuery`), and client methods accept `impl Into<Args>` (including direct paths/GUIDs for 1-field `Args` like `delete` / `get`, a single `SetItem` for `set`, and tuples for 2/3-field `Args`).
+Constructors (`Args::new(...)`) take concrete domain types (`ObjectRef`, `GameObjectRef`, `SoundEngineObjectRef`, `PlatformRef`, `LanguageRef`, `ObjectQuery`) and `impl Into<String>` / `impl Into<PropertyValue>` for string and property-value fields. Domain reference and query types provide explicit named constructors (`ObjectRef::path/guid/name`, `ObjectQuery::path/id/of_type/search`, `CoreObjectGetArgs::from_waql`, `SoundEngineObjectRef::name/guid/short_id`, `GameObjectRef::id`, `PlatformRef::name/guid`, `LanguageRef::name/guid`, `CoreObjectSetArgs::from_item`).
 
 ---
 
@@ -58,7 +58,7 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 - **`Definitions/*.json` `$ref` resolution**: Shared references across `common_definitions.json`, `waapi_definitions.json`, `waapi_ui_definitions.json`, and `wafm_definitions.json` map to shared primitives in `src/api/primitives.rs` and `src/api/generated/primitives.rs` (`ObjectRef`, `PlatformRef`, `SoundEngineObjectRef`, `GameObjectRef`, `LanguageRef`, `WwiseObject`, `WwiseObjectRef`, `OnNameConflict`, `ListMode`, `ImportOperation`, `LogSeverity`, `PropertyValue`, `ChildObject`).
 - **Endpoint-domain enums and structs**: Schemas with inline string enums or nested objects map to generated types in `src/api/generated/primitives.rs`, including `TransportAction` / `TransportState` / `TransportObject` (`transport.*`), `AttenuationCurveType` / `AttenuationCurveUse` / `CurvePoint2D` / `CurveShape` (`object.{get,set}AttenuationCurve`), `PasteMode` (`object.pasteProperties`), `SwitchContainerAssignment` (`switchContainer.getAssignments`), `ProjectMigrationAction` (`ui.project.open`), and `ProjectPlatformInfo` / `ProjectLanguageInfo` / `ProjectDirectoriesInfo` (`core.getProjectInfo`).
 - **Domain-specific return field enums**: Rather than untyped strings, `waapi_definitions.json` return expressions are generated as strongly-typed enums:
-  - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` (and `From<&str>` / `From<String>`) for arbitrary dot-accessor queries.
+  - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` / `ObjectReturnField::property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` / `ObjectReturnField::custom("...")` for arbitrary dot-accessor queries.
   - `BusReturnField`, `AudioObjectReturnField`, and `VoiceReturnField` for profiler queries.
 - **Generated `ObjectType` enum (`WObjects.xml`)**: `src/api/generated/object_types.rs` (re-exported as `wwise_waapi::ObjectType` and `wwise_waapi::api::ObjectType`) is generated from the `<WwiseObject>` definitions in `Definitions/WObjects.xml` and contains all Wwise object types (e.g. `ObjectType::Sound`, `ObjectType::ActorMixer`/`ObjectType::PropertyContainer`, `ObjectType::Event`, `ObjectType::Folder`, `ObjectType::RandomSequenceContainer`). It is used in `CoreObjectCreateArgs`, `ChildObject`, `WwiseObject`, `ObjectQuery::OfType`, `ImportItem`, and `ImportDefaults`, and provides `as_str()`, `class_id()`, `from_class_id()`, `FromStr`, `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`. The union of Wwise 2024 + 2025 `WObjects.xml` keeps `ActorMixer` (2024) and `PropertyContainer` (2025) as distinct variants sharing `class_id()` `524304`.
 - **Generated `Property` enum (`WObjects.xml`)**: `src/api/generated/properties.rs` (re-exported as `wwise_waapi::Property` and `wwise_waapi::api::Property`) is generated from `Definitions/WObjects.xml` and contains all Wwise object properties, references, and object lists (e.g. `Property::Volume`, `Property::Pitch`, `Property::Lowpass`, `Property::OutputBus`, `Property::RTPC`). `Property::as_str()` returns the bare `&'static str` (`"Volume"`), `Property::as_at_str()` returns the `@`-prefixed `&'static str` (`"@Volume"`), and `Property` implements `AsRef<str>`, `Display`, `Serialize`, and `Deserialize`.
@@ -67,12 +67,15 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 
 ### Specifying Return Fields
 
-Typed endpoint and topic `Options` structs provide a `.return_fields(...)` builder that accepts any iterable (such as an array `[ObjectReturnField::Id, ObjectReturnField::Name]` or `Vec`). `ObjectReturnOptions::basic()` returns the common `[Id, Name, Type, Path]` preset, and RPC methods taking `impl Into<Options>` also accept `()` (default options) or an array of return fields directly:
+Typed endpoint and topic `Options` structs provide a `.return_fields(...)` builder that accepts any iterable (such as an array `[ObjectReturnField::Id, ObjectReturnField::Name]` or `Vec`). `ObjectReturnOptions::basic()` returns the common `[Id, Name, Type, Path]` preset:
 
 ```rust
 let res = client
     .object()
-    .get(r"\Containers\Default Work Unit", ObjectReturnOptions::basic())
+    .get(
+        CoreObjectGetArgs::new(ObjectQuery::path(r"\Containers\Default Work Unit")),
+        ObjectReturnOptions::basic(),
+    )
     .await?;
 ```
 
@@ -103,7 +106,7 @@ Every remaining namespace (`profiler.*`, `remote.*`, `sourceControl.*`, `waapi.*
 | `ak.wwise.core.project.save` | `client.wwise().core().project().save(args)` | `CoreProjectSaveArgs` | — | `()` |
 | `ak.wwise.core.object.get` | `client.wwise().core().object().get(args, options)` | `CoreObjectGetArgs` | `CoreObjectGetOptions` | `CoreObjectGetResponse` |
 | `ak.wwise.core.object.set` | `client.wwise().core().object().set(args, options)` | `CoreObjectSetArgs` + `CoreObjectSetItem` | `CoreObjectSetOptions` | `CoreObjectSetResponse` + `CoreObjectSetObject` |
-| `ak.wwise.core.object.create` | `client.wwise().core().object().create(args, options)` | `CoreObjectCreateArgs` | `CoreObjectCreateOptions` | `CoreObjectCreateResponse` |
+| `ak.wwise.core.object.create` | `client.wwise().core().object().create(args)` | `CoreObjectCreateArgs` | — | `CoreObjectCreateResponse` |
 | `ak.wwise.core.object.delete` | `client.wwise().core().object().delete(args)` | `CoreObjectDeleteArgs` | — | `()` |
 | `ak.wwise.core.object.move` | `client.wwise().core().object().move_(args)` | `CoreObjectMoveArgs` | — | `CoreObjectMoveResponse` (`WwiseObject`) |
 | `ak.wwise.core.object.copy` | `client.wwise().core().object().copy(args, options)` | `CoreObjectCopyArgs` | `CoreObjectCopyOptions` | `CoreObjectCopyResponse` (`WwiseObject`) |

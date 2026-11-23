@@ -27,15 +27,9 @@ impl CoreProfilerGetVoicesArgs {
     }
 
     /// The pipeline ID of a single voice to get.
-    pub fn voice_pipeline_id(mut self, voice_pipeline_id: impl Into<u32>) -> Self {
-        self.voice_pipeline_id = Some(voice_pipeline_id.into());
+    pub fn voice_pipeline_id(mut self, voice_pipeline_id: u32) -> Self {
+        self.voice_pipeline_id = Some(voice_pipeline_id);
         self
-    }
-}
-
-impl From<serde_json::Value> for CoreProfilerGetVoicesArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
     }
 }
 
@@ -56,40 +50,14 @@ impl CoreProfilerGetVoicesOptions {
     }
 
     /// Members to return for each voice. Defaults to Pipeline ID, Game Object ID and Object GUID.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<VoiceReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<VoiceReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<VoiceReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<VoiceReturnField>>) -> Self {
         self.return_fields(return_fields)
-    }
-}
-
-impl From<()> for CoreProfilerGetVoicesOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[VoiceReturnField; N]> for CoreProfilerGetVoicesOptions {
-    fn from(return_fields: [VoiceReturnField; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<VoiceReturnField>> for CoreProfilerGetVoicesOptions {
-    fn from(return_fields: Vec<VoiceReturnField>) -> Self {
-        Self::new().return_fields(return_fields)
     }
 }
 
@@ -102,12 +70,3 @@ pub struct CoreProfilerGetVoicesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetVoicesArgs`].
-pub type GetVoicesArgs = CoreProfilerGetVoicesArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetVoicesOptions`].
-pub type GetVoicesOptions = CoreProfilerGetVoicesOptions;
-
-/// Module-scoped alias for [`CoreProfilerGetVoicesResponse`].
-pub type GetVoicesResponse = CoreProfilerGetVoicesResponse;

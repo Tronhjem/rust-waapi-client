@@ -62,24 +62,3 @@ impl UiCommandsExecuteArgs {
         self
     }
 }
-
-impl From<String> for UiCommandsExecuteArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiCommandsExecuteArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiCommandsExecuteArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiCommandsExecuteArgs`].
-pub type ExecuteArgs = UiCommandsExecuteArgs;

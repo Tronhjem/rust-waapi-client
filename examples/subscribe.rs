@@ -4,7 +4,7 @@
 
 use log::{error, info};
 use tokio::time::{Duration, timeout};
-use wwise_waapi::api::ak::wwise::core::object::CreatedOptions;
+use wwise_waapi::api::ak::wwise::core::object::CoreObjectCreatedOptions;
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -17,7 +17,7 @@ async fn main() -> WaapiResult<()> {
     let client = WaapiClient::connect_to(address).await?;
     info!("Successfully connected to WAAPI");
 
-    let options = CreatedOptions::new().return_fields([
+    let options = CoreObjectCreatedOptions::new().return_fields([
         ObjectReturnField::Id,
         ObjectReturnField::Name,
         ObjectReturnField::Type,

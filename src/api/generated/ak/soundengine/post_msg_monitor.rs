@@ -22,24 +22,3 @@ impl SoundenginePostMsgMonitorArgs {
         }
     }
 }
-
-impl From<String> for SoundenginePostMsgMonitorArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundenginePostMsgMonitorArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundenginePostMsgMonitorArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`SoundenginePostMsgMonitorArgs`].
-pub type PostMsgMonitorArgs = SoundenginePostMsgMonitorArgs;

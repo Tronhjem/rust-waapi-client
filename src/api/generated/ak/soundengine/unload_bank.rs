@@ -17,42 +17,7 @@ pub struct SoundengineUnloadBankArgs {
 
 impl SoundengineUnloadBankArgs {
     /// Creates a new [`SoundengineUnloadBankArgs`] with the required fields.
-    pub fn new(sound_bank: impl Into<SoundEngineObjectRef>) -> Self {
-        Self {
-            sound_bank: sound_bank.into(),
-        }
+    pub fn new(sound_bank: SoundEngineObjectRef) -> Self {
+        Self { sound_bank }
     }
 }
-
-impl From<SoundEngineObjectRef> for SoundengineUnloadBankArgs {
-    fn from(value: SoundEngineObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundengineUnloadBankArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for SoundengineUnloadBankArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundengineUnloadBankArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<u32> for SoundengineUnloadBankArgs {
-    fn from(value: u32) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`SoundengineUnloadBankArgs`].
-pub type UnloadBankArgs = SoundengineUnloadBankArgs;

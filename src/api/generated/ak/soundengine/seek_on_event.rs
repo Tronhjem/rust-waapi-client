@@ -32,14 +32,14 @@ pub struct SoundengineSeekOnEventArgs {
 impl SoundengineSeekOnEventArgs {
     /// Creates a new [`SoundengineSeekOnEventArgs`] with the required fields.
     pub fn new(
-        event: impl Into<SoundEngineObjectRef>,
-        game_object: impl Into<GameObjectRef>,
+        event: SoundEngineObjectRef,
+        game_object: GameObjectRef,
         seek_to_nearest_marker: bool,
         playing_id: u32,
     ) -> Self {
         Self {
-            event: event.into(),
-            game_object: game_object.into(),
+            event,
+            game_object,
             seek_to_nearest_marker,
             playing_id,
             position: None,
@@ -48,17 +48,14 @@ impl SoundengineSeekOnEventArgs {
     }
 
     /// Desired position where playback should restart, in milliseconds.
-    pub fn position(mut self, position: impl Into<i32>) -> Self {
-        self.position = Some(position.into());
+    pub fn position(mut self, position: i32) -> Self {
+        self.position = Some(position);
         self
     }
 
     /// Desired position where playback should restart, expressed in a percentage of the file's total duration, between 0 and 1.f. See note above about infinite looping sounds.
-    pub fn percent(mut self, percent: impl Into<f64>) -> Self {
-        self.percent = Some(percent.into());
+    pub fn percent(mut self, percent: f64) -> Self {
+        self.percent = Some(percent);
         self
     }
 }
-
-/// Module-scoped alias for [`SoundengineSeekOnEventArgs`].
-pub type SeekOnEventArgs = SoundengineSeekOnEventArgs;

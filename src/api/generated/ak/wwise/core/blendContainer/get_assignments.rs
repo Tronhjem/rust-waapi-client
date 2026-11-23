@@ -23,24 +23,6 @@ impl CoreBlendContainerGetAssignmentsArgs {
     }
 }
 
-impl From<String> for CoreBlendContainerGetAssignmentsArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreBlendContainerGetAssignmentsArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreBlendContainerGetAssignmentsArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.blendContainer.getAssignments`.
 ///
 /// Returns a list of a Blend Track assignments.
@@ -50,9 +32,3 @@ pub struct CoreBlendContainerGetAssignmentsResponse {
     #[serde(rename = "return", default)]
     pub assignments: Vec<BlendTrackAssignment>,
 }
-
-/// Module-scoped alias for [`CoreBlendContainerGetAssignmentsArgs`].
-pub type GetAssignmentsArgs = CoreBlendContainerGetAssignmentsArgs;
-
-/// Module-scoped alias for [`CoreBlendContainerGetAssignmentsResponse`].
-pub type GetAssignmentsResponse = CoreBlendContainerGetAssignmentsResponse;

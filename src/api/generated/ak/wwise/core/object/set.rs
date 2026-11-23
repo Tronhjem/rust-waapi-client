@@ -38,9 +38,9 @@ pub struct CoreObjectSetItem {
 
 impl CoreObjectSetItem {
     /// Creates a new [`CoreObjectSetItem`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef) -> Self {
         Self {
-            object: object.into(),
+            object,
             name: None,
             notes: None,
             children: None,
@@ -71,26 +71,26 @@ impl CoreObjectSetItem {
     }
 
     /// The ID (GUID) or unique name of the platform used when setting properties and references via this operation. Not specifying a platform sets the value for all linked platforms.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// The action to take if "object" already has a child with the same name. Default value is "fail".
-    pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
-        self.on_name_conflict = Some(on_name_conflict.into());
+    pub fn on_name_conflict(mut self, on_name_conflict: OnNameConflict) -> Self {
+        self.on_name_conflict = Some(on_name_conflict);
         self
     }
 
     /// The action to take if "object" already has objects in a specified list. Default value is "append". See the WAAPI list modes documentation for more information.
-    pub fn list_mode(mut self, list_mode: impl Into<ListMode>) -> Self {
-        self.list_mode = Some(list_mode.into());
+    pub fn list_mode(mut self, list_mode: ListMode) -> Self {
+        self.list_mode = Some(list_mode);
         self
     }
 
     /// Import command argument.
-    pub fn import(mut self, import: impl Into<serde_json::Value>) -> Self {
-        self.import = Some(import.into());
+    pub fn import(mut self, import: serde_json::Value) -> Self {
+        self.import = Some(import);
         self
     }
 
@@ -110,30 +110,6 @@ impl CoreObjectSetItem {
     pub fn extra(mut self, key: impl Into<String>, value: impl Into<serde_json::Value>) -> Self {
         self.extra.insert(key.into(), value.into());
         self
-    }
-}
-
-impl From<ObjectRef> for CoreObjectSetItem {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreObjectSetItem {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreObjectSetItem {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreObjectSetItem {
-    fn from(value: &String) -> Self {
-        Self::new(value)
     }
 }
 
@@ -163,9 +139,9 @@ pub struct CoreObjectSetArgs {
 
 impl CoreObjectSetArgs {
     /// Creates a new [`CoreObjectSetArgs`] with the required fields.
-    pub fn new(objects: Vec<CoreObjectSetItem>) -> Self {
+    pub fn new(objects: impl Into<Vec<CoreObjectSetItem>>) -> Self {
         Self {
-            objects,
+            objects: objects.into(),
             platform: None,
             auto_add_to_source_control: None,
             on_name_conflict: None,
@@ -174,41 +150,33 @@ impl CoreObjectSetArgs {
     }
 
     /// Unless overridden by an individual "object", the ID (GUID) or unique name of the platform used when setting properties and references via this operation. Not specifying a platform sets the value for all linked platforms.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
-        self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: bool) -> Self {
+        self.auto_add_to_source_control = Some(auto_add_to_source_control);
         self
     }
 
     /// Unless overridden by an individual "object", the action to take if "object" already has a child with the same name. Default value is "fail". See the WAAPI object creation modes documentation for more information.
-    pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
-        self.on_name_conflict = Some(on_name_conflict.into());
+    pub fn on_name_conflict(mut self, on_name_conflict: OnNameConflict) -> Self {
+        self.on_name_conflict = Some(on_name_conflict);
         self
     }
 
     /// Unless overridden by an individual "object", the action to take if "object" already has objects in a specified list. Default value is "append". See the WAAPI list modes documentation for more information.
-    pub fn list_mode(mut self, list_mode: impl Into<ListMode>) -> Self {
-        self.list_mode = Some(list_mode.into());
+    pub fn list_mode(mut self, list_mode: ListMode) -> Self {
+        self.list_mode = Some(list_mode);
         self
     }
 }
 
-impl From<Vec<CoreObjectSetItem>> for CoreObjectSetArgs {
-    fn from(value: Vec<CoreObjectSetItem>) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<CoreObjectSetItem> for CoreObjectSetArgs {
-    fn from(item: CoreObjectSetItem) -> Self {
+impl CoreObjectSetArgs {
+    /// Creates a new [`CoreObjectSetArgs`] containing a single [`CoreObjectSetItem`].
+    pub fn from_item(item: CoreObjectSetItem) -> Self {
         Self::new(vec![item])
     }
 }
@@ -325,18 +293,3 @@ pub struct CoreObjectSetResponse {
     #[serde(default)]
     pub objects: Vec<CoreObjectSetObject>,
 }
-
-/// Module-scoped alias for [`CoreObjectSetArgs`].
-pub type SetArgs = CoreObjectSetArgs;
-
-/// Module-scoped alias for [`CoreObjectSetItem`].
-pub type SetItem = CoreObjectSetItem;
-
-/// Module-scoped alias for [`CoreObjectSetOptions`].
-pub type SetOptions = CoreObjectSetOptions;
-
-/// Module-scoped alias for [`CoreObjectSetResponse`].
-pub type SetResponse = CoreObjectSetResponse;
-
-/// Module-scoped alias for [`CoreObjectSetObject`].
-pub type SetObject = CoreObjectSetObject;

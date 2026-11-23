@@ -4,7 +4,6 @@
 mod item_added;
 pub use item_added::{
     CoreProfilerCaptureLogItemAddedOptions, CoreProfilerCaptureLogItemAddedPayload,
-    ItemAddedOptions, ItemAddedPayload,
 };
 mod save;
-pub use save::{CoreProfilerCaptureLogSaveArgs, SaveArgs};
+pub use save::CoreProfilerCaptureLogSaveArgs;

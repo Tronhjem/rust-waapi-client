@@ -10,6 +10,3 @@ use crate::api::generated::primitives::*;
 /// Sent when the game objects have been reset, such as closing a connection to a game while profiling.
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGameObjectResetPayload {}
-
-/// Module-scoped alias for [`CoreProfilerGameObjectResetPayload`].
-pub type GameObjectResetPayload = CoreProfilerGameObjectResetPayload;

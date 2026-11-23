@@ -57,63 +57,31 @@ impl CoreSoundbankGeneratedOptions {
     }
 
     /// Data to be returned for the SoundBank generated. See the Wwise Objects Reference for more information on the properties available.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_fields(return_fields)
     }
 
     /// Embed the JSON SoundBank info file in the response.
-    pub fn info_file(mut self, info_file: impl Into<bool>) -> Self {
-        self.info_file = Some(info_file.into());
+    pub fn info_file(mut self, info_file: bool) -> Self {
+        self.info_file = Some(info_file);
         self
     }
 
     /// Embed the base64 SoundBank data in the response.
-    pub fn bank_data(mut self, bank_data: impl Into<bool>) -> Self {
-        self.bank_data = Some(bank_data.into());
+    pub fn bank_data(mut self, bank_data: bool) -> Self {
+        self.bank_data = Some(bank_data);
         self
     }
 
     /// Embed the JSON PluginInfo file in the response.
-    pub fn plugin_info(mut self, plugin_info: impl Into<bool>) -> Self {
-        self.plugin_info = Some(plugin_info.into());
+    pub fn plugin_info(mut self, plugin_info: bool) -> Self {
+        self.plugin_info = Some(plugin_info);
         self
     }
 }
-
-impl From<()> for CoreSoundbankGeneratedOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[ObjectReturnField; N]> for CoreSoundbankGeneratedOptions {
-    fn from(return_fields: [ObjectReturnField; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<ObjectReturnField>> for CoreSoundbankGeneratedOptions {
-    fn from(return_fields: Vec<ObjectReturnField>) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-/// Module-scoped alias for [`CoreSoundbankGeneratedPayload`].
-pub type GeneratedPayload = CoreSoundbankGeneratedPayload;
-
-/// Module-scoped alias for [`CoreSoundbankGeneratedOptions`].
-pub type GeneratedOptions = CoreSoundbankGeneratedOptions;

@@ -33,7 +33,7 @@ pub async fn master_audio_bus(client: &mut WaapiClient) -> (String, String) {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(
+            CoreObjectGetArgs::new(ObjectQuery::path(
                 r"\Master-Mixer Hierarchy\Default Work Unit",
             ))
             .transform(vec![Transform::Select {

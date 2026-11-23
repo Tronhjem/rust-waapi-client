@@ -23,24 +23,3 @@ impl CoreUndoEndGroupArgs {
         }
     }
 }
-
-impl From<String> for CoreUndoEndGroupArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreUndoEndGroupArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreUndoEndGroupArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreUndoEndGroupArgs`].
-pub type EndGroupArgs = CoreUndoEndGroupArgs;

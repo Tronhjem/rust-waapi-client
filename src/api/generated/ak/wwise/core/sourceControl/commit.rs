@@ -18,17 +18,11 @@ pub struct CoreSourceControlCommitArgs {
 
 impl CoreSourceControlCommitArgs {
     /// Creates a new [`CoreSourceControlCommitArgs`] with the required fields.
-    pub fn new(files: Vec<String>, message: impl Into<String>) -> Self {
+    pub fn new(files: impl Into<Vec<String>>, message: impl Into<String>) -> Self {
         Self {
-            files,
+            files: files.into(),
             message: message.into(),
         }
-    }
-}
-
-impl<T0: Into<Vec<String>>, T1: Into<String>> From<(T0, T1)> for CoreSourceControlCommitArgs {
-    fn from((files, message): (T0, T1)) -> Self {
-        Self::new(files.into(), message)
     }
 }
 
@@ -40,9 +34,3 @@ pub struct CoreSourceControlCommitResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlCommitArgs`].
-pub type CommitArgs = CoreSourceControlCommitArgs;
-
-/// Module-scoped alias for [`CoreSourceControlCommitResponse`].
-pub type CommitResponse = CoreSourceControlCommitResponse;

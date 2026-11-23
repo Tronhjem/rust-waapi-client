@@ -17,6 +17,3 @@ pub struct CoreSoundbankGenerationDonePayload {
     #[serde(default)]
     pub logs: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSoundbankGenerationDonePayload`].
-pub type GenerationDonePayload = CoreSoundbankGenerationDonePayload;

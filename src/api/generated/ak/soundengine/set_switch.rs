@@ -23,31 +23,17 @@ pub struct SoundengineSetSwitchArgs {
 
 impl SoundengineSetSwitchArgs {
     /// Creates a new [`SoundengineSetSwitchArgs`] with the required fields.
-    pub fn new(
-        switch_group: impl Into<SoundEngineObjectRef>,
-        switch_state: impl Into<SoundEngineObjectRef>,
-    ) -> Self {
+    pub fn new(switch_group: SoundEngineObjectRef, switch_state: SoundEngineObjectRef) -> Self {
         Self {
-            switch_group: switch_group.into(),
-            switch_state: switch_state.into(),
+            switch_group,
+            switch_state,
             game_object: None,
         }
     }
 
     /// Associated game object ID. Its default value is the transport game object.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
     }
 }
-
-impl<T0: Into<SoundEngineObjectRef>, T1: Into<SoundEngineObjectRef>> From<(T0, T1)>
-    for SoundengineSetSwitchArgs
-{
-    fn from((switch_group, switch_state): (T0, T1)) -> Self {
-        Self::new(switch_group, switch_state)
-    }
-}
-
-/// Module-scoped alias for [`SoundengineSetSwitchArgs`].
-pub type SetSwitchArgs = SoundengineSetSwitchArgs;

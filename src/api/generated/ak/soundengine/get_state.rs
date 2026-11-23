@@ -17,34 +17,8 @@ pub struct SoundengineGetStateArgs {
 
 impl SoundengineGetStateArgs {
     /// Creates a new [`SoundengineGetStateArgs`] with the required fields.
-    pub fn new(state_group: impl Into<ObjectRef>) -> Self {
-        Self {
-            state_group: state_group.into(),
-        }
-    }
-}
-
-impl From<ObjectRef> for SoundengineGetStateArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundengineGetStateArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for SoundengineGetStateArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundengineGetStateArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
+    pub fn new(state_group: ObjectRef) -> Self {
+        Self { state_group }
     }
 }
 
@@ -62,12 +36,3 @@ pub struct SoundengineGetStateResponse {
     #[serde(rename = "return")]
     pub state: WwiseObject,
 }
-
-/// Module-scoped alias for [`SoundengineGetStateArgs`].
-pub type GetStateArgs = SoundengineGetStateArgs;
-
-/// Module-scoped alias for [`SoundengineGetStateOptions`].
-pub type GetStateOptions = SoundengineGetStateOptions;
-
-/// Module-scoped alias for [`SoundengineGetStateResponse`].
-pub type GetStateResponse = SoundengineGetStateResponse;

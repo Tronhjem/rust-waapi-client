@@ -22,20 +22,12 @@ pub struct CoreObjectSetLinkedArgs {
 
 impl CoreObjectSetLinkedArgs {
     /// Creates a new [`CoreObjectSetLinkedArgs`] with the required fields.
-    pub fn new(
-        object: impl Into<ObjectRef>,
-        property: Property,
-        platform: impl Into<PlatformRef>,
-        linked: bool,
-    ) -> Self {
+    pub fn new(object: ObjectRef, property: Property, platform: PlatformRef, linked: bool) -> Self {
         Self {
-            object: object.into(),
+            object,
             property,
-            platform: platform.into(),
+            platform,
             linked,
         }
     }
 }
-
-/// Module-scoped alias for [`CoreObjectSetLinkedArgs`].
-pub type SetLinkedArgs = CoreObjectSetLinkedArgs;

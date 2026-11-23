@@ -69,7 +69,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(GAME_PARAMS_WU_PATH),
+                ObjectRef::path(GAME_PARAMS_WU_PATH),
                 ObjectType::GameParameter,
                 TEST_RTPC_NAME.to_string(),
             )
@@ -86,7 +86,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(EVENTS_WU_PATH),
+                ObjectRef::path(EVENTS_WU_PATH),
                 ObjectType::Event,
                 TEST_EVENT_NAME.to_string(),
             )
@@ -146,7 +146,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
     client
         .soundengine()
         .set_rtpc_value(
-            SoundengineSetRtpcValueArgs::new(RtpcRef::from(TEST_RTPC_NAME), 75.0)
+            SoundengineSetRtpcValueArgs::new(RtpcRef::name(TEST_RTPC_NAME), 75.0)
                 .game_object(emitter),
         )
         .await
@@ -156,7 +156,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
     let post_resp = client
         .soundengine()
         .post_event(
-            SoundenginePostEventArgs::new(EventRef::from(TEST_EVENT_NAME)).game_object(emitter),
+            SoundenginePostEventArgs::new(EventRef::name(TEST_EVENT_NAME)).game_object(emitter),
         )
         .await
         .expect("Failed to call ak.soundengine.postEvent");
@@ -208,7 +208,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(rtpc_id.as_str())))
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(rtpc_id.as_str())))
         .await
         .expect("Failed to delete temporary GameParameter");
 
@@ -216,7 +216,7 @@ async fn info_ui_soundengine_and_raw_call_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             event_id.as_str(),
         )))
         .await

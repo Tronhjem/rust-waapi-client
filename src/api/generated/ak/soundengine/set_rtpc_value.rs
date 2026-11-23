@@ -21,26 +21,17 @@ pub struct SoundengineSetRtpcValueArgs {
 
 impl SoundengineSetRtpcValueArgs {
     /// Creates a new [`SoundengineSetRtpcValueArgs`] with the required fields.
-    pub fn new(rtpc: impl Into<SoundEngineObjectRef>, value: f64) -> Self {
+    pub fn new(rtpc: SoundEngineObjectRef, value: f64) -> Self {
         Self {
-            rtpc: rtpc.into(),
+            rtpc,
             value,
             game_object: None,
         }
     }
 
     /// Associated game object ID. The default value is transport game object.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
     }
 }
-
-impl<T0: Into<SoundEngineObjectRef>, T1: Into<f64>> From<(T0, T1)> for SoundengineSetRtpcValueArgs {
-    fn from((rtpc, value): (T0, T1)) -> Self {
-        Self::new(rtpc, value.into())
-    }
-}
-
-/// Module-scoped alias for [`SoundengineSetRtpcValueArgs`].
-pub type SetRtpcValueArgs = SoundengineSetRtpcValueArgs;

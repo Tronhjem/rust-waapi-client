@@ -37,7 +37,7 @@ async fn object_get_queries_and_transforms_sequence() {
 
     // 1. Create a test hierarchy under Default Work Unit
     let create_args = CoreObjectCreateArgs::new(
-        ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+        ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
         ObjectType::ActorMixer,
         QUERY_MIXER_NAME.to_string(),
     )
@@ -110,13 +110,13 @@ async fn object_get_queries_and_transforms_sequence() {
         Some("Default Work Unit")
     );
 
-    // 3. Query by multiple GUIDs (`ObjectQuery::from(vec![id1, id2])`)
+    // 3. Query by multiple GUIDs (`ObjectQuery::ids(vec![id1, id2])`)
     let by_ids_resp = client
         .wwise()
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(vec![alpha_id.clone(), beta_id.clone()])),
+            CoreObjectGetArgs::new(ObjectQuery::ids(vec![alpha_id.clone(), beta_id.clone()])),
             return_opts.clone(),
         )
         .await
@@ -130,7 +130,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(EVENTS_WORK_UNIT_PATH),
+                ObjectRef::path(EVENTS_WORK_UNIT_PATH),
                 ObjectType::Event,
                 QUERY_EVENT_NAME.to_string(),
             )
@@ -155,7 +155,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(qualified_name.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::name(qualified_name.as_str())),
             return_opts.clone(),
         )
         .await
@@ -186,7 +186,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(vec![
+            CoreObjectGetArgs::new(ObjectQuery::of_types(vec![
                 ObjectType::SwitchContainer,
                 ObjectType::RandomSequenceContainer,
             ])),
@@ -228,7 +228,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str()))
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str()))
                 .transform(vec![Transform::select(TransformSelect::Children)]),
             return_opts.clone(),
         )
@@ -241,7 +241,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+            CoreObjectGetArgs::new(ObjectQuery::id(alpha_id.as_str()))
                 .transform(vec![Transform::select(TransformSelect::Parent)]),
             return_opts.clone(),
         )
@@ -258,7 +258,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+            CoreObjectGetArgs::new(ObjectQuery::id(alpha_id.as_str()))
                 .transform(vec![Transform::select(TransformSelect::Ancestors)]),
             return_opts.clone(),
         )
@@ -276,7 +276,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(alpha_id.as_str()))
+            CoreObjectGetArgs::new(ObjectQuery::id(alpha_id.as_str()))
                 .transform(vec![Transform::select(TransformSelect::ReferencesTo)]),
             return_opts.clone(),
         )
@@ -297,7 +297,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(vec![alpha_id.clone(), beta_id.clone()]))
+            CoreObjectGetArgs::new(ObjectQuery::ids(vec![alpha_id.clone(), beta_id.clone()]))
                 .transform(vec![Transform::select(TransformSelect::Parent)]),
             return_opts.clone(),
         )
@@ -310,7 +310,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(vec![alpha_id.clone(), beta_id.clone()]))
+            CoreObjectGetArgs::new(ObjectQuery::ids(vec![alpha_id.clone(), beta_id.clone()]))
                 .transform(vec![
                     Transform::select(TransformSelect::Parent),
                     Transform::distinct(),
@@ -331,7 +331,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::range(0, 2),
             ]),
@@ -346,7 +346,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::range(2, 2),
             ]),
@@ -363,7 +363,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::where_name_contains("Sound"),
             ]),
@@ -378,7 +378,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::where_name_matches(".*Alpha$"),
             ]),
@@ -397,7 +397,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::where_type_is_in([
                     ObjectType::SwitchContainer,
@@ -421,7 +421,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(mixer_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(mixer_id.as_str())).transform(vec![
                 Transform::select(TransformSelect::Descendants),
                 Transform::where_type_is_in([ObjectType::Sound]),
                 Transform::where_name_contains("Beta"),
@@ -442,7 +442,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             event_id.as_str(),
         )))
         .await
@@ -452,7 +452,7 @@ async fn object_get_queries_and_transforms_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await

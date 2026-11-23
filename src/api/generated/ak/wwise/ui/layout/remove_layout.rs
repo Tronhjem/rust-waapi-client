@@ -20,24 +20,3 @@ impl UiLayoutRemoveLayoutArgs {
         Self { name: name.into() }
     }
 }
-
-impl From<String> for UiLayoutRemoveLayoutArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutRemoveLayoutArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutRemoveLayoutArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutRemoveLayoutArgs`].
-pub type RemoveLayoutArgs = UiLayoutRemoveLayoutArgs;

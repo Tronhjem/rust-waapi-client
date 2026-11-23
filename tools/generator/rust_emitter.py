@@ -46,15 +46,7 @@ from .type_mapper import (
 
 INTO_CTOR_TYPES = {
     "String",
-    "ObjectRef",
-    "GameObjectRef",
-    "SoundEngineObjectRef",
-    "EventRef",
-    "RtpcRef",
-    "PlatformRef",
-    "LanguageRef",
     "PropertyValue",
-    "ObjectQuery",
 }
 
 
@@ -211,14 +203,16 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
             if f not in ctor_fields:
                 ctor_fields.append(f)
         params = ", ".join(
-            f"{f.rust_name}: impl Into<{f.ty}>" if f.ty in INTO_CTOR_TYPES else f"{f.rust_name}: {f.ty}"
+            f"{f.rust_name}: impl Into<{f.ty}>"
+            if (f.ty in INTO_CTOR_TYPES or f.ty.startswith("Vec<"))
+            else f"{f.rust_name}: {f.ty}"
             for f in ctor_fields
         )
         lines.append(f"    /// Creates a new [`{struct_name}`] with the required fields.")
         lines.append(f"    pub fn new({params}) -> Self {{")
         lines.append("        Self {")
         for f in ctor_fields:
-            if f.ty in INTO_CTOR_TYPES:
+            if f.ty in INTO_CTOR_TYPES or f.ty.startswith("Vec<"):
                 lines.append(f"            {f.rust_name}: {f.rust_name}.into(),")
             else:
                 lines.append(f"            {f.rust_name},")
@@ -238,27 +232,23 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
             lines.append("")
             lines += doc_lines(f.doc, "    ") or [f"    /// Sets `{f.wire}`."]
             if f.rust_name == "return_fields" and f.ty.startswith("Vec<") and f.ty.endswith(">"):
-                elem_ty = f.ty[4:-1]
-                lines.append(f"    pub fn {f.rust_name}<I, T>(mut self, {f.rust_name}: I) -> Self")
-                lines.append("    where")
-                lines.append("        I: IntoIterator<Item = T>,")
-                lines.append(f"        T: Into<{elem_ty}>,")
-                lines.append("    {")
-                lines.append(f"        self.{f.rust_name} = Some({f.rust_name}.into_iter().map(Into::into).collect());")
+                lines.append(f"    pub fn {f.rust_name}(mut self, {f.rust_name}: impl Into<{f.ty}>) -> Self {{")
+                lines.append(f"        self.{f.rust_name} = Some({f.rust_name}.into());")
                 lines.append("        self")
                 lines.append("    }")
                 lines.append("")
                 lines.append("    /// Alias for [`Self::return_fields`].")
-                lines.append("    pub fn return_<I, T>(self, return_fields: I) -> Self")
-                lines.append("    where")
-                lines.append("        I: IntoIterator<Item = T>,")
-                lines.append(f"        T: Into<{elem_ty}>,")
-                lines.append("    {")
+                lines.append(f"    pub fn return_(self, return_fields: impl Into<{f.ty}>) -> Self {{")
                 lines.append("        self.return_fields(return_fields)")
                 lines.append("    }")
-            else:
+            elif f.ty in INTO_CTOR_TYPES or f.ty.startswith("Vec<"):
                 lines.append(f"    pub fn {f.rust_name}(mut self, {f.rust_name}: impl Into<{f.ty}>) -> Self {{")
                 lines.append(f"        self.{f.rust_name} = Some({f.rust_name}.into());")
+                lines.append("        self")
+                lines.append("    }")
+            else:
+                lines.append(f"    pub fn {f.rust_name}(mut self, {f.rust_name}: {f.ty}) -> Self {{")
+                lines.append(f"        self.{f.rust_name} = Some({f.rust_name});")
                 lines.append("        self")
                 lines.append("    }")
         if extra_flatten:
@@ -281,63 +271,6 @@ def emit_struct(kind, struct_name, doc, fields, ctx, ctor_order=None, required_o
             lines.append("        self")
             lines.append("    }")
     lines.append("}")
-
-    if kind == "args" and len(ctor_fields) == 1:
-        f = ctor_fields[0]
-        from_types = []
-        if f.ty != struct_name:
-            from_types.append(f.ty)
-        if f.ty in {"ObjectRef", "SoundEngineObjectRef", "EventRef", "RtpcRef", "PlatformRef", "LanguageRef", "ObjectQuery"}:
-            from_types.extend(["&str", "String", "&String"])
-        elif f.ty == "String":
-            from_types.extend(["&str", "&String"])
-        if f.ty in {"SoundEngineObjectRef", "EventRef", "RtpcRef"}:
-            from_types.append("u32")
-        elif f.ty == "GameObjectRef":
-            from_types.extend(["u64", "u32"])
-        for src_ty in from_types:
-            lines.append("")
-            lines.append(f"impl From<{src_ty}> for {struct_name} {{")
-            lines.append(f"    fn from(value: {src_ty}) -> Self {{")
-            lines.append("        Self::new(value)")
-            lines.append("    }")
-            lines.append("}")
-    elif kind == "args" and len(ctor_fields) in (2, 3):
-        t_params = [f"T{i}: Into<{f.ty}>" for i, f in enumerate(ctor_fields)]
-        t_names = ", ".join(f"T{i}" for i in range(len(ctor_fields)))
-        f_names = ", ".join(f.rust_name for f in ctor_fields)
-        f_args = ", ".join(
-            f.rust_name if f.ty in INTO_CTOR_TYPES else f"{f.rust_name}.into()"
-            for f in ctor_fields
-        )
-        lines.append("")
-        lines.append(f"impl<{', '.join(t_params)}> From<({t_names})> for {struct_name} {{")
-        lines.append(f"    fn from(({f_names}): ({t_names})) -> Self {{")
-        lines.append(f"        Self::new({f_args})")
-        lines.append("    }")
-        lines.append("}")
-    elif kind == "options" and not required:
-        lines.append("")
-        lines.append(f"impl From<()> for {struct_name} {{")
-        lines.append("    fn from((): ()) -> Self {")
-        lines.append("        Self::default()")
-        lines.append("    }")
-        lines.append("}")
-        for f in optional:
-            if f.rust_name == "return_fields" and f.ty.startswith("Vec<") and f.ty.endswith(">"):
-                elem_ty = f.ty[4:-1]
-                lines.append("")
-                lines.append(f"impl<const N: usize> From<[{elem_ty}; N]> for {struct_name} {{")
-                lines.append(f"    fn from(return_fields: [{elem_ty}; N]) -> Self {{")
-                lines.append("        Self::new().return_fields(return_fields)")
-                lines.append("    }")
-                lines.append("}")
-                lines.append("")
-                lines.append(f"impl From<Vec<{elem_ty}>> for {struct_name} {{")
-                lines.append(f"    fn from(return_fields: Vec<{elem_ty}>) -> Self {{")
-                lines.append("        Self::new().return_fields(return_fields)")
-                lines.append("    }")
-                lines.append("}")
 
     return "\n".join(lines)
 
@@ -803,15 +736,6 @@ def gen_object_return_field(enum_vals, field_docs=None):
     lines.append("impl From<Property> for ObjectReturnField {")
     lines.append("    fn from(prop: Property) -> Self { ObjectReturnField::Property(prop) }")
     lines.append("}")
-    lines.append("impl From<&str> for ObjectReturnField {")
-    lines.append("    fn from(s: &str) -> Self { ObjectReturnField::Custom(s.to_string()) }")
-    lines.append("}")
-    lines.append("impl From<String> for ObjectReturnField {")
-    lines.append("    fn from(s: String) -> Self { ObjectReturnField::Custom(s) }")
-    lines.append("}")
-    lines.append("impl From<&String> for ObjectReturnField {")
-    lines.append("    fn from(s: &String) -> Self { ObjectReturnField::Custom(s.clone()) }")
-    lines.append("}")
     return "\n".join(lines)
 
 
@@ -936,17 +860,26 @@ def gen_object_query(ctx):
     lines.append("    }")
     lines.append("")
     lines.append("    /// Query a single object by backslash-separated hierarchy path.")
+    lines.append("    ///")
+    lines.append("    /// A leading `\\` is prepended automatically if not already present, as required by WAAPI.")
     lines.append("    pub fn path(path: impl Into<String>) -> Self {")
-    lines.append("        ObjectQuery::Path(vec![path.into()])")
+    lines.append("        let s = path.into();")
+    lines.append("        let s = if s.starts_with('\\\\') { s } else { format!(r\"\\{s}\") };")
+    lines.append("        ObjectQuery::Path(vec![s])")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Query multiple objects by backslash-separated hierarchy paths.")
+    lines.append("    ///")
+    lines.append("    /// A leading `\\` is prepended automatically to each path if not already present.")
     lines.append("    pub fn paths<I, S>(paths: I) -> Self")
     lines.append("    where")
     lines.append("        I: IntoIterator<Item = S>,")
     lines.append("        S: Into<String>,")
     lines.append("    {")
-    lines.append("        ObjectQuery::Path(paths.into_iter().map(Into::into).collect())")
+    lines.append("        ObjectQuery::Path(paths.into_iter().map(|p| {")
+    lines.append("            let s = p.into();")
+    lines.append("            if s.starts_with('\\\\') { s } else { format!(r\"\\{s}\") }")
+    lines.append("        }).collect())")
     lines.append("    }")
     lines.append("")
     lines.append("    /// Query a single object by unique qualified name (`Type:Name`).")
@@ -982,37 +915,6 @@ def gen_object_query(ctx):
     lines.append("    pub fn query(guid: impl Into<String>) -> Self {")
     lines.append("        ObjectQuery::Query(vec![guid.into()])")
     lines.append("    }")
-    lines.append("}")
-    lines.append("")
-    lines.append("impl From<String> for ObjectQuery {")
-    lines.append("    fn from(s: String) -> Self {")
-    lines.append("        if s.starts_with('{') && s.ends_with('}') {")
-    lines.append("            ObjectQuery::Id(vec![serde_json::Value::String(s)])")
-    lines.append("        } else if s.starts_with('\\\\') {")
-    lines.append("            ObjectQuery::Path(vec![s])")
-    lines.append("        } else if s.contains(':') {")
-    lines.append("            ObjectQuery::Name(vec![s])")
-    lines.append("        } else {")
-    lines.append("            ObjectQuery::Path(vec![s])")
-    lines.append("        }")
-    lines.append("    }")
-    lines.append("}")
-    lines.append("impl From<&str> for ObjectQuery {")
-    lines.append("    fn from(s: &str) -> Self { Self::from(s.to_string()) }")
-    lines.append("}")
-    lines.append("impl From<&String> for ObjectQuery {")
-    lines.append("    fn from(s: &String) -> Self { Self::from(s.as_str()) }")
-    lines.append("}")
-    lines.append("impl From<Vec<String>> for ObjectQuery {")
-    lines.append("    fn from(v: Vec<String>) -> Self {")
-    lines.append("        ObjectQuery::Id(v.into_iter().map(serde_json::Value::String).collect())")
-    lines.append("    }")
-    lines.append("}")
-    lines.append("impl From<ObjectType> for ObjectQuery {")
-    lines.append("    fn from(object_type: ObjectType) -> Self { ObjectQuery::OfType(vec![object_type]) }")
-    lines.append("}")
-    lines.append("impl From<Vec<ObjectType>> for ObjectQuery {")
-    lines.append("    fn from(object_types: Vec<ObjectType>) -> Self { ObjectQuery::OfType(object_types) }")
     lines.append("}")
     return "\n".join(lines)
 
@@ -1201,8 +1103,8 @@ pub struct AuxSendValue {
 
 impl AuxSendValue {
     /// Creates a new [`AuxSendValue`].
-    pub fn new(listener: impl Into<GameObjectRef>, aux_bus: impl Into<SoundEngineObjectRef>, control_value: f64) -> Self {
-        Self { listener: listener.into(), aux_bus: aux_bus.into(), control_value }
+    pub fn new(listener: GameObjectRef, aux_bus: SoundEngineObjectRef, control_value: f64) -> Self {
+        Self { listener, aux_bus, control_value }
     }
 }""",
         """/// A single position entry for `soundengine.setMultiplePositions`.
@@ -1214,20 +1116,14 @@ pub struct MultiPosition {
 
 impl MultiPosition {
     /// Creates a new [`MultiPosition`].
-    pub fn new(position: impl Into<Position>) -> Self {
-        Self { position: position.into() }
+    pub fn new(position: Position) -> Self {
+        Self { position }
     }
 }
 
 impl From<Position> for MultiPosition {
     fn from(position: Position) -> Self {
         Self { position }
-    }
-}
-
-impl From<Vector3> for MultiPosition {
-    fn from(position: Vector3) -> Self {
-        Self { position: Position::new(position) }
     }
 }""",
         """/// A Wwise object type entry returned by `object.getTypes`.
@@ -1315,8 +1211,8 @@ pub struct SoundBankInclusion {
 
 impl SoundBankInclusion {
     /// Creates a new [`SoundBankInclusion`] for `object` with an empty filter list.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
-        Self { object: object.into(), filter: Vec::new() }
+    pub fn new(object: ObjectRef) -> Self {
+        Self { object, filter: Vec::new() }
     }
 
     /// Appends a [`SoundBankInclusionFilter`] to the inclusion filter list.
@@ -1357,22 +1253,14 @@ impl SoundBankInfo {
     }
 
     /// Sets the events to include in the SoundBank.
-    pub fn events<I, T>(mut self, events: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectRef>,
-    {
-        self.events = Some(events.into_iter().map(Into::into).collect());
+    pub fn events(mut self, events: impl Into<Vec<ObjectRef>>) -> Self {
+        self.events = Some(events.into());
         self
     }
 
     /// Sets the auxiliary busses to include in the SoundBank.
-    pub fn aux_busses<I, T>(mut self, aux_busses: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectRef>,
-    {
-        self.aux_busses = Some(aux_busses.into_iter().map(Into::into).collect());
+    pub fn aux_busses(mut self, aux_busses: impl Into<Vec<ObjectRef>>) -> Self {
+        self.aux_busses = Some(aux_busses.into());
         self
     }
 
@@ -1418,8 +1306,8 @@ pub struct ExternalSourceInfo {
 
 impl ExternalSourceInfo {
     /// Creates a new [`ExternalSourceInfo`] for `platform` and `input`.
-    pub fn new(platform: impl Into<PlatformRef>, input: impl Into<String>) -> Self {
-        Self { platform: platform.into(), input: input.into(), output: None }
+    pub fn new(platform: PlatformRef, input: impl Into<String>) -> Self {
+        Self { platform, input: input.into(), output: None }
     }
 
     /// Sets the output directory override.
@@ -1550,31 +1438,6 @@ impl SoundEngineObjectRef {
     }
 }
 
-impl From<&str> for SoundEngineObjectRef {
-    fn from(s: &str) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            SoundEngineObjectRef::Guid(s.to_string())
-        } else {
-            SoundEngineObjectRef::Name(s.to_string())
-        }
-    }
-}
-impl From<String> for SoundEngineObjectRef {
-    fn from(s: String) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            SoundEngineObjectRef::Guid(s)
-        } else {
-            SoundEngineObjectRef::Name(s)
-        }
-    }
-}
-impl From<&String> for SoundEngineObjectRef {
-    fn from(s: &String) -> Self { Self::from(s.as_str()) }
-}
-impl From<u32> for SoundEngineObjectRef {
-    fn from(id: u32) -> Self { SoundEngineObjectRef::ShortId(id) }
-}
-
 /// Event reference accepted by `soundengine.postEvent`.
 pub type EventRef = SoundEngineObjectRef;
 
@@ -1606,13 +1469,6 @@ impl GameObjectRef {
     }
 }
 
-impl From<u64> for GameObjectRef {
-    fn from(id: u64) -> Self { GameObjectRef::Id(id) }
-}
-impl From<u32> for GameObjectRef {
-    fn from(id: u32) -> Self { GameObjectRef::Id(id as u64) }
-}
-
 /// Language reference used in return options.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
@@ -1633,28 +1489,6 @@ impl LanguageRef {
     pub fn guid(s: impl Into<String>) -> Self {
         LanguageRef::Guid(s.into())
     }
-}
-
-impl From<&str> for LanguageRef {
-    fn from(s: &str) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            LanguageRef::Guid(s.to_string())
-        } else {
-            LanguageRef::Name(s.to_string())
-        }
-    }
-}
-impl From<String> for LanguageRef {
-    fn from(s: String) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            LanguageRef::Guid(s)
-        } else {
-            LanguageRef::Name(s)
-        }
-    }
-}
-impl From<&String> for LanguageRef {
-    fn from(s: &String) -> Self { Self::from(s.as_str()) }
 }"""
 
 STATIC_OBJECT_RETURN_OPTIONS = """/// Options controlling which fields are returned for each object.
@@ -1689,64 +1523,26 @@ impl ObjectReturnOptions {
     }
 
     /// Specifies the fields or `@Property` expressions to return for each object.
-    pub fn return_fields<I, T>(mut self, fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
-        self.return_fields = Some(fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, fields: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_fields = Some(fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
+    pub fn return_(self, fields: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_fields(fields)
     }
 
     /// Specifies the platform to use when querying properties.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// Specifies the language to use when querying language-specific properties.
-    pub fn language(mut self, language: impl Into<LanguageRef>) -> Self {
-        self.language = Some(language.into());
+    pub fn language(mut self, language: LanguageRef) -> Self {
+        self.language = Some(language);
         self
-    }
-}
-
-impl From<()> for ObjectReturnOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[ObjectReturnField; N]> for ObjectReturnOptions {
-    fn from(fields: [ObjectReturnField; N]) -> Self {
-        Self::new().return_fields(fields)
-    }
-}
-
-impl From<Vec<ObjectReturnField>> for ObjectReturnOptions {
-    fn from(fields: Vec<ObjectReturnField>) -> Self {
-        Self::new().return_fields(fields)
-    }
-}
-
-impl From<&[ObjectReturnField]> for ObjectReturnOptions {
-    fn from(fields: &[ObjectReturnField]) -> Self {
-        Self::new().return_fields(fields.iter().cloned())
-    }
-}
-
-impl From<ObjectReturnField> for ObjectReturnOptions {
-    fn from(field: ObjectReturnField) -> Self {
-        Self::new().return_fields([field])
     }
 }"""
 
@@ -1919,7 +1715,6 @@ def _compose_struct_doc(header, desc):
 
 def gen_endpoint_file(ctx):
     base = endpoint_base_name(ctx.uri)
-    leaf = pascal_case(endpoint_segments(ctx.uri)[-1])
     endpoint_desc = clean_doc(ctx.doc.get("description", ""))
     args_schema = ctx.doc.get("argsSchema", {})
     options_schema = ctx.doc.get("optionsSchema", {})
@@ -1940,23 +1735,15 @@ def gen_endpoint_file(ctx):
     sections = [f"// Generated bindings for {ctx.uri}", "", "#![allow(unused_imports)]",
                 "#![allow(dead_code)]", "", "use crate::api::generated::primitives::*;", ""]
     exports = []
-    aliases = []
-
-    def add_alias(short_name, target_name, doc):
-        if short_name != target_name:
-            exports.append(short_name)
-            aliases.append(f"/// Module-scoped alias for [`{target_name}`].\npub type {short_name} = {target_name};")
 
     if has_args:
         name = f"{base}Args"
         exports.append(name)
-        add_alias(f"{leaf}Args", name, f"Arguments for `{ctx.uri}`.")
         if ctx.uri == "ak.wwise.core.object.get":
             sections.append(gen_object_get_args(ctx, name))
         elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Item"
             exports.append(item_name)
-            add_alias(f"{leaf}Item", item_name, f"Item for `{ctx.uri}`.")
             sections.append(gen_object_set_args(ctx, name, item_name))
         else:
             ctx.local_root = args_schema
@@ -1974,7 +1761,6 @@ def gen_endpoint_file(ctx):
     if has_options:
         name = f"{base}Options"
         exports.append(name)
-        add_alias(f"{leaf}Options", name, f"Options for `{ctx.uri}`.")
         opts_doc = _compose_struct_doc(
             f"Options for `{ctx.uri}`.",
             schema_description(ctx, options_schema) or endpoint_desc,
@@ -1989,7 +1775,6 @@ def gen_endpoint_file(ctx):
     if has_response:
         name = f"{base}Response"
         exports.append(name)
-        add_alias(f"{leaf}Response", name, f"Response from `{ctx.uri}`.")
         resp_doc = _compose_struct_doc(
             f"Response from `{ctx.uri}`.",
             schema_description(ctx, result_schema) or endpoint_desc,
@@ -1999,7 +1784,6 @@ def gen_endpoint_file(ctx):
         elif ctx.uri == "ak.wwise.core.object.set":
             item_name = f"{base}Object"
             exports.append(item_name)
-            add_alias(f"{leaf}Object", item_name, f"Object entry in `{ctx.uri}` response.")
             sections.append(gen_object_set_response(ctx, name, item_name))
         else:
             ctx.local_root = result_schema
@@ -2007,16 +1791,12 @@ def gen_endpoint_file(ctx):
             ctx.local_root = None
             sections.append(emit_struct("response", name, resp_doc, fields, ctx))
 
-    if aliases:
-        sections.append("\n\n".join(aliases))
-
     return "\n\n".join(sections) + "\n", exports, has_args, has_options, has_response
 
 
 def gen_topic_file(ctx):
     """Generate the payload struct and subscription options for a WAAPI topic."""
     base = endpoint_base_name(ctx.uri)
-    leaf = pascal_case(endpoint_segments(ctx.uri)[-1])
     topic_desc = clean_doc(ctx.doc.get("description", ""))
     options_schema = ctx.doc.get("optionsSchema", {})
     publish_schema = ctx.doc.get("publishSchema", {})
@@ -2029,16 +1809,9 @@ def gen_topic_file(ctx):
                 "#![allow(unused_imports)]", "#![allow(dead_code)]", "",
                 "use crate::api::generated::primitives::*;", ""]
     exports = []
-    aliases = []
-
-    def add_alias(short_name, target_name):
-        if short_name != target_name:
-            exports.append(short_name)
-            aliases.append(f"/// Module-scoped alias for [`{target_name}`].\npub type {short_name} = {target_name};")
 
     payload_name = f"{base}Payload"
     exports.append(payload_name)
-    add_alias(f"{leaf}Payload", payload_name)
     payload_doc = _compose_struct_doc(
         f"Payload for `{ctx.uri}`.",
         schema_description(ctx, publish_schema) or topic_desc,
@@ -2058,7 +1831,6 @@ def gen_topic_file(ctx):
     if has_options:
         name = f"{base}Options"
         exports.append(name)
-        add_alias(f"{leaf}Options", name)
         opts_doc = _compose_struct_doc(
             f"Subscription options for `{ctx.uri}`.",
             schema_description(ctx, options_schema) or topic_desc,
@@ -2070,9 +1842,6 @@ def gen_topic_file(ctx):
             fields = collect_fields(ctx, options_schema, "options", name)
             ctx.local_root = None
             sections.append(emit_struct("options", name, opts_doc, fields, ctx))
-
-    if aliases:
-        sections.append("\n\n".join(aliases))
 
     return "\n\n".join(sections) + "\n", exports, has_options
 
@@ -2095,10 +1864,10 @@ pub struct {name} {{
 
 impl {name} {{
     /// Creates a new [`{name}`] starting from a `from` [`ObjectQuery`].
-    pub fn new(from: impl Into<ObjectQuery>) -> Self {{
+    pub fn new(from: ObjectQuery) -> Self {{
         Self {{
             waql: None,
-            from: Some(from.into()),
+            from: Some(from),
             transform: None,
         }}
     }}
@@ -2119,8 +1888,8 @@ impl {name} {{
     }}
 
     /// Sets the query starting point (`from`).
-    pub fn from(mut self, from: impl Into<ObjectQuery>) -> Self {{
-        self.from = Some(from.into());
+    pub fn from(mut self, from: ObjectQuery) -> Self {{
+        self.from = Some(from);
         self
     }}
 
@@ -2128,48 +1897,6 @@ impl {name} {{
     pub fn transform(mut self, transform: impl Into<Vec<Transform>>) -> Self {{
         self.transform = Some(transform.into());
         self
-    }}
-}}
-
-impl From<ObjectQuery> for {name} {{
-    fn from(from: ObjectQuery) -> Self {{
-        Self::new(from)
-    }}
-}}
-
-impl From<&str> for {name} {{
-    fn from(s: &str) -> Self {{
-        Self::new(s)
-    }}
-}}
-
-impl From<String> for {name} {{
-    fn from(s: String) -> Self {{
-        Self::new(s)
-    }}
-}}
-
-impl From<&String> for {name} {{
-    fn from(s: &String) -> Self {{
-        Self::new(s)
-    }}
-}}
-
-impl From<ObjectType> for {name} {{
-    fn from(object_type: ObjectType) -> Self {{
-        Self::new(object_type)
-    }}
-}}
-
-impl From<Vec<ObjectType>> for {name} {{
-    fn from(object_types: Vec<ObjectType>) -> Self {{
-        Self::new(object_types)
-    }}
-}}
-
-impl From<Vec<String>> for {name} {{
-    fn from(ids: Vec<String>) -> Self {{
-        Self::new(ids)
     }}
 }}"""
 
@@ -2213,8 +1940,9 @@ def gen_object_set_args(ctx, args_name, item_name):
                        required_order=args_schema.get("required"))
     out += f"""
 
-impl From<{item_name}> for {args_name} {{
-    fn from(item: {item_name}) -> Self {{
+impl {args_name} {{
+    /// Creates a new [`{args_name}`] containing a single [`{item_name}`].
+    pub fn from_item(item: {item_name}) -> Self {{
         Self::new(vec![item])
     }}
 }}"""

@@ -16,16 +16,9 @@ pub struct CoreSoundbankConvertExternalSourcesArgs {
 
 impl CoreSoundbankConvertExternalSourcesArgs {
     /// Creates a new [`CoreSoundbankConvertExternalSourcesArgs`] with the required fields.
-    pub fn new(sources: Vec<ExternalSourceInfo>) -> Self {
-        Self { sources }
+    pub fn new(sources: impl Into<Vec<ExternalSourceInfo>>) -> Self {
+        Self {
+            sources: sources.into(),
+        }
     }
 }
-
-impl From<Vec<ExternalSourceInfo>> for CoreSoundbankConvertExternalSourcesArgs {
-    fn from(value: Vec<ExternalSourceInfo>) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreSoundbankConvertExternalSourcesArgs`].
-pub type ConvertExternalSourcesArgs = CoreSoundbankConvertExternalSourcesArgs;

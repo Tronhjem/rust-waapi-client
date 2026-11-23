@@ -27,17 +27,8 @@ impl CoreTransportExecuteActionArgs {
     }
 
     /// The transport object ID to be used with all other ak.wwise.core.transport functions.
-    pub fn transport(mut self, transport: impl Into<u32>) -> Self {
-        self.transport = Some(transport.into());
+    pub fn transport(mut self, transport: u32) -> Self {
+        self.transport = Some(transport);
         self
     }
 }
-
-impl From<TransportAction> for CoreTransportExecuteActionArgs {
-    fn from(value: TransportAction) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreTransportExecuteActionArgs`].
-pub type ExecuteActionArgs = CoreTransportExecuteActionArgs;

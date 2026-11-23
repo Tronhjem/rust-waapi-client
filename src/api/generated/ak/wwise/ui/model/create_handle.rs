@@ -26,12 +26,6 @@ impl UiModelCreateHandleArgs {
     }
 }
 
-impl<T0: Into<String>, T1: Into<String>> From<(T0, T1)> for UiModelCreateHandleArgs {
-    fn from((container, template): (T0, T1)) -> Self {
-        Self::new(container, template)
-    }
-}
-
 /// Response from `ak.wwise.ui.model.createHandle`.
 ///
 /// Creates a frontend handle and instantiates its widgets.
@@ -41,9 +35,3 @@ pub struct UiModelCreateHandleResponse {
     #[serde(rename = "handleID", default)]
     pub handle_id: Option<String>,
 }
-
-/// Module-scoped alias for [`UiModelCreateHandleArgs`].
-pub type CreateHandleArgs = UiModelCreateHandleArgs;
-
-/// Module-scoped alias for [`UiModelCreateHandleResponse`].
-pub type CreateHandleResponse = UiModelCreateHandleResponse;

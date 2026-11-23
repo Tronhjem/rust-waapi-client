@@ -45,7 +45,7 @@ async fn object_introspection_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(ACTOR_MIXER_WU),
+                ObjectRef::path(ACTOR_MIXER_WU),
                 ObjectType::ActorMixer,
                 "WaapiSeqIntrospectMixer".to_string(),
             )
@@ -62,7 +62,7 @@ async fn object_introspection_sequence() {
         .object()
         .get_property_and_reference_names(
             CoreObjectGetPropertyAndReferenceNamesArgs::new()
-                .object(ObjectRef::from(mixer_id.as_str())),
+                .object(ObjectRef::guid(mixer_id.as_str())),
         )
         .await
         .expect("get property and reference names");
@@ -78,7 +78,7 @@ async fn object_introspection_sequence() {
         .object()
         .get_property_info(
             CoreObjectGetPropertyInfoArgs::new(Property::Volume)
-                .object(ObjectRef::from(mixer_id.as_str())),
+                .object(ObjectRef::guid(mixer_id.as_str())),
         )
         .await
         .expect("get property info");
@@ -91,7 +91,7 @@ async fn object_introspection_sequence() {
         .core()
         .object()
         .set_linked(CoreObjectSetLinkedArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             Property::Volume,
             platform.clone(),
             false,
@@ -103,7 +103,7 @@ async fn object_introspection_sequence() {
         .core()
         .object()
         .is_linked(CoreObjectIsLinkedArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             Property::Volume,
             platform.clone(),
         ))
@@ -117,7 +117,7 @@ async fn object_introspection_sequence() {
         .core()
         .object()
         .is_property_enabled(CoreObjectIsPropertyEnabledArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             platform.clone(),
             Property::Volume,
         ))
@@ -132,7 +132,7 @@ async fn object_introspection_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(STATE_GROUPS_WU),
+                ObjectRef::path(STATE_GROUPS_WU),
                 ObjectType::StateGroup,
                 "WaapiSeqIntrospectStateGroup".to_string(),
             )
@@ -147,8 +147,8 @@ async fn object_introspection_sequence() {
         .core()
         .object()
         .set_state_groups(CoreObjectSetStateGroupsArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
-            vec![ObjectRef::from(state_group_id.as_str())],
+            ObjectRef::guid(mixer_id.as_str()),
+            vec![ObjectRef::guid(state_group_id.as_str())],
         ))
         .await
         .expect("set state groups");
@@ -157,7 +157,7 @@ async fn object_introspection_sequence() {
         .core()
         .object()
         .set_state_properties(CoreObjectSetStatePropertiesArgs::new(
-            ObjectRef::from(mixer_id.as_str()),
+            ObjectRef::guid(mixer_id.as_str()),
             vec!["Volume".to_string(), "Pitch".to_string()],
         ))
         .await
@@ -168,7 +168,7 @@ async fn object_introspection_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await
@@ -177,7 +177,7 @@ async fn object_introspection_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             state_group_id.as_str(),
         )))
         .await

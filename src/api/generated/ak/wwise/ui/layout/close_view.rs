@@ -23,24 +23,3 @@ impl UiLayoutCloseViewArgs {
         }
     }
 }
-
-impl From<String> for UiLayoutCloseViewArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutCloseViewArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutCloseViewArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutCloseViewArgs`].
-pub type CloseViewArgs = UiLayoutCloseViewArgs;

@@ -22,9 +22,9 @@ pub struct CoreObjectDeleteArgs {
 
 impl CoreObjectDeleteArgs {
     /// Creates a new [`CoreObjectDeleteArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef) -> Self {
         Self {
-            object: object.into(),
+            object,
             auto_check_out_to_source_control: None,
         }
     }
@@ -32,36 +32,9 @@ impl CoreObjectDeleteArgs {
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
     }
 }
-
-impl From<ObjectRef> for CoreObjectDeleteArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreObjectDeleteArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreObjectDeleteArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreObjectDeleteArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectDeleteArgs`].
-pub type DeleteArgs = CoreObjectDeleteArgs;

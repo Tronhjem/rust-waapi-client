@@ -1,5 +1,4 @@
-//! Demonstrates the string-based escape hatch for endpoints that have no
-//! typed binding yet.
+//! Demonstrates the raw JSON escape hatch (`client.call` with `WaapiFunction` and `json!`).
 //!
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example raw_call

@@ -19,19 +19,10 @@ pub struct UiModelGetStateArgs {
 
 impl UiModelGetStateArgs {
     /// Creates a new [`UiModelGetStateArgs`] with the required fields.
-    pub fn new(handle_id: impl Into<String>, state: Vec<serde_json::Value>) -> Self {
+    pub fn new(handle_id: impl Into<String>, state: impl Into<Vec<serde_json::Value>>) -> Self {
         Self {
             handle_id: handle_id.into(),
-            state,
+            state: state.into(),
         }
     }
 }
-
-impl<T0: Into<String>, T1: Into<Vec<serde_json::Value>>> From<(T0, T1)> for UiModelGetStateArgs {
-    fn from((handle_id, state): (T0, T1)) -> Self {
-        Self::new(handle_id, state.into())
-    }
-}
-
-/// Module-scoped alias for [`UiModelGetStateArgs`].
-pub type GetStateArgs = UiModelGetStateArgs;

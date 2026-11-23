@@ -1,13 +1,13 @@
-//! Create a Random Sequence Container named "Boom" with two Sound children.
+//! Create a Random Sequence Container named "Boom" with two Sound children
+//! at the top level of `\Containers\Default Work Unit`.
 //!
 //! Mirrors the Audiokinetic WAAPI example "Creating a Random Container with two
 //! Sound objects" (`ak.wwise.core.object.create`).
 //!
-//! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080. Replace the
-//! parent GUID with a GUID (or path) from your own project.
+//! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example create_object
 
-use wwise_waapi::api::ak::wwise::core::object::CreateArgs;
+use wwise_waapi::api::ak::wwise::core::object::CoreObjectCreateArgs;
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -16,12 +16,13 @@ async fn main() -> WaapiResult<()> {
 
     let client = WaapiClient::connect().await?;
 
-    let args = CreateArgs::new(
-        ObjectRef::guid("{7A12D08F-B0D9-4403-9EFA-2E6338C197C1}"),
+    let args = CoreObjectCreateArgs::new(
+        ObjectRef::path(r"\Containers\Default Work Unit"),
         ObjectType::RandomSequenceContainer,
         "Boom",
     )
-    .property("RandomOrSequence", 1)
+    .on_name_conflict(OnNameConflict::Replace)
+    .property(Property::RandomOrSequence, 1)
     .children(vec![
         ChildObject::new(ObjectType::Sound, "A"),
         ChildObject::new(ObjectType::Sound, "B"),

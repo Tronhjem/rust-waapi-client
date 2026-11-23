@@ -31,35 +31,14 @@ impl CoreLogAddItemArgs {
     }
 
     /// The severity of the message to add. Default is 'Message'.
-    pub fn severity(mut self, severity: impl Into<LogSeverity>) -> Self {
-        self.severity = Some(severity.into());
+    pub fn severity(mut self, severity: LogSeverity) -> Self {
+        self.severity = Some(severity);
         self
     }
 
     /// The channel on which to add the message. Default is 'general'.
-    pub fn channel(mut self, channel: impl Into<LogChannel>) -> Self {
-        self.channel = Some(channel.into());
+    pub fn channel(mut self, channel: LogChannel) -> Self {
+        self.channel = Some(channel);
         self
     }
 }
-
-impl From<String> for CoreLogAddItemArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreLogAddItemArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreLogAddItemArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreLogAddItemArgs`].
-pub type AddItemArgs = CoreLogAddItemArgs;

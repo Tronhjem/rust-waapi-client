@@ -41,9 +41,9 @@ pub struct CoreObjectPropertyChangedOptions {
 
 impl CoreObjectPropertyChangedOptions {
     /// Creates a new [`CoreObjectPropertyChangedOptions`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, property: Property) -> Self {
+    pub fn new(object: ObjectRef, property: Property) -> Self {
         Self {
-            object: object.into(),
+            object,
             property,
             return_fields: None,
             platform: None,
@@ -51,21 +51,13 @@ impl CoreObjectPropertyChangedOptions {
     }
 
     /// Data to be returned for every change on "property" of "object". See the Wwise Objects Reference for more information on the properties available.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_fields(return_fields)
     }
 
@@ -75,9 +67,3 @@ impl CoreObjectPropertyChangedOptions {
         self
     }
 }
-
-/// Module-scoped alias for [`CoreObjectPropertyChangedPayload`].
-pub type PropertyChangedPayload = CoreObjectPropertyChangedPayload;
-
-/// Module-scoped alias for [`CoreObjectPropertyChangedOptions`].
-pub type PropertyChangedOptions = CoreObjectPropertyChangedOptions;

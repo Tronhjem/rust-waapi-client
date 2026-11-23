@@ -19,49 +19,16 @@ pub struct SoundenginePostTriggerArgs {
 
 impl SoundenginePostTriggerArgs {
     /// Creates a new [`SoundenginePostTriggerArgs`] with the required fields.
-    pub fn new(trigger: impl Into<SoundEngineObjectRef>) -> Self {
+    pub fn new(trigger: SoundEngineObjectRef) -> Self {
         Self {
-            trigger: trigger.into(),
+            trigger,
             game_object: None,
         }
     }
 
     /// Associated game object ID. Its default value is the transport game object.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
     }
 }
-
-impl From<SoundEngineObjectRef> for SoundenginePostTriggerArgs {
-    fn from(value: SoundEngineObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundenginePostTriggerArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for SoundenginePostTriggerArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundenginePostTriggerArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<u32> for SoundenginePostTriggerArgs {
-    fn from(value: u32) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`SoundenginePostTriggerArgs`].
-pub type PostTriggerArgs = SoundenginePostTriggerArgs;

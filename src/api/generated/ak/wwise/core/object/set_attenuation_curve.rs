@@ -28,26 +28,23 @@ pub struct CoreObjectSetAttenuationCurveArgs {
 impl CoreObjectSetAttenuationCurveArgs {
     /// Creates a new [`CoreObjectSetAttenuationCurveArgs`] with the required fields.
     pub fn new(
-        object: impl Into<ObjectRef>,
+        object: ObjectRef,
         curve_type: AttenuationCurveType,
         use_: AttenuationCurveUse,
-        points: Vec<CurvePoint2D>,
+        points: impl Into<Vec<CurvePoint2D>>,
     ) -> Self {
         Self {
-            object: object.into(),
+            object,
             curve_type,
             use_,
-            points,
+            points: points.into(),
             platform: None,
         }
     }
 
     /// The ID (GUID) or unique name of the platform to set curves. Set to null-guid for unlinked curve.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 }
-
-/// Module-scoped alias for [`CoreObjectSetAttenuationCurveArgs`].
-pub type SetAttenuationCurveArgs = CoreObjectSetAttenuationCurveArgs;

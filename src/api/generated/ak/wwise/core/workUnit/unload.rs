@@ -16,36 +16,7 @@ pub struct CoreWorkUnitUnloadArgs {
 
 impl CoreWorkUnitUnloadArgs {
     /// Creates a new [`CoreWorkUnitUnloadArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
-        Self {
-            object: object.into(),
-        }
+    pub fn new(object: ObjectRef) -> Self {
+        Self { object }
     }
 }
-
-impl From<ObjectRef> for CoreWorkUnitUnloadArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreWorkUnitUnloadArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreWorkUnitUnloadArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreWorkUnitUnloadArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreWorkUnitUnloadArgs`].
-pub type UnloadArgs = CoreWorkUnitUnloadArgs;

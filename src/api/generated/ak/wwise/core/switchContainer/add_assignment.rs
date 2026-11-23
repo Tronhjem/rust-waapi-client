@@ -19,21 +19,10 @@ pub struct CoreSwitchContainerAddAssignmentArgs {
 
 impl CoreSwitchContainerAddAssignmentArgs {
     /// Creates a new [`CoreSwitchContainerAddAssignmentArgs`] with the required fields.
-    pub fn new(child: impl Into<ObjectRef>, state_or_switch: impl Into<ObjectRef>) -> Self {
+    pub fn new(child: ObjectRef, state_or_switch: ObjectRef) -> Self {
         Self {
-            child: child.into(),
-            state_or_switch: state_or_switch.into(),
+            child,
+            state_or_switch,
         }
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)>
-    for CoreSwitchContainerAddAssignmentArgs
-{
-    fn from((child, state_or_switch): (T0, T1)) -> Self {
-        Self::new(child, state_or_switch)
-    }
-}
-
-/// Module-scoped alias for [`CoreSwitchContainerAddAssignmentArgs`].
-pub type AddAssignmentArgs = CoreSwitchContainerAddAssignmentArgs;

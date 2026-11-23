@@ -19,19 +19,10 @@ pub struct SoundengineSetPositionArgs {
 
 impl SoundengineSetPositionArgs {
     /// Creates a new [`SoundengineSetPositionArgs`] with the required fields.
-    pub fn new(game_object: impl Into<GameObjectRef>, position: Position) -> Self {
+    pub fn new(game_object: GameObjectRef, position: Position) -> Self {
         Self {
-            game_object: game_object.into(),
+            game_object,
             position,
         }
     }
 }
-
-impl<T0: Into<GameObjectRef>, T1: Into<Position>> From<(T0, T1)> for SoundengineSetPositionArgs {
-    fn from((game_object, position): (T0, T1)) -> Self {
-        Self::new(game_object, position.into())
-    }
-}
-
-/// Module-scoped alias for [`SoundengineSetPositionArgs`].
-pub type SetPositionArgs = SoundengineSetPositionArgs;

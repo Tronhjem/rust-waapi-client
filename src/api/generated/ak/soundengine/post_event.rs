@@ -19,47 +19,17 @@ pub struct SoundenginePostEventArgs {
 
 impl SoundenginePostEventArgs {
     /// Creates a new [`SoundenginePostEventArgs`] with the required fields.
-    pub fn new(event: impl Into<SoundEngineObjectRef>) -> Self {
+    pub fn new(event: SoundEngineObjectRef) -> Self {
         Self {
-            event: event.into(),
+            event,
             game_object: None,
         }
     }
 
     /// The unique ID of the game object. When not specified, `AK_INVALID_GAME_OBJECT` is used.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
-    }
-}
-
-impl From<SoundEngineObjectRef> for SoundenginePostEventArgs {
-    fn from(value: SoundEngineObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundenginePostEventArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for SoundenginePostEventArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundenginePostEventArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<u32> for SoundenginePostEventArgs {
-    fn from(value: u32) -> Self {
-        Self::new(value)
     }
 }
 
@@ -72,9 +42,3 @@ pub struct SoundenginePostEventResponse {
     #[serde(rename = "return")]
     pub playing_id: u32,
 }
-
-/// Module-scoped alias for [`SoundenginePostEventArgs`].
-pub type PostEventArgs = SoundenginePostEventArgs;
-
-/// Module-scoped alias for [`SoundenginePostEventResponse`].
-pub type PostEventResponse = SoundenginePostEventResponse;

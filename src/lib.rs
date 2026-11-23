@@ -13,7 +13,9 @@
 //! can be stored, copied, and reused concurrently across multiple calls:
 //!
 //! ```no_run
-//! use wwise_waapi::api::ak::wwise::core::object::{CreateArgs, GetOptions};
+//! use wwise_waapi::api::ak::wwise::core::object::{
+//!     CoreObjectCreateArgs, CoreObjectGetArgs, CoreObjectGetOptions,
+//! };
 //! use wwise_waapi::prelude::*;
 //!
 //! #[tokio::main]
@@ -24,12 +26,12 @@
 //!     let info = client.core().get_info().await?;
 //!     println!("Connected to {} {}", info.display_name, info.version.display_name);
 //!
-//!     // Query objects directly by path, GUID, type, or ObjectQuery:
+//!     // Query objects with an explicit CoreObjectGetArgs (`CoreObjectGetArgs::new(ObjectQuery)` or `CoreObjectGetArgs::from_waql(...)`):
 //!     let response = client
 //!         .object()
 //!         .get(
-//!             r"\Containers\Default Work Unit",
-//!             GetOptions::new().return_fields([
+//!             CoreObjectGetArgs::new(ObjectQuery::path(r"\Containers\Default Work Unit")),
+//!             CoreObjectGetOptions::new().return_fields([
 //!                 ObjectReturnField::Id,
 //!                 ObjectReturnField::Name,
 //!                 ObjectReturnField::Type,
@@ -42,12 +44,12 @@
 //!         println!("{:?} ({:?}): {:?}", obj.name(), obj.object_type(), obj.id());
 //!     }
 //!
-//!     // Create a Sound object (`CreateArgs::new` accepts `&str`, `String`, or `ObjectRef`):
+//!     // Create a Sound object with an explicit parent ObjectRef:
 //!     let created = client
 //!         .object()
 //!         .create(
-//!             CreateArgs::new(
-//!                 r"\Containers\Default Work Unit",
+//!             CoreObjectCreateArgs::new(
+//!                 ObjectRef::path(r"\Containers\Default Work Unit"),
 //!                 ObjectType::Sound,
 //!                 "MyNewSound",
 //!             )
@@ -68,7 +70,7 @@
 //! `subscribe_*` method on its namespace client:
 //!
 //! ```no_run
-//! use wwise_waapi::api::ak::wwise::core::object::CreatedOptions;
+//! use wwise_waapi::api::ak::wwise::core::object::CoreObjectCreatedOptions;
 //! use wwise_waapi::prelude::*;
 //!
 //! #[tokio::main]
@@ -78,7 +80,7 @@
 //!     let (sub_id, mut rx) = client
 //!         .object()
 //!         .subscribe_created(Some(
-//!             CreatedOptions::new()
+//!             CoreObjectCreatedOptions::new()
 //!                 .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]),
 //!         ))
 //!         .await?;

@@ -11,9 +11,9 @@ def endpoint_call_shape(info):
     has_args, has_options, has_response = info["has_args"], info["has_options"], info["has_response"]
     params = []
     if has_args:
-        params.append(("args", f"impl Into<{info['base']}Args>"))
+        params.append(("args", f"{info['base']}Args"))
     if has_options:
-        params.append(("options", f"impl Into<{info['base']}Options>"))
+        params.append(("options", f"{info['base']}Options"))
     return params, has_response
 
 
@@ -36,15 +36,10 @@ def emit_call_body(uri, info, target="self.client"):
     uri_variant = f"WaapiFunction::{uri.replace('.', '_')}"
     call = f"{target}.{method}{turbofish}({uri_variant}, {args_expr}, {options_expr}).await"
 
-    prefix = []
-    if has_args:
-        prefix.append(f"let args: {info['base']}Args = args.into();")
-    if has_options:
-        prefix.append(f"let options: {info['base']}Options = options.into();")
     if has_response:
-        return [*prefix, call]
+        return [call]
     else:
-        return [*prefix, f"{call}?;", "Ok(())"]
+        return [f"{call}?;", "Ok(())"]
 
 
 def use_path(uri, types):

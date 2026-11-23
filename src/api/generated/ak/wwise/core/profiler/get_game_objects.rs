@@ -21,12 +21,6 @@ impl CoreProfilerGetGameObjectsArgs {
     }
 }
 
-impl From<serde_json::Value> for CoreProfilerGetGameObjectsArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.profiler.getGameObjects`.
 ///
 /// Retrieves the game objects at a specific profiler capture time.
@@ -36,9 +30,3 @@ pub struct CoreProfilerGetGameObjectsResponse {
     #[serde(rename = "return")]
     pub return_: Vec<WwiseObjectRef>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetGameObjectsArgs`].
-pub type GetGameObjectsArgs = CoreProfilerGetGameObjectsArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetGameObjectsResponse`].
-pub type GetGameObjectsResponse = CoreProfilerGetGameObjectsResponse;

@@ -16,14 +16,10 @@ pub struct CoreSourceControlAddArgs {
 
 impl CoreSourceControlAddArgs {
     /// Creates a new [`CoreSourceControlAddArgs`] with the required fields.
-    pub fn new(files: Vec<String>) -> Self {
-        Self { files }
-    }
-}
-
-impl From<Vec<String>> for CoreSourceControlAddArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
+    pub fn new(files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+        }
     }
 }
 
@@ -35,9 +31,3 @@ pub struct CoreSourceControlAddResponse {
     /// Array of log entries generated during the request.
     pub log: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlAddArgs`].
-pub type AddArgs = CoreSourceControlAddArgs;
-
-/// Module-scoped alias for [`CoreSourceControlAddResponse`].
-pub type AddResponse = CoreSourceControlAddResponse;

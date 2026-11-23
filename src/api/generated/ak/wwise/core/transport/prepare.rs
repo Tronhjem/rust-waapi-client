@@ -16,36 +16,7 @@ pub struct CoreTransportPrepareArgs {
 
 impl CoreTransportPrepareArgs {
     /// Creates a new [`CoreTransportPrepareArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
-        Self {
-            object: object.into(),
-        }
+    pub fn new(object: ObjectRef) -> Self {
+        Self { object }
     }
 }
-
-impl From<ObjectRef> for CoreTransportPrepareArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreTransportPrepareArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreTransportPrepareArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreTransportPrepareArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreTransportPrepareArgs`].
-pub type PrepareArgs = CoreTransportPrepareArgs;

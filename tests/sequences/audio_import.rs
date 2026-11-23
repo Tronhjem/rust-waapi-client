@@ -80,7 +80,7 @@ async fn audio_import_base64_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+                ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
                 ObjectType::ActorMixer,
                 IMPORT_MIXER_NAME.to_string(),
             )
@@ -152,7 +152,7 @@ async fn audio_import_base64_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(imported_sound_id)).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(imported_sound_id)).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Children],
                 },
@@ -182,7 +182,7 @@ async fn audio_import_base64_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(DEFAULT_WORK_UNIT_PATH)),
+            CoreObjectGetArgs::new(ObjectQuery::path(DEFAULT_WORK_UNIT_PATH)),
             CoreObjectGetOptions::new().return_fields(vec![
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
@@ -206,7 +206,7 @@ async fn audio_import_base64_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(imported_sound_id)),
+            CoreObjectGetArgs::new(ObjectQuery::id(imported_sound_id)),
             CoreObjectGetOptions::new().return_fields(vec![
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
@@ -282,7 +282,7 @@ async fn audio_import_base64_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             mixer_id.as_str(),
         )))
         .await

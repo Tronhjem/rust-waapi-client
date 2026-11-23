@@ -22,11 +22,8 @@ impl SoundengineStopAllArgs {
     }
 
     /// The game object on which to stop playback. If not specified, stops all sounds.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
     }
 }
-
-/// Module-scoped alias for [`SoundengineStopAllArgs`].
-pub type StopAllArgs = SoundengineStopAllArgs;

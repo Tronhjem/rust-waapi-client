@@ -33,7 +33,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(DEFAULT_WORK_UNIT_PATH)),
+            CoreObjectGetArgs::new(ObjectQuery::path(DEFAULT_WORK_UNIT_PATH)),
             base_return_opts.clone(),
         )
         .await
@@ -50,7 +50,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
 
     // 2. Create a new Actor Mixer under Default Work Unit and get its ID
     let create_am_args = CoreObjectCreateArgs::new(
-        ObjectRef::from(default_wu_id),
+        ObjectRef::guid(default_wu_id),
         ObjectType::ActorMixer,
         ACTOR_MIXER_NAME.to_string(),
     )
@@ -72,7 +72,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(actor_mixer_path.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::path(actor_mixer_path.as_str())),
             base_return_opts.clone(),
         )
         .await
@@ -91,7 +91,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
 
     // 3. Create a RandomSequenceContainer as a child of the Actor Mixer named "NewSound"
     let create_container_args = CoreObjectCreateArgs::new(
-        ObjectRef::from(actor_mixer_id.as_str()),
+        ObjectRef::guid(actor_mixer_id.as_str()),
         ObjectType::RandomSequenceContainer,
         INITIAL_CONTAINER_NAME.to_string(),
     )
@@ -115,7 +115,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(initial_container_path.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::path(initial_container_path.as_str())),
             base_return_opts.clone(),
         )
         .await
@@ -132,7 +132,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
 
     // 5. Set the name to "RanamedNewSound" and set the volume to -6
     let set_args = CoreObjectSetArgs::new(vec![
-        CoreObjectSetItem::new(ObjectRef::from(container_id.as_str()))
+        CoreObjectSetItem::new(ObjectRef::guid(container_id.as_str()))
             .name(RENAMED_CONTAINER_NAME.to_string())
             .property(Property::Volume, -6.0),
     ]);
@@ -159,7 +159,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(renamed_container_path.as_str())),
+            CoreObjectGetArgs::new(ObjectQuery::path(renamed_container_path.as_str())),
             get_with_volume_opts,
         )
         .await
@@ -185,13 +185,13 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             container_id.as_str(),
         )))
         .await
         .expect("Failed to delete RandomSequenceContainer");
 
-    let children_query = CoreObjectGetArgs::new(ObjectQuery::from(actor_mixer_id.as_str()))
+    let children_query = CoreObjectGetArgs::new(ObjectQuery::id(actor_mixer_id.as_str()))
         .transform(vec![Transform::Select {
             select: vec![TransformSelect::Children],
         }]);
@@ -219,7 +219,7 @@ async fn actor_mixer_and_container_lifecycle_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             actor_mixer_id.as_str(),
         )))
         .await
@@ -246,7 +246,7 @@ async fn nested_hierarchy_and_batch_set_sequence() {
 
     // 1. Create a root ActorMixer with nested children in a single create call
     let create_args = CoreObjectCreateArgs::new(
-        ObjectRef::from(DEFAULT_WORK_UNIT_PATH),
+        ObjectRef::path(DEFAULT_WORK_UNIT_PATH),
         ObjectType::ActorMixer,
         NESTED_MIXER_NAME.to_string(),
     )
@@ -294,7 +294,7 @@ async fn nested_hierarchy_and_batch_set_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(root_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(root_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Descendants],
                 },
@@ -354,16 +354,16 @@ async fn nested_hierarchy_and_batch_set_sequence() {
 
     // 3. Batch update multiple objects and create a new child via object.set
     let set_args = CoreObjectSetArgs::new(vec![
-        CoreObjectSetItem::new(ObjectRef::from(sound_a_id))
+        CoreObjectSetItem::new(ObjectRef::guid(sound_a_id))
             .notes("Updated SoundA notes")
             .property(Property::Volume, -8.5)
             .property(Property::Pitch, -250)
             .property(Property::Highpass, 15)
             .property(Property::IsLoopingEnabled, true),
-        CoreObjectSetItem::new(ObjectRef::from(sound_b_id))
+        CoreObjectSetItem::new(ObjectRef::guid(sound_b_id))
             .property(Property::Volume, -3.0)
             .property(Property::Lowpass, 45),
-        CoreObjectSetItem::new(ObjectRef::from(container_id))
+        CoreObjectSetItem::new(ObjectRef::guid(container_id))
             .on_name_conflict(OnNameConflict::Replace)
             .children(vec![
                 ChildObject::new(ObjectType::Sound, SOUND_C_NAME).property(Property::Volume, -1.0),
@@ -407,7 +407,7 @@ async fn nested_hierarchy_and_batch_set_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(root_id.as_str())).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::id(root_id.as_str())).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Descendants],
                 },
@@ -483,7 +483,7 @@ async fn nested_hierarchy_and_batch_set_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(root_id.as_str())))
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(root_id.as_str())))
         .await
         .expect("Failed to delete root ActorMixer");
 
@@ -492,7 +492,7 @@ async fn nested_hierarchy_and_batch_set_sequence() {
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(DEFAULT_WORK_UNIT_PATH)).transform(vec![
+            CoreObjectGetArgs::new(ObjectQuery::path(DEFAULT_WORK_UNIT_PATH)).transform(vec![
                 Transform::Select {
                     select: vec![TransformSelect::Children],
                 },

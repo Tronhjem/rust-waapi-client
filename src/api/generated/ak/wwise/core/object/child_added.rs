@@ -36,21 +36,13 @@ impl CoreObjectChildAddedOptions {
     }
 
     /// Data to be returned for every child being added.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_fields(return_fields)
     }
 
@@ -60,27 +52,3 @@ impl CoreObjectChildAddedOptions {
         self
     }
 }
-
-impl From<()> for CoreObjectChildAddedOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[ObjectReturnField; N]> for CoreObjectChildAddedOptions {
-    fn from(return_fields: [ObjectReturnField; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<ObjectReturnField>> for CoreObjectChildAddedOptions {
-    fn from(return_fields: Vec<ObjectReturnField>) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectChildAddedPayload`].
-pub type ChildAddedPayload = CoreObjectChildAddedPayload;
-
-/// Module-scoped alias for [`CoreObjectChildAddedOptions`].
-pub type ChildAddedOptions = CoreObjectChildAddedOptions;

@@ -22,11 +22,8 @@ impl CoreUndoCancelGroupArgs {
     }
 
     /// Specify if the operations are undone. False when not specified.
-    pub fn undo(mut self, undo: impl Into<bool>) -> Self {
-        self.undo = Some(undo.into());
+    pub fn undo(mut self, undo: bool) -> Self {
+        self.undo = Some(undo);
         self
     }
 }
-
-/// Module-scoped alias for [`CoreUndoCancelGroupArgs`].
-pub type CancelGroupArgs = CoreUndoCancelGroupArgs;

@@ -22,11 +22,8 @@ impl CoreLogClearArgs {
     }
 
     /// The channel to clear. Default is 'general'.
-    pub fn channel(mut self, channel: impl Into<LogChannel>) -> Self {
-        self.channel = Some(channel.into());
+    pub fn channel(mut self, channel: LogChannel) -> Self {
+        self.channel = Some(channel);
         self
     }
 }
-
-/// Module-scoped alias for [`CoreLogClearArgs`].
-pub type ClearArgs = CoreLogClearArgs;

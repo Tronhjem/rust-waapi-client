@@ -16,14 +16,10 @@ pub struct CoreSourceControlGetStatusArgs {
 
 impl CoreSourceControlGetStatusArgs {
     /// Creates a new [`CoreSourceControlGetStatusArgs`] with the required fields.
-    pub fn new(files: Vec<String>) -> Self {
-        Self { files }
-    }
-}
-
-impl From<Vec<String>> for CoreSourceControlGetStatusArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
+    pub fn new(files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+        }
     }
 }
 
@@ -37,9 +33,3 @@ pub struct CoreSourceControlGetStatusResponse {
     /// Array of source control statuses.
     pub result: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreSourceControlGetStatusArgs`].
-pub type GetStatusArgs = CoreSourceControlGetStatusArgs;
-
-/// Module-scoped alias for [`CoreSourceControlGetStatusResponse`].
-pub type GetStatusResponse = CoreSourceControlGetStatusResponse;

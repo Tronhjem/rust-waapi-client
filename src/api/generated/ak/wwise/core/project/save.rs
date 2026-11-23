@@ -27,12 +27,9 @@ impl CoreProjectSaveArgs {
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
     }
 }
-
-/// Module-scoped alias for [`CoreProjectSaveArgs`].
-pub type SaveArgs = CoreProjectSaveArgs;

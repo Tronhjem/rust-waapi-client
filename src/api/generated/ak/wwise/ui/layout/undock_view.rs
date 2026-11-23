@@ -35,23 +35,14 @@ impl UiLayoutUndockViewArgs {
     }
 
     /// Position of the undocked view on the horizontal axis. Defaults to 0.
-    pub fn pos_x(mut self, pos_x: impl Into<i64>) -> Self {
-        self.pos_x = Some(pos_x.into());
+    pub fn pos_x(mut self, pos_x: i64) -> Self {
+        self.pos_x = Some(pos_x);
         self
     }
 
     /// Position of the undocked view on the vertical axis. Defaults to 0.
-    pub fn pos_y(mut self, pos_y: impl Into<i64>) -> Self {
-        self.pos_y = Some(pos_y.into());
+    pub fn pos_y(mut self, pos_y: i64) -> Self {
+        self.pos_y = Some(pos_y);
         self
     }
 }
-
-impl<T0: Into<String>, T1: Into<String>> From<(T0, T1)> for UiLayoutUndockViewArgs {
-    fn from((name, view_id): (T0, T1)) -> Self {
-        Self::new(name, view_id)
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutUndockViewArgs`].
-pub type UndockViewArgs = UiLayoutUndockViewArgs;

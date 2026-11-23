@@ -50,45 +50,27 @@ impl UiCliExecuteLuaScriptArgs {
     }
 
     /// Specify a search path for Lua modules loaded. This option must be followed by a Lua path. Ex: '--lua-path C:\\module\\?.lua'.
-    pub fn lua_path(mut self, lua_path: impl Into<serde_json::Value>) -> Self {
-        self.lua_path = Some(lua_path.into());
+    pub fn lua_path(mut self, lua_path: serde_json::Value) -> Self {
+        self.lua_path = Some(lua_path);
         self
     }
 
     /// Specify an array of Lua module to load at runtime using the require system. This option must be followed by a Lua module name. The module name must be found in the Lua path. Ex: '--require debug.lua'.
-    pub fn require(mut self, require: impl Into<serde_json::Value>) -> Self {
-        self.require = Some(require.into());
+    pub fn require(mut self, require: serde_json::Value) -> Self {
+        self.require = Some(require);
         self
     }
 
     /// Specify an array of Lua files to load before the main Lua script is loaded and executed. This option must be followed by a absolute file name.
-    pub fn do_file(mut self, do_file: impl Into<serde_json::Value>) -> Self {
-        self.do_file = Some(do_file.into());
+    pub fn do_file(mut self, do_file: serde_json::Value) -> Self {
+        self.do_file = Some(do_file);
         self
     }
 
     /// Allow migration and save of the Wwise project before executing the operation.
-    pub fn allow_migration(mut self, allow_migration: impl Into<bool>) -> Self {
-        self.allow_migration = Some(allow_migration.into());
+    pub fn allow_migration(mut self, allow_migration: bool) -> Self {
+        self.allow_migration = Some(allow_migration);
         self
-    }
-}
-
-impl From<String> for UiCliExecuteLuaScriptArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiCliExecuteLuaScriptArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiCliExecuteLuaScriptArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
     }
 }
 
@@ -100,9 +82,3 @@ pub struct UiCliExecuteLuaScriptResponse {
     /// Result returned by the Lua script.
     pub result: serde_json::Value,
 }
-
-/// Module-scoped alias for [`UiCliExecuteLuaScriptArgs`].
-pub type ExecuteLuaScriptArgs = UiCliExecuteLuaScriptArgs;
-
-/// Module-scoped alias for [`UiCliExecuteLuaScriptResponse`].
-pub type ExecuteLuaScriptResponse = UiCliExecuteLuaScriptResponse;

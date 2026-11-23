@@ -21,6 +21,3 @@ impl UiLayoutGetCurrentLayoutNameResponse {
         self.name.as_deref()
     }
 }
-
-/// Module-scoped alias for [`UiLayoutGetCurrentLayoutNameResponse`].
-pub type GetCurrentLayoutNameResponse = UiLayoutGetCurrentLayoutNameResponse;

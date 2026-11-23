@@ -18,9 +18,3 @@ pub struct UiGetSelectedObjectsResponse {
     /// The selected objects, in the format specified in the options. Can be empty if no object is selected.
     pub objects: Vec<WwiseObject>,
 }
-
-/// Module-scoped alias for [`UiGetSelectedObjectsOptions`].
-pub type GetSelectedObjectsOptions = UiGetSelectedObjectsOptions;
-
-/// Module-scoped alias for [`UiGetSelectedObjectsResponse`].
-pub type GetSelectedObjectsResponse = UiGetSelectedObjectsResponse;

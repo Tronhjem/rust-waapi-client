@@ -19,49 +19,16 @@ pub struct SoundengineResetRtpcValueArgs {
 
 impl SoundengineResetRtpcValueArgs {
     /// Creates a new [`SoundengineResetRtpcValueArgs`] with the required fields.
-    pub fn new(rtpc: impl Into<SoundEngineObjectRef>) -> Self {
+    pub fn new(rtpc: SoundEngineObjectRef) -> Self {
         Self {
-            rtpc: rtpc.into(),
+            rtpc,
             game_object: None,
         }
     }
 
     /// Associated game object ID. The default value is transport game object.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
     }
 }
-
-impl From<SoundEngineObjectRef> for SoundengineResetRtpcValueArgs {
-    fn from(value: SoundEngineObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for SoundengineResetRtpcValueArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for SoundengineResetRtpcValueArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for SoundengineResetRtpcValueArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<u32> for SoundengineResetRtpcValueArgs {
-    fn from(value: u32) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`SoundengineResetRtpcValueArgs`].
-pub type ResetRtpcValueArgs = SoundengineResetRtpcValueArgs;

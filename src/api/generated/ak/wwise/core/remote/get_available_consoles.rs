@@ -13,6 +13,3 @@ pub struct CoreRemoteGetAvailableConsolesResponse {
     /// An array of remote consoles available.
     pub consoles: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreRemoteGetAvailableConsolesResponse`].
-pub type GetAvailableConsolesResponse = CoreRemoteGetAvailableConsolesResponse;

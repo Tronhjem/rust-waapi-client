@@ -20,24 +20,3 @@ impl CoreProfilerSaveCaptureArgs {
         Self { file: file.into() }
     }
 }
-
-impl From<String> for CoreProfilerSaveCaptureArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreProfilerSaveCaptureArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreProfilerSaveCaptureArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreProfilerSaveCaptureArgs`].
-pub type SaveCaptureArgs = CoreProfilerSaveCaptureArgs;

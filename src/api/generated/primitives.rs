@@ -43,35 +43,6 @@ impl SoundEngineObjectRef {
     }
 }
 
-impl From<&str> for SoundEngineObjectRef {
-    fn from(s: &str) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            SoundEngineObjectRef::Guid(s.to_string())
-        } else {
-            SoundEngineObjectRef::Name(s.to_string())
-        }
-    }
-}
-impl From<String> for SoundEngineObjectRef {
-    fn from(s: String) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            SoundEngineObjectRef::Guid(s)
-        } else {
-            SoundEngineObjectRef::Name(s)
-        }
-    }
-}
-impl From<&String> for SoundEngineObjectRef {
-    fn from(s: &String) -> Self {
-        Self::from(s.as_str())
-    }
-}
-impl From<u32> for SoundEngineObjectRef {
-    fn from(id: u32) -> Self {
-        SoundEngineObjectRef::ShortId(id)
-    }
-}
-
 /// Event reference accepted by `soundengine.postEvent`.
 pub type EventRef = SoundEngineObjectRef;
 
@@ -103,17 +74,6 @@ impl GameObjectRef {
     }
 }
 
-impl From<u64> for GameObjectRef {
-    fn from(id: u64) -> Self {
-        GameObjectRef::Id(id)
-    }
-}
-impl From<u32> for GameObjectRef {
-    fn from(id: u32) -> Self {
-        GameObjectRef::Id(id as u64)
-    }
-}
-
 /// Language reference used in return options.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
@@ -133,30 +93,6 @@ impl LanguageRef {
     /// Reference a language by GUID string (`{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}`).
     pub fn guid(s: impl Into<String>) -> Self {
         LanguageRef::Guid(s.into())
-    }
-}
-
-impl From<&str> for LanguageRef {
-    fn from(s: &str) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            LanguageRef::Guid(s.to_string())
-        } else {
-            LanguageRef::Name(s.to_string())
-        }
-    }
-}
-impl From<String> for LanguageRef {
-    fn from(s: String) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            LanguageRef::Guid(s)
-        } else {
-            LanguageRef::Name(s)
-        }
-    }
-}
-impl From<&String> for LanguageRef {
-    fn from(s: &String) -> Self {
-        Self::from(s.as_str())
     }
 }
 
@@ -424,21 +360,6 @@ impl From<Property> for ObjectReturnField {
         ObjectReturnField::Property(prop)
     }
 }
-impl From<&str> for ObjectReturnField {
-    fn from(s: &str) -> Self {
-        ObjectReturnField::Custom(s.to_string())
-    }
-}
-impl From<String> for ObjectReturnField {
-    fn from(s: String) -> Self {
-        ObjectReturnField::Custom(s)
-    }
-}
-impl From<&String> for ObjectReturnField {
-    fn from(s: &String) -> Self {
-        ObjectReturnField::Custom(s.clone())
-    }
-}
 
 /// Options controlling which fields are returned for each object.
 #[derive(Debug, Clone, Default, serde::Serialize)]
@@ -472,64 +393,26 @@ impl ObjectReturnOptions {
     }
 
     /// Specifies the fields or `@Property` expressions to return for each object.
-    pub fn return_fields<I, T>(mut self, fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
-        self.return_fields = Some(fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, fields: impl Into<Vec<ObjectReturnField>>) -> Self {
+        self.return_fields = Some(fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectReturnField>,
-    {
+    pub fn return_(self, fields: impl Into<Vec<ObjectReturnField>>) -> Self {
         self.return_fields(fields)
     }
 
     /// Specifies the platform to use when querying properties.
-    pub fn platform(mut self, platform: impl Into<PlatformRef>) -> Self {
-        self.platform = Some(platform.into());
+    pub fn platform(mut self, platform: PlatformRef) -> Self {
+        self.platform = Some(platform);
         self
     }
 
     /// Specifies the language to use when querying language-specific properties.
-    pub fn language(mut self, language: impl Into<LanguageRef>) -> Self {
-        self.language = Some(language.into());
+    pub fn language(mut self, language: LanguageRef) -> Self {
+        self.language = Some(language);
         self
-    }
-}
-
-impl From<()> for ObjectReturnOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[ObjectReturnField; N]> for ObjectReturnOptions {
-    fn from(fields: [ObjectReturnField; N]) -> Self {
-        Self::new().return_fields(fields)
-    }
-}
-
-impl From<Vec<ObjectReturnField>> for ObjectReturnOptions {
-    fn from(fields: Vec<ObjectReturnField>) -> Self {
-        Self::new().return_fields(fields)
-    }
-}
-
-impl From<&[ObjectReturnField]> for ObjectReturnOptions {
-    fn from(fields: &[ObjectReturnField]) -> Self {
-        Self::new().return_fields(fields.iter().cloned())
-    }
-}
-
-impl From<ObjectReturnField> for ObjectReturnOptions {
-    fn from(field: ObjectReturnField) -> Self {
-        Self::new().return_fields([field])
     }
 }
 
@@ -1522,17 +1405,39 @@ impl ObjectQuery {
     }
 
     /// Query a single object by backslash-separated hierarchy path.
+    ///
+    /// A leading `\` is prepended automatically if not already present, as required by WAAPI.
     pub fn path(path: impl Into<String>) -> Self {
-        ObjectQuery::Path(vec![path.into()])
+        let s = path.into();
+        let s = if s.starts_with('\\') {
+            s
+        } else {
+            format!(r"\{s}")
+        };
+        ObjectQuery::Path(vec![s])
     }
 
     /// Query multiple objects by backslash-separated hierarchy paths.
+    ///
+    /// A leading `\` is prepended automatically to each path if not already present.
     pub fn paths<I, S>(paths: I) -> Self
     where
         I: IntoIterator<Item = S>,
         S: Into<String>,
     {
-        ObjectQuery::Path(paths.into_iter().map(Into::into).collect())
+        ObjectQuery::Path(
+            paths
+                .into_iter()
+                .map(|p| {
+                    let s = p.into();
+                    if s.starts_with('\\') {
+                        s
+                    } else {
+                        format!(r"\{s}")
+                    }
+                })
+                .collect(),
+        )
     }
 
     /// Query a single object by unique qualified name (`Type:Name`).
@@ -1567,45 +1472,6 @@ impl ObjectQuery {
     /// Run a saved Wwise Query object by GUID.
     pub fn query(guid: impl Into<String>) -> Self {
         ObjectQuery::Query(vec![guid.into()])
-    }
-}
-
-impl From<String> for ObjectQuery {
-    fn from(s: String) -> Self {
-        if s.starts_with('{') && s.ends_with('}') {
-            ObjectQuery::Id(vec![serde_json::Value::String(s)])
-        } else if s.starts_with('\\') {
-            ObjectQuery::Path(vec![s])
-        } else if s.contains(':') {
-            ObjectQuery::Name(vec![s])
-        } else {
-            ObjectQuery::Path(vec![s])
-        }
-    }
-}
-impl From<&str> for ObjectQuery {
-    fn from(s: &str) -> Self {
-        Self::from(s.to_string())
-    }
-}
-impl From<&String> for ObjectQuery {
-    fn from(s: &String) -> Self {
-        Self::from(s.as_str())
-    }
-}
-impl From<Vec<String>> for ObjectQuery {
-    fn from(v: Vec<String>) -> Self {
-        ObjectQuery::Id(v.into_iter().map(serde_json::Value::String).collect())
-    }
-}
-impl From<ObjectType> for ObjectQuery {
-    fn from(object_type: ObjectType) -> Self {
-        ObjectQuery::OfType(vec![object_type])
-    }
-}
-impl From<Vec<ObjectType>> for ObjectQuery {
-    fn from(object_types: Vec<ObjectType>) -> Self {
-        ObjectQuery::OfType(object_types)
     }
 }
 
@@ -1889,8 +1755,8 @@ impl ImportItem {
     }
 
     /// Specifies the type of object to create when importing an audio file. This type can also be specified directly in the objectPath. See the Wwise Objects Reference for the available types.
-    pub fn object_type(mut self, object_type: impl Into<ObjectType>) -> Self {
-        self.object_type = Some(object_type.into());
+    pub fn object_type(mut self, object_type: ObjectType) -> Self {
+        self.object_type = Some(object_type);
         self
     }
 
@@ -1901,8 +1767,8 @@ impl ImportItem {
     }
 
     /// Object ID (GUID), name, or path used as root relative object paths.
-    pub fn import_location(mut self, import_location: impl Into<ObjectRef>) -> Self {
-        self.import_location = Some(import_location.into());
+    pub fn import_location(mut self, import_location: ObjectRef) -> Self {
+        self.import_location = Some(import_location);
         self
     }
 
@@ -1967,24 +1833,6 @@ impl ImportItem {
     }
 }
 
-impl From<String> for ImportItem {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for ImportItem {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for ImportItem {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Default values applied to every item in `audio.import`.
 #[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct ImportDefaults {
@@ -2042,8 +1890,8 @@ impl ImportDefaults {
     }
 
     /// Specifies the type of object to create when importing an audio file. This type can also be specified directly in the objectPath. See the Wwise Objects Reference for the available types.
-    pub fn object_type(mut self, object_type: impl Into<ObjectType>) -> Self {
-        self.object_type = Some(object_type.into());
+    pub fn object_type(mut self, object_type: ObjectType) -> Self {
+        self.object_type = Some(object_type);
         self
     }
 
@@ -2054,8 +1902,8 @@ impl ImportDefaults {
     }
 
     /// Object ID (GUID), name, or path used as root relative object paths.
-    pub fn import_location(mut self, import_location: impl Into<ObjectRef>) -> Self {
-        self.import_location = Some(import_location.into());
+    pub fn import_location(mut self, import_location: ObjectRef) -> Self {
+        self.import_location = Some(import_location);
         self
     }
 
@@ -2547,14 +2395,10 @@ pub struct AuxSendValue {
 
 impl AuxSendValue {
     /// Creates a new [`AuxSendValue`].
-    pub fn new(
-        listener: impl Into<GameObjectRef>,
-        aux_bus: impl Into<SoundEngineObjectRef>,
-        control_value: f64,
-    ) -> Self {
+    pub fn new(listener: GameObjectRef, aux_bus: SoundEngineObjectRef, control_value: f64) -> Self {
         Self {
-            listener: listener.into(),
-            aux_bus: aux_bus.into(),
+            listener,
+            aux_bus,
             control_value,
         }
     }
@@ -2569,24 +2413,14 @@ pub struct MultiPosition {
 
 impl MultiPosition {
     /// Creates a new [`MultiPosition`].
-    pub fn new(position: impl Into<Position>) -> Self {
-        Self {
-            position: position.into(),
-        }
+    pub fn new(position: Position) -> Self {
+        Self { position }
     }
 }
 
 impl From<Position> for MultiPosition {
     fn from(position: Position) -> Self {
         Self { position }
-    }
-}
-
-impl From<Vector3> for MultiPosition {
-    fn from(position: Vector3) -> Self {
-        Self {
-            position: Position::new(position),
-        }
     }
 }
 
@@ -2765,9 +2599,9 @@ pub struct SoundBankInclusion {
 
 impl SoundBankInclusion {
     /// Creates a new [`SoundBankInclusion`] for `object` with an empty filter list.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef) -> Self {
         Self {
-            object: object.into(),
+            object,
             filter: Vec::new(),
         }
     }
@@ -2817,22 +2651,14 @@ impl SoundBankInfo {
     }
 
     /// Sets the events to include in the SoundBank.
-    pub fn events<I, T>(mut self, events: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectRef>,
-    {
-        self.events = Some(events.into_iter().map(Into::into).collect());
+    pub fn events(mut self, events: impl Into<Vec<ObjectRef>>) -> Self {
+        self.events = Some(events.into());
         self
     }
 
     /// Sets the auxiliary busses to include in the SoundBank.
-    pub fn aux_busses<I, T>(mut self, aux_busses: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<ObjectRef>,
-    {
-        self.aux_busses = Some(aux_busses.into_iter().map(Into::into).collect());
+    pub fn aux_busses(mut self, aux_busses: impl Into<Vec<ObjectRef>>) -> Self {
+        self.aux_busses = Some(aux_busses.into());
         self
     }
 
@@ -2906,9 +2732,9 @@ pub struct ExternalSourceInfo {
 
 impl ExternalSourceInfo {
     /// Creates a new [`ExternalSourceInfo`] for `platform` and `input`.
-    pub fn new(platform: impl Into<PlatformRef>, input: impl Into<String>) -> Self {
+    pub fn new(platform: PlatformRef, input: impl Into<String>) -> Self {
         Self {
-            platform: platform.into(),
+            platform,
             input: input.into(),
             output: None,
         }

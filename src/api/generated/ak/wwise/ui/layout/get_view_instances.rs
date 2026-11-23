@@ -21,24 +21,6 @@ impl UiLayoutGetViewInstancesArgs {
     }
 }
 
-impl From<String> for UiLayoutGetViewInstancesArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutGetViewInstancesArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutGetViewInstancesArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.ui.layout.getViewInstances`.
 ///
 /// Retrieves a list of all view instances of a layout.
@@ -48,9 +30,3 @@ pub struct UiLayoutGetViewInstancesResponse {
     #[serde(rename = "viewInstances", default)]
     pub view_instances: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`UiLayoutGetViewInstancesArgs`].
-pub type GetViewInstancesArgs = UiLayoutGetViewInstancesArgs;
-
-/// Module-scoped alias for [`UiLayoutGetViewInstancesResponse`].
-pub type GetViewInstancesResponse = UiLayoutGetViewInstancesResponse;

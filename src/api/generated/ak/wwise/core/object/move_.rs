@@ -27,34 +27,28 @@ pub struct CoreObjectMoveArgs {
 
 impl CoreObjectMoveArgs {
     /// Creates a new [`CoreObjectMoveArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, parent: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef, parent: ObjectRef) -> Self {
         Self {
-            object: object.into(),
-            parent: parent.into(),
+            object,
+            parent,
             on_name_conflict: None,
             auto_check_out_to_source_control: None,
         }
     }
 
     /// The action to take if "parent" already has a child with the same name. Default value is "fail".
-    pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
-        self.on_name_conflict = Some(on_name_conflict.into());
+    pub fn on_name_conflict(mut self, on_name_conflict: OnNameConflict) -> Self {
+        self.on_name_conflict = Some(on_name_conflict);
         self
     }
 
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectMoveArgs {
-    fn from((object, parent): (T0, T1)) -> Self {
-        Self::new(object, parent)
     }
 }
 
@@ -62,9 +56,3 @@ impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectMove
 ///
 /// The moved object.
 pub type CoreObjectMoveResponse = WwiseObject;
-
-/// Module-scoped alias for [`CoreObjectMoveArgs`].
-pub type MoveArgs = CoreObjectMoveArgs;
-
-/// Module-scoped alias for [`CoreObjectMoveResponse`].
-pub type MoveResponse = CoreObjectMoveResponse;

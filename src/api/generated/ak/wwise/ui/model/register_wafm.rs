@@ -21,12 +21,6 @@ impl UiModelRegisterWafmArgs {
     }
 }
 
-impl From<serde_json::Value> for UiModelRegisterWafmArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.ui.model.registerWafm`.
 ///
 /// Registers WAFM files and inline widget descriptors.
@@ -36,9 +30,3 @@ pub struct UiModelRegisterWafmResponse {
     #[serde(default)]
     pub success: Option<bool>,
 }
-
-/// Module-scoped alias for [`UiModelRegisterWafmArgs`].
-pub type RegisterWafmArgs = UiModelRegisterWafmArgs;
-
-/// Module-scoped alias for [`UiModelRegisterWafmResponse`].
-pub type RegisterWafmResponse = UiModelRegisterWafmResponse;

@@ -23,24 +23,3 @@ impl UiLayoutGetViewHandleArgs {
         }
     }
 }
-
-impl From<String> for UiLayoutGetViewHandleArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutGetViewHandleArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutGetViewHandleArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`UiLayoutGetViewHandleArgs`].
-pub type GetViewHandleArgs = UiLayoutGetViewHandleArgs;

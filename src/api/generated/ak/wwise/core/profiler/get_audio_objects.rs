@@ -27,15 +27,9 @@ impl CoreProfilerGetAudioObjectsArgs {
     }
 
     /// The pipeline ID of a Bus instance for which to get Audio Objects.
-    pub fn bus_pipeline_id(mut self, bus_pipeline_id: impl Into<u32>) -> Self {
-        self.bus_pipeline_id = Some(bus_pipeline_id.into());
+    pub fn bus_pipeline_id(mut self, bus_pipeline_id: u32) -> Self {
+        self.bus_pipeline_id = Some(bus_pipeline_id);
         self
-    }
-}
-
-impl From<serde_json::Value> for CoreProfilerGetAudioObjectsArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
     }
 }
 
@@ -56,40 +50,14 @@ impl CoreProfilerGetAudioObjectsOptions {
     }
 
     /// Members to return for each Audio Object. Defaults to Audio Object ID, Bus Pipeline ID, Instigator Pipeline ID and Effect Class ID.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<AudioObjectReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<AudioObjectReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<AudioObjectReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<AudioObjectReturnField>>) -> Self {
         self.return_fields(return_fields)
-    }
-}
-
-impl From<()> for CoreProfilerGetAudioObjectsOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[AudioObjectReturnField; N]> for CoreProfilerGetAudioObjectsOptions {
-    fn from(return_fields: [AudioObjectReturnField; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<AudioObjectReturnField>> for CoreProfilerGetAudioObjectsOptions {
-    fn from(return_fields: Vec<AudioObjectReturnField>) -> Self {
-        Self::new().return_fields(return_fields)
     }
 }
 
@@ -102,12 +70,3 @@ pub struct CoreProfilerGetAudioObjectsResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetAudioObjectsArgs`].
-pub type GetAudioObjectsArgs = CoreProfilerGetAudioObjectsArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetAudioObjectsOptions`].
-pub type GetAudioObjectsOptions = CoreProfilerGetAudioObjectsOptions;
-
-/// Module-scoped alias for [`CoreProfilerGetAudioObjectsResponse`].
-pub type GetAudioObjectsResponse = CoreProfilerGetAudioObjectsResponse;

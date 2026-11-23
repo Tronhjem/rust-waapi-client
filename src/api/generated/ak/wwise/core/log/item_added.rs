@@ -15,6 +15,3 @@ pub struct CoreLogItemAddedPayload {
     /// A log entry.
     pub item: LogCentralItem,
 }
-
-/// Module-scoped alias for [`CoreLogItemAddedPayload`].
-pub type ItemAddedPayload = CoreLogItemAddedPayload;

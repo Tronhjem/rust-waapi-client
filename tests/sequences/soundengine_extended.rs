@@ -72,7 +72,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(SWITCH_GROUPS_WU),
+                ObjectRef::path(SWITCH_GROUPS_WU),
                 ObjectType::SwitchGroup,
                 switch_group_name.clone(),
             )
@@ -87,7 +87,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(switch_group_id.as_str()),
+                ObjectRef::guid(switch_group_id.as_str()),
                 ObjectType::Switch,
                 switch_name.clone(),
             )
@@ -103,7 +103,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(STATE_GROUPS_WU),
+                ObjectRef::path(STATE_GROUPS_WU),
                 ObjectType::StateGroup,
                 state_group_name.clone(),
             )
@@ -118,7 +118,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(state_group_id.as_str()),
+                ObjectRef::guid(state_group_id.as_str()),
                 ObjectType::State,
                 state_name.clone(),
             )
@@ -137,7 +137,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(master_bus_id.as_str()),
+                ObjectRef::guid(master_bus_id.as_str()),
                 ObjectType::AuxBus,
                 aux_bus_name.clone(),
             )
@@ -153,7 +153,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(TRIGGERS_WU),
+                ObjectRef::path(TRIGGERS_WU),
                 ObjectType::Trigger,
                 trigger_name.clone(),
             )
@@ -169,7 +169,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(GAME_PARAMS_WU),
+                ObjectRef::path(GAME_PARAMS_WU),
                 ObjectType::GameParameter,
                 rtpc_name.clone(),
             )
@@ -185,7 +185,7 @@ async fn soundengine_extended_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(EVENTS_WU),
+                ObjectRef::path(EVENTS_WU),
                 ObjectType::Event,
                 event_name.clone(),
             )
@@ -209,8 +209,8 @@ async fn soundengine_extended_sequence() {
         .soundengine()
         .set_switch(
             SoundengineSetSwitchArgs::new(
-                SoundEngineObjectRef::from(switch_group_name.as_str()),
-                SoundEngineObjectRef::from(switch_name.as_str()),
+                SoundEngineObjectRef::name(switch_group_name.as_str()),
+                SoundEngineObjectRef::name(switch_name.as_str()),
             )
             .game_object(emitter),
         )
@@ -219,7 +219,7 @@ async fn soundengine_extended_sequence() {
     let got_switch = client
         .soundengine()
         .get_switch(
-            SoundengineGetSwitchArgs::new(ObjectRef::from(switch_group_id.as_str()))
+            SoundengineGetSwitchArgs::new(ObjectRef::guid(switch_group_id.as_str()))
                 .game_object(emitter),
             id_name.clone(),
         )
@@ -230,15 +230,15 @@ async fn soundengine_extended_sequence() {
     client
         .soundengine()
         .set_state(SoundengineSetStateArgs::new(
-            SoundEngineObjectRef::from(state_group_name.as_str()),
-            SoundEngineObjectRef::from(state_name.as_str()),
+            SoundEngineObjectRef::name(state_group_name.as_str()),
+            SoundEngineObjectRef::name(state_name.as_str()),
         ))
         .await
         .expect("set state");
     let got_state = client
         .soundengine()
         .get_state(
-            SoundengineGetStateArgs::new(ObjectRef::from(state_group_id.as_str())),
+            SoundengineGetStateArgs::new(ObjectRef::guid(state_group_id.as_str())),
             ObjectReturnOptions::new()
                 .return_fields(vec![ObjectReturnField::Id, ObjectReturnField::Type]),
         )
@@ -303,7 +303,11 @@ async fn soundengine_extended_sequence() {
         .soundengine()
         .set_game_object_aux_send_values(SoundengineSetGameObjectAuxSendValuesArgs::new(
             emitter,
-            vec![AuxSendValue::new(listener, aux_bus_name.as_str(), -6.0)],
+            vec![AuxSendValue::new(
+                listener,
+                SoundEngineObjectRef::name(aux_bus_name.as_str()),
+                -6.0,
+            )],
         ))
         .await
         .expect("set aux send values");
@@ -312,7 +316,7 @@ async fn soundengine_extended_sequence() {
     client
         .soundengine()
         .reset_rtpc_value(
-            SoundengineResetRtpcValueArgs::new(SoundEngineObjectRef::from(rtpc_name.as_str()))
+            SoundengineResetRtpcValueArgs::new(SoundEngineObjectRef::name(rtpc_name.as_str()))
                 .game_object(emitter),
         )
         .await
@@ -320,7 +324,7 @@ async fn soundengine_extended_sequence() {
     client
         .soundengine()
         .post_trigger(
-            SoundenginePostTriggerArgs::new(SoundEngineObjectRef::from(trigger_name.as_str()))
+            SoundenginePostTriggerArgs::new(SoundEngineObjectRef::name(trigger_name.as_str()))
                 .game_object(emitter),
         )
         .await
@@ -336,7 +340,7 @@ async fn soundengine_extended_sequence() {
     let posted = client
         .soundengine()
         .post_event(
-            SoundenginePostEventArgs::new(EventRef::from(event_name.as_str())).game_object(emitter),
+            SoundenginePostEventArgs::new(EventRef::name(event_name.as_str())).game_object(emitter),
         )
         .await
         .expect("post event");
@@ -354,7 +358,7 @@ async fn soundengine_extended_sequence() {
     client
         .soundengine()
         .execute_action_on_event(SoundengineExecuteActionOnEventArgs::new(
-            EventRef::from(event_name.as_str()),
+            EventRef::name(event_name.as_str()),
             ActionOnEventType::Stop,
             emitter,
             100,
@@ -382,7 +386,7 @@ async fn soundengine_extended_sequence() {
             .wwise()
             .core()
             .object()
-            .delete(CoreObjectDeleteArgs::new(ObjectRef::from(id.as_str())))
+            .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(id.as_str())))
             .await
             .expect("delete created object");
     }

@@ -16,36 +16,7 @@ pub struct CoreWorkUnitLoadArgs {
 
 impl CoreWorkUnitLoadArgs {
     /// Creates a new [`CoreWorkUnitLoadArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
-        Self {
-            object: object.into(),
-        }
+    pub fn new(object: ObjectRef) -> Self {
+        Self { object }
     }
 }
-
-impl From<ObjectRef> for CoreWorkUnitLoadArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreWorkUnitLoadArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreWorkUnitLoadArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreWorkUnitLoadArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreWorkUnitLoadArgs`].
-pub type LoadArgs = CoreWorkUnitLoadArgs;

@@ -4,8 +4,8 @@
 //! Run with: cargo run --example chained_api
 
 use log::info;
-use wwise_waapi::api::ak::wwise::core::object::GetOptions;
-use wwise_waapi::api::ak::wwise::ui::GetSelectedObjectsOptions;
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions};
+use wwise_waapi::api::ak::wwise::ui::UiGetSelectedObjectsOptions;
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -23,8 +23,8 @@ async fn main() -> WaapiResult<()> {
     let objects = client
         .object()
         .get(
-            r"\Containers",
-            GetOptions::new().return_fields([
+            CoreObjectGetArgs::new(ObjectQuery::path(r"\Containers")),
+            CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
                 ObjectReturnField::Type,
@@ -36,7 +36,7 @@ async fn main() -> WaapiResult<()> {
     let selected = client
         .ui()
         .get_selected_objects(
-            GetSelectedObjectsOptions::new()
+            UiGetSelectedObjectsOptions::new()
                 .return_fields([ObjectReturnField::Name, ObjectReturnField::Type]),
         )
         .await?;

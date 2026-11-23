@@ -31,21 +31,15 @@ impl CoreObjectGetPropertyInfoArgs {
     }
 
     /// The ID (class ID) of the object to retrieve the property from.
-    pub fn class_id(mut self, class_id: impl Into<u32>) -> Self {
-        self.class_id = Some(class_id.into());
+    pub fn class_id(mut self, class_id: u32) -> Self {
+        self.class_id = Some(class_id);
         self
     }
 
     /// The ID (GUID), name, or path of the object to watch.
-    pub fn object(mut self, object: impl Into<ObjectRef>) -> Self {
-        self.object = Some(object.into());
+    pub fn object(mut self, object: ObjectRef) -> Self {
+        self.object = Some(object);
         self
-    }
-}
-
-impl From<Property> for CoreObjectGetPropertyInfoArgs {
-    fn from(value: Property) -> Self {
-        Self::new(value)
     }
 }
 
@@ -89,9 +83,3 @@ impl CoreObjectGetPropertyInfoResponse {
         self.name.as_deref()
     }
 }
-
-/// Module-scoped alias for [`CoreObjectGetPropertyInfoArgs`].
-pub type GetPropertyInfoArgs = CoreObjectGetPropertyInfoArgs;
-
-/// Module-scoped alias for [`CoreObjectGetPropertyInfoResponse`].
-pub type GetPropertyInfoResponse = CoreObjectGetPropertyInfoResponse;

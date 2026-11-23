@@ -14,6 +14,3 @@ pub struct CoreProjectSavedPayload {
     #[serde(rename = "modifiedPaths")]
     pub modified_paths: Vec<String>,
 }
-
-/// Module-scoped alias for [`CoreProjectSavedPayload`].
-pub type SavedPayload = CoreProjectSavedPayload;

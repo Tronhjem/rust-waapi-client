@@ -29,7 +29,7 @@ async fn get_sound_fields(
         .core()
         .object()
         .get(
-            CoreObjectGetArgs::new(ObjectQuery::from(id)),
+            CoreObjectGetArgs::new(ObjectQuery::id(id)),
             ObjectReturnOptions::new().return_fields(fields),
         )
         .await
@@ -86,7 +86,7 @@ async fn soundbank_and_audio_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(SOUNDBANKS_WU),
+                ObjectRef::path(SOUNDBANKS_WU),
                 ObjectType::SoundBank,
                 "WaapiSeqTestBank".to_string(),
             )
@@ -102,9 +102,9 @@ async fn soundbank_and_audio_sequence() {
         .core()
         .soundbank()
         .set_inclusions(CoreSoundbankSetInclusionsArgs::new(
-            ObjectRef::from(soundbank_id.as_str()),
+            ObjectRef::guid(soundbank_id.as_str()),
             vec![
-                SoundBankInclusion::new(ObjectRef::from(sound_id.as_str()))
+                SoundBankInclusion::new(ObjectRef::guid(sound_id.as_str()))
                     .filter(SoundBankInclusionFilter::Structures)
                     .filter(SoundBankInclusionFilter::Media),
             ],
@@ -117,7 +117,7 @@ async fn soundbank_and_audio_sequence() {
         .wwise()
         .core()
         .soundbank()
-        .get_inclusions(CoreSoundbankGetInclusionsArgs::new(ObjectRef::from(
+        .get_inclusions(CoreSoundbankGetInclusionsArgs::new(ObjectRef::guid(
             soundbank_id.as_str(),
         )))
         .await
@@ -155,7 +155,7 @@ async fn soundbank_and_audio_sequence() {
         .core()
         .audio()
         .mute(CoreAudioMuteArgs::new(
-            vec![ObjectRef::from(sound_id.as_str())],
+            vec![ObjectRef::guid(sound_id.as_str())],
             true,
         ))
         .await
@@ -188,7 +188,7 @@ async fn soundbank_and_audio_sequence() {
         .core()
         .audio()
         .solo(CoreAudioSoloArgs::new(
-            vec![ObjectRef::from(sound_id.as_str())],
+            vec![ObjectRef::guid(sound_id.as_str())],
             true,
         ))
         .await
@@ -221,7 +221,7 @@ async fn soundbank_and_audio_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             soundbank_id.as_str(),
         )))
         .await
@@ -230,7 +230,7 @@ async fn soundbank_and_audio_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             sound_id.as_str(),
         )))
         .await

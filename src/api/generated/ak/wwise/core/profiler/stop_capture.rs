@@ -14,6 +14,3 @@ pub struct CoreProfilerStopCaptureResponse {
     #[serde(rename = "return", default)]
     pub return_: Option<i64>,
 }
-
-/// Module-scoped alias for [`CoreProfilerStopCaptureResponse`].
-pub type StopCaptureResponse = CoreProfilerStopCaptureResponse;

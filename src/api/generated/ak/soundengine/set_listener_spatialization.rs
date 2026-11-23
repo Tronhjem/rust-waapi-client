@@ -25,19 +25,16 @@ pub struct SoundengineSetListenerSpatializationArgs {
 impl SoundengineSetListenerSpatializationArgs {
     /// Creates a new [`SoundengineSetListenerSpatializationArgs`] with the required fields.
     pub fn new(
-        listener: impl Into<GameObjectRef>,
+        listener: GameObjectRef,
         spatialized: bool,
         channel_config: u32,
-        volume_offsets: Vec<f64>,
+        volume_offsets: impl Into<Vec<f64>>,
     ) -> Self {
         Self {
-            listener: listener.into(),
+            listener,
             spatialized,
             channel_config,
-            volume_offsets,
+            volume_offsets: volume_offsets.into(),
         }
     }
 }
-
-/// Module-scoped alias for [`SoundengineSetListenerSpatializationArgs`].
-pub type SetListenerSpatializationArgs = SoundengineSetListenerSpatializationArgs;

@@ -17,16 +17,9 @@ pub struct CoreProfilerEnableProfilerDataArgs {
 
 impl CoreProfilerEnableProfilerDataArgs {
     /// Creates a new [`CoreProfilerEnableProfilerDataArgs`] with the required fields.
-    pub fn new(data_types: Vec<serde_json::Value>) -> Self {
-        Self { data_types }
+    pub fn new(data_types: impl Into<Vec<serde_json::Value>>) -> Self {
+        Self {
+            data_types: data_types.into(),
+        }
     }
 }
-
-impl From<Vec<serde_json::Value>> for CoreProfilerEnableProfilerDataArgs {
-    fn from(value: Vec<serde_json::Value>) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreProfilerEnableProfilerDataArgs`].
-pub type EnableProfilerDataArgs = CoreProfilerEnableProfilerDataArgs;

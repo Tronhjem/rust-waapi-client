@@ -19,6 +19,3 @@ pub struct CoreRemoteGetConnectionStatusResponse {
     #[serde(default)]
     pub console: Option<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreRemoteGetConnectionStatusResponse`].
-pub type GetConnectionStatusResponse = CoreRemoteGetConnectionStatusResponse;

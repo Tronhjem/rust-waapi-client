@@ -19,41 +19,17 @@ pub struct CoreTransportCreateArgs {
 
 impl CoreTransportCreateArgs {
     /// Creates a new [`CoreTransportCreateArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef) -> Self {
         Self {
-            object: object.into(),
+            object,
             game_object: None,
         }
     }
 
     /// The game object to use for playback.
-    pub fn game_object(mut self, game_object: impl Into<GameObjectRef>) -> Self {
-        self.game_object = Some(game_object.into());
+    pub fn game_object(mut self, game_object: GameObjectRef) -> Self {
+        self.game_object = Some(game_object);
         self
-    }
-}
-
-impl From<ObjectRef> for CoreTransportCreateArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreTransportCreateArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreTransportCreateArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreTransportCreateArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
     }
 }
 
@@ -65,9 +41,3 @@ pub struct CoreTransportCreateResponse {
     /// Transport object ID to be used with all other ak.wwise.core.transport functions.
     pub transport: u32,
 }
-
-/// Module-scoped alias for [`CoreTransportCreateArgs`].
-pub type CreateArgs = CoreTransportCreateArgs;
-
-/// Module-scoped alias for [`CoreTransportCreateResponse`].
-pub type CreateResponse = CoreTransportCreateResponse;

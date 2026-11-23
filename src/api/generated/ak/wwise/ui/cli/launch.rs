@@ -27,6 +27,3 @@ impl UiCliLaunchArgs {
         self
     }
 }
-
-/// Module-scoped alias for [`UiCliLaunchArgs`].
-pub type LaunchArgs = UiCliLaunchArgs;

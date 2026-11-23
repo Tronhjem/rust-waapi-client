@@ -18,16 +18,10 @@ pub struct CoreAudioSoloArgs {
 
 impl CoreAudioSoloArgs {
     /// Creates a new [`CoreAudioSoloArgs`] with the required fields.
-    pub fn new(objects: Vec<ObjectRef>, value: bool) -> Self {
-        Self { objects, value }
+    pub fn new(objects: impl Into<Vec<ObjectRef>>, value: bool) -> Self {
+        Self {
+            objects: objects.into(),
+            value,
+        }
     }
 }
-
-impl<T0: Into<Vec<ObjectRef>>, T1: Into<bool>> From<(T0, T1)> for CoreAudioSoloArgs {
-    fn from((objects, value): (T0, T1)) -> Self {
-        Self::new(objects.into(), value.into())
-    }
-}
-
-/// Module-scoped alias for [`CoreAudioSoloArgs`].
-pub type SoloArgs = CoreAudioSoloArgs;

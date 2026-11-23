@@ -20,26 +20,11 @@ pub struct CoreAudioSetConversionPluginArgs {
 
 impl CoreAudioSetConversionPluginArgs {
     /// Creates a new [`CoreAudioSetConversionPluginArgs`] with the required fields.
-    pub fn new(
-        conversion: impl Into<ObjectRef>,
-        platform: impl Into<PlatformRef>,
-        plugin: impl Into<String>,
-    ) -> Self {
+    pub fn new(conversion: ObjectRef, platform: PlatformRef, plugin: impl Into<String>) -> Self {
         Self {
-            conversion: conversion.into(),
-            platform: platform.into(),
+            conversion,
+            platform,
             plugin: plugin.into(),
         }
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<PlatformRef>, T2: Into<String>> From<(T0, T1, T2)>
-    for CoreAudioSetConversionPluginArgs
-{
-    fn from((conversion, platform, plugin): (T0, T1, T2)) -> Self {
-        Self::new(conversion, platform, plugin)
-    }
-}
-
-/// Module-scoped alias for [`CoreAudioSetConversionPluginArgs`].
-pub type SetConversionPluginArgs = CoreAudioSetConversionPluginArgs;

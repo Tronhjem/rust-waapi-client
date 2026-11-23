@@ -23,25 +23,14 @@ pub struct SoundengineSetMultiplePositionsArgs {
 impl SoundengineSetMultiplePositionsArgs {
     /// Creates a new [`SoundengineSetMultiplePositionsArgs`] with the required fields.
     pub fn new(
-        game_object: impl Into<GameObjectRef>,
-        positions: Vec<MultiPosition>,
+        game_object: GameObjectRef,
+        positions: impl Into<Vec<MultiPosition>>,
         multi_position_type: MultiPositionType,
     ) -> Self {
         Self {
-            game_object: game_object.into(),
-            positions,
+            game_object,
+            positions: positions.into(),
             multi_position_type,
         }
     }
 }
-
-impl<T0: Into<GameObjectRef>, T1: Into<Vec<MultiPosition>>, T2: Into<MultiPositionType>>
-    From<(T0, T1, T2)> for SoundengineSetMultiplePositionsArgs
-{
-    fn from((game_object, positions, multi_position_type): (T0, T1, T2)) -> Self {
-        Self::new(game_object, positions.into(), multi_position_type.into())
-    }
-}
-
-/// Module-scoped alias for [`SoundengineSetMultiplePositionsArgs`].
-pub type SetMultiplePositionsArgs = SoundengineSetMultiplePositionsArgs;

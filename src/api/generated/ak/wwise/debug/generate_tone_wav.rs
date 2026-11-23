@@ -86,38 +86,38 @@ impl DebugGenerateToneWavArgs {
     }
 
     /// Sample rate of the audio file. Default is 48000.
-    pub fn sample_rate(mut self, sample_rate: impl Into<f64>) -> Self {
-        self.sample_rate = Some(sample_rate.into());
+    pub fn sample_rate(mut self, sample_rate: f64) -> Self {
+        self.sample_rate = Some(sample_rate);
         self
     }
 
     /// Sets the channel configuration type to anonymous, this overrides the channel config but keeps the number of channels specified. When not specified, the default is false.
-    pub fn set_anonymous(mut self, set_anonymous: impl Into<bool>) -> Self {
-        self.set_anonymous = Some(set_anonymous.into());
+    pub fn set_anonymous(mut self, set_anonymous: bool) -> Self {
+        self.set_anonymous = Some(set_anonymous);
         self
     }
 
     /// Number of seconds of the signal holds at the specified level. Default is 1 second.
-    pub fn sustain_time(mut self, sustain_time: impl Into<f64>) -> Self {
-        self.sustain_time = Some(sustain_time.into());
+    pub fn sustain_time(mut self, sustain_time: f64) -> Self {
+        self.sustain_time = Some(sustain_time);
         self
     }
 
     /// Decibel attenuation for the sustained signal. Default is 0 dB.
-    pub fn sustain_level(mut self, sustain_level: impl Into<f64>) -> Self {
-        self.sustain_level = Some(sustain_level.into());
+    pub fn sustain_level(mut self, sustain_level: f64) -> Self {
+        self.sustain_level = Some(sustain_level);
         self
     }
 
     /// Number of seconds for the signal to reach sustain level. Default is 0 second.
-    pub fn attack_time(mut self, attack_time: impl Into<f64>) -> Self {
-        self.attack_time = Some(attack_time.into());
+    pub fn attack_time(mut self, attack_time: f64) -> Self {
+        self.attack_time = Some(attack_time);
         self
     }
 
     /// Number of seconds for the signal to release from sustain level. Default is 0 second.
-    pub fn release_time(mut self, release_time: impl Into<f64>) -> Self {
-        self.release_time = Some(release_time.into());
+    pub fn release_time(mut self, release_time: f64) -> Self {
+        self.release_time = Some(release_time);
         self
     }
 
@@ -128,14 +128,14 @@ impl DebugGenerateToneWavArgs {
     }
 
     /// Specifies which channels receive waveform data. The channel mask is a bit field where each bit represents a channel. The least significant bit represents the channel at index zero. The bits with 0 are silent. When not specified, the default outputs waveform data on all channels.
-    pub fn waveform_channel_mask(mut self, waveform_channel_mask: impl Into<i64>) -> Self {
-        self.waveform_channel_mask = Some(waveform_channel_mask.into());
+    pub fn waveform_channel_mask(mut self, waveform_channel_mask: i64) -> Self {
+        self.waveform_channel_mask = Some(waveform_channel_mask);
         self
     }
 
     /// Waveform frequency. Default is 440.
-    pub fn frequency(mut self, frequency: impl Into<f64>) -> Self {
-        self.frequency = Some(frequency.into());
+    pub fn frequency(mut self, frequency: f64) -> Self {
+        self.frequency = Some(frequency);
         self
     }
 
@@ -145,24 +145,3 @@ impl DebugGenerateToneWavArgs {
         self
     }
 }
-
-impl From<String> for DebugGenerateToneWavArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for DebugGenerateToneWavArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for DebugGenerateToneWavArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`DebugGenerateToneWavArgs`].
-pub type GenerateToneWavArgs = DebugGenerateToneWavArgs;

@@ -33,10 +33,10 @@ pub struct CoreObjectCopyArgs {
 
 impl CoreObjectCopyArgs {
     /// Creates a new [`CoreObjectCopyArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, parent: impl Into<ObjectRef>) -> Self {
+    pub fn new(object: ObjectRef, parent: ObjectRef) -> Self {
         Self {
-            object: object.into(),
-            parent: parent.into(),
+            object,
+            parent,
             auto_add_to_source_control: None,
             on_name_conflict: None,
             auto_check_out_to_source_control: None,
@@ -44,33 +44,24 @@ impl CoreObjectCopyArgs {
     }
 
     /// Determines if Wwise automatically performs an Add source control operation for affected work units. Defaults to true.
-    pub fn auto_add_to_source_control(
-        mut self,
-        auto_add_to_source_control: impl Into<bool>,
-    ) -> Self {
-        self.auto_add_to_source_control = Some(auto_add_to_source_control.into());
+    pub fn auto_add_to_source_control(mut self, auto_add_to_source_control: bool) -> Self {
+        self.auto_add_to_source_control = Some(auto_add_to_source_control);
         self
     }
 
     /// The action to take if "parent" already has a child with the same name. Default value is "fail".
-    pub fn on_name_conflict(mut self, on_name_conflict: impl Into<OnNameConflict>) -> Self {
-        self.on_name_conflict = Some(on_name_conflict.into());
+    pub fn on_name_conflict(mut self, on_name_conflict: OnNameConflict) -> Self {
+        self.on_name_conflict = Some(on_name_conflict);
         self
     }
 
     /// Determines if Wwise automatically performs a Checkout source control operation for affected work units and for the project. Defaults to true.
     pub fn auto_check_out_to_source_control(
         mut self,
-        auto_check_out_to_source_control: impl Into<bool>,
+        auto_check_out_to_source_control: bool,
     ) -> Self {
-        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control.into());
+        self.auto_check_out_to_source_control = Some(auto_check_out_to_source_control);
         self
-    }
-}
-
-impl<T0: Into<ObjectRef>, T1: Into<ObjectRef>> From<(T0, T1)> for CoreObjectCopyArgs {
-    fn from((object, parent): (T0, T1)) -> Self {
-        Self::new(object, parent)
     }
 }
 
@@ -83,12 +74,3 @@ pub type CoreObjectCopyOptions = ObjectReturnOptions;
 ///
 /// The copied object.
 pub type CoreObjectCopyResponse = WwiseObject;
-
-/// Module-scoped alias for [`CoreObjectCopyArgs`].
-pub type CopyArgs = CoreObjectCopyArgs;
-
-/// Module-scoped alias for [`CoreObjectCopyOptions`].
-pub type CopyOptions = CoreObjectCopyOptions;
-
-/// Module-scoped alias for [`CoreObjectCopyResponse`].
-pub type CopyResponse = CoreObjectCopyResponse;

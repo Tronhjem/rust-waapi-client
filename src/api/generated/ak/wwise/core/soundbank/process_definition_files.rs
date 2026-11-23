@@ -16,16 +16,9 @@ pub struct CoreSoundbankProcessDefinitionFilesArgs {
 
 impl CoreSoundbankProcessDefinitionFilesArgs {
     /// Creates a new [`CoreSoundbankProcessDefinitionFilesArgs`] with the required fields.
-    pub fn new(files: Vec<String>) -> Self {
-        Self { files }
+    pub fn new(files: impl Into<Vec<String>>) -> Self {
+        Self {
+            files: files.into(),
+        }
     }
 }
-
-impl From<Vec<String>> for CoreSoundbankProcessDefinitionFilesArgs {
-    fn from(value: Vec<String>) -> Self {
-        Self::new(value)
-    }
-}
-
-/// Module-scoped alias for [`CoreSoundbankProcessDefinitionFilesArgs`].
-pub type ProcessDefinitionFilesArgs = CoreSoundbankProcessDefinitionFilesArgs;

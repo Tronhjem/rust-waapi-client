@@ -10,8 +10,11 @@
 //! The example modifies whatever object is currently selected in the Wwise
 //! authoring UI (sets its notes and Volume), so select something first.
 
-use wwise_waapi::api::ak::wwise::core::object::{GetOptions, SetItem, SetOptions};
-use wwise_waapi::api::ak::wwise::ui::GetSelectedObjectsOptions;
+use wwise_waapi::api::ak::wwise::core::object::{
+    CoreObjectGetArgs, CoreObjectGetOptions, CoreObjectSetArgs, CoreObjectSetItem,
+    CoreObjectSetOptions,
+};
+use wwise_waapi::api::ak::wwise::ui::UiGetSelectedObjectsOptions;
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -24,8 +27,8 @@ async fn main() -> WaapiResult<()> {
     let get = client
         .object()
         .get(
-            r"\Containers\Default Work Unit",
-            GetOptions::new().return_fields([
+            CoreObjectGetArgs::new(ObjectQuery::path(r"\Containers\Default Work Unit")),
+            CoreObjectGetOptions::new().return_fields([
                 ObjectReturnField::Id,
                 ObjectReturnField::Name,
                 ObjectReturnField::ChildrenCount,
@@ -45,7 +48,7 @@ async fn main() -> WaapiResult<()> {
     // 2. See what is selected in the Wwise UI.
     let selected = client
         .ui()
-        .get_selected_objects(GetSelectedObjectsOptions::new().return_fields([
+        .get_selected_objects(UiGetSelectedObjectsOptions::new().return_fields([
             ObjectReturnField::Id,
             ObjectReturnField::Name,
             ObjectReturnField::Type,
@@ -68,17 +71,21 @@ async fn main() -> WaapiResult<()> {
     );
 
     // 3. Modify it: set notes and the Volume property.
-    let item = SetItem::new(target_id)
+    let item = CoreObjectSetItem::new(ObjectRef::guid(target_id))
         .notes("Modified by the wwise-waapi object_get_set example.")
         .property(Property::Volume, -3.0);
 
-    let set_options = SetOptions::new().return_fields([
+    let set_options = CoreObjectSetOptions::new().return_fields([
         ObjectReturnField::Id,
         ObjectReturnField::Name,
         ObjectReturnField::Property(Property::Volume),
     ]);
 
-    match client.object().set(item, set_options).await {
+    match client
+        .object()
+        .set(CoreObjectSetArgs::from_item(item), set_options)
+        .await
+    {
         Ok(response) => {
             for obj in &response.objects {
                 println!(

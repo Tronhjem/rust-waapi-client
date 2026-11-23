@@ -27,15 +27,9 @@ impl CoreProfilerGetBussesArgs {
     }
 
     /// The pipeline ID of a single bus instance to get.
-    pub fn bus_pipeline_id(mut self, bus_pipeline_id: impl Into<u32>) -> Self {
-        self.bus_pipeline_id = Some(bus_pipeline_id.into());
+    pub fn bus_pipeline_id(mut self, bus_pipeline_id: u32) -> Self {
+        self.bus_pipeline_id = Some(bus_pipeline_id);
         self
-    }
-}
-
-impl From<serde_json::Value> for CoreProfilerGetBussesArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
     }
 }
 
@@ -56,40 +50,14 @@ impl CoreProfilerGetBussesOptions {
     }
 
     /// Members to return for each bus. Defaults to Pipeline ID, Game Object ID, and Object GUID.
-    pub fn return_fields<I, T>(mut self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<BusReturnField>,
-    {
-        self.return_fields = Some(return_fields.into_iter().map(Into::into).collect());
+    pub fn return_fields(mut self, return_fields: impl Into<Vec<BusReturnField>>) -> Self {
+        self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_<I, T>(self, return_fields: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<BusReturnField>,
-    {
+    pub fn return_(self, return_fields: impl Into<Vec<BusReturnField>>) -> Self {
         self.return_fields(return_fields)
-    }
-}
-
-impl From<()> for CoreProfilerGetBussesOptions {
-    fn from((): ()) -> Self {
-        Self::default()
-    }
-}
-
-impl<const N: usize> From<[BusReturnField; N]> for CoreProfilerGetBussesOptions {
-    fn from(return_fields: [BusReturnField; N]) -> Self {
-        Self::new().return_fields(return_fields)
-    }
-}
-
-impl From<Vec<BusReturnField>> for CoreProfilerGetBussesOptions {
-    fn from(return_fields: Vec<BusReturnField>) -> Self {
-        Self::new().return_fields(return_fields)
     }
 }
 
@@ -102,12 +70,3 @@ pub struct CoreProfilerGetBussesResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetBussesArgs`].
-pub type GetBussesArgs = CoreProfilerGetBussesArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetBussesOptions`].
-pub type GetBussesOptions = CoreProfilerGetBussesOptions;
-
-/// Module-scoped alias for [`CoreProfilerGetBussesResponse`].
-pub type GetBussesResponse = CoreProfilerGetBussesResponse;

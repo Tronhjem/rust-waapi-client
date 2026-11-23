@@ -35,18 +35,3 @@ impl SoundengineStopPlayingIdArgs {
         }
     }
 }
-
-impl<T0: Into<u32>, T1: Into<i32>, T2: Into<AkCurveInterpolation>> From<(T0, T1, T2)>
-    for SoundengineStopPlayingIdArgs
-{
-    fn from((playing_id, transition_duration, fade_curve): (T0, T1, T2)) -> Self {
-        Self::new(
-            playing_id.into(),
-            transition_duration.into(),
-            fade_curve.into(),
-        )
-    }
-}
-
-/// Module-scoped alias for [`SoundengineStopPlayingIdArgs`].
-pub type StopPlayingIdArgs = SoundengineStopPlayingIdArgs;

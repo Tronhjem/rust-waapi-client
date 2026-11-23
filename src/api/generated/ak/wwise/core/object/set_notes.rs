@@ -18,19 +18,10 @@ pub struct CoreObjectSetNotesArgs {
 
 impl CoreObjectSetNotesArgs {
     /// Creates a new [`CoreObjectSetNotesArgs`] with the required fields.
-    pub fn new(object: impl Into<ObjectRef>, value: impl Into<String>) -> Self {
+    pub fn new(object: ObjectRef, value: impl Into<String>) -> Self {
         Self {
-            object: object.into(),
+            object,
             value: value.into(),
         }
     }
 }
-
-impl<T0: Into<ObjectRef>, T1: Into<String>> From<(T0, T1)> for CoreObjectSetNotesArgs {
-    fn from((object, value): (T0, T1)) -> Self {
-        Self::new(object, value)
-    }
-}
-
-/// Module-scoped alias for [`CoreObjectSetNotesArgs`].
-pub type SetNotesArgs = CoreObjectSetNotesArgs;

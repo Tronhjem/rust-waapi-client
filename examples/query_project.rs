@@ -6,7 +6,7 @@
 //! Requires Wwise running with WAAPI enabled on 127.0.0.1:8080.
 //! Run with: cargo run --example query_project
 
-use wwise_waapi::api::ak::wwise::core::object::GetArgs;
+use wwise_waapi::api::ak::wwise::core::object::{CoreObjectGetArgs, CoreObjectGetOptions};
 use wwise_waapi::prelude::*;
 
 #[tokio::main]
@@ -17,13 +17,13 @@ async fn main() -> WaapiResult<()> {
 
     // The WAQL query `"\""` (a string containing a single backslash) selects the
     // project root itself, rather than any object inside it.
-    let args = GetArgs::from_waql(r#""\""#);
+    let args = CoreObjectGetArgs::from_waql(r#""\""#);
 
-    let options = [
+    let options = CoreObjectGetOptions::new().return_fields([
         ObjectReturnField::Name,
         ObjectReturnField::FilePath,
         ObjectReturnField::WorkunitIsDirty,
-    ];
+    ]);
 
     let response = client.object().get(args, options).await?;
 

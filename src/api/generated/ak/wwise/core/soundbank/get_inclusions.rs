@@ -16,34 +16,8 @@ pub struct CoreSoundbankGetInclusionsArgs {
 
 impl CoreSoundbankGetInclusionsArgs {
     /// Creates a new [`CoreSoundbankGetInclusionsArgs`] with the required fields.
-    pub fn new(soundbank: impl Into<ObjectRef>) -> Self {
-        Self {
-            soundbank: soundbank.into(),
-        }
-    }
-}
-
-impl From<ObjectRef> for CoreSoundbankGetInclusionsArgs {
-    fn from(value: ObjectRef) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for CoreSoundbankGetInclusionsArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<String> for CoreSoundbankGetInclusionsArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for CoreSoundbankGetInclusionsArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
+    pub fn new(soundbank: ObjectRef) -> Self {
+        Self { soundbank }
     }
 }
 
@@ -56,9 +30,3 @@ pub struct CoreSoundbankGetInclusionsResponse {
     #[serde(default)]
     pub inclusions: Vec<SoundBankInclusion>,
 }
-
-/// Module-scoped alias for [`CoreSoundbankGetInclusionsArgs`].
-pub type GetInclusionsArgs = CoreSoundbankGetInclusionsArgs;
-
-/// Module-scoped alias for [`CoreSoundbankGetInclusionsResponse`].
-pub type GetInclusionsResponse = CoreSoundbankGetInclusionsResponse;

@@ -21,24 +21,6 @@ impl UiLayoutGetLayoutArgs {
     }
 }
 
-impl From<String> for UiLayoutGetLayoutArgs {
-    fn from(value: String) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&str> for UiLayoutGetLayoutArgs {
-    fn from(value: &str) -> Self {
-        Self::new(value)
-    }
-}
-
-impl From<&String> for UiLayoutGetLayoutArgs {
-    fn from(value: &String) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.ui.layout.getLayout`.
 ///
 /// Serializes a specific layout into a JSON format.
@@ -48,9 +30,3 @@ pub struct UiLayoutGetLayoutResponse {
     #[serde(rename = "Layout", default)]
     pub layout: Option<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`UiLayoutGetLayoutArgs`].
-pub type GetLayoutArgs = UiLayoutGetLayoutArgs;
-
-/// Module-scoped alias for [`UiLayoutGetLayoutResponse`].
-pub type GetLayoutResponse = UiLayoutGetLayoutResponse;

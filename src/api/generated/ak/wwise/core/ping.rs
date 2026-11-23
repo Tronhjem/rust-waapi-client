@@ -14,6 +14,3 @@ pub struct CorePingResponse {
     #[serde(rename = "isAvailable")]
     pub is_available: bool,
 }
-
-/// Module-scoped alias for [`CorePingResponse`].
-pub type PingResponse = CorePingResponse;

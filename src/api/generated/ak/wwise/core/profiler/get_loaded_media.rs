@@ -21,12 +21,6 @@ impl CoreProfilerGetLoadedMediaArgs {
     }
 }
 
-impl From<serde_json::Value> for CoreProfilerGetLoadedMediaArgs {
-    fn from(value: serde_json::Value) -> Self {
-        Self::new(value)
-    }
-}
-
 /// Response from `ak.wwise.core.profiler.getLoadedMedia`.
 ///
 /// Retrieves the loaded media at a specific profiler capture time. This data can also be found in the Advanced Profiler, under the Loaded Media tab. To ensure the Loaded Media data is received, see `ak.wwise.core.profiler.enableProfilerData`.
@@ -36,9 +30,3 @@ pub struct CoreProfilerGetLoadedMediaResponse {
     #[serde(rename = "return")]
     pub return_: Vec<serde_json::Value>,
 }
-
-/// Module-scoped alias for [`CoreProfilerGetLoadedMediaArgs`].
-pub type GetLoadedMediaArgs = CoreProfilerGetLoadedMediaArgs;
-
-/// Module-scoped alias for [`CoreProfilerGetLoadedMediaResponse`].
-pub type GetLoadedMediaResponse = CoreProfilerGetLoadedMediaResponse;

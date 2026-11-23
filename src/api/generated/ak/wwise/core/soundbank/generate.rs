@@ -64,32 +64,32 @@ impl CoreSoundbankGenerateArgs {
     }
 
     /// By default, if you don't specify any languages all languages will be generated. If you set this parameter to true, no localized SoundBank will be generated.
-    pub fn skip_languages(mut self, skip_languages: impl Into<bool>) -> Self {
-        self.skip_languages = Some(skip_languages.into());
+    pub fn skip_languages(mut self, skip_languages: bool) -> Self {
+        self.skip_languages = Some(skip_languages);
         self
     }
 
     /// If you don't use rebuildSoundBanks, use this option to force a rebuild of the Init bank for each specified platform.
-    pub fn rebuild_init_bank(mut self, rebuild_init_bank: impl Into<bool>) -> Self {
-        self.rebuild_init_bank = Some(rebuild_init_bank.into());
+    pub fn rebuild_init_bank(mut self, rebuild_init_bank: bool) -> Self {
+        self.rebuild_init_bank = Some(rebuild_init_bank);
         self
     }
 
     /// Will rebuild all SoundBanks if true. If you want to clear the converted media as well, use clearAudioFileCache parameter. Default value: false.
-    pub fn rebuild_sound_banks(mut self, rebuild_sound_banks: impl Into<bool>) -> Self {
-        self.rebuild_sound_banks = Some(rebuild_sound_banks.into());
+    pub fn rebuild_sound_banks(mut self, rebuild_sound_banks: bool) -> Self {
+        self.rebuild_sound_banks = Some(rebuild_sound_banks);
         self
     }
 
     /// Deletes the content of the Wwise audio file cache folder prior to converting source files and generating SoundBanks, which ensures that all source files are reconverted. Note that the whole cache is cleared, for all platforms, regardless of the platforms arguments. Default value: false.
-    pub fn clear_audio_file_cache(mut self, clear_audio_file_cache: impl Into<bool>) -> Self {
-        self.clear_audio_file_cache = Some(clear_audio_file_cache.into());
+    pub fn clear_audio_file_cache(mut self, clear_audio_file_cache: bool) -> Self {
+        self.clear_audio_file_cache = Some(clear_audio_file_cache);
         self
     }
 
     /// Use the normal SoundBank generation process and write the sound bank and info file to disk. Default value: false.
-    pub fn write_to_disk(mut self, write_to_disk: impl Into<bool>) -> Self {
-        self.write_to_disk = Some(write_to_disk.into());
+    pub fn write_to_disk(mut self, write_to_disk: bool) -> Self {
+        self.write_to_disk = Some(write_to_disk);
         self
     }
 }
@@ -106,9 +106,3 @@ pub struct CoreSoundbankGenerateResponse {
     #[serde(default)]
     pub logs: Vec<LogCentralItem>,
 }
-
-/// Module-scoped alias for [`CoreSoundbankGenerateArgs`].
-pub type GenerateArgs = CoreSoundbankGenerateArgs;
-
-/// Module-scoped alias for [`CoreSoundbankGenerateResponse`].
-pub type GenerateResponse = CoreSoundbankGenerateResponse;

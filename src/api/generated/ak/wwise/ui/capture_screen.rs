@@ -37,14 +37,14 @@ impl UiCaptureScreenArgs {
     }
 
     /// The selection channel of the view. Can be a value of 1, 2, 3 or 4. By default, the current selection channel of the view is detected automatically.
-    pub fn view_selection_channel(mut self, view_selection_channel: impl Into<i64>) -> Self {
-        self.view_selection_channel = Some(view_selection_channel.into());
+    pub fn view_selection_channel(mut self, view_selection_channel: i64) -> Self {
+        self.view_selection_channel = Some(view_selection_channel);
         self
     }
 
     /// The capture region. By default, the whole view is captured.
-    pub fn rect(mut self, rect: impl Into<serde_json::Value>) -> Self {
-        self.rect = Some(rect.into());
+    pub fn rect(mut self, rect: serde_json::Value) -> Self {
+        self.rect = Some(rect);
         self
     }
 }
@@ -61,9 +61,3 @@ pub struct UiCaptureScreenResponse {
     #[serde(rename = "contentBase64", default)]
     pub content_base64: Option<String>,
 }
-
-/// Module-scoped alias for [`UiCaptureScreenArgs`].
-pub type CaptureScreenArgs = UiCaptureScreenArgs;
-
-/// Module-scoped alias for [`UiCaptureScreenResponse`].
-pub type CaptureScreenResponse = UiCaptureScreenResponse;

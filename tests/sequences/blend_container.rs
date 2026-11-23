@@ -23,7 +23,7 @@ async fn blend_container_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(ACTOR_MIXER_WU),
+                ObjectRef::path(ACTOR_MIXER_WU),
                 ObjectType::BlendContainer,
                 "WaapiSeqBlendContainer".to_string(),
             )
@@ -39,7 +39,7 @@ async fn blend_container_sequence() {
         .object()
         .create(
             CoreObjectCreateArgs::new(
-                ObjectRef::from(blend_id.as_str()),
+                ObjectRef::guid(blend_id.as_str()),
                 ObjectType::Sound,
                 "WaapiSeqBlendChild".to_string(),
             )
@@ -55,7 +55,7 @@ async fn blend_container_sequence() {
         .core()
         .blend_container()
         .add_track(CoreBlendContainerAddTrackArgs::new(
-            ObjectRef::from(blend_id.as_str()),
+            ObjectRef::guid(blend_id.as_str()),
             "WaapiSeqBlendTrack".to_string(),
         ))
         .await
@@ -71,7 +71,7 @@ async fn blend_container_sequence() {
         .blend_container()
         .add_assignment(CoreBlendContainerAddAssignmentArgs::new(
             track_id.clone(),
-            ObjectRef::from(sound_id.as_str()),
+            ObjectRef::guid(sound_id.as_str()),
         ))
         .await
         .expect("add blend assignment");
@@ -92,7 +92,7 @@ async fn blend_container_sequence() {
         .blend_container()
         .remove_assignment(CoreBlendContainerRemoveAssignmentArgs::new(
             track_id.clone(),
-            ObjectRef::from(sound_id.as_str()),
+            ObjectRef::guid(sound_id.as_str()),
         ))
         .await
         .expect("remove blend assignment");
@@ -111,7 +111,7 @@ async fn blend_container_sequence() {
         .wwise()
         .core()
         .object()
-        .delete(CoreObjectDeleteArgs::new(ObjectRef::from(
+        .delete(CoreObjectDeleteArgs::new(ObjectRef::guid(
             blend_id.as_str(),
         )))
         .await
