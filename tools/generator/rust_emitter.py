@@ -684,17 +684,87 @@ def union_definition_enum_values(schema_dirs, definition_file, key):
     return ordered
 
 
-def load_object_return_props():
+def load_definition_props(def_key: str):
     props = {}
     for sdir in SCHEMA_DIRS:
         defs_path = sdir / "Definitions" / "waapi_definitions.json"
         if not defs_path.exists():
             continue
         waapi_defs = json.loads(defs_path.read_text())
-        obj_return = waapi_defs.get("definitions", {}).get("objectReturn", {})
-        for wire, sub in obj_return.get("properties", {}).items():
+        defn = waapi_defs.get("definitions", {}).get(def_key, {})
+        target = defn.get("properties") or defn.get("items", {}).get("properties") or {}
+        for wire, sub in target.items():
             props[wire] = sub
     return props
+
+
+def load_object_return_props():
+    return load_definition_props("objectReturn")
+
+
+def _resolve_local_ref(sdir, node):
+    while isinstance(node, dict) and "$ref" in node:
+        ref = node["$ref"]
+        if "#" not in ref:
+            break
+        file_part, ptr = ref.split("#", 1)
+        defs_path = sdir / "Definitions" / file_part
+        if not defs_path.exists():
+            break
+        target = json.loads(defs_path.read_text())
+        for seg in ptr.strip("/").split("/"):
+            if isinstance(target, dict) and seg in target:
+                target = target[seg]
+            else:
+                target = {}
+                break
+        node = target
+    return node
+
+
+def _expand_node_candidates(sdir, node):
+    node = _resolve_local_ref(sdir, node)
+    if not isinstance(node, dict):
+        return []
+    out = [node]
+    if isinstance(node.get("items"), dict):
+        out.extend(_expand_node_candidates(sdir, node["items"]))
+    for key in ("oneOf", "anyOf"):
+        for branch in node.get(key, []):
+            out.extend(_expand_node_candidates(sdir, branch))
+    return out
+
+
+def union_endpoint_enum_values(uris, section: str, prop_path):
+    """Union `enum` string values at `section -> prop_path` across all `SCHEMA_DIRS` and `uris`."""
+    if isinstance(uris, str):
+        uris = [uris]
+    seen = set()
+    ordered = []
+    for sdir in SCHEMA_DIRS:
+        for uri in uris:
+            p = sdir / f"{uri}.json"
+            if not p.exists():
+                continue
+            doc = json.loads(p.read_text())
+            nodes = [doc.get(section, {})]
+            steps = [s for s in prop_path if s not in ("properties", "items")]
+            for step in steps:
+                next_nodes = []
+                for raw in nodes:
+                    for cand in _expand_node_candidates(sdir, raw):
+                        if isinstance(cand.get("properties"), dict) and step in cand["properties"]:
+                            next_nodes.append(cand["properties"][step])
+                nodes = next_nodes
+            for raw in nodes:
+                for cand in _expand_node_candidates(sdir, raw):
+                    for v in extract_enum_values(cand):
+                        if v not in seen:
+                            seen.add(v)
+                            ordered.append(v)
+    if not ordered:
+        raise ValueError(f"No enum values found for {uris} {section} {prop_path}")
+    return ordered
 
 
 def gen_object_return_field(enum_vals, field_docs=None):
@@ -1015,11 +1085,27 @@ def gen_transport_types(exec_ctx, state_ctx, list_ctx):
 
 
 def gen_attenuation_and_object_types(waapi_defs, atten_ctx, paste_ctx, switch_ctx, open_ctx):
-    curve_shape_vals = waapi_defs["definitions"]["curveShape"]["enum"]
-    curve_type_vals = atten_ctx.doc["argsSchema"]["properties"]["curveType"]["enum"]
-    curve_use_vals = atten_ctx.doc["resultSchema"]["properties"]["use"]["enum"]
-    paste_mode_vals = paste_ctx.doc["argsSchema"]["properties"]["pasteMode"]["enum"]
-    migration_vals = open_ctx.doc["argsSchema"]["properties"]["onMigrationRequired"]["enum"]
+    curve_shape_vals = union_definition_enum_values(SCHEMA_DIRS, "waapi_definitions.json", "curveShape")
+    curve_type_vals = union_endpoint_enum_values(
+        ["ak.wwise.core.object.getAttenuationCurve", "ak.wwise.core.object.setAttenuationCurve"],
+        "argsSchema",
+        ["properties", "curveType"],
+    )
+    curve_use_vals = union_endpoint_enum_values(
+        "ak.wwise.core.object.getAttenuationCurve",
+        "resultSchema",
+        ["properties", "use"],
+    )
+    paste_mode_vals = union_endpoint_enum_values(
+        "ak.wwise.core.object.pasteProperties",
+        "argsSchema",
+        ["properties", "pasteMode"],
+    )
+    migration_vals = union_endpoint_enum_values(
+        "ak.wwise.ui.project.open",
+        "argsSchema",
+        ["properties", "onMigrationRequired"],
+    )
 
     curve_point_rust = """/// A 2D point in an attenuation or RTPC curve (`pointsDefinition`).
 #[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -1139,7 +1225,7 @@ pub struct WwiseObjectTypeInfo {
     pub name: String,
 }""",
         emit_enum("RtpcSupportMode", "How a property supports RTPC (`object.getPropertyInfo`).",
-                  ["None", "Additive", "Exclusive", "Multiplicative"]),
+                  union_endpoint_enum_values(["ak.wwise.core.object.getPropertyInfo"], "resultSchema", ("supports", "rtpc"))),
         """/// RTPC/randomizer/unlink support flags for a property (`object.getPropertyInfo`).
 #[derive(Debug, Clone, Copy, Default, serde::Serialize, serde::Deserialize)]
 pub struct PropertyInfoSupports {
@@ -1153,7 +1239,8 @@ pub struct PropertyInfoSupports {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unlink: Option<bool>,
 }""",
-        emit_enum("BlendFadeMode", "Fade mode of a blend track edge.", ["None", "Manual", "Automatic"]),
+        emit_enum("BlendFadeMode", "Fade mode of a blend track edge.",
+                  extract_enum_values(load_definition_props("blendTrackEdge")["fadeMode"])),
         """/// An edge of a blend track (`blendContainer.addAssignment` / `getAssignments`).
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct BlendEdge {
@@ -1195,10 +1282,14 @@ pub struct BlendTrackAssignment {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub edges: Option<Vec<BlendEdge>>,
 }""",
-        emit_enum("OnCurveUpdate", "Action when a Game Parameter range is modified.", ["stretch", "preserveX"]),
-        emit_enum("SoundBankInclusionType", "Inclusion type used by `soundbank.generate`.", ["event", "structure", "media"]),
-        emit_enum("SoundBankInclusionFilter", "Inclusion relation used by `soundbank.get/setInclusions`.", ["events", "structures", "media"]),
-        emit_enum("SoundBankInclusionOperation", "How `soundbank.setInclusions` modifies the inclusion list.", ["add", "remove", "replace"]),
+        emit_enum("OnCurveUpdate", "Action when a Game Parameter range is modified.",
+                  union_endpoint_enum_values(["ak.wwise.core.gameParameter.setRange"], "argsSchema", ("onCurveUpdate",))),
+        emit_enum("SoundBankInclusionType", "Inclusion type used by `soundbank.generate`.",
+                  union_endpoint_enum_values(["ak.wwise.core.soundbank.generate"], "argsSchema", ("soundbanks", "inclusions"))),
+        emit_enum("SoundBankInclusionFilter", "Inclusion relation used by `soundbank.get/setInclusions`.",
+                  union_endpoint_enum_values(["ak.wwise.core.soundbank.getInclusions", "ak.wwise.core.soundbank.setInclusions"], "resultSchema", ("inclusions", "filter"))),
+        emit_enum("SoundBankInclusionOperation", "How `soundbank.setInclusions` modifies the inclusion list.",
+                  union_endpoint_enum_values(["ak.wwise.core.soundbank.setInclusions"], "argsSchema", ("operation",))),
         """/// A SoundBank inclusion (`soundbank.get/setInclusions`).
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SoundBankInclusion {
@@ -1290,8 +1381,7 @@ pub struct LogCentralItem {
     pub parameters: Option<Vec<String>>,
 }""",
         emit_enum("LogChannel", "The Wwise log channel (`log.itemAdded`).",
-                  ["soundbankGenerate", "conversion", "copyPlatformSettings", "waapi",
-                   "projectLoad", "general", "sourceControl", "lua"]),
+                  union_definition_enum_values(SCHEMA_DIRS, "waapi_definitions.json", "logCentralChannel")),
         """/// A source file to convert (`soundbank.convertExternalSources`).
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ExternalSourceInfo {
@@ -1334,9 +1424,9 @@ def gen_profiler_and_domain_types(schemas, endpoints_docs):
     loaded_media_ctx = endpoints_docs["ak.wwise.core.profiler.getLoadedMedia"]
     streamed_media_ctx = endpoints_docs["ak.wwise.core.profiler.getStreamedMedia"]
 
-    voice_fields = collect_fields(get_ctx, waapi_defs["definitions"]["voiceReturn"], "response", "ProfilerVoice")
-    bus_fields = collect_fields(get_ctx, waapi_defs["definitions"]["busReturn"], "response", "ProfilerBus")
-    audio_obj_fields = collect_fields(get_ctx, waapi_defs["definitions"]["audioObjectReturn"], "response", "ProfilerAudioObject")
+    voice_fields = collect_fields(get_ctx, {"properties": load_definition_props("voiceReturn")}, "response", "ProfilerVoice")
+    bus_fields = collect_fields(get_ctx, {"properties": load_definition_props("busReturn")}, "response", "ProfilerBus")
+    audio_obj_fields = collect_fields(get_ctx, {"properties": load_definition_props("audioObjectReturn")}, "response", "ProfilerAudioObject")
     for f in audio_obj_fields:
         if f.wire == "metadata":
             f.ty = "Vec<AudioObjectMetadata>"
@@ -1347,7 +1437,11 @@ def gen_profiler_and_domain_types(schemas, endpoints_docs):
     streamed_media_fields = collect_fields(streamed_media_ctx, streamed_media_sch, "response", "ProfilerStreamedMedia")
 
     parts = [
-        emit_enum("ProfilerCursor", "A profiler cursor selector (`profilerCursor`).", ["user", "capture"]),
+        emit_enum(
+            "ProfilerCursor",
+            "A profiler cursor selector (`profilerCursor`).",
+            union_definition_enum_values(SCHEMA_DIRS, "waapi_definitions.json", "profilerCursor"),
+        ),
         """/// Profiler cursor time (`cursorTime`): either an explicit timestamp in milliseconds or a named cursor (`"user"` / `"capture"`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
@@ -1386,14 +1480,16 @@ impl From<ProfilerCursor> for CursorTime {
         Self::Cursor(cursor)
     }
 }""",
-        emit_enum("CursorMovePosition", "Direction or boundary for `ak.wwise.core.profiler.moveCursor`.",
-                  ["first", "last", "next", "previous"]),
-        emit_enum("ProfilerDataType", "Profiler data category for `ak.wwise.core.profiler.enableProfilerData`.",
-                  ["cpu", "memory", "stream", "voices", "listener", "obstructionOcclusion",
-                   "markersNotification", "soundbanks", "loadedMedia", "preparedObjects",
-                   "preparedGameSyncs", "interactiveMusic", "streamingDevice", "meter",
-                   "auxiliarySends", "apiCalls", "spatialAudio", "spatialAudioRaycasting",
-                   "voiceInspector", "audioObjects", "gameSyncs", "customerSupportData"]),
+        emit_enum(
+            "CursorMovePosition",
+            "Direction or boundary for `ak.wwise.core.profiler.moveCursor`.",
+            union_endpoint_enum_values("ak.wwise.core.profiler.moveCursor", "argsSchema", ["properties", "position"]),
+        ),
+        emit_enum(
+            "ProfilerDataType",
+            "Profiler data category for `ak.wwise.core.profiler.enableProfilerData`.",
+            union_endpoint_enum_values("ak.wwise.core.profiler.enableProfilerData", "argsSchema", ("dataTypes", "dataType")),
+        ),
         """/// Entry configuring a profiler data type in `ak.wwise.core.profiler.enableProfilerData`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ProfilerDataTypeEntry {
@@ -1507,10 +1603,16 @@ pub struct AudioObjectMetadata {
                     loaded_media_fields, loaded_media_ctx),
         emit_struct("response", "ProfilerStreamedMedia", "A streamed media entry returned by `ak.wwise.core.profiler.getStreamedMedia`.",
                     streamed_media_fields, streamed_media_ctx),
-        emit_enum("MeterSource", "Audio signal source for a profiler meter (`getMeters`).",
-                  ["Bus", "DeviceMainMix", "DevicePassthrough", "DeviceSystemAudioObjects"]),
-        emit_enum("MeterConfigurationType", "Channel configuration type for a profiler meter (`getMeters`).",
-                  ["Anonymous", "Standard", "Ambisonic", "Objects"]),
+        emit_enum(
+            "MeterSource",
+            "Audio signal source for a profiler meter (`getMeters`).",
+            union_endpoint_enum_values("ak.wwise.core.profiler.getMeters", "resultSchema", ["properties", "meters", "items", "properties", "source"]),
+        ),
+        emit_enum(
+            "MeterConfigurationType",
+            "Channel configuration type for a profiler meter (`getMeters`).",
+            union_endpoint_enum_values("ak.wwise.core.profiler.getMeters", "resultSchema", ["properties", "meters", "items", "properties", "configurationType"]),
+        ),
         """/// Per-channel meter reading inside a [`ProfilerMeter`].
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct MeterChannel {
@@ -1604,14 +1706,21 @@ pub struct VoiceContributions {
     #[serde(default)]
     pub objects: Vec<VoiceContributionObject>,
 }""",
-        emit_enum("CaptureLogType", "Capture log item type filter for `ak.wwise.core.profiler.captureLog.itemAdded`.",
-                  ["Error", "Notification", "Action", "Event", "Switch", "State", "GameParameter",
-                   "Trigger", "ActionDelayed", "Marker", "InteractiveMusic", "Midi", "ExternalSource",
-                   "DialogueEventResolved", "SoundBank", "Media", "API", "Modulator"]),
-        emit_enum("CaptureLogSeverity", "Severity of a capture log item (`ak.wwise.core.profiler.captureLog.itemAdded`).",
-                  ["Normal", "Message", "Error"]),
-        emit_enum("StructureChangeType", "Kind of hierarchy change reported in `ak.wwise.core.object.structureChanged`.",
-                  ["create", "delete", "nameChange", "notesChange", "parentChange", "ownerChange", "load", "unload"]),
+        emit_enum(
+            "CaptureLogType",
+            "Capture log item type filter for `ak.wwise.core.profiler.captureLog.itemAdded`.",
+            union_endpoint_enum_values("ak.wwise.core.profiler.captureLog.itemAdded", "optionsSchema", ["properties", "types"]),
+        ),
+        emit_enum(
+            "CaptureLogSeverity",
+            "Severity of a capture log item (`ak.wwise.core.profiler.captureLog.itemAdded`).",
+            union_endpoint_enum_values("ak.wwise.core.profiler.captureLog.itemAdded", "publishSchema", ["properties", "severity"]),
+        ),
+        emit_enum(
+            "StructureChangeType",
+            "Kind of hierarchy change reported in `ak.wwise.core.object.structureChanged`.",
+            union_endpoint_enum_values("ak.wwise.core.object.structureChanged", "publishSchema", ["properties", "objects", "items", "properties", "changes", "items", "properties", "type"]),
+        ),
         """/// Old and new parent references for a `parentChange` entry in [`StructureChange`].
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct StructureParentChange {
@@ -1713,7 +1822,7 @@ pub struct PropertyUiDisplayAs {
     pub percentage: Option<bool>,
 }""",
         emit_enum("PropertyDataMeaning", "Semantic meaning of a property's numeric value (`object.getPropertyInfo`).",
-                  ["None", "Frequency", "Decibels", "PitchCents"]),
+                  union_endpoint_enum_values(["ak.wwise.core.object.getPropertyInfo"], "resultSchema", ("ui", "dataMeaning"))),
         """/// Numeric value constraints and formatting metadata for a property UI (`object.getPropertyInfo`).
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct PropertyUiValueInfo {
@@ -1752,38 +1861,12 @@ pub struct PropertyUiInfo {
     #[serde(default, rename = "autoUpdate", skip_serializing_if = "Option::is_none")]
     pub auto_update: Option<bool>,
 }""",
-        emit_enum("PropertyDependencyType", "Action triggered by a property dependency (`object.getPropertyInfo`).",
-                  ["Enable", "Disable", "Show", "Hide"]),
-        """/// Condition activating a [`PropertyDependency`] (`object.getPropertyInfo`).
-#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
-pub struct PropertyDependencyCondition {
-    /// Values of the controlling property that satisfy the condition.
-    #[serde(default)]
-    pub values: Vec<serde_json::Value>,
-    /// Whether the condition is satisfied when the controlling property is set.
-    #[serde(default, rename = "isSet", skip_serializing_if = "Option::is_none")]
-    pub is_set: Option<bool>,
-    /// Controlling object type IDs.
-    #[serde(default, rename = "objectTypes")]
-    pub object_types: Vec<i64>,
-}""",
-        """/// Dependency rule between properties returned by `ak.wwise.core.object.getPropertyInfo`.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct PropertyDependency {
-    /// Action taken when the dependency condition matches (`Enable`, `Disable`, `Show`, `Hide`).
-    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
-    pub dependency_type: Option<PropertyDependencyType>,
-    /// Name of the controlling property or reference.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub property: Option<String>,
-    /// Condition evaluated against the controlling property.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub condition: Option<PropertyDependencyCondition>,
-}""",
-        """/// Value restriction metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
+        emit_enum("PropertyDependencyType", "Type of property dependency (`object.getPropertyInfo`).",
+                  union_endpoint_enum_values(["ak.wwise.core.object.getPropertyInfo"], "resultSchema", ("dependencies", "type"))),
+        """/// Value or reference restriction metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct PropertyRestriction {
-    /// Kind of value restriction (`"none"`, `"range"`, `"enum"`).
+    /// Kind of value restriction (`"range"`, `"reference"`, `"enum"`), or `None` when unrestricted (`{}`).
     #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
     pub restriction_type: Option<String>,
     /// Minimum allowed value when `restriction_type` is `"range"`.
@@ -1792,14 +1875,58 @@ pub struct PropertyRestriction {
     /// Maximum allowed value when `restriction_type` is `"range"`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max: Option<f64>,
+    /// Reference restrictions when `restriction_type` is `"reference"`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub restrictions: Vec<serde_json::Value>,
+    /// Enumerated allowed values (`{value, displayName}`) when `restriction_type` is `"enum"`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub values: Vec<serde_json::Value>,
+}""",
+        """/// Condition activating a [`PropertyDependency`] (`object.getPropertyInfo`).
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependencyCondition {
+    /// For reference dependencies, defines whether the target reference must be set.
+    #[serde(default, rename = "referenceIsSet", skip_serializing_if = "Option::is_none")]
+    pub reference_is_set: Option<bool>,
+    /// For property dependencies, defines the restriction on which the target property must be set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub restriction: Option<PropertyRestriction>,
+}""",
+        """/// Dependency rule between properties returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependency {
+    /// Type of dependency (`override`, `property`, `reference`, `objectType`, `isMasterBus`).
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub dependency_type: Option<PropertyDependencyType>,
+    /// Boolean value used by `isMasterBus` dependencies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<bool>,
+    /// Name of the action that is performed when the conditions are met (e.g. `"enable"`, `"show"`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// Name of the target property or reference to which the dependency is applied.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub property: Option<String>,
+    /// Name of the context in which the dependency is evaluated.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<String>,
+    /// Conditions related to the dependency.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub conditions: Vec<PropertyDependencyCondition>,
 }""",
         """/// Default work unit reference returned by `ak.wwise.core.getProjectInfo` (Wwise 2025+).
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct DefaultWorkUnitInfo {
     /// Work unit GUID.
     pub id: String,
-    /// Work unit name.
+    /// Work unit name in the project.
     pub name: String,
+    /// Work unit project hierarchy path.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    /// Absolute file system path of the work unit `.wwu` file.
+    #[serde(default, rename = "filePath", skip_serializing_if = "Option::is_none")]
+    pub file_path: Option<String>,
 }""",
         """/// Available remote console entry returned by `ak.wwise.core.remote.getAvailableConsoles`.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -1816,9 +1943,6 @@ pub struct RemoteConsoleInfo {
     /// Command port number.
     #[serde(rename = "commandPort")]
     pub command_port: u16,
-    /// Notification port number, if reported by the target.
-    #[serde(default, rename = "notificationPort", skip_serializing_if = "Option::is_none")]
-    pub notification_port: Option<u16>,
     /// Connected application name.
     #[serde(rename = "appName")]
     pub app_name: String,
@@ -1840,9 +1964,9 @@ pub struct ConnectedConsoleInfo {
     pub app_name: String,
 }""",
         emit_enum("SourceControlFileFilter", "Filter for `ak.wwise.core.sourceControl.getSourceFiles`.",
-                  ["all", "used", "unused"]),
+                  union_endpoint_enum_values(["ak.wwise.core.sourceControl.getSourceFiles"], "argsSchema", ("filter",))),
         emit_enum("SourceControlReturnField", "Return field selector for `ak.wwise.core.sourceControl.getSourceFiles`.",
-                  ["isUsed", "usage", "isMissing", "file", "folder"]),
+                  union_endpoint_enum_values(["ak.wwise.core.sourceControl.getSourceFiles"], "optionsSchema", ("return",))),
         """/// A source file entry returned by `ak.wwise.core.sourceControl.getSourceFiles`.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SourceControlSourceFile {
@@ -1873,10 +1997,9 @@ pub struct SourceControlStatus {
     pub status: Option<String>,
 }""",
         emit_enum("MediaPoolFilterType", "Filter category for `ak.wwise.core.mediaPool.get`.",
-                  ["field", "audioDescription", "audioSimilarity"]),
+                  union_endpoint_enum_values(["ak.wwise.core.mediaPool.get"], "argsSchema", ("filters", "type"))),
         emit_enum("MediaPoolFilterOperator", "Comparison operator for a `field` filter in `ak.wwise.core.mediaPool.get`.",
-                  ["equals", "notEquals", "contains", "startsWith", "endsWith", "matchesRegex",
-                   "lessThan", "greaterThan", "lessThanOrEqual", "greaterThanOrEqual"]),
+                  union_endpoint_enum_values(["ak.wwise.core.mediaPool.get"], "argsSchema", ("filters", "operator"))),
         """/// A filter predicate entry for `ak.wwise.core.mediaPool.get`.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct MediaPoolFilterEntry {
@@ -1942,15 +2065,18 @@ impl MediaPoolFilterEntry {
     }
 }""",
         """/// A log entry returned by `ak.wwise.core.audio.import`.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AudioImportLogItem {
     /// Severity level of the import log entry.
     pub severity: LogSeverity,
     /// Human-readable log message.
     pub message: String,
+    /// Index of the import command to which the log entry applies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<f64>,
 }""",
         emit_enum("AudioImportedOperation", "Operation reported by `ak.wwise.core.audio.imported`.",
-                  ["CreateNewObject", "ReplaceFile", "Localize", "ReplaceObject"]),
+                  union_endpoint_enum_values(["ak.wwise.core.audio.imported"], "publishSchema", ("operation",))),
         """/// Base64-encoded SoundBank data payload in `ak.wwise.core.soundbank.generated`.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SoundBankGeneratedBankData {
@@ -1992,13 +2118,11 @@ pub struct SoundBankPluginInfo {
     pub plugin_libs: Vec<SoundBankPluginLib>,
 }""",
         emit_enum("ToneChannelConfig", "Channel configuration for `ak.wwise.debug.generateToneWAV`.",
-                  ["0.1", "1.0", "2.0", "2.1", "3.0", "4.0", "5.1", "7.1", "5.1.2", "7.1.2", "7.1.4",
-                   "Ambisonics 1st order", "Ambisonics 2nd order", "Ambisonics 3rd order",
-                   "Ambisonics 4th order", "Ambisonics 5th order"]),
+                  union_endpoint_enum_values(["ak.wwise.debug.generateToneWAV"], "argsSchema", ("channelConfig",))),
         emit_enum("ToneBitDepth", "Sample bit depth for `ak.wwise.debug.generateToneWAV`.",
-                  ["int16", "float32"]),
+                  union_endpoint_enum_values(["ak.wwise.debug.generateToneWAV"], "argsSchema", ("bitDepth",))),
         emit_enum("ToneWaveform", "Waveform type for `ak.wwise.debug.generateToneWAV`.",
-                  ["silence", "sine", "triangle", "square", "whiteNoise"]),
+                  union_endpoint_enum_values(["ak.wwise.debug.generateToneWAV"], "argsSchema", ("waveform",))),
         """/// A WAV cue marker definition for `ak.wwise.debug.generateToneWAV`.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct WavMarker {
@@ -2207,8 +2331,7 @@ impl StringOrVec {
     }
 }""",
         emit_enum("CommandStartMode", "Process launch mode for a custom add-on command (`addOnsCommands`).",
-                  ["SingleSelectionSingleProcess", "MultipleSelectionSingleProcessSpaceSeparated",
-                   "MultipleSelectionMultipleProcesses"]),
+                  extract_enum_values(load_definition_props("addOnsCommands")["startMode"])),
         """/// Context-menu placement configuration for an [`AddOnCommand`].
 #[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct CommandContextMenu {
@@ -2270,6 +2393,15 @@ pub struct AddOnCommand {
     /// Executable or script to invoke when the command is triggered.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub program: Option<String>,
+    /// Lua script file path to run inside the Wwise process when the command is executed (Wwise 2025+).
+    #[serde(default, rename = "luaScript", skip_serializing_if = "Option::is_none")]
+    pub lua_script: Option<String>,
+    /// Additional Lua search paths used when running `lua_script` (Wwise 2025+).
+    #[serde(default, rename = "luaPaths", skip_serializing_if = "Option::is_none")]
+    pub lua_paths: Option<Vec<String>>,
+    /// Return expressions for selected objects passed to `lua_script` in `wa_args.selected` (Wwise 2025+).
+    #[serde(default, rename = "luaSelectedReturn", skip_serializing_if = "Option::is_none")]
+    pub lua_selected_return: Option<Vec<String>>,
     /// Process launch mode for multi-selection commands.
     #[serde(default, rename = "startMode", skip_serializing_if = "Option::is_none")]
     pub start_mode: Option<CommandStartMode>,
@@ -2282,9 +2414,9 @@ pub struct AddOnCommand {
     /// Default keyboard shortcut (e.g. `"Ctrl+Shift+K"`).
     #[serde(default, rename = "defaultShortcut", skip_serializing_if = "Option::is_none")]
     pub default_shortcut: Option<String>,
-    /// Redirect mode or destination for standard output/error.
+    /// Whether standard output and standard error of `program` are redirected and logged to Wwise on termination.
     #[serde(default, rename = "redirectOutputs", skip_serializing_if = "Option::is_none")]
-    pub redirect_outputs: Option<String>,
+    pub redirect_outputs: Option<bool>,
     /// Context menu placement configuration.
     #[serde(default, rename = "contextMenu", skip_serializing_if = "Option::is_none")]
     pub context_menu: Option<CommandContextMenu>,
@@ -2300,6 +2432,9 @@ impl AddOnCommand {
             id: id.into(),
             display_name: display_name.into(),
             program: None,
+            lua_script: None,
+            lua_paths: None,
+            lua_selected_return: None,
             start_mode: None,
             args: None,
             cwd: None,
@@ -2313,6 +2448,24 @@ impl AddOnCommand {
     /// Sets the executable or script path.
     pub fn program(mut self, program: impl Into<String>) -> Self {
         self.program = Some(program.into());
+        self
+    }
+
+    /// Sets the Lua script file path to run inside the Wwise process (Wwise 2025+).
+    pub fn lua_script(mut self, lua_script: impl Into<String>) -> Self {
+        self.lua_script = Some(lua_script.into());
+        self
+    }
+
+    /// Sets the additional Lua search paths (Wwise 2025+).
+    pub fn lua_paths(mut self, lua_paths: impl Into<Vec<String>>) -> Self {
+        self.lua_paths = Some(lua_paths.into());
+        self
+    }
+
+    /// Sets the return expressions for selected objects passed to `lua_script` (Wwise 2025+).
+    pub fn lua_selected_return(mut self, lua_selected_return: impl Into<Vec<String>>) -> Self {
+        self.lua_selected_return = Some(lua_selected_return.into());
         self
     }
 
@@ -2337,6 +2490,12 @@ impl AddOnCommand {
     /// Sets the default keyboard shortcut.
     pub fn default_shortcut(mut self, shortcut: impl Into<String>) -> Self {
         self.default_shortcut = Some(shortcut.into());
+        self
+    }
+
+    /// Sets whether standard output and error streams are redirected and logged to Wwise.
+    pub fn redirect_outputs(mut self, redirect_outputs: bool) -> Self {
+        self.redirect_outputs = Some(redirect_outputs);
         self
     }
 

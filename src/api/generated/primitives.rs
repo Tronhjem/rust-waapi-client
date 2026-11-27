@@ -2103,9 +2103,6 @@ pub enum AttenuationCurveType {
     /// `HighPassFilterUsage`.
     #[serde(rename = "HighPassFilterUsage")]
     HighPassFilterUsage,
-    /// `DualShelfUsage`.
-    #[serde(rename = "DualShelfUsage")]
-    DualShelfUsage,
     /// `SpreadUsage`.
     #[serde(rename = "SpreadUsage")]
     SpreadUsage,
@@ -2115,51 +2112,69 @@ pub enum AttenuationCurveType {
     /// `ObstructionVolumeUsage`.
     #[serde(rename = "ObstructionVolumeUsage")]
     ObstructionVolumeUsage,
-    /// `ObstructionHPFUsage`.
-    #[serde(rename = "ObstructionHPFUsage")]
-    ObstructionHpfUsage,
     /// `ObstructionLPFUsage`.
     #[serde(rename = "ObstructionLPFUsage")]
     ObstructionLpfUsage,
-    /// `ObstructionDSFUsage`.
-    #[serde(rename = "ObstructionDSFUsage")]
-    ObstructionDsfUsage,
+    /// `ObstructionHPFUsage`.
+    #[serde(rename = "ObstructionHPFUsage")]
+    ObstructionHpfUsage,
     /// `OcclusionVolumeUsage`.
     #[serde(rename = "OcclusionVolumeUsage")]
     OcclusionVolumeUsage,
-    /// `OcclusionHPFUsage`.
-    #[serde(rename = "OcclusionHPFUsage")]
-    OcclusionHpfUsage,
     /// `OcclusionLPFUsage`.
     #[serde(rename = "OcclusionLPFUsage")]
     OcclusionLpfUsage,
-    /// `OcclusionDSFUsage`.
-    #[serde(rename = "OcclusionDSFUsage")]
-    OcclusionDsfUsage,
+    /// `OcclusionHPFUsage`.
+    #[serde(rename = "OcclusionHPFUsage")]
+    OcclusionHpfUsage,
     /// `DiffractionVolumeUsage`.
     #[serde(rename = "DiffractionVolumeUsage")]
     DiffractionVolumeUsage,
-    /// `DiffractionHPFUsage`.
-    #[serde(rename = "DiffractionHPFUsage")]
-    DiffractionHpfUsage,
     /// `DiffractionLPFUsage`.
     #[serde(rename = "DiffractionLPFUsage")]
     DiffractionLpfUsage,
-    /// `DiffractionDSFUsage`.
-    #[serde(rename = "DiffractionDSFUsage")]
-    DiffractionDsfUsage,
+    /// `DiffractionHPFUsage`.
+    #[serde(rename = "DiffractionHPFUsage")]
+    DiffractionHpfUsage,
     /// `TransmissionVolumeUsage`.
     #[serde(rename = "TransmissionVolumeUsage")]
     TransmissionVolumeUsage,
-    /// `TransmissionHPFUsage`.
-    #[serde(rename = "TransmissionHPFUsage")]
-    TransmissionHpfUsage,
     /// `TransmissionLPFUsage`.
     #[serde(rename = "TransmissionLPFUsage")]
     TransmissionLpfUsage,
+    /// `TransmissionHPFUsage`.
+    #[serde(rename = "TransmissionHPFUsage")]
+    TransmissionHpfUsage,
+    /// `DualShelfUsage`.
+    #[serde(rename = "DualShelfUsage")]
+    DualShelfUsage,
+    /// `ObstructionDSFUsage`.
+    #[serde(rename = "ObstructionDSFUsage")]
+    ObstructionDsfUsage,
+    /// `OcclusionDSFUsage`.
+    #[serde(rename = "OcclusionDSFUsage")]
+    OcclusionDsfUsage,
+    /// `DiffractionDSFUsage`.
+    #[serde(rename = "DiffractionDSFUsage")]
+    DiffractionDsfUsage,
     /// `TransmissionDSFUsage`.
     #[serde(rename = "TransmissionDSFUsage")]
     TransmissionDsfUsage,
+    /// `HighShelfUsage`.
+    #[serde(rename = "HighShelfUsage")]
+    HighShelfUsage,
+    /// `ObstructionHSFUsage`.
+    #[serde(rename = "ObstructionHSFUsage")]
+    ObstructionHsfUsage,
+    /// `OcclusionHSFUsage`.
+    #[serde(rename = "OcclusionHSFUsage")]
+    OcclusionHsfUsage,
+    /// `DiffractionHSFUsage`.
+    #[serde(rename = "DiffractionHSFUsage")]
+    DiffractionHsfUsage,
+    /// `TransmissionHSFUsage`.
+    #[serde(rename = "TransmissionHSFUsage")]
+    TransmissionHsfUsage,
 }
 
 /// Usage mode of an attenuation curve.
@@ -3177,6 +3192,12 @@ pub struct ProfilerAudioObject {
     /// The focus value (normalized) of the Audio Object.
     #[serde(default)]
     pub focus: Option<f64>,
+    /// The starting gain of the Audio Object for the current frame.
+    #[serde(rename = "prevGain", default)]
+    pub prev_gain: Option<f64>,
+    /// The target gain of the Audio Object for the current frame.
+    #[serde(rename = "nextGain", default)]
+    pub next_gain: Option<f64>,
     /// The channel configuration of the Audio Object. Use `AK::AkChannelConfig::Deserialize` to deserialize the value.
     #[serde(rename = "channelConfig", default)]
     pub channel_config: Option<u32>,
@@ -3397,36 +3418,9 @@ pub struct VoiceContributions {
 /// Capture log item type filter for `ak.wwise.core.profiler.captureLog.itemAdded`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CaptureLogType {
-    /// `Error`.
-    #[serde(rename = "Error")]
-    Error,
     /// `Notification`.
     #[serde(rename = "Notification")]
     Notification,
-    /// `Action`.
-    #[serde(rename = "Action")]
-    Action,
-    /// `Event`.
-    #[serde(rename = "Event")]
-    Event,
-    /// `Switch`.
-    #[serde(rename = "Switch")]
-    Switch,
-    /// `State`.
-    #[serde(rename = "State")]
-    State,
-    /// `GameParameter`.
-    #[serde(rename = "GameParameter")]
-    GameParameter,
-    /// `Trigger`.
-    #[serde(rename = "Trigger")]
-    Trigger,
-    /// `ActionDelayed`.
-    #[serde(rename = "ActionDelayed")]
-    ActionDelayed,
-    /// `Marker`.
-    #[serde(rename = "Marker")]
-    Marker,
     /// `InteractiveMusic`.
     #[serde(rename = "InteractiveMusic")]
     InteractiveMusic,
@@ -3436,21 +3430,48 @@ pub enum CaptureLogType {
     /// `ExternalSource`.
     #[serde(rename = "ExternalSource")]
     ExternalSource,
+    /// `Marker`.
+    #[serde(rename = "Marker")]
+    Marker,
+    /// `State`.
+    #[serde(rename = "State")]
+    State,
+    /// `Switch`.
+    #[serde(rename = "Switch")]
+    Switch,
+    /// `SetParameter`.
+    #[serde(rename = "SetParameter")]
+    SetParameter,
+    /// `ParameterChanged`.
+    #[serde(rename = "ParameterChanged")]
+    ParameterChanged,
+    /// `Bank`.
+    #[serde(rename = "Bank")]
+    Bank,
+    /// `Prepare`.
+    #[serde(rename = "Prepare")]
+    Prepare,
+    /// `Event`.
+    #[serde(rename = "Event")]
+    Event,
     /// `DialogueEventResolved`.
     #[serde(rename = "DialogueEventResolved")]
     DialogueEventResolved,
-    /// `SoundBank`.
-    #[serde(rename = "SoundBank")]
-    SoundBank,
-    /// `Media`.
-    #[serde(rename = "Media")]
-    Media,
-    /// `API`.
-    #[serde(rename = "API")]
-    Api,
-    /// `Modulator`.
-    #[serde(rename = "Modulator")]
-    Modulator,
+    /// `ActionTriggered`.
+    #[serde(rename = "ActionTriggered")]
+    ActionTriggered,
+    /// `ActionDelayed`.
+    #[serde(rename = "ActionDelayed")]
+    ActionDelayed,
+    /// `Message`.
+    #[serde(rename = "Message")]
+    Message,
+    /// `APICall`.
+    #[serde(rename = "APICall")]
+    ApiCall,
+    /// `GameObjectRegistration`.
+    #[serde(rename = "GameObjectRegistration")]
+    GameObjectRegistration,
 }
 
 /// Severity of a capture log item (`ak.wwise.core.profiler.captureLog.itemAdded`).
@@ -3685,55 +3706,30 @@ pub struct PropertyUiInfo {
     pub auto_update: Option<bool>,
 }
 
-/// Action triggered by a property dependency (`object.getPropertyInfo`).
+/// Type of property dependency (`object.getPropertyInfo`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PropertyDependencyType {
-    /// `Enable`.
-    #[serde(rename = "Enable")]
-    Enable,
-    /// `Disable`.
-    #[serde(rename = "Disable")]
-    Disable,
-    /// `Show`.
-    #[serde(rename = "Show")]
-    Show,
-    /// `Hide`.
-    #[serde(rename = "Hide")]
-    Hide,
+    /// `override`.
+    #[serde(rename = "override")]
+    Override,
+    /// `property`.
+    #[serde(rename = "property")]
+    Property,
+    /// `reference`.
+    #[serde(rename = "reference")]
+    Reference,
+    /// `objectType`.
+    #[serde(rename = "objectType")]
+    ObjectType,
+    /// `isMasterBus`.
+    #[serde(rename = "isMasterBus")]
+    IsMasterBus,
 }
 
-/// Condition activating a [`PropertyDependency`] (`object.getPropertyInfo`).
-#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
-pub struct PropertyDependencyCondition {
-    /// Values of the controlling property that satisfy the condition.
-    #[serde(default)]
-    pub values: Vec<serde_json::Value>,
-    /// Whether the condition is satisfied when the controlling property is set.
-    #[serde(default, rename = "isSet", skip_serializing_if = "Option::is_none")]
-    pub is_set: Option<bool>,
-    /// Controlling object type IDs.
-    #[serde(default, rename = "objectTypes")]
-    pub object_types: Vec<i64>,
-}
-
-/// Dependency rule between properties returned by `ak.wwise.core.object.getPropertyInfo`.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct PropertyDependency {
-    /// Action taken when the dependency condition matches (`Enable`, `Disable`, `Show`, `Hide`).
-    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
-    pub dependency_type: Option<PropertyDependencyType>,
-    /// Name of the controlling property or reference.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub property: Option<String>,
-    /// Condition evaluated against the controlling property.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub condition: Option<PropertyDependencyCondition>,
-}
-
-/// Value restriction metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
+/// Value or reference restriction metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct PropertyRestriction {
-    /// Kind of value restriction (`"none"`, `"range"`, `"enum"`).
+    /// Kind of value restriction (`"range"`, `"reference"`, `"enum"`), or `None` when unrestricted (`{}`).
     #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
     pub restriction_type: Option<String>,
     /// Minimum allowed value when `restriction_type` is `"range"`.
@@ -3742,15 +3738,65 @@ pub struct PropertyRestriction {
     /// Maximum allowed value when `restriction_type` is `"range"`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max: Option<f64>,
+    /// Reference restrictions when `restriction_type` is `"reference"`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub restrictions: Vec<serde_json::Value>,
+    /// Enumerated allowed values (`{value, displayName}`) when `restriction_type` is `"enum"`.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub values: Vec<serde_json::Value>,
+}
+
+/// Condition activating a [`PropertyDependency`] (`object.getPropertyInfo`).
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependencyCondition {
+    /// For reference dependencies, defines whether the target reference must be set.
+    #[serde(
+        default,
+        rename = "referenceIsSet",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub reference_is_set: Option<bool>,
+    /// For property dependencies, defines the restriction on which the target property must be set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub restriction: Option<PropertyRestriction>,
+}
+
+/// Dependency rule between properties returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependency {
+    /// Type of dependency (`override`, `property`, `reference`, `objectType`, `isMasterBus`).
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub dependency_type: Option<PropertyDependencyType>,
+    /// Boolean value used by `isMasterBus` dependencies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<bool>,
+    /// Name of the action that is performed when the conditions are met (e.g. `"enable"`, `"show"`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action: Option<String>,
+    /// Name of the target property or reference to which the dependency is applied.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub property: Option<String>,
+    /// Name of the context in which the dependency is evaluated.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context: Option<String>,
+    /// Conditions related to the dependency.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub conditions: Vec<PropertyDependencyCondition>,
 }
 
 /// Default work unit reference returned by `ak.wwise.core.getProjectInfo` (Wwise 2025+).
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct DefaultWorkUnitInfo {
     /// Work unit GUID.
     pub id: String,
-    /// Work unit name.
+    /// Work unit name in the project.
     pub name: String,
+    /// Work unit project hierarchy path.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    /// Absolute file system path of the work unit `.wwu` file.
+    #[serde(default, rename = "filePath", skip_serializing_if = "Option::is_none")]
+    pub file_path: Option<String>,
 }
 
 /// Available remote console entry returned by `ak.wwise.core.remote.getAvailableConsoles`.
@@ -3768,13 +3814,6 @@ pub struct RemoteConsoleInfo {
     /// Command port number.
     #[serde(rename = "commandPort")]
     pub command_port: u16,
-    /// Notification port number, if reported by the target.
-    #[serde(
-        default,
-        rename = "notificationPort",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub notification_port: Option<u16>,
     /// Connected application name.
     #[serde(rename = "appName")]
     pub app_name: String,
@@ -3977,12 +4016,15 @@ impl MediaPoolFilterEntry {
 }
 
 /// A log entry returned by `ak.wwise.core.audio.import`.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AudioImportLogItem {
     /// Severity level of the import log entry.
     pub severity: LogSeverity,
     /// Human-readable log message.
     pub message: String,
+    /// Index of the import command to which the log entry applies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<f64>,
 }
 
 /// Operation reported by `ak.wwise.core.audio.imported`.
@@ -4456,6 +4498,19 @@ pub struct AddOnCommand {
     /// Executable or script to invoke when the command is triggered.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub program: Option<String>,
+    /// Lua script file path to run inside the Wwise process when the command is executed (Wwise 2025+).
+    #[serde(default, rename = "luaScript", skip_serializing_if = "Option::is_none")]
+    pub lua_script: Option<String>,
+    /// Additional Lua search paths used when running `lua_script` (Wwise 2025+).
+    #[serde(default, rename = "luaPaths", skip_serializing_if = "Option::is_none")]
+    pub lua_paths: Option<Vec<String>>,
+    /// Return expressions for selected objects passed to `lua_script` in `wa_args.selected` (Wwise 2025+).
+    #[serde(
+        default,
+        rename = "luaSelectedReturn",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub lua_selected_return: Option<Vec<String>>,
     /// Process launch mode for multi-selection commands.
     #[serde(default, rename = "startMode", skip_serializing_if = "Option::is_none")]
     pub start_mode: Option<CommandStartMode>,
@@ -4472,13 +4527,13 @@ pub struct AddOnCommand {
         skip_serializing_if = "Option::is_none"
     )]
     pub default_shortcut: Option<String>,
-    /// Redirect mode or destination for standard output/error.
+    /// Whether standard output and standard error of `program` are redirected and logged to Wwise on termination.
     #[serde(
         default,
         rename = "redirectOutputs",
         skip_serializing_if = "Option::is_none"
     )]
-    pub redirect_outputs: Option<String>,
+    pub redirect_outputs: Option<bool>,
     /// Context menu placement configuration.
     #[serde(
         default,
@@ -4498,6 +4553,9 @@ impl AddOnCommand {
             id: id.into(),
             display_name: display_name.into(),
             program: None,
+            lua_script: None,
+            lua_paths: None,
+            lua_selected_return: None,
             start_mode: None,
             args: None,
             cwd: None,
@@ -4511,6 +4569,24 @@ impl AddOnCommand {
     /// Sets the executable or script path.
     pub fn program(mut self, program: impl Into<String>) -> Self {
         self.program = Some(program.into());
+        self
+    }
+
+    /// Sets the Lua script file path to run inside the Wwise process (Wwise 2025+).
+    pub fn lua_script(mut self, lua_script: impl Into<String>) -> Self {
+        self.lua_script = Some(lua_script.into());
+        self
+    }
+
+    /// Sets the additional Lua search paths (Wwise 2025+).
+    pub fn lua_paths(mut self, lua_paths: impl Into<Vec<String>>) -> Self {
+        self.lua_paths = Some(lua_paths.into());
+        self
+    }
+
+    /// Sets the return expressions for selected objects passed to `lua_script` (Wwise 2025+).
+    pub fn lua_selected_return(mut self, lua_selected_return: impl Into<Vec<String>>) -> Self {
+        self.lua_selected_return = Some(lua_selected_return.into());
         self
     }
 
@@ -4535,6 +4611,12 @@ impl AddOnCommand {
     /// Sets the default keyboard shortcut.
     pub fn default_shortcut(mut self, shortcut: impl Into<String>) -> Self {
         self.default_shortcut = Some(shortcut.into());
+        self
+    }
+
+    /// Sets whether standard output and error streams are redirected and logged to Wwise.
+    pub fn redirect_outputs(mut self, redirect_outputs: bool) -> Self {
+        self.redirect_outputs = Some(redirect_outputs);
         self
     }
 

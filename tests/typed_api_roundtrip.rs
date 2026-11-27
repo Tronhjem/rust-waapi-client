@@ -1997,7 +1997,8 @@ fn object_type_union_preserves_renamed_variants() {
 #[test]
 fn return_field_union_keeps_removed_variants() {
     use wwise_waapi::api::generated::primitives::{
-        AudioObjectReturnField, ObjectReturnField, WwiseObject,
+        AttenuationCurveType, AudioObjectReturnField, ObjectReturnField, ProfilerAudioObject,
+        WwiseObject,
     };
 
     // Fields removed in Wwise 2025 but retained for 2024 compatibility.
@@ -2021,6 +2022,30 @@ fn return_field_union_keeps_removed_variants() {
         serde_json::from_value(json!({"id": "{OBJ-1}", "transitionObject": {"id": "{TRANS-1}"}}))
             .unwrap();
     assert_eq!(obj.transition_object, Some(json!({"id": "{TRANS-1}"})));
+
+    // ProfilerAudioObject retains 2024-only prevGain / nextGain fields alongside 2025 fields.
+    let audio_obj: ProfilerAudioObject =
+        serde_json::from_value(json!({"prevGain": -3.0, "nextGain": -6.0})).unwrap();
+    assert_eq!(audio_obj.prev_gain, Some(-3.0));
+    assert_eq!(audio_obj.next_gain, Some(-6.0));
+
+    // AttenuationCurveType unions 2024 HSF variants and 2025 DSF variants.
+    assert_eq!(
+        serde_json::to_value(AttenuationCurveType::HighShelfUsage).unwrap(),
+        json!("HighShelfUsage")
+    );
+    assert_eq!(
+        serde_json::to_value(AttenuationCurveType::ObstructionHsfUsage).unwrap(),
+        json!("ObstructionHSFUsage")
+    );
+    assert_eq!(
+        serde_json::to_value(AttenuationCurveType::DualShelfUsage).unwrap(),
+        json!("DualShelfUsage")
+    );
+    assert_eq!(
+        serde_json::to_value(AttenuationCurveType::ObstructionDsfUsage).unwrap(),
+        json!("ObstructionDSFUsage")
+    );
 }
 
 #[test]
@@ -3179,11 +3204,14 @@ fn tier1_profiler_endpoints_and_types_roundtrip() {
     );
 
     // captureLog.itemAdded options
-    let cap_opts = CoreProfilerCaptureLogItemAddedOptions::new()
-        .types(vec![CaptureLogType::Error, CaptureLogType::Notification]);
+    let cap_opts = CoreProfilerCaptureLogItemAddedOptions::new().types(vec![
+        CaptureLogType::Message,
+        CaptureLogType::Notification,
+        CaptureLogType::ApiCall,
+    ]);
     assert_eq!(
         serde_json::to_value(cap_opts).unwrap(),
-        json!({"types": ["Error", "Notification"]})
+        json!({"types": ["Message", "Notification", "APICall"]})
     );
 }
 
@@ -3287,10 +3315,15 @@ fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
         },
         "dependencies": [{
             "property": "EnableAttenuation",
-            "type": "Show",
-            "condition": {"values": [1], "isSet": true}
+            "type": "property",
+            "action": "enable",
+            "context": "General",
+            "conditions": [{
+                "referenceIsSet": true,
+                "restriction": {"type": "range", "min": 1.0, "max": 1.0}
+            }]
         }],
-        "restriction": {"type": "Range", "min": -200.0, "max": 200.0}
+        "restriction": {"type": "range", "min": -200.0, "max": 200.0}
     }))
     .unwrap();
     assert_eq!(
@@ -3303,11 +3336,12 @@ fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
     assert_eq!(ui.display_as.as_ref().unwrap().percentage, Some(false));
     assert_eq!(
         prop_info.dependencies[0].dependency_type,
-        Some(PropertyDependencyType::Show)
+        Some(PropertyDependencyType::Property)
     );
+    assert_eq!(prop_info.dependencies[0].action.as_deref(), Some("enable"));
     assert_eq!(
-        prop_info.dependencies[0].condition.as_ref().unwrap().values,
-        vec![json!(1)]
+        prop_info.dependencies[0].conditions[0].reference_is_set,
+        Some(true)
     );
     assert_eq!(prop_info.restriction.as_ref().unwrap().min, Some(-200.0));
 
@@ -3333,14 +3367,33 @@ fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
             "properties": "/proj/Properties"
         },
         "defaultWorkUnits": {
-            "Containers": {"id": "{WU-1}", "name": "Default Work Unit"}
+            "Containers": {
+                "id": "{WU-1}",
+                "name": "Default Work Unit",
+                "path": "\\Containers\\Default Work Unit",
+                "filePath": "/proj/Containers/Default Work Unit.wwu"
+            }
         },
-        "defaultImportWorkUnit": {"id": "{WU-1}", "name": "Default Work Unit"}
+        "defaultImportWorkUnit": {
+            "id": "{WU-1}",
+            "name": "Default Work Unit",
+            "path": "\\Containers\\Default Work Unit",
+            "filePath": "/proj/Containers/Default Work Unit.wwu"
+        }
     }))
     .unwrap();
     assert_eq!(
         proj_info.default_import_work_unit.as_ref().unwrap().id,
         "{WU-1}"
+    );
+    assert_eq!(
+        proj_info
+            .default_import_work_unit
+            .as_ref()
+            .unwrap()
+            .file_path
+            .as_deref(),
+        Some("/proj/Containers/Default Work Unit.wwu")
     );
     assert_eq!(
         proj_info
@@ -3361,13 +3414,12 @@ fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
             "customPlatform": "Windows",
             "host": "127.0.0.1",
             "appName": "MyGame",
-            "commandPort": 24024,
-            "notificationPort": 24025
+            "commandPort": 24024
         }]
     }))
     .unwrap();
     assert_eq!(consoles.consoles[0].command_port, 24024);
-    assert_eq!(consoles.consoles[0].notification_port, Some(24025));
+    assert_eq!(consoles.consoles[0].app_name, "MyGame");
 
     let conn_status: CoreRemoteGetConnectionStatusResponse = serde_json::from_value(json!({
         "isConnected": true,
@@ -3445,12 +3497,13 @@ fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
     // audio.import log items
     let import_resp: CoreAudioImportResponse = serde_json::from_value(json!({
         "objects": [{"id": "{SND-1}"}],
-        "log": [{"severity": "Message", "message": "Imported 1 file"}]
+        "log": [{"severity": "Message", "message": "Imported 1 file", "index": 0.0}]
     }))
     .unwrap();
     assert_eq!(import_resp.log.len(), 1);
     assert_eq!(import_resp.log[0].severity, LogSeverity::Message);
     assert_eq!(import_resp.log[0].message, "Imported 1 file");
+    assert_eq!(import_resp.log[0].index, Some(0.0));
 
     // executeLuaScript -> .result and debug.getWalTree -> .tree
     let lua_resp: CoreExecuteLuaScriptResponse =
@@ -3551,7 +3604,11 @@ fn tier3_debug_and_ui_types_roundtrip() {
     // ui.commands.register with AddOnCommand & StringOrVec
     let cmd = AddOnCommand::new("my_addon.normalize", "Normalize")
         .program("python")
+        .lua_script("scripts/normalize.lua")
+        .lua_paths(vec!["scripts/?.lua".to_string()])
+        .lua_selected_return(vec!["id".to_string(), "name".to_string()])
         .args("normalize.py ${id}")
+        .redirect_outputs(true)
         .start_mode(CommandStartMode::MultipleSelectionSingleProcessSpaceSeparated)
         .main_menu(CommandMainMenu::new("Add-ons/Audio"))
         .context_menu(
@@ -3570,7 +3627,11 @@ fn tier3_debug_and_ui_types_roundtrip() {
                 "id": "my_addon.normalize",
                 "displayName": "Normalize",
                 "program": "python",
+                "luaScript": "scripts/normalize.lua",
+                "luaPaths": ["scripts/?.lua"],
+                "luaSelectedReturn": ["id", "name"],
                 "args": "normalize.py ${id}",
+                "redirectOutputs": true,
                 "startMode": "MultipleSelectionSingleProcessSpaceSeparated",
                 "mainMenu": {"basePath": "Add-ons/Audio"},
                 "contextMenu": {
