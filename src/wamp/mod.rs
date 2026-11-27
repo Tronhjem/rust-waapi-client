@@ -710,7 +710,15 @@ mod tests {
                 json!({}),
                 "ak.wwise.invalid_arguments".to_string(),
                 vec![],
-                json!({ "message": "'parent' already has child with same name." }),
+                json!({
+                    "message": "'parent' already has child with same name.",
+                    "details": {
+                        "typeUri": "ak.wwise.invalid_arguments",
+                        "argumentName": "name",
+                        "argumentPointer": "/name",
+                        "argumentValue": "DuplicateSound"
+                    }
+                }),
             );
             send_msg(&mut write, &err_msg).await.unwrap();
 
@@ -761,9 +769,22 @@ mod tests {
         assert!(matches!(err, crate::WaapiError::Call(_)));
         assert_eq!(err.error_uri(), Some("ak.wwise.invalid_arguments"));
         assert_eq!(
+            err.error_kind(),
+            Some(&crate::WaapiErrorKind::InvalidArguments)
+        );
+        assert_eq!(err.procedure(), Some("ak.wwise.core.object.create"));
+        assert_eq!(
             err.waapi_message(),
             Some("'parent' already has child with same name.")
         );
+        let details = err.error_details().expect("expected structured details");
+        assert_eq!(
+            details.type_uri.as_deref(),
+            Some("ak.wwise.invalid_arguments")
+        );
+        assert_eq!(details.argument_name.as_deref(), Some("name"));
+        assert_eq!(details.argument_pointer.as_deref(), Some("/name"));
+        assert_eq!(details.argument_value, Some(json!("DuplicateSound")));
 
         // Verify the same session remains healthy for subsequent typed calls
         let got = client
@@ -783,5 +804,51 @@ mod tests {
 
         client.shutdown().await.unwrap();
         server.await.unwrap();
+    }
+
+    #[test]
+    fn structured_waapi_call_error_details_parse_and_display() {
+        let err = crate::WaapiCallError::new(
+            "ak.wwise.schema_validation_failed",
+            vec![],
+            json!({
+                "message": "Failed validating arguments schema for uri ak.wwise.core.object.get.",
+                "details": {
+                    "procedureUri": "ak.wwise.core.object.get",
+                    "typeUri": "ak.wwise.schema_validation_failed",
+                    "schemaKeyword": "required",
+                    "schemaExpect": "from, waql",
+                    "schemaPointer": "/anyOf",
+                    "reasons": [
+                        {
+                            "argumentName": "from",
+                            "argumentPointer": "/from",
+                            "schemaKeyword": "required",
+                            "schemaDescription": "The query starting point."
+                        }
+                    ],
+                    "customKey": 42
+                }
+            }),
+        );
+
+        assert_eq!(err.kind(), &crate::WaapiErrorKind::SchemaValidationFailed);
+        assert_eq!(err.procedure(), Some("ak.wwise.core.object.get"));
+        assert_eq!(
+            err.message(),
+            Some("Failed validating arguments schema for uri ak.wwise.core.object.get.")
+        );
+        let details = err
+            .structured_details()
+            .expect("expected structured details");
+        assert_eq!(details.schema_keyword.as_deref(), Some("required"));
+        assert_eq!(details.schema_expect.as_deref(), Some("from, waql"));
+        assert_eq!(details.reasons.len(), 1);
+        assert_eq!(details.reasons[0].argument_name.as_deref(), Some("from"));
+        assert_eq!(details.extra.get("customKey"), Some(&json!(42)));
+        assert!(
+            err.to_string()
+                .contains("ak.wwise.schema_validation_failed (calling ak.wwise.core.object.get)")
+        );
     }
 }

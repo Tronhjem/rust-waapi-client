@@ -39,12 +39,29 @@ impl fmt::Display for WampError {
             WampError::UnexpectedMessage(msg) => write!(f, "unexpected message: {msg}"),
             WampError::ConnectionClosed => write!(f, "connection closed"),
             WampError::Shutdown => write!(f, "client shutdown"),
-            WampError::CallError { uri, .. } => write!(f, "WAMP error for {uri}"),
+            WampError::CallError { uri, args, kwargs } => {
+                if let Some(msg) = kwargs
+                    .get("message")
+                    .and_then(Value::as_str)
+                    .or_else(|| args.first().and_then(Value::as_str))
+                {
+                    write!(f, "WAMP error {uri}: {msg}")
+                } else {
+                    write!(f, "WAMP error for {uri}")
+                }
+            }
         }
     }
 }
 
-impl std::error::Error for WampError {}
+impl std::error::Error for WampError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            WampError::Serialize(e) | WampError::Deserialize(e) => Some(e),
+            _ => None,
+        }
+    }
+}
 
 impl From<serde_json::Error> for WampError {
     fn from(err: serde_json::Error) -> Self {
