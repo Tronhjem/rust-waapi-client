@@ -29,5 +29,6 @@ impl CoreSourceControlDeleteArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlDeleteResponse {
     /// Array of log entries generated during the request.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
 }

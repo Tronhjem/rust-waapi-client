@@ -15,7 +15,7 @@ pub struct CoreSourceControlGetSourceFilesArgs {
     /// - used: Only displays files that are used in the project.
     /// - unused: Only displays files that are not used in the project.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub filter: Option<String>,
+    pub filter: Option<SourceControlFileFilter>,
     /// Base folder for search relative to Originals folder. Default to the Originals folder.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub folder: Option<String>,
@@ -34,8 +34,8 @@ impl CoreSourceControlGetSourceFilesArgs {
     /// - all: Displays all files in the Originals folder (default).
     /// - used: Only displays files that are used in the project.
     /// - unused: Only displays files that are not used in the project.
-    pub fn filter(mut self, filter: impl Into<String>) -> Self {
-        self.filter = Some(filter.into());
+    pub fn filter(mut self, filter: SourceControlFileFilter) -> Self {
+        self.filter = Some(filter);
         self
     }
 
@@ -59,7 +59,7 @@ impl CoreSourceControlGetSourceFilesArgs {
 pub struct CoreSourceControlGetSourceFilesOptions {
     /// Array of fields to return for each file or folder found.
     #[serde(rename = "return", skip_serializing_if = "Option::is_none")]
-    pub return_fields: Option<Vec<String>>,
+    pub return_fields: Option<Vec<SourceControlReturnField>>,
     /// The array of return expressions defines which elements of the Wwise object is returned. This can include built-in accessors, such as the name or id, or object properties, such as the Volume or the Pitch.
     #[serde(rename = "objectReturn", skip_serializing_if = "Option::is_none")]
     pub object_return: Option<Vec<ObjectReturnField>>,
@@ -72,13 +72,16 @@ impl CoreSourceControlGetSourceFilesOptions {
     }
 
     /// Array of fields to return for each file or folder found.
-    pub fn return_fields(mut self, return_fields: impl Into<Vec<String>>) -> Self {
+    pub fn return_fields(
+        mut self,
+        return_fields: impl Into<Vec<SourceControlReturnField>>,
+    ) -> Self {
         self.return_fields = Some(return_fields.into());
         self
     }
 
     /// Alias for [`Self::return_fields`].
-    pub fn return_(self, return_fields: impl Into<Vec<String>>) -> Self {
+    pub fn return_(self, return_fields: impl Into<Vec<SourceControlReturnField>>) -> Self {
         self.return_fields(return_fields)
     }
 
@@ -95,6 +98,6 @@ impl CoreSourceControlGetSourceFilesOptions {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlGetSourceFilesResponse {
     /// Files and folders found.
-    #[serde(rename = "return")]
-    pub return_: Vec<serde_json::Value>,
+    #[serde(rename = "return", default)]
+    pub files: Vec<SourceControlSourceFile>,
 }

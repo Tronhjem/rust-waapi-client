@@ -11,12 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerGetGameObjectsArgs {
     /// The time in milliseconds to query for game objects.
-    pub time: serde_json::Value,
+    pub time: CursorTime,
 }
 
 impl CoreProfilerGetGameObjectsArgs {
     /// Creates a new [`CoreProfilerGetGameObjectsArgs`] with the required fields.
-    pub fn new(time: serde_json::Value) -> Self {
+    pub fn new(time: CursorTime) -> Self {
         Self { time }
     }
 }
@@ -27,6 +27,6 @@ impl CoreProfilerGetGameObjectsArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGetGameObjectsResponse {
     /// An array of objects containing game object data.
-    #[serde(rename = "return")]
-    pub return_: Vec<WwiseObjectRef>,
+    #[serde(rename = "return", default)]
+    pub game_objects: Vec<ProfilerGameObject>,
 }

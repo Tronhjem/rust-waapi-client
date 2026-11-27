@@ -28,5 +28,5 @@ impl CoreProfilerSetCursorTimeArgs {
 pub struct CoreProfilerSetCursorTimeResponse {
     /// The new position of the user Time Cursor, in ms. This could differ from the specified time due to snapping.
     #[serde(rename = "return")]
-    pub return_: i64,
+    pub time: i64,
 }

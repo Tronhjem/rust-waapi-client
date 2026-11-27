@@ -89,5 +89,6 @@ impl CoreSourceControlSetProviderArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlSetProviderResponse {
     /// The entries of the log.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
 }

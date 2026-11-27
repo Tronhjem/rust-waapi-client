@@ -11,6 +11,7 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiSelectionChangedPayload {
     /// The selected objects, in the format specified in the options. Can be empty if no object is selected.
+    #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
 

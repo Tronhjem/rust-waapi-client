@@ -134,7 +134,10 @@ mod waapi_client;
 mod wamp;
 
 pub use serde_json;
-pub use waapi_client::{Event, WaapiCallError, WaapiClient, WaapiError, WaapiResult};
+pub use waapi_client::{
+    Event, WaapiCallError, WaapiClient, WaapiError, WaapiErrorDetails, WaapiErrorKind, WaapiResult,
+};
+pub use wamp::WampError;
 
 /// Convenience wrapper around `serde_json::json!`.
 ///
@@ -158,12 +161,14 @@ pub use waapi_topics_api::WaapiTopic;
 /// ```
 pub mod prelude {
     pub use crate::api::{
-        ChildObject, EventRef, GameObjectRef, LanguageRef, ListMode, ObjectQuery, ObjectRef,
-        ObjectReturnField, ObjectReturnOptions, ObjectType, OnNameConflict, PlatformRef, Position,
-        Property, PropertyValue, RtpcRef, SoundEngineObjectRef, Transform, TransformSelect,
-        Vector3, WwiseObject, WwiseObjectRef,
+        ChildObject, CursorMovePosition, CursorTime, EventRef, GameObjectRef, LanguageRef,
+        ListMode, ObjectQuery, ObjectRef, ObjectReturnField, ObjectReturnOptions, ObjectType,
+        OnNameConflict, PlatformRef, Position, ProfilerCursor, ProfilerDataType,
+        ProfilerDataTypeEntry, Property, PropertyValue, RtpcRef, SoundEngineObjectRef, Transform,
+        TransformSelect, Vector3, WwiseObject, WwiseObjectRef,
     };
     pub use crate::{
-        Event, WaapiCallError, WaapiClient, WaapiError, WaapiFunction, WaapiResult, WaapiTopic,
+        Event, WaapiCallError, WaapiClient, WaapiError, WaapiErrorDetails, WaapiErrorKind,
+        WaapiFunction, WaapiResult, WaapiTopic, WampError,
     };
 }

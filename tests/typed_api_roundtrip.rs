@@ -1740,8 +1740,18 @@ fn remaining_topic_payloads_deserialize() {
         "platform": {"id": "{PLAT}"},
         "soundbank": {"id": "{SB}"},
         "language": {"id": "{LANG}"},
-        "bankData": {"size": 10},
-        "pluginInfo": {"version": 1},
+        "bankData": {"size": 10, "data": "AAAA"},
+        "pluginInfo": {
+            "Platform": "Windows",
+            "BasePlatform": "Windows",
+            "PluginLibs": [{
+                "Type": "Effect",
+                "LibName": "AkCompressor",
+                "LibId": "7077891",
+                "DLL": "AkCompressor.dll",
+                "StaticLib": "AkCompressorFX.lib"
+            }]
+        },
         "error": null,
         "bankInfo": [{"id": "{BI}"}]
     }))
@@ -1749,8 +1759,20 @@ fn remaining_topic_payloads_deserialize() {
     assert_eq!(generated.platform, json!({"id": "{PLAT}"}));
     assert_eq!(generated.soundbank.id.as_deref(), Some("{SB}"));
     assert_eq!(generated.language, Some(json!({"id": "{LANG}"})));
-    assert_eq!(generated.bank_data, Some(json!({"size": 10})));
-    assert_eq!(generated.plugin_info, Some(json!({"version": 1})));
+    assert_eq!(
+        generated.bank_data,
+        Some(
+            wwise_waapi::api::generated::primitives::SoundBankGeneratedBankData {
+                size: 10,
+                data: "AAAA".to_string(),
+            }
+        )
+    );
+    let plugin_info = generated.plugin_info.expect("plugin info");
+    assert_eq!(plugin_info.platform, "Windows");
+    assert_eq!(plugin_info.base_platform, "Windows");
+    assert_eq!(plugin_info.plugin_libs.len(), 1);
+    assert_eq!(plugin_info.plugin_libs[0].lib_name, "AkCompressor");
     assert!(generated.error.is_none());
     assert_eq!(generated.bank_info, vec![json!({"id": "{BI}"})]);
 
@@ -1786,12 +1808,15 @@ fn remaining_topic_payloads_deserialize() {
     // audio.imported
     let imported: CoreAudioImportedPayload = serde_json::from_value(json!({
         "files": ["a.wav"],
-        "operation": "createNew",
+        "operation": "CreateNewObject",
         "objects": [{"id": "{OBJ-1}"}]
     }))
     .unwrap();
     assert_eq!(imported.files, vec!["a.wav"]);
-    assert_eq!(imported.operation, "createNew");
+    assert_eq!(
+        imported.operation,
+        wwise_waapi::api::generated::primitives::AudioImportedOperation::CreateNewObject
+    );
     assert_eq!(imported.objects[0].id.as_deref(), Some("{OBJ-1}"));
 
     // log.itemAdded
@@ -1869,7 +1894,10 @@ fn remaining_topic_payloads_deserialize() {
     }))
     .unwrap();
     assert_eq!(capture_log.object_type, "StateChanged");
-    assert_eq!(capture_log.severity, "Normal");
+    assert_eq!(
+        capture_log.severity,
+        wwise_waapi::api::generated::primitives::CaptureLogSeverity::Normal
+    );
     assert_eq!(capture_log.object_name.as_deref(), Some("MyObj"));
     assert_eq!(capture_log.time, 20);
     assert!(matches!(
@@ -2037,12 +2065,12 @@ fn new_2025_endpoints_roundtrip() {
     );
     let media_resp: serde_json::Value = json!({"return": [{"Path": "a.wav"}]});
     let parsed: CoreMediaPoolGetResponse = serde_json::from_value(media_resp).unwrap();
-    assert_eq!(parsed.return_, vec![json!({"Path": "a.wav"})]);
+    assert_eq!(parsed.results, vec![json!({"Path": "a.wav"})]);
 
     // mediaPool.getFields: no args, wrapped "return" string list.
     let fields: CoreMediaPoolGetFieldsResponse =
         serde_json::from_value(json!({"return": ["Path", "FileId"]})).unwrap();
-    assert_eq!(fields.return_, vec!["Path", "FileId"]);
+    assert_eq!(fields.fields, vec!["Path", "FileId"]);
 
     // profiler.captureLog.save
     let save = CoreProfilerCaptureLogSaveArgs::new("/tmp/capture.log".to_string());
@@ -2052,14 +2080,16 @@ fn new_2025_endpoints_roundtrip() {
     );
 
     // profiler.moveCursor
-    let move_cursor = CoreProfilerMoveCursorArgs::new("next".to_string());
+    let move_cursor = CoreProfilerMoveCursorArgs::new(
+        wwise_waapi::api::generated::primitives::CursorMovePosition::Next,
+    );
     assert_eq!(
         serde_json::to_value(move_cursor).unwrap(),
         json!({"position": "next"})
     );
     let move_resp: CoreProfilerMoveCursorResponse =
         serde_json::from_value(json!({"return": 500})).unwrap();
-    assert_eq!(move_resp.return_, 500);
+    assert_eq!(move_resp.time, 500);
 
     // profiler.setCursorTime
     let set_time = CoreProfilerSetCursorTimeArgs::new(1234);
@@ -2069,7 +2099,7 @@ fn new_2025_endpoints_roundtrip() {
     );
     let set_resp: CoreProfilerSetCursorTimeResponse =
         serde_json::from_value(json!({"return": 1234})).unwrap();
-    assert_eq!(set_resp.return_, 1234);
+    assert_eq!(set_resp.time, 1234);
 
     // workUnit.load / unload
     let load = CoreWorkUnitLoadArgs::new(ObjectRef::guid("{WU-1}"));
@@ -2192,16 +2222,25 @@ fn schema_discovered_endpoints_roundtrip() {
     assert!(log_resp.items.is_empty());
 
     // remote.getAvailableConsoles & getConnectionStatus
-    let consoles: CoreRemoteGetAvailableConsolesResponse =
-        serde_json::from_value(json!({"consoles": [{"name": "Local", "host": "127.0.0.1"}]}))
-            .unwrap();
+    let consoles: CoreRemoteGetAvailableConsolesResponse = serde_json::from_value(json!({
+        "consoles": [{
+            "name": "Local",
+            "platform": "Mac",
+            "customPlatform": "Mac",
+            "host": "127.0.0.1",
+            "commandPort": 24024,
+            "appName": "Wwise"
+        }]
+    }))
+    .unwrap();
     assert_eq!(consoles.consoles.len(), 1);
     let conn_status: CoreRemoteGetConnectionStatusResponse =
         serde_json::from_value(json!({"isConnected": false, "status": "Disconnected"})).unwrap();
-    assert!(!conn_status.is_connected);
+    assert_eq!(conn_status.is_connected, Some(false));
 
-    // profiler getBusses / getVoices / getAudioObjects with typed return field enums
-    let busses_args = CoreProfilerGetBussesArgs::new(json!("user")).bus_pipeline_id(42u32);
+    // profiler getBusses / getVoices / getAudioObjects with typed CursorTime & return field enums
+    use wwise_waapi::api::generated::primitives::CursorTime;
+    let busses_args = CoreProfilerGetBussesArgs::new(CursorTime::user()).bus_pipeline_id(42u32);
     assert_eq!(
         serde_json::to_value(busses_args).unwrap(),
         json!({"time": "user", "busPipelineID": 42})
@@ -2213,7 +2252,7 @@ fn schema_discovered_endpoints_roundtrip() {
         json!({"return": ["objectGUID", "objectName"]})
     );
 
-    let voices_args = CoreProfilerGetVoicesArgs::new(json!(1000));
+    let voices_args = CoreProfilerGetVoicesArgs::new(CursorTime::ms(1000));
     assert_eq!(
         serde_json::to_value(voices_args).unwrap(),
         json!({"time": 1000})
@@ -2227,7 +2266,7 @@ fn schema_discovered_endpoints_roundtrip() {
         json!({"return": ["objectGUID", "gameObjectName"]})
     );
 
-    let audio_objs_args = CoreProfilerGetAudioObjectsArgs::new(json!("capture"));
+    let audio_objs_args = CoreProfilerGetAudioObjectsArgs::new(CursorTime::capture());
     assert_eq!(
         serde_json::to_value(audio_objs_args).unwrap(),
         json!({"time": "capture"})
@@ -2534,24 +2573,43 @@ fn unified_return_fields_options_accessors_and_errors_roundtrip() {
             "message": "'parent' already has child with same name.",
             "details": {"argumentName": "name"}
         }),
-    );
+    )
+    .with_procedure("ak.wwise.core.object.create");
     assert_eq!(call_err.uri(), "ak.wwise.invalid_arguments");
+    assert_eq!(call_err.kind(), &WaapiErrorKind::InvalidArguments);
+    assert_eq!(call_err.procedure(), Some("ak.wwise.core.object.create"));
     assert_eq!(
         call_err.message(),
         Some("'parent' already has child with same name.")
     );
     assert_eq!(call_err.details(), &json!({"argumentName": "name"}));
-    let waapi_err = WaapiError::Call(call_err);
+    assert_eq!(
+        call_err
+            .structured_details()
+            .and_then(|d| d.argument_name.as_deref()),
+        Some("name")
+    );
+    let waapi_err = WaapiError::from(call_err);
     assert_eq!(waapi_err.error_uri(), Some("ak.wwise.invalid_arguments"));
+    assert_eq!(
+        waapi_err.error_kind(),
+        Some(&WaapiErrorKind::InvalidArguments)
+    );
+    assert_eq!(waapi_err.procedure(), Some("ak.wwise.core.object.create"));
     assert_eq!(
         waapi_err.waapi_message(),
         Some("'parent' already has child with same name.")
     );
-    assert!(waapi_err.as_call_error().is_some());
-    assert!(
+    assert_eq!(
         waapi_err
-            .to_string()
-            .contains("ak.wwise.invalid_arguments: 'parent' already has child with same name.")
+            .error_details()
+            .and_then(|d| d.argument_name.as_deref()),
+        Some("name")
+    );
+    assert!(waapi_err.as_call_error().is_some());
+    assert_eq!(
+        waapi_err.to_string(),
+        "call error: ak.wwise.invalid_arguments (calling ak.wwise.core.object.create): 'parent' already has child with same name. ({\"argumentName\":\"name\"})"
     );
     assert_eq!(
         WaapiError::ClientShutdown.to_string(),
@@ -2729,5 +2787,1590 @@ fn into_constructor_helpers_roundtrip() {
             "events": ["Play_TestSound"],
             "auxBusses": [r"\Busses\Default Work Unit\Main Audio Bus"]
         })
+    );
+}
+
+#[test]
+fn tier1_profiler_endpoints_and_types_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::profiler::captureLog::CoreProfilerCaptureLogItemAddedOptions;
+    use wwise_waapi::api::ak::wwise::core::profiler::{
+        CoreProfilerEnableProfilerDataArgs, CoreProfilerGetAudioObjectsResponse,
+        CoreProfilerGetBussesResponse, CoreProfilerGetCpuUsageArgs,
+        CoreProfilerGetCpuUsageResponse, CoreProfilerGetCursorTimeArgs,
+        CoreProfilerGetCursorTimeResponse, CoreProfilerGetGameObjectsArgs,
+        CoreProfilerGetGameObjectsResponse, CoreProfilerGetLoadedMediaArgs,
+        CoreProfilerGetLoadedMediaResponse, CoreProfilerGetMetersArgs,
+        CoreProfilerGetMetersResponse, CoreProfilerGetPerformanceMonitorArgs,
+        CoreProfilerGetPerformanceMonitorResponse, CoreProfilerGetRtpCsArgs,
+        CoreProfilerGetRtpCsResponse, CoreProfilerGetStreamedMediaArgs,
+        CoreProfilerGetStreamedMediaResponse, CoreProfilerGetVoiceContributionsArgs,
+        CoreProfilerGetVoiceContributionsResponse, CoreProfilerGetVoicesResponse,
+        CoreProfilerStartCaptureResponse, CoreProfilerStopCaptureResponse,
+    };
+    use wwise_waapi::api::{
+        CaptureLogType, CursorTime, MeterConfigurationType, MeterSource, ProfilerCursor,
+        ProfilerDataType, ProfilerDataTypeEntry,
+    };
+    use wwise_waapi::prelude::*;
+
+    // CursorTime variants and helpers
+    assert_eq!(
+        serde_json::to_value(CursorTime::ms(2500)).unwrap(),
+        json!(2500)
+    );
+    assert_eq!(
+        serde_json::to_value(CursorTime::user()).unwrap(),
+        json!("user")
+    );
+    assert_eq!(
+        serde_json::to_value(CursorTime::capture()).unwrap(),
+        json!("capture")
+    );
+    assert_eq!(
+        serde_json::to_value(CursorTime::from(500i64)).unwrap(),
+        json!(500)
+    );
+    assert_eq!(
+        serde_json::to_value(CursorTime::from(ProfilerCursor::Capture)).unwrap(),
+        json!("capture")
+    );
+    let parsed_ms: CursorTime = serde_json::from_value(json!(1200)).unwrap();
+    assert_eq!(parsed_ms, CursorTime::TimeMs(1200));
+    let parsed_cursor: CursorTime = serde_json::from_value(json!("user")).unwrap();
+    assert_eq!(parsed_cursor, CursorTime::Cursor(ProfilerCursor::User));
+
+    // getCursorTime, startCapture, stopCapture -> .time
+    let cursor_args = CoreProfilerGetCursorTimeArgs::new(ProfilerCursor::User);
+    assert_eq!(
+        serde_json::to_value(cursor_args).unwrap(),
+        json!({"cursor": "user"})
+    );
+    let cursor_resp: CoreProfilerGetCursorTimeResponse =
+        serde_json::from_value(json!({"return": 4200})).unwrap();
+    assert_eq!(cursor_resp.time, 4200);
+    let start_resp: CoreProfilerStartCaptureResponse =
+        serde_json::from_value(json!({"return": 100})).unwrap();
+    assert_eq!(start_resp.time, 100);
+    let stop_resp: CoreProfilerStopCaptureResponse =
+        serde_json::from_value(json!({"return": 9000})).unwrap();
+    assert_eq!(stop_resp.time, 9000);
+
+    // enableProfilerData
+    let enable_data = CoreProfilerEnableProfilerDataArgs::new(vec![
+        ProfilerDataTypeEntry::new(ProfilerDataType::Voices).enable(true),
+        ProfilerDataTypeEntry::new(ProfilerDataType::Cpu).enable(false),
+        ProfilerDataTypeEntry::new(ProfilerDataType::Meter).enable(true),
+        ProfilerDataTypeEntry::new(ProfilerDataType::AudioObjects).enable(true),
+    ]);
+    assert_eq!(
+        serde_json::to_value(enable_data).unwrap(),
+        json!({
+            "dataTypes": [
+                {"dataType": "voices", "enable": true},
+                {"dataType": "cpu", "enable": false},
+                {"dataType": "meter", "enable": true},
+                {"dataType": "audioObjects", "enable": true}
+            ]
+        })
+    );
+
+    // getGameObjects (verifying u64 id fix + registerTime/unregisterTime)
+    let go_args = CoreProfilerGetGameObjectsArgs::new(CursorTime::capture());
+    assert_eq!(
+        serde_json::to_value(go_args).unwrap(),
+        json!({"time": "capture"})
+    );
+    let go_resp: CoreProfilerGetGameObjectsResponse = serde_json::from_value(json!({
+        "return": [{
+            "id": 18446744073709551614u64,
+            "name": "Transport",
+            "registerTime": 100,
+            "unregisterTime": 0
+        }]
+    }))
+    .unwrap();
+    assert_eq!(go_resp.game_objects.len(), 1);
+    assert_eq!(go_resp.game_objects[0].id, 18446744073709551614u64);
+    assert_eq!(go_resp.game_objects[0].name, "Transport");
+    assert_eq!(go_resp.game_objects[0].register_time, 100);
+    assert_eq!(go_resp.game_objects[0].unregister_time, 0);
+
+    // getRTPCs (verifying value: f64 + gameObjectId: Option<GameObjectRef> fix)
+    let rtpc_args = CoreProfilerGetRtpCsArgs::new(CursorTime::user());
+    assert_eq!(
+        serde_json::to_value(rtpc_args).unwrap(),
+        json!({"time": "user"})
+    );
+    let rtpc_resp: CoreProfilerGetRtpCsResponse = serde_json::from_value(json!({
+        "return": [{
+            "id": "{RTPC-1}",
+            "name": "PlayerHealth",
+            "value": 82.5,
+            "gameObjectId": 1001
+        }]
+    }))
+    .unwrap();
+    assert_eq!(rtpc_resp.rtpcs.len(), 1);
+    assert_eq!(rtpc_resp.rtpcs[0].id, "{RTPC-1}");
+    assert_eq!(rtpc_resp.rtpcs[0].name, "PlayerHealth");
+    assert_eq!(rtpc_resp.rtpcs[0].value, 82.5);
+    assert_eq!(
+        rtpc_resp.rtpcs[0].game_object_id,
+        Some(GameObjectRef::id(1001))
+    );
+
+    // getCpuUsage -> .items
+    let cpu_args = CoreProfilerGetCpuUsageArgs::new(CursorTime::ms(500));
+    assert_eq!(
+        serde_json::to_value(cpu_args).unwrap(),
+        json!({"time": 500})
+    );
+    let cpu_resp: CoreProfilerGetCpuUsageResponse = serde_json::from_value(json!({
+        "return": [{
+            "id": 7077891,
+            "type": "Effect",
+            "elementName": "Wwise Compressor",
+            "instances": 2,
+            "percentInclusive": 1.25,
+            "percentExclusive": 1.10,
+            "millisecondsInclusive": 0.25,
+            "millisecondsExclusive": 0.22
+        }]
+    }))
+    .unwrap();
+    assert_eq!(cpu_resp.items.len(), 1);
+    assert_eq!(cpu_resp.items[0].id, 7077891);
+    assert_eq!(cpu_resp.items[0].item_type, "Effect");
+    assert_eq!(cpu_resp.items[0].element_name, "Wwise Compressor");
+    assert_eq!(cpu_resp.items[0].instances, 2);
+    assert_eq!(cpu_resp.items[0].percent_inclusive, 1.25);
+
+    // getPerformanceMonitor -> .counters
+    let perf_args = CoreProfilerGetPerformanceMonitorArgs::new(CursorTime::user());
+    assert_eq!(
+        serde_json::to_value(perf_args).unwrap(),
+        json!({"time": "user"})
+    );
+    let perf_resp: CoreProfilerGetPerformanceMonitorResponse = serde_json::from_value(json!({
+        "return": [{"id": "cpu_total", "name": "Total CPU", "value": 4.75}]
+    }))
+    .unwrap();
+    assert_eq!(perf_resp.counters.len(), 1);
+    assert_eq!(perf_resp.counters[0].id, "cpu_total");
+    assert_eq!(perf_resp.counters[0].value, 4.75);
+
+    // getLoadedMedia -> .media
+    let media_args = CoreProfilerGetLoadedMediaArgs::new(CursorTime::capture());
+    assert_eq!(
+        serde_json::to_value(media_args).unwrap(),
+        json!({"time": "capture"})
+    );
+    let media_resp: CoreProfilerGetLoadedMediaResponse = serde_json::from_value(json!({
+        "return": [{
+            "mediaId": 123456,
+            "fileName": "explosion.wem",
+            "soundBank": "Main.bnk",
+            "explicit": true,
+            "format": "Vorbis",
+            "size": 65536
+        }]
+    }))
+    .unwrap();
+    assert_eq!(media_resp.media.len(), 1);
+    assert_eq!(media_resp.media[0].media_id, 123456);
+    assert_eq!(media_resp.media[0].file_name, "explosion.wem");
+    assert_eq!(media_resp.media[0].size, 65536);
+
+    // getStreamedMedia -> .streams
+    let stream_args = CoreProfilerGetStreamedMediaArgs::new(CursorTime::capture());
+    assert_eq!(
+        serde_json::to_value(stream_args).unwrap(),
+        json!({"time": "capture"})
+    );
+    let stream_resp: CoreProfilerGetStreamedMediaResponse = serde_json::from_value(json!({
+        "return": [{
+            "deviceName": "Default Device",
+            "streamName": "music.wem",
+            "fileSize": 1048576,
+            "filePosition": 50.0,
+            "priority": 50,
+            "bandwidthTotal": 64000,
+            "bandwidthLowLevel": 32000,
+            "referencedMemory": 16384,
+            "estimatedThroughput": 32000,
+            "active": true,
+            "targetBufferSize": 16384,
+            "bufferStatusBuffered": 100.0
+        }]
+    }))
+    .unwrap();
+    assert_eq!(stream_resp.streams.len(), 1);
+    assert_eq!(stream_resp.streams[0].stream_name, "music.wem");
+    assert!(stream_resp.streams[0].active);
+
+    // getVoices -> .voices, getBusses -> .busses, getAudioObjects -> .audio_objects
+    let voices_resp: CoreProfilerGetVoicesResponse = serde_json::from_value(json!({
+        "return": [{
+            "pipelineID": 7,
+            "playingID": 42,
+            "soundID": 99,
+            "gameObjectID": 1001,
+            "gameObjectName": "Emitter",
+            "objectGUID": "{SOUND-1}",
+            "objectName": "Laser",
+            "playTargetID": 99,
+            "playTargetGUID": "{SOUND-1}",
+            "playTargetName": "Laser",
+            "baseVolume": -3.0,
+            "gameAuxSendVolume": 0.0,
+            "envelope": 0.5,
+            "normalizationGain": 0.0,
+            "lowPassFilter": 0.0,
+            "highPassFilter": 0.0,
+            "priority": 50,
+            "isStarted": true,
+            "isVirtual": false,
+            "isForcedVirtual": false
+        }]
+    }))
+    .unwrap();
+    assert_eq!(voices_resp.voices.len(), 1);
+    assert_eq!(voices_resp.voices[0].pipeline_id, Some(7));
+    assert_eq!(voices_resp.voices[0].object_name.as_deref(), Some("Laser"));
+
+    let busses_resp: CoreProfilerGetBussesResponse = serde_json::from_value(json!({
+        "return": [{
+            "pipelineID": 1,
+            "mixBusID": 2,
+            "objectGUID": "{BUS-1}",
+            "objectName": "Main Audio Bus",
+            "gameObjectName": "Listener",
+            "gameObjectID": 1000,
+            "volume": 0.0,
+            "downstreamGain": -1.5,
+            "voiceCount": 3,
+            "depth": 0
+        }]
+    }))
+    .unwrap();
+    assert_eq!(busses_resp.busses.len(), 1);
+    assert_eq!(
+        busses_resp.busses[0].object_name.as_deref(),
+        Some("Main Audio Bus")
+    );
+    assert_eq!(busses_resp.busses[0].voice_count, Some(3));
+
+    let audio_objs_resp: CoreProfilerGetAudioObjectsResponse = serde_json::from_value(json!({
+        "return": [{
+            "audioObjectID": 10,
+            "busPipelineID": 1,
+            "instigatorPipelineID": 7,
+            "audioObjectName": "LaserObj",
+            "gameObjectID": 1001,
+            "gameObjectName": "Emitter",
+            "x": 1.0,
+            "y": 2.0,
+            "z": 3.0,
+            "spread": 0.5,
+            "focus": 1.0,
+            "cumulativeGain": -2.0,
+            "prevGain": -2.0,
+            "nextGain": -2.0,
+            "channelConfig": 1,
+            "spatializationMode": 0,
+            "metadata": [{
+                "metadataClassID": 12,
+                "metadataName": "Meta",
+                "sourceID": "{SRC-1}",
+                "sourceShortID": 88,
+                "sourceName": "Laser"
+            }],
+            "rmsMeter": [-12.0],
+            "peakMeter": [-6.0]
+        }]
+    }))
+    .unwrap();
+    assert_eq!(audio_objs_resp.audio_objects.len(), 1);
+    assert_eq!(
+        audio_objs_resp.audio_objects[0]
+            .audio_object_name
+            .as_deref(),
+        Some("LaserObj")
+    );
+    assert_eq!(
+        audio_objs_resp.audio_objects[0].metadata[0].source_short_id,
+        88
+    );
+
+    // getMeters -> .meters
+    let meters_args = CoreProfilerGetMetersArgs::new(CursorTime::user());
+    assert_eq!(
+        serde_json::to_value(meters_args).unwrap(),
+        json!({"time": "user"})
+    );
+    let meters_resp: CoreProfilerGetMetersResponse = serde_json::from_value(json!({
+        "meters": [{
+            "object": {"id": "{BUS-1}", "name": "Main Audio Bus"},
+            "source": "Bus",
+            "configurationName": "2.0",
+            "configurationMask": 3,
+            "configurationType": "Standard",
+            "channels": [
+                {"name": "L", "value": -12.5},
+                {"name": "R", "value": -13.0}
+            ]
+        }]
+    }))
+    .unwrap();
+    assert_eq!(meters_resp.meters.len(), 1);
+    assert_eq!(meters_resp.meters[0].source, MeterSource::Bus);
+    assert_eq!(
+        meters_resp.meters[0].configuration_type,
+        MeterConfigurationType::Standard
+    );
+    assert_eq!(meters_resp.meters[0].channels[0].name, "L");
+    assert_eq!(meters_resp.meters[0].channels[0].value, -12.5);
+
+    // getVoiceContributions -> .contributions
+    let vc_args = CoreProfilerGetVoiceContributionsArgs::new(7u32, CursorTime::ms(1000))
+        .busses_pipeline_id(vec![1u32, 2u32]);
+    assert_eq!(
+        serde_json::to_value(vc_args).unwrap(),
+        json!({
+            "time": 1000,
+            "voicePipelineID": 7,
+            "bussesPipelineID": [1, 2]
+        })
+    );
+    let vc_resp: CoreProfilerGetVoiceContributionsResponse = serde_json::from_value(json!({
+        "return": {
+            "volume": -4.5,
+            "LPF": 10.0,
+            "HPF": 0.0,
+            "DSF": -1.0,
+            "objects": [{
+                "name": "Laser",
+                "volume": -4.5,
+                "LPF": 10.0,
+                "HPF": 0.0,
+                "DSF": -1.0,
+                "index": 0,
+                "children": [],
+                "parameters": [{
+                    "propertyType": "Volume",
+                    "reason": "Base",
+                    "driver": "{SOUND-1}",
+                    "driverValue": -4.5,
+                    "value": -4.5
+                }]
+            }]
+        }
+    }))
+    .unwrap();
+    assert_eq!(vc_resp.contributions.volume, -4.5);
+    assert_eq!(vc_resp.contributions.lpf, 10.0);
+    assert_eq!(vc_resp.contributions.dsf, Some(-1.0));
+    assert_eq!(vc_resp.contributions.objects.len(), 1);
+    assert_eq!(
+        vc_resp.contributions.objects[0].parameters[0]
+            .property_type
+            .as_deref(),
+        Some("Volume")
+    );
+
+    // captureLog.itemAdded options
+    let cap_opts = CoreProfilerCaptureLogItemAddedOptions::new()
+        .types(vec![CaptureLogType::Error, CaptureLogType::Notification]);
+    assert_eq!(
+        serde_json::to_value(cap_opts).unwrap(),
+        json!({"types": ["Error", "Notification"]})
+    );
+}
+
+#[test]
+fn tier2_authoring_remote_source_control_and_media_pool_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::audio::CoreAudioImportResponse;
+    use wwise_waapi::api::ak::wwise::core::mediaPool::CoreMediaPoolGetArgs;
+    use wwise_waapi::api::ak::wwise::core::object::{
+        CoreObjectGetPropertyInfoResponse, CoreObjectStructureChangedPayload,
+    };
+    use wwise_waapi::api::ak::wwise::core::remote::{
+        CoreRemoteGetAvailableConsolesResponse, CoreRemoteGetConnectionStatusResponse,
+    };
+    use wwise_waapi::api::ak::wwise::core::sourceControl::{
+        CoreSourceControlGetSourceFilesArgs, CoreSourceControlGetSourceFilesOptions,
+        CoreSourceControlGetSourceFilesResponse, CoreSourceControlGetStatusResponse,
+    };
+    use wwise_waapi::api::ak::wwise::core::{
+        CoreExecuteLuaScriptResponse, CoreGetProjectInfoResponse,
+    };
+    use wwise_waapi::api::ak::wwise::debug::DebugGetWalTreeResponse;
+    use wwise_waapi::api::{
+        LogSeverity, MediaPoolFilterEntry, MediaPoolFilterOperator, PropertyDataMeaning,
+        PropertyDependencyType, SourceControlFileFilter, SourceControlReturnField,
+        StructureChangeType,
+    };
+
+    // object.structureChanged with typed StructureChangedObject & StructureChange
+    let structure: CoreObjectStructureChangedPayload = serde_json::from_value(json!({
+        "objects": [{
+            "object": {"id": "{OBJ-1}", "name": "SoundA"},
+            "changes": [
+                {
+                    "type": "nameChange",
+                    "nameChange": {"oldName": "OldA", "newName": "SoundA"}
+                },
+                {
+                    "type": "parentChange",
+                    "parentChange": {
+                        "oldParent": {"id": "{P-1}"},
+                        "newParent": {"id": "{P-2}"}
+                    }
+                },
+                {
+                    "type": "ownerChange",
+                    "ownerChange": {
+                        "referenceName": "Attenuation",
+                        "oldOwner": {"id": "{O-1}"},
+                        "newOwner": {"id": "{O-2}"}
+                    }
+                },
+                {
+                    "type": "notesChange",
+                    "notesChange": {"oldName": "old notes", "newName": "new notes"}
+                }
+            ]
+        }],
+        "summary": "Rename and Move"
+    }))
+    .unwrap();
+    assert_eq!(structure.summary, "Rename and Move");
+    assert_eq!(structure.objects.len(), 1);
+    assert_eq!(structure.objects[0].object.name(), Some("SoundA"));
+    assert_eq!(
+        structure.objects[0].changes[0].change_type,
+        StructureChangeType::NameChange
+    );
+    assert_eq!(
+        structure.objects[0].changes[0]
+            .name_change
+            .as_ref()
+            .unwrap()
+            .new_name,
+        "SoundA"
+    );
+    assert_eq!(
+        structure.objects[0].changes[1].change_type,
+        StructureChangeType::ParentChange
+    );
+    assert_eq!(
+        structure.objects[0].changes[2]
+            .owner_change
+            .as_ref()
+            .unwrap()
+            .reference_name,
+        "Attenuation"
+    );
+
+    // object.getPropertyInfo with display, ui, dependencies, restriction
+    let prop_info: CoreObjectGetPropertyInfoResponse = serde_json::from_value(json!({
+        "name": "Volume",
+        "type": "Real64",
+        "default": 0.0,
+        "audioEngineId": 0,
+        "display": {"name": "Voice Volume", "index": 1, "group": "General"},
+        "ui": {
+            "value": {"min": -96.0, "max": 12.0, "decimals": 1.0, "step": 0.5, "fine": 0.1, "infinity": -96.3},
+            "displayAs": {"lrMix": false, "musicNote": false, "bitfield": false, "percentage": false},
+            "dataMeaning": "Decibels",
+            "autoUpdate": true
+        },
+        "dependencies": [{
+            "property": "EnableAttenuation",
+            "type": "Show",
+            "condition": {"values": [1], "isSet": true}
+        }],
+        "restriction": {"type": "Range", "min": -200.0, "max": 200.0}
+    }))
+    .unwrap();
+    assert_eq!(
+        prop_info.display.as_ref().unwrap().name.as_deref(),
+        Some("Voice Volume")
+    );
+    let ui = prop_info.ui.expect("ui info");
+    assert_eq!(ui.data_meaning, Some(PropertyDataMeaning::Decibels));
+    assert_eq!(ui.value.as_ref().unwrap().min, Some(-96.0));
+    assert_eq!(ui.display_as.as_ref().unwrap().percentage, Some(false));
+    assert_eq!(
+        prop_info.dependencies[0].dependency_type,
+        Some(PropertyDependencyType::Show)
+    );
+    assert_eq!(
+        prop_info.dependencies[0].condition.as_ref().unwrap().values,
+        vec![json!(1)]
+    );
+    assert_eq!(prop_info.restriction.as_ref().unwrap().min, Some(-200.0));
+
+    // getProjectInfo with defaultWorkUnits and defaultImportWorkUnit
+    let proj_info: CoreGetProjectInfoResponse = serde_json::from_value(json!({
+        "name": "TestProj",
+        "displayTitle": "TestProj",
+        "path": "/proj/TestProj.wproj",
+        "id": "{PROJ-1}",
+        "isDirty": false,
+        "currentLanguageId": "{LANG-1}",
+        "referenceLanguageId": "{LANG-1}",
+        "currentPlatformId": "{PLAT-1}",
+        "languages": [],
+        "platforms": [],
+        "defaultConversion": {"id": "{CONV-1}", "name": "Default Conversion Settings"},
+        "directories": {
+            "root": "/proj",
+            "cache": "/proj/.cache",
+            "originals": "/proj/Originals",
+            "soundBankOutputRoot": "/proj/GeneratedSoundBanks",
+            "commands": "/proj/Commands",
+            "properties": "/proj/Properties"
+        },
+        "defaultWorkUnits": {
+            "Containers": {"id": "{WU-1}", "name": "Default Work Unit"}
+        },
+        "defaultImportWorkUnit": {"id": "{WU-1}", "name": "Default Work Unit"}
+    }))
+    .unwrap();
+    assert_eq!(
+        proj_info.default_import_work_unit.as_ref().unwrap().id,
+        "{WU-1}"
+    );
+    assert_eq!(
+        proj_info
+            .default_work_units
+            .as_ref()
+            .unwrap()
+            .get("Containers")
+            .unwrap()
+            .name,
+        "Default Work Unit"
+    );
+
+    // remote.getAvailableConsoles & getConnectionStatus
+    let consoles: CoreRemoteGetAvailableConsolesResponse = serde_json::from_value(json!({
+        "consoles": [{
+            "name": "MyGame (Debug)",
+            "platform": "Windows",
+            "customPlatform": "Windows",
+            "host": "127.0.0.1",
+            "appName": "MyGame",
+            "commandPort": 24024,
+            "notificationPort": 24025
+        }]
+    }))
+    .unwrap();
+    assert_eq!(consoles.consoles[0].command_port, 24024);
+    assert_eq!(consoles.consoles[0].notification_port, Some(24025));
+
+    let conn_status: CoreRemoteGetConnectionStatusResponse = serde_json::from_value(json!({
+        "isConnected": true,
+        "status": "Connected",
+        "console": {
+            "name": "MyGame",
+            "platform": "Windows",
+            "customPlatform": "Windows",
+            "host": "127.0.0.1",
+            "appName": "MyGame",
+            "commandPort": 24024
+        }
+    }))
+    .unwrap();
+    assert_eq!(conn_status.is_connected, Some(true));
+    assert_eq!(conn_status.console.unwrap().app_name, "MyGame");
+
+    // sourceControl.getSourceFiles & getStatus
+    let sc_args =
+        CoreSourceControlGetSourceFilesArgs::new().filter(SourceControlFileFilter::Unused);
+    assert_eq!(
+        serde_json::to_value(sc_args).unwrap(),
+        json!({"filter": "unused"})
+    );
+    let sc_opts = CoreSourceControlGetSourceFilesOptions::new().return_fields([
+        SourceControlReturnField::File,
+        SourceControlReturnField::IsUsed,
+    ]);
+    assert_eq!(
+        serde_json::to_value(sc_opts).unwrap(),
+        json!({"return": ["file", "isUsed"]})
+    );
+    let sc_resp: CoreSourceControlGetSourceFilesResponse = serde_json::from_value(json!({
+        "return": [{
+            "folder": "/proj/Originals/SFX",
+            "file": "/proj/Originals/SFX/laser.wav",
+            "isUsed": true,
+            "usage": [{"id": "{SRC-1}", "name": "laser"}],
+            "isMissing": false
+        }]
+    }))
+    .unwrap();
+    assert_eq!(sc_resp.files.len(), 1);
+    assert_eq!(sc_resp.files[0].is_used, Some(true));
+    assert_eq!(sc_resp.files[0].usage[0].name(), Some("laser"));
+
+    let status_resp: CoreSourceControlGetStatusResponse = serde_json::from_value(json!({
+        "result": [{"status": "local only", "owner": ""}]
+    }))
+    .unwrap();
+    assert_eq!(status_resp.result[0].status.as_deref(), Some("local only"));
+
+    // mediaPool.get with MediaPoolFilterEntry
+    let mp_args = CoreMediaPoolGetArgs::new().filters(vec![
+        MediaPoolFilterEntry::field_filter(
+            "WAV/Duration",
+            MediaPoolFilterOperator::GreaterThan,
+            json!(1.0),
+        )
+        .weight(0.8),
+    ]);
+    assert_eq!(
+        serde_json::to_value(mp_args).unwrap(),
+        json!({
+            "filters": [{
+                "type": "field",
+                "field": "WAV/Duration",
+                "operator": "greaterThan",
+                "value": 1.0,
+                "weight": 0.8
+            }]
+        })
+    );
+
+    // audio.import log items
+    let import_resp: CoreAudioImportResponse = serde_json::from_value(json!({
+        "objects": [{"id": "{SND-1}"}],
+        "log": [{"severity": "Message", "message": "Imported 1 file"}]
+    }))
+    .unwrap();
+    assert_eq!(import_resp.log.len(), 1);
+    assert_eq!(import_resp.log[0].severity, LogSeverity::Message);
+    assert_eq!(import_resp.log[0].message, "Imported 1 file");
+
+    // executeLuaScript -> .result and debug.getWalTree -> .tree
+    let lua_resp: CoreExecuteLuaScriptResponse =
+        serde_json::from_value(json!({"return": {"answer": 42}})).unwrap();
+    assert_eq!(lua_resp.result, json!({"answer": 42}));
+    let wal_resp: DebugGetWalTreeResponse =
+        serde_json::from_value(json!({"return": {"nodes": []}})).unwrap();
+    assert_eq!(wal_resp.tree, json!({"nodes": []}));
+}
+
+#[test]
+fn tier3_debug_and_ui_types_roundtrip() {
+    use wwise_waapi::api::ak::wwise::debug::DebugGenerateToneWavArgs;
+    use wwise_waapi::api::ak::wwise::ui::UiCaptureScreenArgs;
+    use wwise_waapi::api::ak::wwise::ui::commands::UiCommandsRegisterArgs;
+    use wwise_waapi::api::ak::wwise::ui::layout::{
+        UiLayoutGetViewInstancesResponse, UiLayoutGetViewTypesResponse,
+    };
+    use wwise_waapi::api::ak::wwise::ui::model::{UiModelGetStateArgs, UiModelSetStateArgs};
+    use wwise_waapi::api::ak::wwise::ui::project::UiProjectCreateArgs;
+    use wwise_waapi::api::ak::wwise::ui::window::UiWindowCreateArgs;
+    use wwise_waapi::api::{
+        AddOnCommand, CommandContextMenu, CommandMainMenu, CommandStartMode, PlatformTemplateEntry,
+        PlatformsToCreate, ScreenRect, StringOrVec, ToneBitDepth, ToneChannelConfig, ToneWaveform,
+        WavMarker, WidgetAttributeEntry, WidgetStateQuery, WidgetStateResult, WidgetStateUpdate,
+        WindowSize,
+    };
+
+    // debug.generateToneWAV
+    let tone = DebugGenerateToneWavArgs::new("/tmp/tone.wav")
+        .channel_config(ToneChannelConfig::_20)
+        .bit_depth(ToneBitDepth::Int16)
+        .waveform(ToneWaveform::Sine)
+        .markers(vec![WavMarker::new(0.25).label("Start")]);
+    assert_eq!(
+        serde_json::to_value(tone).unwrap(),
+        json!({
+            "path": "/tmp/tone.wav",
+            "channelConfig": "2.0",
+            "bitDepth": "int16",
+            "waveform": "sine",
+            "markers": [{"position": 0.25, "label": "Start"}]
+        })
+    );
+
+    // ui.captureScreen & ui.window.create
+    let cap = UiCaptureScreenArgs::new().rect(ScreenRect::new(10, 20, 640, 480));
+    assert_eq!(
+        serde_json::to_value(cap).unwrap(),
+        json!({"rect": {"x": 10, "y": 20, "width": 640, "height": 480}})
+    );
+    let win = UiWindowCreateArgs::new("Property Editor", WindowSize::new(800, 600));
+    assert_eq!(
+        serde_json::to_value(win).unwrap(),
+        json!({"title": "Property Editor", "size": {"width": 800, "height": 600}})
+    );
+
+    // ui.layout.getViewInstances & getViewTypes
+    let instances: UiLayoutGetViewInstancesResponse = serde_json::from_value(json!({
+        "viewInstances": [{
+            "viewName": "Project Explorer",
+            "viewID": "{VIEW-1}",
+            "viewIsDocked": true,
+            "viewDisplayName": "Project Explorer"
+        }]
+    }))
+    .unwrap();
+    assert_eq!(instances.view_instances.len(), 1);
+    assert!(instances.view_instances[0].view_is_docked);
+
+    let view_types: UiLayoutGetViewTypesResponse = serde_json::from_value(json!({
+        "viewTypes": [{
+            "viewName": "Project Explorer",
+            "viewDisplayName": "Project Explorer"
+        }]
+    }))
+    .unwrap();
+    assert_eq!(view_types.view_types[0].view_name, "Project Explorer");
+
+    // ui.project.create with PlatformsToCreate
+    let proj_create = UiProjectCreateArgs::new("/tmp/NewProj.wproj").platforms(
+        PlatformsToCreate::Multiple(vec![
+            PlatformTemplateEntry::new("Windows").name("PC"),
+            PlatformTemplateEntry::new("Mac"),
+        ]),
+    );
+    assert_eq!(
+        serde_json::to_value(proj_create).unwrap(),
+        json!({
+            "path": "/tmp/NewProj.wproj",
+            "platforms": [
+                {"basePlatform": "Windows", "name": "PC"},
+                {"basePlatform": "Mac"}
+            ]
+        })
+    );
+
+    // ui.commands.register with AddOnCommand & StringOrVec
+    let cmd = AddOnCommand::new("my_addon.normalize", "Normalize")
+        .program("python")
+        .args("normalize.py ${id}")
+        .start_mode(CommandStartMode::MultipleSelectionSingleProcessSpaceSeparated)
+        .main_menu(CommandMainMenu::new("Add-ons/Audio"))
+        .context_menu(
+            CommandContextMenu::new("Audio Tools")
+                .visible_for(StringOrVec::Single("Sound".to_string()))
+                .enabled_for(StringOrVec::Multiple(vec![
+                    "Sound".to_string(),
+                    "AudioFileSource".to_string(),
+                ])),
+        );
+    let reg = UiCommandsRegisterArgs::new(vec![cmd]);
+    assert_eq!(
+        serde_json::to_value(reg).unwrap(),
+        json!({
+            "commands": [{
+                "id": "my_addon.normalize",
+                "displayName": "Normalize",
+                "program": "python",
+                "args": "normalize.py ${id}",
+                "startMode": "MultipleSelectionSingleProcessSpaceSeparated",
+                "mainMenu": {"basePath": "Add-ons/Audio"},
+                "contextMenu": {
+                    "basePath": "Audio Tools",
+                    "visibleFor": "Sound",
+                    "enabledFor": ["Sound", "AudioFileSource"]
+                }
+            }]
+        })
+    );
+
+    // ui.model.getState & setState
+    let get_state = UiModelGetStateArgs::new(
+        "{HANDLE-1}",
+        vec![WidgetStateQuery::new(
+            "widget.volume",
+            vec!["value".to_string(), "enabled".to_string()],
+        )],
+    );
+    assert_eq!(
+        serde_json::to_value(get_state).unwrap(),
+        json!({
+            "handleID": "{HANDLE-1}",
+            "state": [{
+                "widgetID": "widget.volume",
+                "state": ["value", "enabled"]
+            }]
+        })
+    );
+    let get_state_item: WidgetStateResult = serde_json::from_value(json!({
+        "widgetID": "widget.volume",
+        "state": [{"attribute": "value", "value": -6.0}]
+    }))
+    .unwrap();
+    assert_eq!(get_state_item.widget_id, "widget.volume");
+    assert_eq!(get_state_item.state[0].attribute, "value");
+    assert_eq!(get_state_item.state[0].value, json!(-6.0));
+
+    let set_state = UiModelSetStateArgs::new(
+        "{HANDLE-1}",
+        vec![WidgetStateUpdate::new(
+            "widget.volume",
+            vec![WidgetAttributeEntry::new("value", json!(-6.0))],
+        )],
+    );
+    assert_eq!(
+        serde_json::to_value(set_state).unwrap(),
+        json!({
+            "handleID": "{HANDLE-1}",
+            "state": [{
+                "widgetID": "widget.volume",
+                "state": [{"attribute": "value", "value": -6.0}]
+            }]
+        })
+    );
+}
+
+#[test]
+fn audio_peaks_and_log_add_item_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::audioSourcePeaks::{
+        CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs,
+        CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse,
+    };
+    use wwise_waapi::api::ak::wwise::core::log::CoreLogAddItemArgs;
+    use wwise_waapi::api::{LogChannel, LogSeverity};
+    use wwise_waapi::prelude::*;
+
+    let peaks_args = CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs::new(
+        ObjectRef::guid("{SRC-PEAK-1}"),
+        250,
+    )
+    .get_cross_channel_peaks(true);
+    assert_eq!(
+        serde_json::to_value(peaks_args).unwrap(),
+        json!({
+            "object": "{SRC-PEAK-1}",
+            "numPeaks": 250,
+            "getCrossChannelPeaks": true
+        })
+    );
+
+    let peaks_resp: CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse =
+        serde_json::from_value(json!({
+            "peaksArrayLength": 250.0,
+            "peaksDataSize": 1000.0,
+            "peaksBinaryStrings": ["AAAA"],
+            "numChannels": 1.0,
+            "maxAbsValue": 32767.0,
+            "channelConfig": "1.0"
+        }))
+        .unwrap();
+    assert_eq!(peaks_resp.peaks_array_length, Some(250.0));
+    assert_eq!(peaks_resp.peaks_data_size, Some(1000.0));
+    assert_eq!(peaks_resp.peaks_binary_strings, vec!["AAAA".to_string()]);
+    assert_eq!(peaks_resp.num_channels, Some(1.0));
+    assert_eq!(peaks_resp.max_abs_value, Some(32767.0));
+    assert_eq!(peaks_resp.channel_config.as_deref(), Some("1.0"));
+
+    let log_args = CoreLogAddItemArgs::new("Custom authoring tool message")
+        .severity(LogSeverity::Warning)
+        .channel(LogChannel::General);
+    assert_eq!(
+        serde_json::to_value(log_args).unwrap(),
+        json!({
+            "message": "Custom authoring tool message",
+            "severity": "Warning",
+            "channel": "general"
+        })
+    );
+}
+
+#[test]
+fn profiler_meters_and_save_capture_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::profiler::{
+        CoreProfilerGetMetersOptions, CoreProfilerRegisterMeterArgs, CoreProfilerSaveCaptureArgs,
+        CoreProfilerUnregisterMeterArgs,
+    };
+    use wwise_waapi::prelude::*;
+
+    let reg_meter = CoreProfilerRegisterMeterArgs::new(ObjectRef::path(
+        r"\Busses\Default Work Unit\Main Audio Bus",
+    ));
+    assert_eq!(
+        serde_json::to_value(reg_meter).unwrap(),
+        json!({"object": r"\Busses\Default Work Unit\Main Audio Bus"})
+    );
+
+    let unreg_meter = CoreProfilerUnregisterMeterArgs::new(ObjectRef::guid("{BUS-1}"));
+    assert_eq!(
+        serde_json::to_value(unreg_meter).unwrap(),
+        json!({"object": "{BUS-1}"})
+    );
+
+    let meter_opts = CoreProfilerGetMetersOptions::new()
+        .return_fields([ObjectReturnField::Id, ObjectReturnField::Name]);
+    assert_eq!(
+        serde_json::to_value(meter_opts).unwrap(),
+        json!({"return": ["id", "name"]})
+    );
+
+    let save_cap = CoreProfilerSaveCaptureArgs::new("/tmp/capture.prof");
+    assert_eq!(
+        serde_json::to_value(save_cap).unwrap(),
+        json!({"file": "/tmp/capture.prof"})
+    );
+}
+
+#[test]
+fn remote_and_source_control_operations_roundtrip() {
+    use wwise_waapi::api::LogSeverity;
+    use wwise_waapi::api::ak::wwise::core::remote::CoreRemoteConnectArgs;
+    use wwise_waapi::api::ak::wwise::core::sourceControl::{
+        CoreSourceControlAddArgs, CoreSourceControlAddResponse, CoreSourceControlCheckOutArgs,
+        CoreSourceControlCheckOutResponse, CoreSourceControlCommitArgs,
+        CoreSourceControlCommitResponse, CoreSourceControlDeleteArgs,
+        CoreSourceControlDeleteResponse, CoreSourceControlGetStatusArgs, CoreSourceControlMoveArgs,
+        CoreSourceControlMoveResponse, CoreSourceControlRevertArgs,
+        CoreSourceControlRevertResponse, CoreSourceControlSetProviderArgs,
+        CoreSourceControlSetProviderResponse,
+    };
+
+    let remote_conn = CoreRemoteConnectArgs::new("127.0.0.1")
+        .app_name("MyGame")
+        .command_port(24024)
+        .notification_port(24025);
+    assert_eq!(
+        serde_json::to_value(remote_conn).unwrap(),
+        json!({
+            "host": "127.0.0.1",
+            "appName": "MyGame",
+            "commandPort": 24024,
+            "notificationPort": 24025
+        })
+    );
+
+    let log_json = json!({
+        "log": [{
+            "severity": "Message",
+            "time": 1700000000,
+            "messageId": "SC001",
+            "message": "Operation succeeded"
+        }]
+    });
+
+    let add_args = CoreSourceControlAddArgs::new(vec!["/proj/a.wwu".to_string()]);
+    assert_eq!(
+        serde_json::to_value(add_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"]})
+    );
+    let add_resp: CoreSourceControlAddResponse = serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(add_resp.log[0].severity, LogSeverity::Message);
+
+    let co_args = CoreSourceControlCheckOutArgs::new(vec!["/proj/a.wwu".to_string()]);
+    assert_eq!(
+        serde_json::to_value(co_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"]})
+    );
+    let co_resp: CoreSourceControlCheckOutResponse =
+        serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(co_resp.log[0].message_id, "SC001");
+
+    let commit_args =
+        CoreSourceControlCommitArgs::new(vec!["/proj/a.wwu".to_string()], "Add work unit");
+    assert_eq!(
+        serde_json::to_value(commit_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"], "message": "Add work unit"})
+    );
+    let commit_resp: CoreSourceControlCommitResponse =
+        serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(commit_resp.log.len(), 1);
+
+    let del_args = CoreSourceControlDeleteArgs::new(vec!["/proj/old.wwu".to_string()]);
+    assert_eq!(
+        serde_json::to_value(del_args).unwrap(),
+        json!({"files": ["/proj/old.wwu"]})
+    );
+    let del_resp: CoreSourceControlDeleteResponse =
+        serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(del_resp.log.len(), 1);
+
+    let status_args = CoreSourceControlGetStatusArgs::new(vec!["/proj/a.wwu".to_string()]);
+    assert_eq!(
+        serde_json::to_value(status_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"]})
+    );
+
+    let move_args = CoreSourceControlMoveArgs::new(
+        vec!["/proj/a.wwu".to_string()],
+        vec!["/proj/b.wwu".to_string()],
+    );
+    assert_eq!(
+        serde_json::to_value(move_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"], "newFiles": ["/proj/b.wwu"]})
+    );
+    let move_resp: CoreSourceControlMoveResponse =
+        serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(move_resp.log.len(), 1);
+
+    let revert_args = CoreSourceControlRevertArgs::new(vec!["/proj/a.wwu".to_string()]);
+    assert_eq!(
+        serde_json::to_value(revert_args).unwrap(),
+        json!({"files": ["/proj/a.wwu"]})
+    );
+    let revert_resp: CoreSourceControlRevertResponse =
+        serde_json::from_value(log_json.clone()).unwrap();
+    assert_eq!(revert_resp.log.len(), 1);
+
+    let provider_args = CoreSourceControlSetProviderArgs::new("Perforce")
+        .server("perforce.local")
+        .port("1666")
+        .username("audio_dev")
+        .password("secret")
+        .workspace("wwise_ws")
+        .host("workstation-1");
+    assert_eq!(
+        serde_json::to_value(provider_args).unwrap(),
+        json!({
+            "provider": "Perforce",
+            "server": "perforce.local",
+            "port": "1666",
+            "username": "audio_dev",
+            "password": "secret",
+            "workspace": "wwise_ws",
+            "host": "workstation-1"
+        })
+    );
+    let provider_resp: CoreSourceControlSetProviderResponse =
+        serde_json::from_value(log_json).unwrap();
+    assert_eq!(provider_resp.log.len(), 1);
+}
+
+#[test]
+fn debug_and_waapi_schema_roundtrip() {
+    use wwise_waapi::api::ak::wwise::core::CoreExecuteLuaScriptArgs;
+    use wwise_waapi::api::ak::wwise::debug::{
+        DebugEnableAutomationModeArgs, DebugValidateCallArgs,
+    };
+    use wwise_waapi::api::ak::wwise::waapi::WaapiGetSchemaResponse;
+
+    let auto_mode = DebugEnableAutomationModeArgs::new(true);
+    assert_eq!(
+        serde_json::to_value(auto_mode).unwrap(),
+        json!({"enable": true})
+    );
+
+    let validate = DebugValidateCallArgs::new("ak.wwise.core.getInfo")
+        .args(json!({}))
+        .options(json!({}))
+        .result(json!({"displayName": "Wwise"}));
+    assert_eq!(
+        serde_json::to_value(validate).unwrap(),
+        json!({
+            "id": "ak.wwise.core.getInfo",
+            "args": {},
+            "options": {},
+            "result": {"displayName": "Wwise"}
+        })
+    );
+
+    let lua_args = CoreExecuteLuaScriptArgs::new()
+        .lua_script("scripts/setup.lua")
+        .lua_string("return 42")
+        .lua_paths(vec!["scripts".to_string()])
+        .requires(vec!["waapi_helpers".to_string()])
+        .do_files(vec!["init.lua".to_string()]);
+    assert_eq!(
+        serde_json::to_value(lua_args).unwrap(),
+        json!({
+            "luaScript": "scripts/setup.lua",
+            "luaString": "return 42",
+            "luaPaths": ["scripts"],
+            "requires": ["waapi_helpers"],
+            "doFiles": ["init.lua"]
+        })
+    );
+
+    let schema_resp: WaapiGetSchemaResponse = serde_json::from_value(json!({
+        "argsSchema": {"type": "object"},
+        "optionsSchema": {"type": "object"},
+        "resultSchema": {"type": "object"},
+        "description": "Retrieve global Wwise information.",
+        "examples": [{"title": "Get info"}]
+    }))
+    .unwrap();
+    assert_eq!(
+        schema_resp.description.as_deref(),
+        Some("Retrieve global Wwise information.")
+    );
+    assert_eq!(schema_resp.examples.len(), 1);
+}
+
+#[test]
+fn ui_cli_commands_and_layout_roundtrip() {
+    use wwise_waapi::api::StringOrVec;
+    use wwise_waapi::api::ak::wwise::ui::cli::{
+        UiCliExecuteLuaScriptArgs, UiCliExecuteLuaScriptResponse, UiCliLaunchArgs,
+    };
+    use wwise_waapi::api::ak::wwise::ui::commands::UiCommandsUnregisterArgs;
+    use wwise_waapi::api::ak::wwise::ui::layout::{
+        UiLayoutDockViewArgs, UiLayoutGetCurrentLayoutNameResponse,
+        UiLayoutGetElementRectangleArgs, UiLayoutGetElementRectangleResponse,
+        UiLayoutGetLayoutArgs, UiLayoutGetLayoutNamesResponse, UiLayoutGetLayoutResponse,
+        UiLayoutGetOrCreateViewArgs, UiLayoutGetOrCreateViewResponse, UiLayoutGetViewHandleArgs,
+        UiLayoutGetViewInstancesArgs, UiLayoutMoveSplitterArgs, UiLayoutRemoveLayoutArgs,
+        UiLayoutSetLayoutArgs, UiLayoutSwitchLayoutArgs, UiLayoutUndockViewArgs,
+    };
+
+    let cli_lua = UiCliExecuteLuaScriptArgs::new("run.lua")
+        .project("/proj/Test.wproj")
+        .lua_path(StringOrVec::Single("scripts".to_string()))
+        .require(StringOrVec::Multiple(vec!["util".to_string()]))
+        .do_file(StringOrVec::Single("boot.lua".to_string()))
+        .allow_migration(true);
+    assert_eq!(
+        serde_json::to_value(cli_lua).unwrap(),
+        json!({
+            "lua-script": "run.lua",
+            "project": "/proj/Test.wproj",
+            "lua-path": "scripts",
+            "require": ["util"],
+            "do-file": "boot.lua",
+            "allow-migration": true
+        })
+    );
+    let cli_lua_resp: UiCliExecuteLuaScriptResponse =
+        serde_json::from_value(json!({"result": {"ok": true}})).unwrap();
+    assert_eq!(cli_lua_resp.result, json!({"ok": true}));
+
+    let cli_launch = UiCliLaunchArgs::new().project("/proj/Test.wproj");
+    assert_eq!(
+        serde_json::to_value(cli_launch).unwrap(),
+        json!({"project": "/proj/Test.wproj"})
+    );
+
+    let unreg_cmds = UiCommandsUnregisterArgs::new(vec!["my_addon.normalize".to_string()]);
+    assert_eq!(
+        serde_json::to_value(unreg_cmds).unwrap(),
+        json!({"commands": ["my_addon.normalize"]})
+    );
+
+    let dock = UiLayoutDockViewArgs::new("Designer", "{VIEW-1}", "{TARGET-1}", "left");
+    assert_eq!(
+        serde_json::to_value(dock).unwrap(),
+        json!({
+            "name": "Designer",
+            "viewID": "{VIEW-1}",
+            "targetID": "{TARGET-1}",
+            "side": "left"
+        })
+    );
+
+    let undock = UiLayoutUndockViewArgs::new("Designer", "{VIEW-1}")
+        .pos_x(100)
+        .pos_y(200);
+    assert_eq!(
+        serde_json::to_value(undock).unwrap(),
+        json!({
+            "name": "Designer",
+            "viewID": "{VIEW-1}",
+            "posX": 100,
+            "posY": 200
+        })
+    );
+
+    let cur_layout: UiLayoutGetCurrentLayoutNameResponse =
+        serde_json::from_value(json!({"name": "Designer"})).unwrap();
+    assert_eq!(cur_layout.name(), Some("Designer"));
+
+    let elem_rect_args = UiLayoutGetElementRectangleArgs::new("{ELEM-1}");
+    assert_eq!(
+        serde_json::to_value(elem_rect_args).unwrap(),
+        json!({"id": "{ELEM-1}"})
+    );
+    let elem_rect_resp: UiLayoutGetElementRectangleResponse = serde_json::from_value(json!({
+        "left": 0.0,
+        "top": 10.0,
+        "right": 800.0,
+        "bottom": 600.0
+    }))
+    .unwrap();
+    assert_eq!(elem_rect_resp.right, Some(800.0));
+    assert_eq!(elem_rect_resp.bottom, Some(600.0));
+
+    let get_layout_args = UiLayoutGetLayoutArgs::new("Designer");
+    assert_eq!(
+        serde_json::to_value(get_layout_args).unwrap(),
+        json!({"name": "Designer"})
+    );
+    let get_layout_resp: UiLayoutGetLayoutResponse =
+        serde_json::from_value(json!({"Layout": {"name": "Designer"}})).unwrap();
+    assert_eq!(get_layout_resp.layout, Some(json!({"name": "Designer"})));
+
+    let layout_names: UiLayoutGetLayoutNamesResponse =
+        serde_json::from_value(json!({"layouts": ["Designer", "Profiler"]})).unwrap();
+    assert_eq!(layout_names.layouts, vec!["Designer", "Profiler"]);
+
+    let get_or_create_args = UiLayoutGetOrCreateViewArgs::new("Project Explorer")
+        .pos_x(50)
+        .pos_y(60);
+    assert_eq!(
+        serde_json::to_value(get_or_create_args).unwrap(),
+        json!({"name": "Project Explorer", "posX": 50, "posY": 60})
+    );
+    let get_or_create_resp: UiLayoutGetOrCreateViewResponse =
+        serde_json::from_value(json!({"id": "{VIEW-99}"})).unwrap();
+    assert_eq!(get_or_create_resp.id(), Some("{VIEW-99}"));
+
+    let view_handle_args = UiLayoutGetViewHandleArgs::new("{VIEW-99}");
+    assert_eq!(
+        serde_json::to_value(view_handle_args).unwrap(),
+        json!({"viewID": "{VIEW-99}"})
+    );
+
+    let view_instances_args = UiLayoutGetViewInstancesArgs::new("Designer");
+    assert_eq!(
+        serde_json::to_value(view_instances_args).unwrap(),
+        json!({"name": "Designer"})
+    );
+
+    let move_splitter = UiLayoutMoveSplitterArgs::new("{SPLITTER-1}", 40);
+    assert_eq!(
+        serde_json::to_value(move_splitter).unwrap(),
+        json!({"id": "{SPLITTER-1}", "delta": 40})
+    );
+
+    let remove_layout = UiLayoutRemoveLayoutArgs::new("CustomLayout");
+    assert_eq!(
+        serde_json::to_value(remove_layout).unwrap(),
+        json!({"name": "CustomLayout"})
+    );
+
+    let set_layout = UiLayoutSetLayoutArgs::new("CustomLayout", json!({"dock": {}}));
+    assert_eq!(
+        serde_json::to_value(set_layout).unwrap(),
+        json!({"name": "CustomLayout", "layout": {"dock": {}}})
+    );
+
+    let switch_layout = UiLayoutSwitchLayoutArgs::new("Profiler");
+    assert_eq!(
+        serde_json::to_value(switch_layout).unwrap(),
+        json!({"name": "Profiler"})
+    );
+}
+
+#[test]
+fn ui_model_signal_and_window_roundtrip() {
+    use wwise_waapi::api::ak::wwise::ui::UiCaptureScreenResponse;
+    use wwise_waapi::api::ak::wwise::ui::model::{
+        UiModelCreateHandleArgs, UiModelCreateHandleResponse, UiModelDestroyHandleArgs,
+        UiModelRegisterWafmArgs, UiModelRegisterWafmResponse,
+    };
+    use wwise_waapi::api::ak::wwise::ui::signal::UiSignalEmitArgs;
+    use wwise_waapi::api::ak::wwise::ui::window::{
+        UiWindowCloseArgs, UiWindowCreateResponse, UiWindowPresentArgs,
+    };
+
+    let create_handle = UiModelCreateHandleArgs::new("{WIN-1}", "my.wafm.template");
+    assert_eq!(
+        serde_json::to_value(create_handle).unwrap(),
+        json!({"container": "{WIN-1}", "template": "my.wafm.template"})
+    );
+    let create_handle_resp: UiModelCreateHandleResponse =
+        serde_json::from_value(json!({"handleID": "{HANDLE-1}"})).unwrap();
+    assert_eq!(create_handle_resp.handle_id.as_deref(), Some("{HANDLE-1}"));
+
+    let destroy_handle = UiModelDestroyHandleArgs::new("{HANDLE-1}");
+    assert_eq!(
+        serde_json::to_value(destroy_handle).unwrap(),
+        json!({"handleID": "{HANDLE-1}"})
+    );
+
+    let reg_wafm = UiModelRegisterWafmArgs::new(json!({"templates": []}));
+    assert_eq!(
+        serde_json::to_value(reg_wafm).unwrap(),
+        json!({"wafm": {"templates": []}})
+    );
+    let reg_wafm_resp: UiModelRegisterWafmResponse =
+        serde_json::from_value(json!({"success": true})).unwrap();
+    assert_eq!(reg_wafm_resp.success, Some(true));
+
+    let emit_sig = UiSignalEmitArgs::new("{HANDLE-1}", "btn.ok", "ak.wwise.ui.signal.click");
+    assert_eq!(
+        serde_json::to_value(emit_sig).unwrap(),
+        json!({
+            "handleID": "{HANDLE-1}",
+            "widgetID": "btn.ok",
+            "signal": "ak.wwise.ui.signal.click"
+        })
+    );
+
+    let win_create_resp: UiWindowCreateResponse =
+        serde_json::from_value(json!({"windowID": "{WIN-1}"})).unwrap();
+    assert_eq!(win_create_resp.window_id.as_deref(), Some("{WIN-1}"));
+
+    let win_present = UiWindowPresentArgs::new("{WIN-1}");
+    assert_eq!(
+        serde_json::to_value(win_present).unwrap(),
+        json!({"windowID": "{WIN-1}"})
+    );
+
+    let win_close = UiWindowCloseArgs::new("{WIN-1}");
+    assert_eq!(
+        serde_json::to_value(win_close).unwrap(),
+        json!({"windowID": "{WIN-1}"})
+    );
+
+    let cap_resp: UiCaptureScreenResponse = serde_json::from_value(json!({
+        "contentType": "image/png",
+        "contentBase64": "iVBORw0KGgo="
+    }))
+    .unwrap();
+    assert_eq!(cap_resp.content_type.as_deref(), Some("image/png"));
+    assert_eq!(cap_resp.content_base64.as_deref(), Some("iVBORw0KGgo="));
+}
+
+#[test]
+fn remaining_companion_options_and_responses_roundtrip() {
+    use wwise_waapi::api::ak::soundengine::{
+        SoundengineGetStateOptions, SoundengineGetStateResponse, SoundengineGetSwitchOptions,
+        SoundengineGetSwitchResponse, SoundenginePostEventResponse,
+    };
+    use wwise_waapi::api::ak::wwise::core::audio::{
+        CoreAudioImportTabDelimitedOptions, CoreAudioImportTabDelimitedResponse,
+        CoreAudioImportedOptions,
+    };
+    use wwise_waapi::api::ak::wwise::core::object::{
+        CoreObjectAttenuationCurveChangedOptions, CoreObjectAttenuationCurveLinkChangedOptions,
+        CoreObjectChildAddedOptions, CoreObjectChildRemovedOptions, CoreObjectCopyOptions,
+        CoreObjectCopyResponse, CoreObjectCurveChangedOptions, CoreObjectMoveResponse,
+        CoreObjectNameChangedOptions, CoreObjectNotesChangedOptions, CoreObjectPostDeletedOptions,
+        CoreObjectPreDeletedOptions, CoreObjectReferenceChangedOptions, CoreObjectSetOptions,
+        CoreObjectStructureChangedOptions,
+    };
+    use wwise_waapi::api::ak::wwise::core::profiler::{
+        CoreProfilerStateChangedOptions, CoreProfilerSwitchChangedOptions,
+    };
+    use wwise_waapi::api::ak::wwise::core::soundbank::CoreSoundbankGeneratedOptions;
+    use wwise_waapi::api::ak::wwise::core::switchContainer::{
+        CoreSwitchContainerAssignmentAddedOptions, CoreSwitchContainerAssignmentRemovedOptions,
+    };
+    use wwise_waapi::api::ak::wwise::core::transport::CoreTransportStateChangedOptions;
+    use wwise_waapi::api::ak::wwise::ui::UiSelectionChangedOptions;
+    use wwise_waapi::api::ak::wwise::ui::commands::UiCommandsExecutedOptions;
+    use wwise_waapi::api::ak::wwise::ui::signal::{UiSignalClickOptions, UiSignalToggleOptions};
+    use wwise_waapi::prelude::*;
+
+    // SoundEngine companion responses/options
+    let se_state_opts = SoundengineGetStateOptions::basic();
+    assert_eq!(
+        serde_json::to_value(se_state_opts).unwrap(),
+        json!({"return": ["id", "name", "type", "path"]})
+    );
+    let se_state_resp: SoundengineGetStateResponse =
+        serde_json::from_value(json!({"return": {"id": "{ST-1}", "name": "Alive"}})).unwrap();
+    assert_eq!(se_state_resp.state.name(), Some("Alive"));
+
+    let se_sw_opts = SoundengineGetSwitchOptions::basic();
+    assert_eq!(
+        serde_json::to_value(se_sw_opts).unwrap(),
+        json!({"return": ["id", "name", "type", "path"]})
+    );
+    let se_sw_resp: SoundengineGetSwitchResponse =
+        serde_json::from_value(json!({"return": {"id": "{SW-1}", "name": "Wood"}})).unwrap();
+    assert_eq!(se_sw_resp.switch.name(), Some("Wood"));
+
+    let post_event_resp: SoundenginePostEventResponse =
+        serde_json::from_value(json!({"return": 99})).unwrap();
+    assert_eq!(post_event_resp.playing_id, 99);
+
+    // Audio & Object companion options/responses
+    let tab_opts = CoreAudioImportTabDelimitedOptions::new().return_fields([ObjectReturnField::Id]);
+    assert_eq!(
+        serde_json::to_value(tab_opts).unwrap(),
+        json!({"return": ["id"]})
+    );
+    let tab_resp: CoreAudioImportTabDelimitedResponse =
+        serde_json::from_value(json!({"objects": [{"id": "{IMP-1}"}]})).unwrap();
+    assert_eq!(tab_resp.objects[0].id(), Some("{IMP-1}"));
+
+    let copy_opts = CoreObjectCopyOptions::new().return_fields([ObjectReturnField::Id]);
+    assert_eq!(
+        serde_json::to_value(copy_opts).unwrap(),
+        json!({"return": ["id"]})
+    );
+    let copy_resp: CoreObjectCopyResponse =
+        serde_json::from_value(json!({"id": "{COPY-1}", "name": "Copied"})).unwrap();
+    assert_eq!(copy_resp.id(), Some("{COPY-1}"));
+
+    let move_resp: CoreObjectMoveResponse =
+        serde_json::from_value(json!({"id": "{MOVE-1}", "name": "Moved"})).unwrap();
+    assert_eq!(move_resp.id(), Some("{MOVE-1}"));
+
+    let set_opts = CoreObjectSetOptions::new().return_fields([ObjectReturnField::Id]);
+    assert_eq!(
+        serde_json::to_value(set_opts).unwrap(),
+        json!({"return": ["id"]})
+    );
+
+    // Remaining topic subscription options
+    assert_eq!(
+        serde_json::to_value(
+            CoreAudioImportedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectAttenuationCurveChangedOptions::new()
+                .return_fields([ObjectReturnField::Id])
+                .platform("{PLAT-1}")
+        )
+        .unwrap(),
+        json!({"return": ["id"], "platform": "{PLAT-1}"})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectAttenuationCurveLinkChangedOptions::new()
+                .return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectChildAddedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectChildRemovedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectCurveChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectNameChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectNotesChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectPostDeletedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectPreDeletedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectReferenceChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreObjectStructureChangedOptions::new()
+                .return_fields([ObjectReturnField::Id])
+                .include_loaded_and_unloaded_nested_objects(true)
+        )
+        .unwrap(),
+        json!({
+            "return": ["id"],
+            "includeLoadedAndUnloadedNestedObjects": true
+        })
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreProfilerStateChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreProfilerSwitchChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreSoundbankGeneratedOptions::new()
+                .return_fields([ObjectReturnField::Id])
+                .info_file(true)
+                .bank_data(true)
+                .plugin_info(true)
+        )
+        .unwrap(),
+        json!({
+            "return": ["id"],
+            "infoFile": true,
+            "bankData": true,
+            "pluginInfo": true
+        })
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreSwitchContainerAssignmentAddedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            CoreSwitchContainerAssignmentRemovedOptions::new()
+                .return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(CoreTransportStateChangedOptions::new(7)).unwrap(),
+        json!({"transport": 7})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            UiCommandsExecutedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(
+            UiSelectionChangedOptions::new().return_fields([ObjectReturnField::Id])
+        )
+        .unwrap(),
+        json!({"return": ["id"]})
+    );
+    assert_eq!(
+        serde_json::to_value(UiSignalClickOptions::new("{H-1}", "btn.1")).unwrap(),
+        json!({"handleID": "{H-1}", "widgetID": "btn.1"})
+    );
+    assert_eq!(
+        serde_json::to_value(UiSignalToggleOptions::new("{H-1}", "chk.1")).unwrap(),
+        json!({"handleID": "{H-1}", "widgetID": "chk.1"})
     );
 }

@@ -33,5 +33,6 @@ impl CoreSourceControlMoveArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlMoveResponse {
     /// Array of log entries generated during the request.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
 }

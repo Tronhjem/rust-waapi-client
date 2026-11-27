@@ -11,10 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiCommandsExecutedPayload {
     /// An array of platform for which the command is executed. Each platform is an ID (GUID).
+    #[serde(default)]
     pub platforms: Vec<PlatformRef>,
     /// The command ID that was executed.
     pub command: String,
     /// The objects for which the command was executed. The objects are usually the selected objects. They are returned in the format specified in the options. Can be empty if no object is used.
+    #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
 

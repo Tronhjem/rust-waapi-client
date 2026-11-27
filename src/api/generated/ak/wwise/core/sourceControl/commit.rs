@@ -32,5 +32,6 @@ impl CoreSourceControlCommitArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlCommitResponse {
     /// Array of log entries generated during the request.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
 }

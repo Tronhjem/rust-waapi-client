@@ -29,5 +29,6 @@ impl CoreSourceControlRevertArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlRevertResponse {
     /// Array of log entries generated during the request.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
 }

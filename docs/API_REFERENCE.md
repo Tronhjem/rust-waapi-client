@@ -56,7 +56,13 @@ Each `tools/waapi_schemas/<version>/ak.*.json` file contains either RPC function
 ## 4. Shared `$ref` Definitions, Return Fields, and `@Property` Extensions
 
 - **`Definitions/*.json` `$ref` resolution**: Shared references across `common_definitions.json`, `waapi_definitions.json`, `waapi_ui_definitions.json`, and `wafm_definitions.json` map to shared primitives in `src/api/primitives.rs` and `src/api/generated/primitives.rs` (`ObjectRef`, `PlatformRef`, `SoundEngineObjectRef`, `GameObjectRef`, `LanguageRef`, `WwiseObject`, `WwiseObjectRef`, `OnNameConflict`, `ListMode`, `ImportOperation`, `LogSeverity`, `PropertyValue`, `ChildObject`).
-- **Endpoint-domain enums and structs**: Schemas with inline string enums or nested objects map to generated types in `src/api/generated/primitives.rs`, including `TransportAction` / `TransportState` / `TransportObject` (`transport.*`), `AttenuationCurveType` / `AttenuationCurveUse` / `CurvePoint2D` / `CurveShape` (`object.{get,set}AttenuationCurve`), `PasteMode` (`object.pasteProperties`), `SwitchContainerAssignment` (`switchContainer.getAssignments`), `ProjectMigrationAction` (`ui.project.open`), and `ProjectPlatformInfo` / `ProjectLanguageInfo` / `ProjectDirectoriesInfo` (`core.getProjectInfo`).
+- **Endpoint-domain enums and structs**: Schemas with inline string enums or nested objects map to generated types in `src/api/generated/primitives.rs` (re-exported from `wwise_waapi::api`), including:
+  - **Transport & Authoring:** `TransportAction` / `TransportState` / `TransportObject` (`transport.*`), `AttenuationCurveType` / `AttenuationCurveUse` / `CurvePoint2D` / `CurveShape` (`object.{get,set}AttenuationCurve`), `PasteMode` (`object.pasteProperties`), `SwitchContainerAssignment` (`switchContainer.getAssignments`), `BlendEdge` / `BlendFadeMode` / `BlendTrackAssignment` (`blendContainer.*`), `OnCurveUpdate` (`gameParameter.setRange`), `WwiseObjectTypeInfo` (`object.getTypes`), `PropertyInfoSupports` / `RtpcSupportMode` / `PropertyDisplayInfo` / `PropertyUiInfo` / `PropertyUiValueInfo` / `PropertyUiDisplayAs` / `PropertyDataMeaning` / `PropertyDependency` / `PropertyDependencyType` / `PropertyDependencyCondition` / `PropertyRestriction` (`object.getPropertyInfo`), `StructureChangedObject` / `StructureChange` / `StructureChangeType` / `StructureParentChange` / `StructureOwnerChange` / `StructureNameChange` / `StructureNotesChange` (`object.structureChanged`), `ProjectMigrationAction` (`ui.project.open`), `PlatformTemplateEntry` / `PlatformsToCreate` (`ui.project.create`), and `ProjectPlatformInfo` / `ProjectLanguageInfo` / `ProjectDirectoriesInfo` / `DefaultWorkUnitInfo` (`core.getProjectInfo`).
+  - **SoundEngine:** `ActionOnEventType`, `AkCurveInterpolation`, `MultiPositionType`, `MultiPosition`, `AuxSendValue`.
+  - **Profiler:** `CursorTime`, `ProfilerCursor`, `CursorMovePosition`, `ProfilerDataType`, `ProfilerDataTypeEntry`, `ProfilerVoice`, `ProfilerBus`, `ProfilerAudioObject`, `AudioObjectMetadata`, `ProfilerGameObject`, `ProfilerRtpc`, `ProfilerCpuUsageItem`, `ProfilerLoadedMedia`, `ProfilerStreamedMedia`, `ProfilerPerformanceCounter`, `ProfilerMeter`, `MeterSource`, `MeterConfigurationType`, `MeterChannel`, `VoiceContributions`, `VoiceContributionObject`, `VoiceContributionParameter`, `CaptureLogType`, `CaptureLogSeverity`.
+  - **SoundBank, Audio & Logs:** `SoundBankInfo`, `SoundBankInclusion`, `SoundBankInclusionType`, `SoundBankInclusionFilter`, `SoundBankInclusionOperation`, `SoundBankGeneratedBankData`, `SoundBankPluginInfo`, `SoundBankPluginLib`, `ExternalSourceInfo`, `AudioConvertError`, `AudioImportLogItem`, `AudioImportedOperation`, `LogCentralItem`, `LogChannel`, `LogSeverity`.
+  - **Remote, Source Control & Media Pool:** `RemoteConsoleInfo`, `ConnectedConsoleInfo`, `SourceControlFileFilter`, `SourceControlReturnField`, `SourceControlSourceFile`, `SourceControlStatus`, `MediaPoolFilterEntry`, `MediaPoolFilterType`, `MediaPoolFilterOperator`.
+  - **UI & Debug:** `ToneChannelConfig`, `ToneBitDepth`, `ToneWaveform`, `WavMarker`, `ScreenRect`, `WindowSize`, `ViewInstance`, `ViewTypeInfo`, `WidgetAttributeEntry`, `WidgetStateQuery`, `WidgetStateResult`, `WidgetStateUpdate`, `AddOnCommand`, `CommandStartMode`, `CommandContextMenu`, `CommandMainMenu`, `StringOrVec`.
 - **Domain-specific return field enums**: Rather than untyped strings, `waapi_definitions.json` return expressions are generated as strongly-typed enums:
   - `ObjectReturnField` (wrapped by `ObjectReturnOptions`) — all built-in Wwise object accessors (`Id`, `Name`, `Notes`, `Type`, `Path`, `Parent`, `ShortId`, etc.), `ObjectReturnField::Property(Property)` / `ObjectReturnField::property(Property)` (which serializes as `"@Property"`), plus `ObjectReturnField::Custom(String)` / `ObjectReturnField::custom("...")` for arbitrary dot-accessor queries.
   - `BusReturnField`, `AudioObjectReturnField`, and `VoiceReturnField` for profiler queries.
@@ -204,6 +210,83 @@ Every remaining namespace (`profiler.*`, `remote.*`, `sourceControl.*`, `waapi.*
 | `ak.wwise.ui.getSelectedFiles` | `client.wwise().ui().get_selected_files()` | — | — | `UiGetSelectedFilesResponse` |
 | `ak.wwise.ui.layout.closeView` | `client.wwise().ui().layout().close_view(args)` | `UiLayoutCloseViewArgs` | — | `()` |
 | `ak.wwise.ui.layout.resetLayouts` | `client.wwise().ui().layout().reset_layouts(args)` | `UiLayoutResetLayoutsArgs` | — | `()` |
+| `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInRegion` | `client.wwise().core().audio_source_peaks().get_min_max_peaks_in_region(args)` | `CoreAudioSourcePeaksGetMinMaxPeaksInRegionArgs` | — | `CoreAudioSourcePeaksGetMinMaxPeaksInRegionResponse` |
+| `ak.wwise.core.audioSourcePeaks.getMinMaxPeaksInTrimmedRegion` | `client.wwise().core().audio_source_peaks().get_min_max_peaks_in_trimmed_region(args)` | `CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionArgs` | — | `CoreAudioSourcePeaksGetMinMaxPeaksInTrimmedRegionResponse` |
+| `ak.wwise.core.executeLuaScript` | `client.wwise().core().execute_lua_script(args)` | `CoreExecuteLuaScriptArgs` | — | `CoreExecuteLuaScriptResponse` |
+| `ak.wwise.core.log.addItem` | `client.wwise().core().log().add_item(args)` | `CoreLogAddItemArgs` | — | `()` |
+| `ak.wwise.core.log.clear` | `client.wwise().core().log().clear(args)` | `CoreLogClearArgs` (`LogChannel`) | — | `()` |
+| `ak.wwise.core.log.get` | `client.wwise().core().log().get(args)` | `CoreLogGetArgs` (`LogChannel`) | — | `CoreLogGetResponse` (`LogCentralItem`) |
+| `ak.wwise.core.profiler.enableProfilerData` | `client.wwise().core().profiler().enable_profiler_data(args)` | `CoreProfilerEnableProfilerDataArgs` (`ProfilerDataTypeEntry`) | — | `()` |
+| `ak.wwise.core.profiler.getAudioObjects` | `client.wwise().core().profiler().get_audio_objects(args, options)` | `CoreProfilerGetAudioObjectsArgs` (`CursorTime`) | `CoreProfilerGetAudioObjectsOptions` (`AudioObjectReturnField`) | `CoreProfilerGetAudioObjectsResponse` (`ProfilerAudioObject`) |
+| `ak.wwise.core.profiler.getBusses` | `client.wwise().core().profiler().get_busses(args, options)` | `CoreProfilerGetBussesArgs` (`CursorTime`) | `CoreProfilerGetBussesOptions` (`BusReturnField`) | `CoreProfilerGetBussesResponse` (`ProfilerBus`) |
+| `ak.wwise.core.profiler.getCpuUsage` | `client.wwise().core().profiler().get_cpu_usage(args)` | `CoreProfilerGetCpuUsageArgs` (`CursorTime`) | — | `CoreProfilerGetCpuUsageResponse` (`ProfilerCpuUsageItem`) |
+| `ak.wwise.core.profiler.getCursorTime` | `client.wwise().core().profiler().get_cursor_time(args)` | `CoreProfilerGetCursorTimeArgs` (`ProfilerCursor`) | — | `CoreProfilerGetCursorTimeResponse` |
+| `ak.wwise.core.profiler.getGameObjects` | `client.wwise().core().profiler().get_game_objects(args)` | `CoreProfilerGetGameObjectsArgs` (`CursorTime`) | — | `CoreProfilerGetGameObjectsResponse` (`ProfilerGameObject`) |
+| `ak.wwise.core.profiler.getLoadedMedia` | `client.wwise().core().profiler().get_loaded_media(args)` | `CoreProfilerGetLoadedMediaArgs` (`CursorTime`) | — | `CoreProfilerGetLoadedMediaResponse` (`ProfilerLoadedMedia`) |
+| `ak.wwise.core.profiler.getMeters` | `client.wwise().core().profiler().get_meters(args, options)` | `CoreProfilerGetMetersArgs` | `CoreProfilerGetMetersOptions` | `CoreProfilerGetMetersResponse` (`ProfilerMeter`) |
+| `ak.wwise.core.profiler.getPerformanceMonitor` | `client.wwise().core().profiler().get_performance_monitor(args)` | `CoreProfilerGetPerformanceMonitorArgs` (`CursorTime`) | — | `CoreProfilerGetPerformanceMonitorResponse` (`ProfilerPerformanceCounter`) |
+| `ak.wwise.core.profiler.getRTPCs` | `client.wwise().core().profiler().get_rtp_cs(args)` | `CoreProfilerGetRtpCsArgs` (`CursorTime`) | — | `CoreProfilerGetRtpCsResponse` (`ProfilerRtpc`) |
+| `ak.wwise.core.profiler.getStreamedMedia` | `client.wwise().core().profiler().get_streamed_media(args)` | `CoreProfilerGetStreamedMediaArgs` (`CursorTime`) | — | `CoreProfilerGetStreamedMediaResponse` (`ProfilerStreamedMedia`) |
+| `ak.wwise.core.profiler.getVoiceContributions` | `client.wwise().core().profiler().get_voice_contributions(args)` | `CoreProfilerGetVoiceContributionsArgs` (`CursorTime`) | — | `CoreProfilerGetVoiceContributionsResponse` (`VoiceContributions`) |
+| `ak.wwise.core.profiler.getVoices` | `client.wwise().core().profiler().get_voices(args, options)` | `CoreProfilerGetVoicesArgs` (`CursorTime`) | `CoreProfilerGetVoicesOptions` (`VoiceReturnField`) | `CoreProfilerGetVoicesResponse` (`ProfilerVoice`) |
+| `ak.wwise.core.profiler.registerMeter` | `client.wwise().core().profiler().register_meter(args)` | `CoreProfilerRegisterMeterArgs` | — | `()` |
+| `ak.wwise.core.profiler.saveCapture` | `client.wwise().core().profiler().save_capture(args)` | `CoreProfilerSaveCaptureArgs` | — | `()` |
+| `ak.wwise.core.profiler.startCapture` | `client.wwise().core().profiler().start_capture()` | — | — | `CoreProfilerStartCaptureResponse` |
+| `ak.wwise.core.profiler.stopCapture` | `client.wwise().core().profiler().stop_capture()` | — | — | `CoreProfilerStopCaptureResponse` |
+| `ak.wwise.core.profiler.unregisterMeter` | `client.wwise().core().profiler().unregister_meter(args)` | `CoreProfilerUnregisterMeterArgs` | — | `()` |
+| `ak.wwise.core.remote.connect` | `client.wwise().core().remote().connect(args)` | `CoreRemoteConnectArgs` | — | `()` |
+| `ak.wwise.core.remote.disconnect` | `client.wwise().core().remote().disconnect()` | — | — | `()` |
+| `ak.wwise.core.remote.getAvailableConsoles` | `client.wwise().core().remote().get_available_consoles()` | — | — | `CoreRemoteGetAvailableConsolesResponse` (`RemoteConsoleInfo`) |
+| `ak.wwise.core.remote.getConnectionStatus` | `client.wwise().core().remote().get_connection_status()` | — | — | `CoreRemoteGetConnectionStatusResponse` (`ConnectedConsoleInfo`) |
+| `ak.wwise.core.sourceControl.add` | `client.wwise().core().source_control().add(args)` | `CoreSourceControlAddArgs` (`StringOrVec`) | — | `CoreSourceControlAddResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.checkOut` | `client.wwise().core().source_control().check_out(args)` | `CoreSourceControlCheckOutArgs` (`StringOrVec`) | — | `CoreSourceControlCheckOutResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.commit` | `client.wwise().core().source_control().commit(args)` | `CoreSourceControlCommitArgs` (`StringOrVec`) | — | `CoreSourceControlCommitResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.delete` | `client.wwise().core().source_control().delete(args)` | `CoreSourceControlDeleteArgs` (`StringOrVec`) | — | `CoreSourceControlDeleteResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.getSourceFiles` | `client.wwise().core().source_control().get_source_files(args, options)` | `CoreSourceControlGetSourceFilesArgs` (`SourceControlFileFilter`) | `CoreSourceControlGetSourceFilesOptions` (`SourceControlReturnField`) | `CoreSourceControlGetSourceFilesResponse` (`SourceControlSourceFile`) |
+| `ak.wwise.core.sourceControl.getStatus` | `client.wwise().core().source_control().get_status(args)` | `CoreSourceControlGetStatusArgs` (`StringOrVec`) | — | `CoreSourceControlGetStatusResponse` (`SourceControlStatus`, `LogCentralItem`) |
+| `ak.wwise.core.sourceControl.move` | `client.wwise().core().source_control().move_(args)` | `CoreSourceControlMoveArgs` | — | `CoreSourceControlMoveResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.revert` | `client.wwise().core().source_control().revert(args)` | `CoreSourceControlRevertArgs` (`StringOrVec`) | — | `CoreSourceControlRevertResponse` (`LogCentralItem`) |
+| `ak.wwise.core.sourceControl.setProvider` | `client.wwise().core().source_control().set_provider(args)` | `CoreSourceControlSetProviderArgs` | — | `CoreSourceControlSetProviderResponse` (`LogCentralItem`) |
+| `ak.wwise.debug.enableAsserts` | `client.wwise().debug().enable_asserts(args)` | `DebugEnableAssertsArgs` | — | `()` |
+| `ak.wwise.debug.enableAutomationMode` | `client.wwise().debug().enable_automation_mode(args)` | `DebugEnableAutomationModeArgs` | — | `()` |
+| `ak.wwise.debug.generateToneWAV` | `client.wwise().debug().generate_tone_wav(args)` | `DebugGenerateToneWavArgs` (`ToneWaveform`, `ToneBitDepth`, `ToneChannelConfig`, `WavMarker`) | — | `()` |
+| `ak.wwise.debug.getWalTree` | `client.wwise().debug().get_wal_tree()` | — | — | `DebugGetWalTreeResponse` |
+| `ak.wwise.debug.restartWaapiServers` | `client.wwise().debug().restart_waapi_servers()` | — | — | `()` |
+| `ak.wwise.debug.testAssert` | `client.wwise().debug().test_assert()` | — | — | `()` |
+| `ak.wwise.debug.testCrash` | `client.wwise().debug().test_crash()` | — | — | `()` |
+| `ak.wwise.debug.validateCall` | `client.wwise().debug().validate_call(args)` | `DebugValidateCallArgs` | — | `()` |
+| `ak.wwise.ui.captureScreen` | `client.wwise().ui().capture_screen(args)` | `UiCaptureScreenArgs` (`ScreenRect`) | — | `UiCaptureScreenResponse` |
+| `ak.wwise.ui.cli.executeLuaScript` | `client.wwise().ui().cli().execute_lua_script(args)` | `UiCliExecuteLuaScriptArgs` | — | `UiCliExecuteLuaScriptResponse` |
+| `ak.wwise.ui.cli.launch` | `client.wwise().ui().cli().launch(args)` | `UiCliLaunchArgs` | — | `()` |
+| `ak.wwise.ui.commands.register` | `client.wwise().ui().commands().register(args)` | `UiCommandsRegisterArgs` (`AddOnCommand`) | — | `()` |
+| `ak.wwise.ui.commands.unregister` | `client.wwise().ui().commands().unregister(args)` | `UiCommandsUnregisterArgs` | — | `()` |
+| `ak.wwise.ui.layout.dockView` | `client.wwise().ui().layout().dock_view(args)` | `UiLayoutDockViewArgs` | — | `()` |
+| `ak.wwise.ui.layout.getCurrentLayoutName` | `client.wwise().ui().layout().get_current_layout_name()` | — | — | `UiLayoutGetCurrentLayoutNameResponse` |
+| `ak.wwise.ui.layout.getElementRectangle` | `client.wwise().ui().layout().get_element_rectangle(args)` | `UiLayoutGetElementRectangleArgs` | — | `UiLayoutGetElementRectangleResponse` |
+| `ak.wwise.ui.layout.getLayout` | `client.wwise().ui().layout().get_layout(args)` | `UiLayoutGetLayoutArgs` | — | `UiLayoutGetLayoutResponse` |
+| `ak.wwise.ui.layout.getLayoutNames` | `client.wwise().ui().layout().get_layout_names()` | — | — | `UiLayoutGetLayoutNamesResponse` |
+| `ak.wwise.ui.layout.getOrCreateView` | `client.wwise().ui().layout().get_or_create_view(args)` | `UiLayoutGetOrCreateViewArgs` | — | `UiLayoutGetOrCreateViewResponse` |
+| `ak.wwise.ui.layout.getViewHandle` | `client.wwise().ui().layout().get_view_handle(args)` | `UiLayoutGetViewHandleArgs` | — | `()` |
+| `ak.wwise.ui.layout.getViewInstances` | `client.wwise().ui().layout().get_view_instances(args)` | `UiLayoutGetViewInstancesArgs` | — | `UiLayoutGetViewInstancesResponse` (`ViewInstance`) |
+| `ak.wwise.ui.layout.getViewTypes` | `client.wwise().ui().layout().get_view_types()` | — | — | `UiLayoutGetViewTypesResponse` (`ViewTypeInfo`) |
+| `ak.wwise.ui.layout.moveSplitter` | `client.wwise().ui().layout().move_splitter(args)` | `UiLayoutMoveSplitterArgs` | — | `()` |
+| `ak.wwise.ui.layout.removeLayout` | `client.wwise().ui().layout().remove_layout(args)` | `UiLayoutRemoveLayoutArgs` | — | `()` |
+| `ak.wwise.ui.layout.setLayout` | `client.wwise().ui().layout().set_layout(args)` | `UiLayoutSetLayoutArgs` | — | `()` |
+| `ak.wwise.ui.layout.switchLayout` | `client.wwise().ui().layout().switch_layout(args)` | `UiLayoutSwitchLayoutArgs` | — | `()` |
+| `ak.wwise.ui.layout.undockView` | `client.wwise().ui().layout().undock_view(args)` | `UiLayoutUndockViewArgs` | — | `()` |
+| `ak.wwise.ui.model.createHandle` | `client.wwise().ui().model().create_handle(args)` | `UiModelCreateHandleArgs` | — | `UiModelCreateHandleResponse` |
+| `ak.wwise.ui.model.destroyHandle` | `client.wwise().ui().model().destroy_handle(args)` | `UiModelDestroyHandleArgs` | — | `()` |
+| `ak.wwise.ui.model.getState` | `client.wwise().ui().model().get_state(args)` | `UiModelGetStateArgs` (`WidgetStateQuery`) | — | `()` |
+| `ak.wwise.ui.model.registerWafm` | `client.wwise().ui().model().register_wafm(args)` | `UiModelRegisterWafmArgs` | — | `UiModelRegisterWafmResponse` |
+| `ak.wwise.ui.model.setState` | `client.wwise().ui().model().set_state(args)` | `UiModelSetStateArgs` (`WidgetStateUpdate`) | — | `()` |
+| `ak.wwise.ui.project.create` | `client.wwise().ui().project().create(args)` | `UiProjectCreateArgs` (`PlatformsToCreate`) | — | `()` |
+| `ak.wwise.ui.signal.emit` | `client.wwise().ui().signal().emit(args)` | `UiSignalEmitArgs` | — | `()` |
+| `ak.wwise.ui.window.close` | `client.wwise().ui().window().close(args)` | `UiWindowCloseArgs` | — | `()` |
+| `ak.wwise.ui.window.create` | `client.wwise().ui().window().create(args)` | `UiWindowCreateArgs` (`WindowSize`) | — | `UiWindowCreateResponse` |
+| `ak.wwise.ui.window.present` | `client.wwise().ui().window().present(args)` | `UiWindowPresentArgs` | — | `()` |
+| `ak.wwise.waapi.getFunctions` | `client.wwise().waapi().get_functions()` | — | — | `WaapiGetFunctionsResponse` |
+| `ak.wwise.waapi.getSchema` | `client.wwise().waapi().get_schema(args)` | `WaapiGetSchemaArgs` | — | `WaapiGetSchemaResponse` |
+| `ak.wwise.waapi.getTopics` | `client.wwise().waapi().get_topics()` | — | — | `WaapiGetTopicsResponse` |
 
 ### Typed Topics
 
@@ -248,3 +331,24 @@ Every topic has a generated payload struct (`<Base>Payload`) and a `subscribe_*`
 | `ak.wwise.ui.signal.toggle` | `client.wwise().ui().signal().subscribe_toggle(opts)` | `UiSignalTogglePayload` |
 
 Topic `opts` is `Option<XxxOptions>`; options structs offer `.return_fields([ObjectReturnField::...])` and `.platform(...)`, and some are `ObjectReturnOptions` aliases.
+
+---
+
+## 6. Intentionally Dynamic / Untyped Fields (`serde_json::Value`)
+
+All **180 WAAPI functions** and **35 subscription topics** are generated with typed `Args`, `Options`, `Response`, and `Payload` structs and chained client methods (`EXCLUDED_ENDPOINTS` and `EXCLUDED_TOPICS` in `tools/overrides.json` are both empty).
+
+However, inside **10 endpoints**, specific payload fields are intentionally typed as `serde_json::Value` (or `Vec<serde_json::Value>`) rather than fixed Rust structs because the official Wwise JSON Schema defines them as open-ended, arbitrary, or self-referential JSON documents:
+
+| WAAPI URI | Field(s) kept as `serde_json::Value` | Why it is not mapped to a fixed Rust struct |
+|---|---|---|
+| `ak.wwise.core.executeLuaScript` | `CoreExecuteLuaScriptResponse::result` | Returns whatever arbitrary value (`boolean`, `number`, `string`, `array`, or `object` table) the user's Lua script returns. |
+| `ak.wwise.ui.cli.executeLuaScript` | `UiCliExecuteLuaScriptResponse::result` | Schema defines `result` as `{"type": "any"}` for arbitrary Lua script return values. |
+| `ak.wwise.debug.validateCall` | `DebugValidateCallArgs::{args, options, result}` | Debug endpoint that validates arbitrary raw JSON `args`, `options`, and `result` payloads against any WAAPI URI's schema. |
+| `ak.wwise.debug.getWalTree` | `DebugGetWalTreeResponse::tree` | Internal Wwise Authoring Layer debug dump whose schema is an open-ended `{"type": "object"}` with no fixed properties. |
+| `ak.wwise.waapi.getSchema` | `WaapiGetSchemaResponse::{args_schema, options_schema, result_schema, publish_schema, examples}` | Returns raw JSON Schema draft-04 documents and example JSON payloads for a given WAAPI URI. |
+| `ak.wwise.core.mediaPool.get` | `CoreMediaPoolGetResponse::results` (`Vec<serde_json::Value>`) | Each returned item is a dynamic key/value map keyed by whichever arbitrary media-pool field strings (including custom user metadata columns) were requested in `CoreMediaPoolGetOptions::return_fields`. |
+| `ak.wwise.ui.layout.getLayout` / `ak.wwise.ui.layout.setLayout` | `UiLayoutGetLayoutResponse::layout`, `UiLayoutSetLayoutArgs::layout` | WAFM docking layout tree (`wafm_definitions.json`), an opaque recursive UI docking specification intended to be saved from `getLayout` and passed back to `setLayout`. |
+| `ak.wwise.ui.model.registerWafm` | `UiModelRegisterWafmArgs::wafm` | Accepts either a file path string or an arbitrary inline WAFM UI model JSON document (`oneOf` string or raw WAFM object). |
+| `ak.wwise.core.soundbank.generated` | `CoreSoundbankGeneratedPayload::{platform, language, bank_info}` | Wwise's `publishSchema` defines `platform`, `language`, and `bankInfo` items as unschematized `{"type": "object"}` nodes without properties (whereas `soundbank: WwiseObject`, `bank_data: Option<SoundBankGeneratedBankData>`, `plugin_info: Option<SoundBankPluginInfo>`, and `error: Option<String>` on the same payload are strongly typed). |
+

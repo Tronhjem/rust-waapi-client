@@ -11,5 +11,6 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiGetSelectedFilesResponse {
     /// The selected files. Can be empty if no file is selected.
+    #[serde(default)]
     pub files: Vec<String>,
 }

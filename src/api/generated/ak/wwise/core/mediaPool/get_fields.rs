@@ -12,5 +12,5 @@ use crate::api::generated::primitives::*;
 pub struct CoreMediaPoolGetFieldsResponse {
     /// The list of fields available to use in Media Pool queries.
     #[serde(rename = "return", default)]
-    pub return_: Vec<String>,
+    pub fields: Vec<String>,
 }

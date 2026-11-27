@@ -11,12 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiCommandsRegisterArgs {
     /// Data for the commands to be registered.
-    pub commands: Vec<serde_json::Value>,
+    pub commands: Vec<AddOnCommand>,
 }
 
 impl UiCommandsRegisterArgs {
     /// Creates a new [`UiCommandsRegisterArgs`] with the required fields.
-    pub fn new(commands: impl Into<Vec<serde_json::Value>>) -> Self {
+    pub fn new(commands: impl Into<Vec<AddOnCommand>>) -> Self {
         Self {
             commands: commands.into(),
         }

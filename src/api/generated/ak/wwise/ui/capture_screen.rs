@@ -21,7 +21,7 @@ pub struct UiCaptureScreenArgs {
     pub view_selection_channel: Option<i64>,
     /// The capture region. By default, the whole view is captured.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rect: Option<serde_json::Value>,
+    pub rect: Option<ScreenRect>,
 }
 
 impl UiCaptureScreenArgs {
@@ -43,7 +43,7 @@ impl UiCaptureScreenArgs {
     }
 
     /// The capture region. By default, the whole view is captured.
-    pub fn rect(mut self, rect: serde_json::Value) -> Self {
+    pub fn rect(mut self, rect: ScreenRect) -> Self {
         self.rect = Some(rect);
         self
     }

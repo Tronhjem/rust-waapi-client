@@ -12,5 +12,5 @@ use crate::api::generated::primitives::*;
 pub struct DebugGetWalTreeResponse {
     /// Result returned by the dump of WAL.
     #[serde(rename = "return")]
-    pub return_: serde_json::Value,
+    pub tree: serde_json::Value,
 }

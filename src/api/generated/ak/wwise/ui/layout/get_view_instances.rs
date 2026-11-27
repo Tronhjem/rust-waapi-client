@@ -28,5 +28,5 @@ impl UiLayoutGetViewInstancesArgs {
 pub struct UiLayoutGetViewInstancesResponse {
     /// Array of all view instances of a layout.
     #[serde(rename = "viewInstances", default)]
-    pub view_instances: Vec<serde_json::Value>,
+    pub view_instances: Vec<ViewInstance>,
 }

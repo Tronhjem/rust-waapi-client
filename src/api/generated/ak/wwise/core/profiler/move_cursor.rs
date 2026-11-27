@@ -11,15 +11,13 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerMoveCursorArgs {
     /// The position to move the cursor to.
-    pub position: String,
+    pub position: CursorMovePosition,
 }
 
 impl CoreProfilerMoveCursorArgs {
     /// Creates a new [`CoreProfilerMoveCursorArgs`] with the required fields.
-    pub fn new(position: impl Into<String>) -> Self {
-        Self {
-            position: position.into(),
-        }
+    pub fn new(position: CursorMovePosition) -> Self {
+        Self { position }
     }
 }
 
@@ -30,5 +28,5 @@ impl CoreProfilerMoveCursorArgs {
 pub struct CoreProfilerMoveCursorResponse {
     /// The new position of the user Time Cursor, in ms.
     #[serde(rename = "return")]
-    pub return_: i64,
+    pub time: i64,
 }

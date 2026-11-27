@@ -71,5 +71,5 @@ impl CoreExecuteLuaScriptArgs {
 pub struct CoreExecuteLuaScriptResponse {
     /// Result returned by the Lua script. Use a return statement at the end of the script. In the case of a script that does not return any value, this field will be false.
     #[serde(rename = "return")]
-    pub return_: serde_json::Value,
+    pub result: serde_json::Value,
 }

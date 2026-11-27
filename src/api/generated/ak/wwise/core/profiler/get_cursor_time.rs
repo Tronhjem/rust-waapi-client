@@ -11,15 +11,13 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerGetCursorTimeArgs {
     /// Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.
-    pub cursor: String,
+    pub cursor: ProfilerCursor,
 }
 
 impl CoreProfilerGetCursorTimeArgs {
     /// Creates a new [`CoreProfilerGetCursorTimeArgs`] with the required fields.
-    pub fn new(cursor: impl Into<String>) -> Self {
-        Self {
-            cursor: cursor.into(),
-        }
+    pub fn new(cursor: ProfilerCursor) -> Self {
+        Self { cursor }
     }
 }
 
@@ -30,5 +28,5 @@ impl CoreProfilerGetCursorTimeArgs {
 pub struct CoreProfilerGetCursorTimeResponse {
     /// The current position of the specified Time Cursor, in ms.
     #[serde(rename = "return")]
-    pub return_: i64,
+    pub time: i64,
 }

@@ -11,7 +11,7 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiModelGetStateArgs {
     /// The widgets and attributes to query.
-    pub state: Vec<serde_json::Value>,
+    pub state: Vec<WidgetStateQuery>,
     /// The ID of the handle.
     #[serde(rename = "handleID")]
     pub handle_id: String,
@@ -19,7 +19,7 @@ pub struct UiModelGetStateArgs {
 
 impl UiModelGetStateArgs {
     /// Creates a new [`UiModelGetStateArgs`] with the required fields.
-    pub fn new(handle_id: impl Into<String>, state: impl Into<Vec<serde_json::Value>>) -> Self {
+    pub fn new(handle_id: impl Into<String>, state: impl Into<Vec<WidgetStateQuery>>) -> Self {
         Self {
             handle_id: handle_id.into(),
             state: state.into(),

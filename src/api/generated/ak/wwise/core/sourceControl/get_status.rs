@@ -29,7 +29,9 @@ impl CoreSourceControlGetStatusArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreSourceControlGetStatusResponse {
     /// Array of log entries generated during the request.
+    #[serde(default)]
     pub log: Vec<LogCentralItem>,
     /// Array of source control statuses.
-    pub result: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub result: Vec<SourceControlStatus>,
 }

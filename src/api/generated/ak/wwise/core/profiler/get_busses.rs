@@ -11,7 +11,7 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerGetBussesArgs {
     /// Time in milliseconds to query for busses, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.
-    pub time: serde_json::Value,
+    pub time: CursorTime,
     /// The pipeline ID of a single bus instance to get.
     #[serde(rename = "busPipelineID", skip_serializing_if = "Option::is_none")]
     pub bus_pipeline_id: Option<u32>,
@@ -19,7 +19,7 @@ pub struct CoreProfilerGetBussesArgs {
 
 impl CoreProfilerGetBussesArgs {
     /// Creates a new [`CoreProfilerGetBussesArgs`] with the required fields.
-    pub fn new(time: serde_json::Value) -> Self {
+    pub fn new(time: CursorTime) -> Self {
         Self {
             time,
             bus_pipeline_id: None,
@@ -67,6 +67,6 @@ impl CoreProfilerGetBussesOptions {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGetBussesResponse {
     /// Array of busses.
-    #[serde(rename = "return")]
-    pub return_: Vec<serde_json::Value>,
+    #[serde(rename = "return", default)]
+    pub busses: Vec<ProfilerBus>,
 }

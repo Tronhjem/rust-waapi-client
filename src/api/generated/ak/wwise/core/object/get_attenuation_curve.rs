@@ -43,6 +43,7 @@ impl CoreObjectGetAttenuationCurveArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectGetAttenuationCurveResponse {
     /// The attenuation curve.
+    #[serde(default)]
     pub points: Vec<CurvePoint2D>,
     /// Name of attenuation curve.
     #[serde(rename = "curveType")]

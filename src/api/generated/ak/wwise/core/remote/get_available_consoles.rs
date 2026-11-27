@@ -11,5 +11,6 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreRemoteGetAvailableConsolesResponse {
     /// An array of remote consoles available.
-    pub consoles: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub consoles: Vec<RemoteConsoleInfo>,
 }

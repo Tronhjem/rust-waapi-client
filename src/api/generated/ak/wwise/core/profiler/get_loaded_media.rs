@@ -11,12 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerGetLoadedMediaArgs {
     /// Time in milliseconds to query for media, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.
-    pub time: serde_json::Value,
+    pub time: CursorTime,
 }
 
 impl CoreProfilerGetLoadedMediaArgs {
     /// Creates a new [`CoreProfilerGetLoadedMediaArgs`] with the required fields.
-    pub fn new(time: serde_json::Value) -> Self {
+    pub fn new(time: CursorTime) -> Self {
         Self { time }
     }
 }
@@ -27,6 +27,6 @@ impl CoreProfilerGetLoadedMediaArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGetLoadedMediaResponse {
     /// Array of Loaded Media.
-    #[serde(rename = "return")]
-    pub return_: Vec<serde_json::Value>,
+    #[serde(rename = "return", default)]
+    pub media: Vec<ProfilerLoadedMedia>,
 }

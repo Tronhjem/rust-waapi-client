@@ -14,7 +14,7 @@ pub struct CoreProfilerCaptureLogItemAddedPayload {
     #[serde(rename = "type")]
     pub object_type: String,
     /// The severity level of the log entry.
-    pub severity: String,
+    pub severity: CaptureLogSeverity,
     /// The name of the object for the entry.
     #[serde(rename = "objectName", default)]
     pub object_name: Option<String>,
@@ -49,7 +49,7 @@ pub struct CoreProfilerCaptureLogItemAddedPayload {
 pub struct CoreProfilerCaptureLogItemAddedOptions {
     /// Defines which types of capture log items to receive. This filter can help to reduce the amount of data serialized. When no types are specified, all types are being sent.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub types: Option<Vec<String>>,
+    pub types: Option<Vec<CaptureLogType>>,
 }
 
 impl CoreProfilerCaptureLogItemAddedOptions {
@@ -59,7 +59,7 @@ impl CoreProfilerCaptureLogItemAddedOptions {
     }
 
     /// Defines which types of capture log items to receive. This filter can help to reduce the amount of data serialized. When no types are specified, all types are being sent.
-    pub fn types(mut self, types: impl Into<Vec<String>>) -> Self {
+    pub fn types(mut self, types: impl Into<Vec<CaptureLogType>>) -> Self {
         self.types = Some(types.into());
         self
     }

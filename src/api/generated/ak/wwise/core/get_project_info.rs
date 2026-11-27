@@ -19,8 +19,10 @@ pub struct CoreGetProjectInfoResponse {
     /// The absolute path to the WPROJ file.
     pub path: String,
     /// Array of the Platforms defined in the project.
+    #[serde(default)]
     pub platforms: Vec<ProjectPlatformInfo>,
     /// Array of the Languages defined in the project.
+    #[serde(default)]
     pub languages: Vec<ProjectLanguageInfo>,
     /// The complete text from the Wwise titlebar.
     #[serde(rename = "displayTitle")]
@@ -41,9 +43,17 @@ pub struct CoreGetProjectInfoResponse {
     #[serde(rename = "defaultConversion")]
     pub default_conversion: WwiseObjectRef,
     /// Default work units organized by category.
-    #[serde(rename = "defaultWorkUnits", default)]
-    pub default_work_units: Option<serde_json::Value>,
+    #[serde(
+        rename = "defaultWorkUnits",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub default_work_units: Option<std::collections::HashMap<String, DefaultWorkUnitInfo>>,
     /// The default location to import WAV and MIDI files as sounds and music segments.
-    #[serde(rename = "defaultImportWorkUnit", default)]
-    pub default_import_work_unit: Option<WwiseObjectRef>,
+    #[serde(
+        rename = "defaultImportWorkUnit",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub default_import_work_unit: Option<DefaultWorkUnitInfo>,
 }

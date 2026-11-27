@@ -11,6 +11,6 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProjectSavedPayload {
     /// Array of paths.
-    #[serde(rename = "modifiedPaths")]
+    #[serde(rename = "modifiedPaths", default)]
     pub modified_paths: Vec<String>,
 }

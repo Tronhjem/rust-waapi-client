@@ -11,10 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreAudioImportedPayload {
     /// The list of imported original files.
+    #[serde(default)]
     pub files: Vec<String>,
     /// The operation applied for this import call.
-    pub operation: String,
+    pub operation: AudioImportedOperation,
     /// The list of objects that have been created as part of the same import operation.
+    #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }
 

@@ -11,11 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreRemoteGetConnectionStatusResponse {
     /// The current connection status in text.
-    pub status: String,
-    /// Indicates if the Wwise Authoring application is connected to a Wwise Sound Engine process.
-    #[serde(rename = "isConnected")]
-    pub is_connected: bool,
-    /// Describe the remote process.
     #[serde(default)]
-    pub console: Option<serde_json::Value>,
+    pub status: Option<String>,
+    /// Indicates if the Wwise Authoring application is connected to a Wwise Sound Engine process.
+    #[serde(rename = "isConnected", default)]
+    pub is_connected: Option<bool>,
+    /// Describe the remote process.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub console: Option<ConnectedConsoleInfo>,
 }

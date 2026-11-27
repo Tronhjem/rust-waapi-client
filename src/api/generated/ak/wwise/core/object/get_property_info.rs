@@ -64,17 +64,17 @@ pub struct CoreObjectGetPropertyInfoResponse {
     #[serde(default)]
     pub supports: Option<PropertyInfoSupports>,
     /// Displays information related to the property.
-    #[serde(default)]
-    pub display: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display: Option<PropertyDisplayInfo>,
     /// List of dependencies on other properties with their related action and conditions.
     #[serde(default)]
-    pub dependencies: Vec<serde_json::Value>,
+    pub dependencies: Vec<PropertyDependency>,
     /// Restricts the value of the property.
-    #[serde(default)]
-    pub restriction: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub restriction: Option<PropertyRestriction>,
     /// Information related to how the property is displayed.
-    #[serde(default)]
-    pub ui: Option<serde_json::Value>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ui: Option<PropertyUiInfo>,
 }
 
 impl CoreObjectGetPropertyInfoResponse {

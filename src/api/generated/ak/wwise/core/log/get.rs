@@ -27,5 +27,6 @@ impl CoreLogGetArgs {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreLogGetResponse {
     /// The entries of the log.
+    #[serde(default)]
     pub items: Vec<LogCentralItem>,
 }

@@ -11,7 +11,8 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreObjectStructureChangedPayload {
     /// The list of changed objects.
-    pub objects: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub objects: Vec<StructureChangedObject>,
     /// The operation that triggered the changes. Generally, the name of the top-level undo operation.
     pub summary: String,
 }

@@ -14,7 +14,7 @@ pub struct UiProjectCreateArgs {
     pub path: String,
     /// Specifies the platform or platforms supported by the new project. If not specified, only Windows is used.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub platforms: Option<serde_json::Value>,
+    pub platforms: Option<PlatformsToCreate>,
     /// Array of languages to creates for this project. If not specified, the English(US) language is created. When multiple languages are specified, the first one becomes the default language.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<String>>,
@@ -31,7 +31,7 @@ impl UiProjectCreateArgs {
     }
 
     /// Specifies the platform or platforms supported by the new project. If not specified, only Windows is used.
-    pub fn platforms(mut self, platforms: serde_json::Value) -> Self {
+    pub fn platforms(mut self, platforms: PlatformsToCreate) -> Self {
         self.platforms = Some(platforms);
         self
     }

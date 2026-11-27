@@ -15,7 +15,7 @@ pub struct CoreMediaPoolGetArgs {
     pub databases: Option<Vec<ObjectRef>>,
     /// The list of filters to apply. When not specified, no filters are applied.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub filters: Option<Vec<serde_json::Value>>,
+    pub filters: Option<Vec<MediaPoolFilterEntry>>,
     /// The text for the fuzzy search in the Media Pool. The search is case-insensitive. When not specified, all files matching the specified filter and specified databases are returned.
     #[serde(rename = "searchText", skip_serializing_if = "Option::is_none")]
     pub search_text: Option<String>,
@@ -37,7 +37,7 @@ impl CoreMediaPoolGetArgs {
     }
 
     /// The list of filters to apply. When not specified, no filters are applied.
-    pub fn filters(mut self, filters: impl Into<Vec<serde_json::Value>>) -> Self {
+    pub fn filters(mut self, filters: impl Into<Vec<MediaPoolFilterEntry>>) -> Self {
         self.filters = Some(filters.into());
         self
     }
@@ -90,5 +90,5 @@ impl CoreMediaPoolGetOptions {
 pub struct CoreMediaPoolGetResponse {
     /// The list of files matching the search criteria. Each file is represented as an object with properties defined by the options.
     #[serde(rename = "return", default)]
-    pub return_: Vec<serde_json::Value>,
+    pub results: Vec<serde_json::Value>,
 }

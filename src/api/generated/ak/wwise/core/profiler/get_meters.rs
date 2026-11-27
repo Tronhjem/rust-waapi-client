@@ -11,12 +11,12 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CoreProfilerGetMetersArgs {
     /// Time in milliseconds to query for Performance Monitor data, or a Time Cursor from which to acquire the time. The User Time Cursor is the one that can be manipulated by the user, while the Capture Time Cursor represents the latest time of the current capture.
-    pub time: serde_json::Value,
+    pub time: CursorTime,
 }
 
 impl CoreProfilerGetMetersArgs {
     /// Creates a new [`CoreProfilerGetMetersArgs`] with the required fields.
-    pub fn new(time: serde_json::Value) -> Self {
+    pub fn new(time: CursorTime) -> Self {
         Self { time }
     }
 }
@@ -32,5 +32,6 @@ pub type CoreProfilerGetMetersOptions = ObjectReturnOptions;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerGetMetersResponse {
     /// Array of registered meters.
-    pub meters: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub meters: Vec<ProfilerMeter>,
 }

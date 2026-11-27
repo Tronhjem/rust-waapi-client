@@ -16,5 +16,6 @@ pub type UiGetSelectedObjectsOptions = ObjectReturnOptions;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct UiGetSelectedObjectsResponse {
     /// The selected objects, in the format specified in the options. Can be empty if no object is selected.
+    #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }

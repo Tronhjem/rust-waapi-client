@@ -14,10 +14,10 @@ pub struct DebugGenerateToneWavArgs {
     pub path: String,
     /// Channel configuration of the audio file. Default is 1.0. Please use the silence waveform for the ambisonics configurations, as the other tone signals will be incompatible with the format.
     #[serde(rename = "channelConfig", skip_serializing_if = "Option::is_none")]
-    pub channel_config: Option<String>,
+    pub channel_config: Option<ToneChannelConfig>,
     /// Bit depth of the audio file. Default is int16.
     #[serde(rename = "bitDepth", skip_serializing_if = "Option::is_none")]
-    pub bit_depth: Option<String>,
+    pub bit_depth: Option<ToneBitDepth>,
     /// Sample rate of the audio file. Default is 48000.
     #[serde(rename = "sampleRate", skip_serializing_if = "Option::is_none")]
     pub sample_rate: Option<f64>,
@@ -38,7 +38,7 @@ pub struct DebugGenerateToneWavArgs {
     pub release_time: Option<f64>,
     /// Waveform type. Default is silence.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub waveform: Option<String>,
+    pub waveform: Option<ToneWaveform>,
     /// Specifies which channels receive waveform data. The channel mask is a bit field where each bit represents a channel. The least significant bit represents the channel at index zero. The bits with 0 are silent. When not specified, the default outputs waveform data on all channels.
     #[serde(
         rename = "waveformChannelMask",
@@ -50,7 +50,7 @@ pub struct DebugGenerateToneWavArgs {
     pub frequency: Option<f64>,
     /// A list of markers to add to the generated WAV file. Each marker is an object with 'label' and 'position' properties, where 'position' is the position in seconds.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub markers: Option<Vec<serde_json::Value>>,
+    pub markers: Option<Vec<WavMarker>>,
 }
 
 impl DebugGenerateToneWavArgs {
@@ -74,14 +74,14 @@ impl DebugGenerateToneWavArgs {
     }
 
     /// Channel configuration of the audio file. Default is 1.0. Please use the silence waveform for the ambisonics configurations, as the other tone signals will be incompatible with the format.
-    pub fn channel_config(mut self, channel_config: impl Into<String>) -> Self {
-        self.channel_config = Some(channel_config.into());
+    pub fn channel_config(mut self, channel_config: ToneChannelConfig) -> Self {
+        self.channel_config = Some(channel_config);
         self
     }
 
     /// Bit depth of the audio file. Default is int16.
-    pub fn bit_depth(mut self, bit_depth: impl Into<String>) -> Self {
-        self.bit_depth = Some(bit_depth.into());
+    pub fn bit_depth(mut self, bit_depth: ToneBitDepth) -> Self {
+        self.bit_depth = Some(bit_depth);
         self
     }
 
@@ -122,8 +122,8 @@ impl DebugGenerateToneWavArgs {
     }
 
     /// Waveform type. Default is silence.
-    pub fn waveform(mut self, waveform: impl Into<String>) -> Self {
-        self.waveform = Some(waveform.into());
+    pub fn waveform(mut self, waveform: ToneWaveform) -> Self {
+        self.waveform = Some(waveform);
         self
     }
 
@@ -140,7 +140,7 @@ impl DebugGenerateToneWavArgs {
     }
 
     /// A list of markers to add to the generated WAV file. Each marker is an object with 'label' and 'position' properties, where 'position' is the position in seconds.
-    pub fn markers(mut self, markers: impl Into<Vec<serde_json::Value>>) -> Self {
+    pub fn markers(mut self, markers: impl Into<Vec<WavMarker>>) -> Self {
         self.markers = Some(markers.into());
         self
     }

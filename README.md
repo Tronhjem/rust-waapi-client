@@ -239,7 +239,17 @@ All **180 WAAPI functions** and **35 subscription topics** across the union of W
 - **Multi-Version Union (Wwise 2024 + 2025+):** A single unified API supports both Wwise 2024 and Wwise 2025+ (keeping renamed variants like `ObjectType::ActorMixer` and `ObjectType::PropertyContainer` as aliases sharing `class_id()` `524304`).
 - **Raw URI Constants & Escape Hatch:** Every URI is also available as a `WaapiFunction` / `WaapiTopic` enum variant and as a `&str` constant under `wwise_waapi::waapi_function_api::ak` and `wwise_waapi::waapi_topics_api::ak`.
 
-For the complete endpoint & topic tables and JSON Schema mapping rules, see:
+### Intentionally Dynamic Payloads (`serde_json::Value`)
+
+All **180 WAAPI functions** and **35 subscription topics** have generated typed `Args`, `Options`, `Response`, and `Payload` wrappers and chained client methods (`0` endpoints are excluded). Within **10 endpoints**, specific payload fields are intentionally kept as `serde_json::Value` because Wwise's schema defines them as arbitrary, user-defined, or opaque JSON documents:
+
+- **Lua script execution** (`ak.wwise.core.executeLuaScript`, `ak.wwise.ui.cli.executeLuaScript`) — `result` returns whatever arbitrary value or table a user Lua script produces.
+- **Schema & call introspection** (`ak.wwise.waapi.getSchema`, `ak.wwise.debug.validateCall`, `ak.wwise.debug.getWalTree`) — raw JSON Schema documents, arbitrary call validation payloads, and internal Authoring Layer debug trees with no fixed schema properties.
+- **Dynamic media-pool query rows** (`ak.wwise.core.mediaPool.get`) — `CoreMediaPoolGetArgs` (`MediaPoolFilterEntry`) and `CoreMediaPoolGetOptions` are strongly typed, while `results` is `Vec<serde_json::Value>` because each entry is keyed dynamically by whichever media-pool/user metadata field names were requested.
+- **Opaque WAFM UI layout & model documents** (`ak.wwise.ui.layout.getLayout`, `ak.wwise.ui.layout.setLayout`, `ak.wwise.ui.model.registerWafm`) — recursive WAFM docking layout trees and inline UI model definitions designed to be round-tripped as JSON documents.
+- **Unschematized sub-objects in `ak.wwise.core.soundbank.generated`** — `soundbank`, `bank_data` (`SoundBankGeneratedBankData`), and `plugin_info` (`SoundBankPluginInfo`) are strongly typed, while `platform`, `language`, and `bank_info` are defined in Wwise's schema as bare `{"type": "object"}` nodes without properties.
+
+For the complete 180-function and 35-topic tables, JSON Schema mapping rules, and the full field-by-field breakdown of dynamic payloads, see:
 - **[Typed API Design & Endpoint Reference (`docs/API_REFERENCE.md`)](docs/API_REFERENCE.md)**
 - **[Interactive Rustdoc Documentation](https://tronhjem.github.io/rust-waapi-client/wwise_waapi/)**
 

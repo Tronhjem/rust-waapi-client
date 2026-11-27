@@ -11,14 +11,14 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct UiWindowCreateArgs {
     /// The size of the window.
-    pub size: serde_json::Value,
+    pub size: WindowSize,
     /// The name of the window.
     pub title: String,
 }
 
 impl UiWindowCreateArgs {
     /// Creates a new [`UiWindowCreateArgs`] with the required fields.
-    pub fn new(title: impl Into<String>, size: serde_json::Value) -> Self {
+    pub fn new(title: impl Into<String>, size: WindowSize) -> Self {
         Self {
             title: title.into(),
             size,

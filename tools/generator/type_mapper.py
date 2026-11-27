@@ -151,7 +151,10 @@ def rust_type(
         return f"Vec<{item_ty}>"
     if t == "object":
         props = sch.get("properties", {})
-        if "id" in props and "name" in props:
+        if (
+            set(props.keys()) == {"id", "name"}
+            and props.get("id", {}).get("type") != "integer"
+        ):
             return "WwiseObjectRef"
         _record_fallback(ctx, field_context, "inline object without typed map")
         return "serde_json::Value"
@@ -209,6 +212,8 @@ class Field:
                 pieces.append("default")
                 if self.ty.startswith("Option<"):
                     pieces.append('skip_serializing_if = "Option::is_none"')
+        elif kind == "response" and self.ty.startswith("Vec<"):
+            pieces.append("default")
         if pieces:
             attrs.append(f"#[serde({', '.join(pieces)})]")
         return attrs
@@ -245,7 +250,7 @@ def collect_fields(
     fields: List[Field] = []
     req_set = set(schema_required(schema))
     if kind == "response" and ctx.uri in RESPONSE_REQUIRED_OVERRIDES:
-        req_set |= set(RESPONSE_REQUIRED_OVERRIDES[ctx.uri])
+        req_set = set(RESPONSE_REQUIRED_OVERRIDES[ctx.uri])
     for wire, sub in (schema.get("properties") or {}).items():
         ty = PROP_TYPE_OVERRIDES.get(
             (ctx.uri, kind, wire)

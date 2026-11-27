@@ -83,9 +83,12 @@ pub type CoreAudioImportOptions = ObjectReturnOptions;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreAudioImportResponse {
     /// The list of imported original files.
+    #[serde(default)]
     pub files: Vec<String>,
     /// The audio import log.
-    pub log: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub log: Vec<AudioImportLogItem>,
     /// Array of objects.
+    #[serde(default)]
     pub objects: Vec<WwiseObject>,
 }

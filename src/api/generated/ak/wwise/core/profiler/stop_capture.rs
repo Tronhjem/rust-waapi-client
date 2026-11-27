@@ -11,6 +11,6 @@ use crate::api::generated::primitives::*;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CoreProfilerStopCaptureResponse {
     /// The value of the Capture Time Cursor in ms.
-    #[serde(rename = "return", default)]
-    pub return_: Option<i64>,
+    #[serde(rename = "return")]
+    pub time: i64,
 }

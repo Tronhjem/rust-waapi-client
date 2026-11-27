@@ -12,12 +12,12 @@ use crate::api::generated::primitives::*;
 pub struct CoreProfilerEnableProfilerDataArgs {
     /// An array of data types.
     #[serde(rename = "dataTypes")]
-    pub data_types: Vec<serde_json::Value>,
+    pub data_types: Vec<ProfilerDataTypeEntry>,
 }
 
 impl CoreProfilerEnableProfilerDataArgs {
     /// Creates a new [`CoreProfilerEnableProfilerDataArgs`] with the required fields.
-    pub fn new(data_types: impl Into<Vec<serde_json::Value>>) -> Self {
+    pub fn new(data_types: impl Into<Vec<ProfilerDataTypeEntry>>) -> Self {
         Self {
             data_types: data_types.into(),
         }

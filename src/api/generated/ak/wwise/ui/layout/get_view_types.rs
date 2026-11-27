@@ -12,5 +12,5 @@ use crate::api::generated::primitives::*;
 pub struct UiLayoutGetViewTypesResponse {
     /// Array of all view types registered in Wwise.
     #[serde(rename = "viewTypes", default)]
-    pub view_types: Vec<serde_json::Value>,
+    pub view_types: Vec<ViewTypeInfo>,
 }

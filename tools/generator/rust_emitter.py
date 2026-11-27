@@ -1328,6 +1328,1034 @@ pub struct AudioConvertError {
     return "\n\n".join(parts)
 
 
+def gen_profiler_and_domain_types(schemas, endpoints_docs):
+    waapi_defs = schemas.load_definitions("waapi_definitions.json")
+    get_ctx = endpoints_docs["ak.wwise.core.object.get"]
+    loaded_media_ctx = endpoints_docs["ak.wwise.core.profiler.getLoadedMedia"]
+    streamed_media_ctx = endpoints_docs["ak.wwise.core.profiler.getStreamedMedia"]
+
+    voice_fields = collect_fields(get_ctx, waapi_defs["definitions"]["voiceReturn"], "response", "ProfilerVoice")
+    bus_fields = collect_fields(get_ctx, waapi_defs["definitions"]["busReturn"], "response", "ProfilerBus")
+    audio_obj_fields = collect_fields(get_ctx, waapi_defs["definitions"]["audioObjectReturn"], "response", "ProfilerAudioObject")
+    for f in audio_obj_fields:
+        if f.wire == "metadata":
+            f.ty = "Vec<AudioObjectMetadata>"
+
+    loaded_media_sch = loaded_media_ctx.doc["resultSchema"]["properties"]["return"]["items"]
+    loaded_media_fields = collect_fields(loaded_media_ctx, loaded_media_sch, "response", "ProfilerLoadedMedia")
+    streamed_media_sch = streamed_media_ctx.doc["resultSchema"]["properties"]["return"]["items"]
+    streamed_media_fields = collect_fields(streamed_media_ctx, streamed_media_sch, "response", "ProfilerStreamedMedia")
+
+    parts = [
+        emit_enum("ProfilerCursor", "A profiler cursor selector (`profilerCursor`).", ["user", "capture"]),
+        """/// Profiler cursor time (`cursorTime`): either an explicit timestamp in milliseconds or a named cursor (`"user"` / `"capture"`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum CursorTime {
+    /// Timestamp in milliseconds (`>= 0`).
+    TimeMs(i64),
+    /// Named profiler cursor (`"user"` or `"capture"`).
+    Cursor(ProfilerCursor),
+}
+
+impl CursorTime {
+    /// Specifies an explicit capture timestamp in milliseconds.
+    pub const fn ms(ms: i64) -> Self {
+        Self::TimeMs(ms)
+    }
+
+    /// Selects the user profiler cursor (`"user"`).
+    pub const fn user() -> Self {
+        Self::Cursor(ProfilerCursor::User)
+    }
+
+    /// Selects the capture profiler cursor (`"capture"`).
+    pub const fn capture() -> Self {
+        Self::Cursor(ProfilerCursor::Capture)
+    }
+}
+
+impl From<i64> for CursorTime {
+    fn from(ms: i64) -> Self {
+        Self::TimeMs(ms)
+    }
+}
+
+impl From<ProfilerCursor> for CursorTime {
+    fn from(cursor: ProfilerCursor) -> Self {
+        Self::Cursor(cursor)
+    }
+}""",
+        emit_enum("CursorMovePosition", "Direction or boundary for `ak.wwise.core.profiler.moveCursor`.",
+                  ["first", "last", "next", "previous"]),
+        emit_enum("ProfilerDataType", "Profiler data category for `ak.wwise.core.profiler.enableProfilerData`.",
+                  ["cpu", "memory", "stream", "voices", "listener", "obstructionOcclusion",
+                   "markersNotification", "soundbanks", "loadedMedia", "preparedObjects",
+                   "preparedGameSyncs", "interactiveMusic", "streamingDevice", "meter",
+                   "auxiliarySends", "apiCalls", "spatialAudio", "spatialAudioRaycasting",
+                   "voiceInspector", "audioObjects", "gameSyncs", "customerSupportData"]),
+        """/// Entry configuring a profiler data type in `ak.wwise.core.profiler.enableProfilerData`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerDataTypeEntry {
+    /// Profiler data category to configure.
+    #[serde(rename = "dataType")]
+    pub data_type: ProfilerDataType,
+    /// Whether capture of this data category is enabled.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enable: Option<bool>,
+}
+
+impl ProfilerDataTypeEntry {
+    /// Creates a new [`ProfilerDataTypeEntry`] for `data_type`.
+    pub fn new(data_type: ProfilerDataType) -> Self {
+        Self { data_type, enable: None }
+    }
+
+    /// Sets whether capture of this data category is enabled.
+    pub fn enable(mut self, enable: bool) -> Self {
+        self.enable = Some(enable);
+        self
+    }
+}""",
+        """/// A registered game object returned by `ak.wwise.core.profiler.getGameObjects`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerGameObject {
+    /// Unsigned 64-bit game object ID.
+    pub id: u64,
+    /// Name of the game object.
+    pub name: String,
+    /// Capture timestamp (ms) when the game object was registered.
+    #[serde(rename = "registerTime")]
+    pub register_time: i32,
+    /// Capture timestamp (ms) when the game object was unregistered (`0` if still active).
+    #[serde(rename = "unregisterTime")]
+    pub unregister_time: i32,
+}""",
+        """/// An active RTPC value returned by `ak.wwise.core.profiler.getRTPCs`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerRtpc {
+    /// GUID or identifier of the Game Parameter.
+    pub id: String,
+    /// Name of the Game Parameter.
+    pub name: String,
+    /// Current value of the Game Parameter at the queried cursor time.
+    pub value: f64,
+    /// Game object ID if the RTPC is game-object-scoped.
+    #[serde(default, rename = "gameObjectId", skip_serializing_if = "Option::is_none")]
+    pub game_object_id: Option<GameObjectRef>,
+}""",
+        """/// A CPU usage entry returned by `ak.wwise.core.profiler.getCpuUsage`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerCpuUsageItem {
+    /// Identifier of the profiled element.
+    pub id: i64,
+    /// Category or type of the profiled element.
+    #[serde(rename = "type")]
+    pub item_type: String,
+    /// Display name of the profiled element.
+    #[serde(rename = "elementName")]
+    pub element_name: String,
+    /// Number of active instances of the element.
+    pub instances: i64,
+    /// Inclusive CPU usage percentage.
+    #[serde(rename = "percentInclusive")]
+    pub percent_inclusive: f64,
+    /// Exclusive CPU usage percentage.
+    #[serde(rename = "percentExclusive")]
+    pub percent_exclusive: f64,
+    /// Inclusive CPU time in milliseconds.
+    #[serde(rename = "millisecondsInclusive")]
+    pub milliseconds_inclusive: f64,
+    /// Exclusive CPU time in milliseconds.
+    #[serde(rename = "millisecondsExclusive")]
+    pub milliseconds_exclusive: f64,
+}""",
+        """/// A performance monitor counter value returned by `ak.wwise.core.profiler.getPerformanceMonitor`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerPerformanceCounter {
+    /// Identifier of the performance counter.
+    pub id: String,
+    /// Display name of the performance counter.
+    pub name: String,
+    /// Value of the performance counter at the queried cursor time.
+    pub value: f64,
+}""",
+        emit_struct("response", "ProfilerVoice", "A profiler voice entry (`voiceReturn`).", voice_fields, get_ctx),
+        emit_struct("response", "ProfilerBus", "A profiler bus entry (`busReturn`).", bus_fields, get_ctx),
+        """/// Metadata item attached to a [`ProfilerAudioObject`].
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct AudioObjectMetadata {
+    /// Class ID of the metadata plug-in.
+    #[serde(rename = "metadataClassID")]
+    pub metadata_class_id: u32,
+    /// Name of the metadata plug-in.
+    #[serde(default, rename = "metadataName", skip_serializing_if = "Option::is_none")]
+    pub metadata_name: Option<String>,
+    /// Authoring GUID of the metadata source object.
+    #[serde(default, rename = "sourceID", skip_serializing_if = "Option::is_none")]
+    pub source_id: Option<String>,
+    /// 32-bit Short ID of the metadata source object.
+    #[serde(rename = "sourceShortID")]
+    pub source_short_id: u32,
+    /// Name of the metadata source object.
+    #[serde(default, rename = "sourceName", skip_serializing_if = "Option::is_none")]
+    pub source_name: Option<String>,
+}""",
+        emit_struct("response", "ProfilerAudioObject", "A profiler audio object entry (`audioObjectReturn`).",
+                    audio_obj_fields, get_ctx),
+        emit_struct("response", "ProfilerLoadedMedia", "A loaded media entry returned by `ak.wwise.core.profiler.getLoadedMedia`.",
+                    loaded_media_fields, loaded_media_ctx),
+        emit_struct("response", "ProfilerStreamedMedia", "A streamed media entry returned by `ak.wwise.core.profiler.getStreamedMedia`.",
+                    streamed_media_fields, streamed_media_ctx),
+        emit_enum("MeterSource", "Audio signal source for a profiler meter (`getMeters`).",
+                  ["Bus", "DeviceMainMix", "DevicePassthrough", "DeviceSystemAudioObjects"]),
+        emit_enum("MeterConfigurationType", "Channel configuration type for a profiler meter (`getMeters`).",
+                  ["Anonymous", "Standard", "Ambisonic", "Objects"]),
+        """/// Per-channel meter reading inside a [`ProfilerMeter`].
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct MeterChannel {
+    /// Channel name (e.g. `"FL"`, `"FR"`, `"Object 0"`, `"H1V1"`).
+    pub name: String,
+    /// Meter value for this channel in decibels.
+    pub value: f64,
+}""",
+        """/// Meter data for a registered bus or device returned by `ak.wwise.core.profiler.getMeters`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ProfilerMeter {
+    /// Bus or device object being metered.
+    pub object: WwiseObject,
+    /// Audio signal source of the meter (`Bus`, `DeviceMainMix`, `DevicePassthrough`, `DeviceSystemAudioObjects`).
+    pub source: MeterSource,
+    /// Channel configuration name (e.g. `"2.0"`, `"7.1.4"`).
+    #[serde(rename = "configurationName")]
+    pub configuration_name: String,
+    /// Bitmask of the speaker configuration.
+    #[serde(rename = "configurationMask")]
+    pub configuration_mask: i64,
+    /// Channel configuration type (`Anonymous`, `Standard`, `Ambisonic`, `Objects`).
+    #[serde(rename = "configurationType")]
+    pub configuration_type: MeterConfigurationType,
+    /// Meter readings for each channel.
+    #[serde(default)]
+    pub channels: Vec<MeterChannel>,
+}""",
+        """/// A single parameter contribution (e.g. Volume, LPF, HPF) on a [`VoiceContributionObject`].
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VoiceContributionParameter {
+    /// Property or parameter type name.
+    #[serde(default, rename = "propertyType", skip_serializing_if = "Option::is_none")]
+    pub property_type: Option<String>,
+    /// Reason or driver category for this parameter contribution.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+    /// Driver identifier (such as an RTPC or Attenuation name/GUID) responsible for the contribution.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub driver: Option<String>,
+    /// Driver input value (number or string), if applicable.
+    #[serde(default, rename = "driverValue", skip_serializing_if = "Option::is_none")]
+    pub driver_value: Option<serde_json::Value>,
+    /// Numeric contribution value.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<f64>,
+}""",
+        """/// An object node in the voice contribution hierarchy (`ak.wwise.core.profiler.getVoiceContributions`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VoiceContributionObject {
+    /// Name of the contributing Wwise object.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Resulting volume contribution in dB.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub volume: Option<f64>,
+    /// Resulting low-pass filter contribution.
+    #[serde(default, rename = "LPF", skip_serializing_if = "Option::is_none")]
+    pub lpf: Option<f64>,
+    /// Resulting high-pass filter contribution.
+    #[serde(default, rename = "HPF", skip_serializing_if = "Option::is_none")]
+    pub hpf: Option<f64>,
+    /// Resulting dual-shelf filter contribution (Wwise 2025+).
+    #[serde(default, rename = "DSF", skip_serializing_if = "Option::is_none")]
+    pub dsf: Option<f64>,
+    /// Optional index of the contributing object or slot.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<u32>,
+    /// Parameter contributions originating from this object.
+    #[serde(default)]
+    pub parameters: Vec<VoiceContributionParameter>,
+    /// Child contributing objects in the hierarchy.
+    #[serde(default)]
+    pub children: Vec<VoiceContributionObject>,
+}""",
+        """/// Full voice contribution breakdown returned by `ak.wwise.core.profiler.getVoiceContributions`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VoiceContributions {
+    /// Total resulting volume in dB.
+    pub volume: f64,
+    /// Total resulting low-pass filter value.
+    #[serde(rename = "LPF")]
+    pub lpf: f64,
+    /// Total resulting high-pass filter value.
+    #[serde(rename = "HPF")]
+    pub hpf: f64,
+    /// Total resulting dual-shelf filter value (Wwise 2025+).
+    #[serde(default, rename = "DSF", skip_serializing_if = "Option::is_none")]
+    pub dsf: Option<f64>,
+    /// Root contributing objects in the voice hierarchy.
+    #[serde(default)]
+    pub objects: Vec<VoiceContributionObject>,
+}""",
+        emit_enum("CaptureLogType", "Capture log item type filter for `ak.wwise.core.profiler.captureLog.itemAdded`.",
+                  ["Error", "Notification", "Action", "Event", "Switch", "State", "GameParameter",
+                   "Trigger", "ActionDelayed", "Marker", "InteractiveMusic", "Midi", "ExternalSource",
+                   "DialogueEventResolved", "SoundBank", "Media", "API", "Modulator"]),
+        emit_enum("CaptureLogSeverity", "Severity of a capture log item (`ak.wwise.core.profiler.captureLog.itemAdded`).",
+                  ["Normal", "Message", "Error"]),
+        emit_enum("StructureChangeType", "Kind of hierarchy change reported in `ak.wwise.core.object.structureChanged`.",
+                  ["create", "delete", "nameChange", "notesChange", "parentChange", "ownerChange", "load", "unload"]),
+        """/// Old and new parent references for a `parentChange` entry in [`StructureChange`].
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StructureParentChange {
+    /// Previous parent object.
+    #[serde(default, rename = "oldParent", skip_serializing_if = "Option::is_none")]
+    pub old_parent: Option<WwiseObject>,
+    /// New parent object.
+    #[serde(default, rename = "newParent", skip_serializing_if = "Option::is_none")]
+    pub new_parent: Option<WwiseObject>,
+}""",
+        """/// Old and new owner references for an `ownerChange` entry in [`StructureChange`].
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StructureOwnerChange {
+    /// Name of the reference or property that changed owner.
+    #[serde(rename = "referenceName")]
+    pub reference_name: String,
+    /// Previous owner object.
+    #[serde(default, rename = "oldOwner", skip_serializing_if = "Option::is_none")]
+    pub old_owner: Option<WwiseObject>,
+    /// New owner object.
+    #[serde(default, rename = "newOwner", skip_serializing_if = "Option::is_none")]
+    pub new_owner: Option<WwiseObject>,
+}""",
+        """/// Old and new names for a `nameChange` entry in [`StructureChange`].
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct StructureNameChange {
+    /// Previous object name.
+    #[serde(rename = "oldName")]
+    pub old_name: String,
+    /// New object name.
+    #[serde(rename = "newName")]
+    pub new_name: String,
+}""",
+        """/// Old and new notes for a `notesChange` entry in [`StructureChange`].
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct StructureNotesChange {
+    /// Previous notes string (Wwise schema wire key `"oldName"`).
+    #[serde(rename = "oldName")]
+    pub old_name: String,
+    /// New notes string (Wwise schema wire key `"newName"`).
+    #[serde(rename = "newName")]
+    pub new_name: String,
+}""",
+        """/// A single structural change reported on a [`StructureChangedObject`].
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StructureChange {
+    /// Kind of structural change.
+    #[serde(rename = "type")]
+    pub change_type: StructureChangeType,
+    /// Parent change details when `change_type` is [`StructureChangeType::ParentChange`].
+    #[serde(default, rename = "parentChange", skip_serializing_if = "Option::is_none")]
+    pub parent_change: Option<StructureParentChange>,
+    /// Owner change details when `change_type` is [`StructureChangeType::OwnerChange`].
+    #[serde(default, rename = "ownerChange", skip_serializing_if = "Option::is_none")]
+    pub owner_change: Option<StructureOwnerChange>,
+    /// Name change details when `change_type` is [`StructureChangeType::NameChange`].
+    #[serde(default, rename = "nameChange", skip_serializing_if = "Option::is_none")]
+    pub name_change: Option<StructureNameChange>,
+    /// Notes change details when `change_type` is [`StructureChangeType::NotesChange`].
+    #[serde(default, rename = "notesChange", skip_serializing_if = "Option::is_none")]
+    pub notes_change: Option<StructureNotesChange>,
+}""",
+        """/// An affected object and its changes in `ak.wwise.core.object.structureChanged`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct StructureChangedObject {
+    /// The affected Wwise object.
+    pub object: WwiseObject,
+    /// Structural changes applied to this object.
+    #[serde(default)]
+    pub changes: Vec<StructureChange>,
+}""",
+        """/// Display metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDisplayInfo {
+    /// Human-readable display name of the property.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Display ordering index of the property.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<i64>,
+    /// UI property group name.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub group: Option<String>,
+}""",
+        """/// Display formatting flags for a property in Wwise Authoring (`object.getPropertyInfo`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyUiDisplayAs {
+    /// Whether the property is displayed as a Left/Right balance mix slider.
+    #[serde(default, rename = "lrMix", skip_serializing_if = "Option::is_none")]
+    pub lr_mix: Option<bool>,
+    /// Whether the property is displayed as a musical MIDI note name.
+    #[serde(default, rename = "musicNote", skip_serializing_if = "Option::is_none")]
+    pub music_note: Option<bool>,
+    /// Whether the property is displayed as a bitfield.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bitfield: Option<bool>,
+    /// Whether the property is displayed as a percentage.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub percentage: Option<bool>,
+}""",
+        emit_enum("PropertyDataMeaning", "Semantic meaning of a property's numeric value (`object.getPropertyInfo`).",
+                  ["None", "Frequency", "Decibels", "PitchCents"]),
+        """/// Numeric value constraints and formatting metadata for a property UI (`object.getPropertyInfo`).
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyUiValueInfo {
+    /// Minimum UI value.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min: Option<f64>,
+    /// Maximum UI value.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max: Option<f64>,
+    /// Number of decimal places displayed in the UI.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decimals: Option<f64>,
+    /// Standard UI increment step.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub step: Option<f64>,
+    /// Fine UI increment step.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fine: Option<f64>,
+    /// Numeric threshold below which the UI displays negative infinity.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub infinity: Option<f64>,
+}""",
+        """/// UI metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyUiInfo {
+    /// Numeric value range and step details.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value: Option<PropertyUiValueInfo>,
+    /// Special display formatting flags (`lrMix`, `musicNote`, `bitfield`, `percentage`).
+    #[serde(default, rename = "displayAs", skip_serializing_if = "Option::is_none")]
+    pub display_as: Option<PropertyUiDisplayAs>,
+    /// Semantic unit or meaning of the property value (`None`, `Frequency`, `Decibels`, `PitchCents`).
+    #[serde(default, rename = "dataMeaning", skip_serializing_if = "Option::is_none")]
+    pub data_meaning: Option<PropertyDataMeaning>,
+    /// Whether the property updates automatically while dragging in the UI.
+    #[serde(default, rename = "autoUpdate", skip_serializing_if = "Option::is_none")]
+    pub auto_update: Option<bool>,
+}""",
+        emit_enum("PropertyDependencyType", "Action triggered by a property dependency (`object.getPropertyInfo`).",
+                  ["Enable", "Disable", "Show", "Hide"]),
+        """/// Condition activating a [`PropertyDependency`] (`object.getPropertyInfo`).
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependencyCondition {
+    /// Values of the controlling property that satisfy the condition.
+    #[serde(default)]
+    pub values: Vec<serde_json::Value>,
+    /// Whether the condition is satisfied when the controlling property is set.
+    #[serde(default, rename = "isSet", skip_serializing_if = "Option::is_none")]
+    pub is_set: Option<bool>,
+    /// Controlling object type IDs.
+    #[serde(default, rename = "objectTypes")]
+    pub object_types: Vec<i64>,
+}""",
+        """/// Dependency rule between properties returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PropertyDependency {
+    /// Action taken when the dependency condition matches (`Enable`, `Disable`, `Show`, `Hide`).
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub dependency_type: Option<PropertyDependencyType>,
+    /// Name of the controlling property or reference.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub property: Option<String>,
+    /// Condition evaluated against the controlling property.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub condition: Option<PropertyDependencyCondition>,
+}""",
+        """/// Value restriction metadata for a property returned by `ak.wwise.core.object.getPropertyInfo`.
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct PropertyRestriction {
+    /// Kind of value restriction (`"none"`, `"range"`, `"enum"`).
+    #[serde(default, rename = "type", skip_serializing_if = "Option::is_none")]
+    pub restriction_type: Option<String>,
+    /// Minimum allowed value when `restriction_type` is `"range"`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min: Option<f64>,
+    /// Maximum allowed value when `restriction_type` is `"range"`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max: Option<f64>,
+}""",
+        """/// Default work unit reference returned by `ak.wwise.core.getProjectInfo` (Wwise 2025+).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct DefaultWorkUnitInfo {
+    /// Work unit GUID.
+    pub id: String,
+    /// Work unit name.
+    pub name: String,
+}""",
+        """/// Available remote console entry returned by `ak.wwise.core.remote.getAvailableConsoles`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct RemoteConsoleInfo {
+    /// Name of the remote console or executable.
+    pub name: String,
+    /// Target platform name.
+    pub platform: String,
+    /// Custom platform name configured in the project.
+    #[serde(rename = "customPlatform")]
+    pub custom_platform: String,
+    /// IP address or hostname of the remote target.
+    pub host: String,
+    /// Command port number.
+    #[serde(rename = "commandPort")]
+    pub command_port: u16,
+    /// Notification port number, if reported by the target.
+    #[serde(default, rename = "notificationPort", skip_serializing_if = "Option::is_none")]
+    pub notification_port: Option<u16>,
+    /// Connected application name.
+    #[serde(rename = "appName")]
+    pub app_name: String,
+}""",
+        """/// Connected console details returned by `ak.wwise.core.remote.getConnectionStatus`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ConnectedConsoleInfo {
+    /// Name of the remote console or executable.
+    pub name: String,
+    /// Target platform name.
+    pub platform: String,
+    /// Custom platform name configured in the project.
+    #[serde(rename = "customPlatform")]
+    pub custom_platform: String,
+    /// IP address or hostname of the remote target.
+    pub host: String,
+    /// Connected application name.
+    #[serde(rename = "appName")]
+    pub app_name: String,
+}""",
+        emit_enum("SourceControlFileFilter", "Filter for `ak.wwise.core.sourceControl.getSourceFiles`.",
+                  ["all", "used", "unused"]),
+        emit_enum("SourceControlReturnField", "Return field selector for `ak.wwise.core.sourceControl.getSourceFiles`.",
+                  ["isUsed", "usage", "isMissing", "file", "folder"]),
+        """/// A source file entry returned by `ak.wwise.core.sourceControl.getSourceFiles`.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SourceControlSourceFile {
+    /// Directory path containing the source file.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub folder: Option<String>,
+    /// Full file path or file name on disk.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub file: Option<String>,
+    /// Whether the file is used in the project.
+    #[serde(default, rename = "isUsed", skip_serializing_if = "Option::is_none")]
+    pub is_used: Option<bool>,
+    /// Wwise objects referencing this source file.
+    #[serde(default)]
+    pub usage: Vec<WwiseObject>,
+    /// Whether the file is missing on disk.
+    #[serde(default, rename = "isMissing", skip_serializing_if = "Option::is_none")]
+    pub is_missing: Option<bool>,
+}""",
+        """/// File status entry returned by `ak.wwise.core.sourceControl.getStatus`.
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct SourceControlStatus {
+    /// Source control owner or lock holder.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner: Option<String>,
+    /// Source control status text.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
+}""",
+        emit_enum("MediaPoolFilterType", "Filter category for `ak.wwise.core.mediaPool.get`.",
+                  ["field", "audioDescription", "audioSimilarity"]),
+        emit_enum("MediaPoolFilterOperator", "Comparison operator for a `field` filter in `ak.wwise.core.mediaPool.get`.",
+                  ["equals", "notEquals", "contains", "startsWith", "endsWith", "matchesRegex",
+                   "lessThan", "greaterThan", "lessThanOrEqual", "greaterThanOrEqual"]),
+        """/// A filter predicate entry for `ak.wwise.core.mediaPool.get`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct MediaPoolFilterEntry {
+    /// Type of filter (`field`, `audioDescription`, or `audioSimilarity`).
+    #[serde(rename = "type")]
+    pub filter_type: MediaPoolFilterType,
+    /// Media Pool field name to compare when `filter_type` is [`MediaPoolFilterType::Field`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub field: Option<String>,
+    /// Comparison operator when `filter_type` is [`MediaPoolFilterType::Field`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operator: Option<MediaPoolFilterOperator>,
+    /// Value to compare against (string, number, or similarity reference object).
+    pub value: serde_json::Value,
+    /// Optional weight for similarity/description matching (`0.0..=1.0`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weight: Option<f64>,
+}
+
+impl MediaPoolFilterEntry {
+    /// Creates a new [`MediaPoolFilterEntry`] with `filter_type` and `value`.
+    pub fn new(filter_type: MediaPoolFilterType, value: impl serde::Serialize) -> Self {
+        Self {
+            filter_type,
+            field: None,
+            operator: None,
+            value: serde_json::to_value(value).unwrap_or(serde_json::Value::Null),
+            weight: None,
+        }
+    }
+
+    /// Creates a `field` filter entry comparing `field` with `operator` against `value`.
+    pub fn field_filter(
+        field: impl Into<String>,
+        operator: MediaPoolFilterOperator,
+        value: impl serde::Serialize,
+    ) -> Self {
+        Self {
+            filter_type: MediaPoolFilterType::Field,
+            field: Some(field.into()),
+            operator: Some(operator),
+            value: serde_json::to_value(value).unwrap_or(serde_json::Value::Null),
+            weight: None,
+        }
+    }
+
+    /// Sets the Media Pool field name.
+    pub fn field(mut self, field: impl Into<String>) -> Self {
+        self.field = Some(field.into());
+        self
+    }
+
+    /// Sets the field comparison operator.
+    pub fn operator(mut self, operator: MediaPoolFilterOperator) -> Self {
+        self.operator = Some(operator);
+        self
+    }
+
+    /// Sets the similarity/description weight (`0.0..=1.0`).
+    pub fn weight(mut self, weight: f64) -> Self {
+        self.weight = Some(weight);
+        self
+    }
+}""",
+        """/// A log entry returned by `ak.wwise.core.audio.import`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct AudioImportLogItem {
+    /// Severity level of the import log entry.
+    pub severity: LogSeverity,
+    /// Human-readable log message.
+    pub message: String,
+}""",
+        emit_enum("AudioImportedOperation", "Operation reported by `ak.wwise.core.audio.imported`.",
+                  ["CreateNewObject", "ReplaceFile", "Localize", "ReplaceObject"]),
+        """/// Base64-encoded SoundBank data payload in `ak.wwise.core.soundbank.generated`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct SoundBankGeneratedBankData {
+    /// Size of the generated SoundBank in bytes.
+    pub size: i64,
+    /// Base64-encoded SoundBank binary data.
+    pub data: String,
+}""",
+        """/// A plug-in library entry inside [`SoundBankPluginInfo`].
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct SoundBankPluginLib {
+    /// Plug-in category or type.
+    #[serde(rename = "Type")]
+    pub plugin_type: String,
+    /// Library display name.
+    #[serde(rename = "LibName")]
+    pub lib_name: String,
+    /// Numeric or hex library identifier.
+    #[serde(rename = "LibId")]
+    pub lib_id: String,
+    /// Dynamic library file name (`.dll` / `.so` / `.dylib`), if applicable.
+    #[serde(default, rename = "DLL", skip_serializing_if = "Option::is_none")]
+    pub dll: Option<String>,
+    /// Static library file name (`.lib` / `.a`), if applicable.
+    #[serde(default, rename = "StaticLib", skip_serializing_if = "Option::is_none")]
+    pub static_lib: Option<String>,
+}""",
+        """/// Plug-in usage metadata emitted in `ak.wwise.core.soundbank.generated`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct SoundBankPluginInfo {
+    /// Target platform name.
+    #[serde(rename = "Platform")]
+    pub platform: String,
+    /// Base platform name.
+    #[serde(rename = "BasePlatform")]
+    pub base_platform: String,
+    /// Plug-in libraries referenced by the generated SoundBank.
+    #[serde(default, rename = "PluginLibs")]
+    pub plugin_libs: Vec<SoundBankPluginLib>,
+}""",
+        emit_enum("ToneChannelConfig", "Channel configuration for `ak.wwise.debug.generateToneWAV`.",
+                  ["0.1", "1.0", "2.0", "2.1", "3.0", "4.0", "5.1", "7.1", "5.1.2", "7.1.2", "7.1.4",
+                   "Ambisonics 1st order", "Ambisonics 2nd order", "Ambisonics 3rd order",
+                   "Ambisonics 4th order", "Ambisonics 5th order"]),
+        emit_enum("ToneBitDepth", "Sample bit depth for `ak.wwise.debug.generateToneWAV`.",
+                  ["int16", "float32"]),
+        emit_enum("ToneWaveform", "Waveform type for `ak.wwise.debug.generateToneWAV`.",
+                  ["silence", "sine", "triangle", "square", "whiteNoise"]),
+        """/// A WAV cue marker definition for `ak.wwise.debug.generateToneWAV`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct WavMarker {
+    /// Position of the marker in seconds.
+    pub position: f64,
+    /// Optional marker text label.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+}
+
+impl WavMarker {
+    /// Creates a new [`WavMarker`] at `position` (in seconds).
+    pub fn new(position: f64) -> Self {
+        Self { position, label: None }
+    }
+
+    /// Sets the marker text label.
+    pub fn label(mut self, label: impl Into<String>) -> Self {
+        self.label = Some(label.into());
+        self
+    }
+}""",
+        """/// Screen rectangle region for `ak.wwise.ui.captureScreen`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ScreenRect {
+    /// Left X coordinate in pixels.
+    pub x: i64,
+    /// Top Y coordinate in pixels.
+    pub y: i64,
+    /// Width in pixels.
+    pub width: i64,
+    /// Height in pixels.
+    pub height: i64,
+}
+
+impl ScreenRect {
+    /// Creates a new [`ScreenRect`].
+    pub const fn new(x: i64, y: i64, width: i64, height: i64) -> Self {
+        Self { x, y, width, height }
+    }
+}""",
+        """/// Window dimensions for `ak.wwise.ui.window.create`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct WindowSize {
+    /// Width in pixels.
+    pub width: i64,
+    /// Height in pixels.
+    pub height: i64,
+}
+
+impl WindowSize {
+    /// Creates a new [`WindowSize`].
+    pub const fn new(width: i64, height: i64) -> Self {
+        Self { width, height }
+    }
+}""",
+        """/// An active view instance returned by `ak.wwise.ui.layout.getViewInstances`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ViewInstance {
+    /// Internal view type name.
+    #[serde(rename = "viewName")]
+    pub view_name: String,
+    /// Unique identifier (GUID) of the view instance.
+    #[serde(rename = "viewID")]
+    pub view_id: String,
+    /// Whether the view instance is docked inside a layout.
+    #[serde(rename = "viewIsDocked")]
+    pub view_is_docked: bool,
+    /// Localized display name of the view.
+    #[serde(default, rename = "viewDisplayName", skip_serializing_if = "Option::is_none")]
+    pub view_display_name: Option<String>,
+}""",
+        """/// A view type definition returned by `ak.wwise.ui.layout.getViewTypes`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct ViewTypeInfo {
+    /// Internal view type identifier.
+    #[serde(rename = "viewName")]
+    pub view_name: String,
+    /// Localized display name of the view type.
+    #[serde(rename = "viewDisplayName")]
+    pub view_display_name: String,
+}""",
+        """/// A platform entry for `ak.wwise.ui.project.create` (`platformToCreateArg`).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct PlatformTemplateEntry {
+    /// Optional custom platform name in the project.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Base deployment platform name (e.g. `"Windows"`, `"Mac"`, `"PS4"`).
+    #[serde(rename = "basePlatform")]
+    pub base_platform: String,
+}
+
+impl PlatformTemplateEntry {
+    /// Creates a new [`PlatformTemplateEntry`] for `base_platform`.
+    pub fn new(base_platform: impl Into<String>) -> Self {
+        Self { name: None, base_platform: base_platform.into() }
+    }
+
+    /// Sets a custom platform name for this entry.
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
+        self
+    }
+}""",
+        """/// Platforms to create in `ak.wwise.ui.project.create` (`platformsToCreateArg`): either a single platform entry or a list.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum PlatformsToCreate {
+    /// A single platform definition.
+    Single(PlatformTemplateEntry),
+    /// Multiple platform definitions.
+    Multiple(Vec<PlatformTemplateEntry>),
+}
+
+impl PlatformsToCreate {
+    /// Creates a [`PlatformsToCreate::Single`] entry.
+    pub fn single(entry: PlatformTemplateEntry) -> Self {
+        Self::Single(entry)
+    }
+
+    /// Creates a [`PlatformsToCreate::Multiple`] list of platform entries.
+    pub fn multiple(entries: impl Into<Vec<PlatformTemplateEntry>>) -> Self {
+        Self::Multiple(entries.into())
+    }
+}""",
+        """/// A widget attribute key/value pair (`widgetAttributeEntry`).
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct WidgetAttributeEntry {
+    /// Widget attribute name.
+    pub attribute: String,
+    /// Widget attribute value.
+    pub value: serde_json::Value,
+}
+
+impl WidgetAttributeEntry {
+    /// Creates a new [`WidgetAttributeEntry`].
+    pub fn new(attribute: impl Into<String>, value: impl serde::Serialize) -> Self {
+        Self {
+            attribute: attribute.into(),
+            value: serde_json::to_value(value).unwrap_or(serde_json::Value::Null),
+        }
+    }
+}""",
+        """/// A widget state query entry for `ak.wwise.ui.model.getState`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct WidgetStateQuery {
+    /// Identifier of the widget to query.
+    #[serde(rename = "widgetID")]
+    pub widget_id: String,
+    /// List of attribute names to retrieve for the widget.
+    pub state: Vec<String>,
+}
+
+impl WidgetStateQuery {
+    /// Creates a new [`WidgetStateQuery`] for `widget_id`.
+    pub fn new(widget_id: impl Into<String>, state: impl Into<Vec<String>>) -> Self {
+        Self { widget_id: widget_id.into(), state: state.into() }
+    }
+}""",
+        """/// A widget state result entry returned by `ak.wwise.ui.model.getState`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct WidgetStateResult {
+    /// Identifier of the queried widget.
+    #[serde(rename = "widgetID")]
+    pub widget_id: String,
+    /// Retrieved attribute values for the widget.
+    #[serde(default)]
+    pub state: Vec<WidgetAttributeEntry>,
+}""",
+        """/// A widget state update entry for `ak.wwise.ui.model.setState`.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct WidgetStateUpdate {
+    /// Identifier of the widget to update.
+    #[serde(rename = "widgetID")]
+    pub widget_id: String,
+    /// Attribute values to apply to the widget.
+    pub state: Vec<WidgetAttributeEntry>,
+}
+
+impl WidgetStateUpdate {
+    /// Creates a new [`WidgetStateUpdate`] for `widget_id`.
+    pub fn new(widget_id: impl Into<String>, state: impl Into<Vec<WidgetAttributeEntry>>) -> Self {
+        Self { widget_id: widget_id.into(), state: state.into() }
+    }
+}""",
+        """/// Either a single string or a list of strings (`stringOrArrayOfString`).
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum StringOrVec {
+    /// A single string value.
+    Single(String),
+    /// Multiple string values.
+    Multiple(Vec<String>),
+}
+
+impl StringOrVec {
+    /// Creates a [`StringOrVec::Single`] value.
+    pub fn single(value: impl Into<String>) -> Self {
+        Self::Single(value.into())
+    }
+
+    /// Creates a [`StringOrVec::Multiple`] list of strings.
+    pub fn multiple(values: impl IntoIterator<Item = impl Into<String>>) -> Self {
+        Self::Multiple(values.into_iter().map(Into::into).collect())
+    }
+}""",
+        emit_enum("CommandStartMode", "Process launch mode for a custom add-on command (`addOnsCommands`).",
+                  ["SingleSelectionSingleProcess", "MultipleSelectionSingleProcessSpaceSeparated",
+                   "MultipleSelectionMultipleProcesses"]),
+        """/// Context-menu placement configuration for an [`AddOnCommand`].
+#[derive(Debug, Clone, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+pub struct CommandContextMenu {
+    /// Slash-separated menu path inside the context menu.
+    #[serde(default, rename = "basePath", skip_serializing_if = "Option::is_none")]
+    pub base_path: Option<String>,
+    /// Object types or categories for which the menu item is visible.
+    #[serde(default, rename = "visibleFor", skip_serializing_if = "Option::is_none")]
+    pub visible_for: Option<StringOrVec>,
+    /// Object types or categories for which the menu item is enabled.
+    #[serde(default, rename = "enabledFor", skip_serializing_if = "Option::is_none")]
+    pub enabled_for: Option<StringOrVec>,
+}
+
+impl CommandContextMenu {
+    /// Creates a new [`CommandContextMenu`] with `base_path`.
+    pub fn new(base_path: impl Into<String>) -> Self {
+        Self {
+            base_path: Some(base_path.into()),
+            visible_for: None,
+            enabled_for: None,
+        }
+    }
+
+    /// Sets the object types for which this context menu item is visible.
+    pub fn visible_for(mut self, visible_for: StringOrVec) -> Self {
+        self.visible_for = Some(visible_for);
+        self
+    }
+
+    /// Sets the object types for which this context menu item is enabled.
+    pub fn enabled_for(mut self, enabled_for: StringOrVec) -> Self {
+        self.enabled_for = Some(enabled_for);
+        self
+    }
+}""",
+        """/// Main-menu placement configuration for an [`AddOnCommand`].
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct CommandMainMenu {
+    /// Slash-separated menu path inside the Wwise Authoring main menu bar.
+    #[serde(rename = "basePath")]
+    pub base_path: String,
+}
+
+impl CommandMainMenu {
+    /// Creates a new [`CommandMainMenu`] with `base_path`.
+    pub fn new(base_path: impl Into<String>) -> Self {
+        Self { base_path: base_path.into() }
+    }
+}""",
+        """/// A custom add-on command definition (`addOnsCommands`) for `ak.wwise.ui.commands.register`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct AddOnCommand {
+    /// Unique identifier for the command.
+    pub id: String,
+    /// Display name shown in menus and shortcuts.
+    #[serde(rename = "displayName")]
+    pub display_name: String,
+    /// Executable or script to invoke when the command is triggered.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub program: Option<String>,
+    /// Process launch mode for multi-selection commands.
+    #[serde(default, rename = "startMode", skip_serializing_if = "Option::is_none")]
+    pub start_mode: Option<CommandStartMode>,
+    /// Command-line arguments template passed to `program`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub args: Option<String>,
+    /// Working directory when launching `program`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cwd: Option<String>,
+    /// Default keyboard shortcut (e.g. `"Ctrl+Shift+K"`).
+    #[serde(default, rename = "defaultShortcut", skip_serializing_if = "Option::is_none")]
+    pub default_shortcut: Option<String>,
+    /// Redirect mode or destination for standard output/error.
+    #[serde(default, rename = "redirectOutputs", skip_serializing_if = "Option::is_none")]
+    pub redirect_outputs: Option<String>,
+    /// Context menu placement configuration.
+    #[serde(default, rename = "contextMenu", skip_serializing_if = "Option::is_none")]
+    pub context_menu: Option<CommandContextMenu>,
+    /// Main menu placement configuration.
+    #[serde(default, rename = "mainMenu", skip_serializing_if = "Option::is_none")]
+    pub main_menu: Option<CommandMainMenu>,
+}
+
+impl AddOnCommand {
+    /// Creates a new [`AddOnCommand`] with `id` and `display_name`.
+    pub fn new(id: impl Into<String>, display_name: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            display_name: display_name.into(),
+            program: None,
+            start_mode: None,
+            args: None,
+            cwd: None,
+            default_shortcut: None,
+            redirect_outputs: None,
+            context_menu: None,
+            main_menu: None,
+        }
+    }
+
+    /// Sets the executable or script path.
+    pub fn program(mut self, program: impl Into<String>) -> Self {
+        self.program = Some(program.into());
+        self
+    }
+
+    /// Sets the multi-selection process start mode.
+    pub fn start_mode(mut self, start_mode: CommandStartMode) -> Self {
+        self.start_mode = Some(start_mode);
+        self
+    }
+
+    /// Sets the command-line arguments template.
+    pub fn args(mut self, args: impl Into<String>) -> Self {
+        self.args = Some(args.into());
+        self
+    }
+
+    /// Sets the working directory for the command process.
+    pub fn cwd(mut self, cwd: impl Into<String>) -> Self {
+        self.cwd = Some(cwd.into());
+        self
+    }
+
+    /// Sets the default keyboard shortcut.
+    pub fn default_shortcut(mut self, shortcut: impl Into<String>) -> Self {
+        self.default_shortcut = Some(shortcut.into());
+        self
+    }
+
+    /// Sets the context menu configuration.
+    pub fn context_menu(mut self, context_menu: CommandContextMenu) -> Self {
+        self.context_menu = Some(context_menu);
+        self
+    }
+
+    /// Sets the main menu configuration.
+    pub fn main_menu(mut self, main_menu: CommandMainMenu) -> Self {
+        self.main_menu = Some(main_menu);
+        self
+    }
+}""",
+    ]
+    return "\n\n".join(parts)
+
+
 def gen_primitives(schemas, endpoints_docs):
     waapi_defs = schemas.load_definitions("waapi_definitions.json")
     get_ctx = endpoints_docs["ak.wwise.core.object.get"]
@@ -1397,6 +2425,7 @@ def gen_primitives(schemas, endpoints_docs):
     parts.append(gen_transport_types(exec_ctx, state_ctx, list_ctx))
     parts.append(gen_attenuation_and_object_types(waapi_defs, atten_ctx, paste_ctx, switch_ctx, open_ctx))
     parts.append(gen_soundengine_and_misc_types())
+    parts.append(gen_profiler_and_domain_types(schemas, endpoints_docs))
     return "\n\n".join(parts) + "\n"
 
 
@@ -1405,7 +2434,7 @@ HEADER = """// Shared primitives referenced by generated typed bindings.
 """
 
 STATIC_REFS = """/// Object reference accepted by soundengine endpoints: name, GUID, or Short ID.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SoundEngineObjectRef {
     /// Object name.
@@ -1445,7 +2474,7 @@ pub type EventRef = SoundEngineObjectRef;
 pub type RtpcRef = SoundEngineObjectRef;
 
 /// Game object reference accepted by soundengine calls.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum GameObjectRef {
     /// Numeric 64-bit game object ID.
@@ -1470,7 +2499,7 @@ impl GameObjectRef {
 }
 
 /// Language reference used in return options.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum LanguageRef {
     /// Language name.

@@ -21,7 +21,27 @@
     "ak.wwise.core.object.isPropertyEnabled|return": "enabled",
     "ak.soundengine.postEvent|return": "playing_id",
     "ak.soundengine.getSwitch|return": "switch",
-    "ak.soundengine.getState|return": "state"
+    "ak.soundengine.getState|return": "state",
+    "ak.wwise.core.executeLuaScript|return": "result",
+    "ak.wwise.core.profiler.getAudioObjects|return": "audio_objects",
+    "ak.wwise.core.profiler.getBusses|return": "busses",
+    "ak.wwise.core.profiler.getCpuUsage|return": "items",
+    "ak.wwise.core.profiler.getCursorTime|return": "time",
+    "ak.wwise.core.profiler.getGameObjects|return": "game_objects",
+    "ak.wwise.core.profiler.getLoadedMedia|return": "media",
+    "ak.wwise.core.profiler.getPerformanceMonitor|return": "counters",
+    "ak.wwise.core.profiler.getRTPCs|return": "rtpcs",
+    "ak.wwise.core.profiler.getStreamedMedia|return": "streams",
+    "ak.wwise.core.profiler.getVoiceContributions|return": "contributions",
+    "ak.wwise.core.profiler.getVoices|return": "voices",
+    "ak.wwise.core.profiler.startCapture|return": "time",
+    "ak.wwise.core.profiler.stopCapture|return": "time",
+    "ak.wwise.core.profiler.moveCursor|return": "time",
+    "ak.wwise.core.profiler.setCursorTime|return": "time",
+    "ak.wwise.core.sourceControl.getSourceFiles|return": "files",
+    "ak.wwise.debug.getWalTree|return": "tree",
+    "ak.wwise.core.mediaPool.get|return": "results",
+    "ak.wwise.core.mediaPool.getFields|return": "fields"
   },
   "result_wrapped_object_return": [
     "ak.soundengine.getState",
@@ -42,7 +62,26 @@
     ],
     "ak.wwise.ui.project.close": [
       "hadProjectOpen"
-    ]
+    ],
+    "ak.wwise.core.profiler.getVoiceContributions": [
+      "return"
+    ],
+    "ak.wwise.core.profiler.getCursorTime": [
+      "return"
+    ],
+    "ak.wwise.core.profiler.startCapture": [
+      "return"
+    ],
+    "ak.wwise.core.profiler.stopCapture": [
+      "return"
+    ],
+    "ak.wwise.core.profiler.moveCursor": [
+      "return"
+    ],
+    "ak.wwise.core.profiler.setCursorTime": [
+      "return"
+    ],
+    "ak.wwise.core.remote.getConnectionStatus": []
   },
   "field_name_overrides": {
     "type": "object_type"
@@ -101,7 +140,49 @@
     "ak.wwise.core.object.attenuationCurveChanged|response|curveType": "AttenuationCurveType",
     "ak.wwise.core.object.attenuationCurveLinkChanged|response|curveType": "AttenuationCurveType",
     "ak.wwise.core.object.propertyChanged|response|old": "serde_json::Value",
-    "ak.wwise.core.object.propertyChanged|response|new": "serde_json::Value"
+    "ak.wwise.core.object.propertyChanged|response|new": "serde_json::Value",
+    "ak.wwise.core.profiler.getCursorTime|args|cursor": "ProfilerCursor",
+    "ak.wwise.core.profiler.moveCursor|args|position": "CursorMovePosition",
+    "ak.wwise.core.profiler.enableProfilerData|args|dataTypes": "Vec<ProfilerDataTypeEntry>",
+    "ak.wwise.core.profiler.getGameObjects|response|return": "Vec<ProfilerGameObject>",
+    "ak.wwise.core.profiler.getRTPCs|response|return": "Vec<ProfilerRtpc>",
+    "ak.wwise.core.profiler.getCpuUsage|response|return": "Vec<ProfilerCpuUsageItem>",
+    "ak.wwise.core.profiler.getPerformanceMonitor|response|return": "Vec<ProfilerPerformanceCounter>",
+    "ak.wwise.core.profiler.getLoadedMedia|response|return": "Vec<ProfilerLoadedMedia>",
+    "ak.wwise.core.profiler.getStreamedMedia|response|return": "Vec<ProfilerStreamedMedia>",
+    "ak.wwise.core.profiler.getMeters|response|meters": "Vec<ProfilerMeter>",
+    "ak.wwise.core.profiler.getVoiceContributions|response|return": "VoiceContributions",
+    "ak.wwise.core.profiler.captureLog.itemAdded|options|types": "Vec<CaptureLogType>",
+    "ak.wwise.core.profiler.captureLog.itemAdded|response|severity": "CaptureLogSeverity",
+    "ak.wwise.core.object.structureChanged|response|objects": "Vec<StructureChangedObject>",
+    "ak.wwise.core.object.getPropertyInfo|response|display": "Option<PropertyDisplayInfo>",
+    "ak.wwise.core.object.getPropertyInfo|response|ui": "Option<PropertyUiInfo>",
+    "ak.wwise.core.object.getPropertyInfo|response|dependencies": "Vec<PropertyDependency>",
+    "ak.wwise.core.object.getPropertyInfo|response|restriction": "Option<PropertyRestriction>",
+    "ak.wwise.core.getProjectInfo|response|defaultWorkUnits": "Option<std::collections::HashMap<String, DefaultWorkUnitInfo>>",
+    "ak.wwise.core.getProjectInfo|response|defaultImportWorkUnit": "Option<DefaultWorkUnitInfo>",
+    "ak.wwise.core.remote.getAvailableConsoles|response|consoles": "Vec<RemoteConsoleInfo>",
+    "ak.wwise.core.remote.getConnectionStatus|response|console": "Option<ConnectedConsoleInfo>",
+    "ak.wwise.core.sourceControl.getSourceFiles|args|filter": "SourceControlFileFilter",
+    "ak.wwise.core.sourceControl.getSourceFiles|options|return": "Vec<SourceControlReturnField>",
+    "ak.wwise.core.sourceControl.getSourceFiles|response|return": "Vec<SourceControlSourceFile>",
+    "ak.wwise.core.sourceControl.getStatus|response|result": "Vec<SourceControlStatus>",
+    "ak.wwise.core.mediaPool.get|args|filters": "Vec<MediaPoolFilterEntry>",
+    "ak.wwise.core.audio.import|response|log": "Vec<AudioImportLogItem>",
+    "ak.wwise.core.audio.imported|response|operation": "AudioImportedOperation",
+    "ak.wwise.core.soundbank.generated|response|bankData": "Option<SoundBankGeneratedBankData>",
+    "ak.wwise.core.soundbank.generated|response|pluginInfo": "Option<SoundBankPluginInfo>",
+    "ak.wwise.debug.generateToneWAV|args|channelConfig": "ToneChannelConfig",
+    "ak.wwise.debug.generateToneWAV|args|bitDepth": "ToneBitDepth",
+    "ak.wwise.debug.generateToneWAV|args|waveform": "ToneWaveform",
+    "ak.wwise.debug.generateToneWAV|args|markers": "Vec<WavMarker>",
+    "ak.wwise.ui.captureScreen|args|rect": "ScreenRect",
+    "ak.wwise.ui.window.create|args|size": "WindowSize",
+    "ak.wwise.ui.layout.getViewInstances|response|viewInstances": "Vec<ViewInstance>",
+    "ak.wwise.ui.layout.getViewTypes|response|viewTypes": "Vec<ViewTypeInfo>",
+    "ak.wwise.ui.project.create|args|platforms": "PlatformsToCreate",
+    "ak.wwise.ui.model.getState|args|state": "Vec<WidgetStateQuery>",
+    "ak.wwise.ui.model.setState|args|state": "Vec<WidgetStateUpdate>"
   },
   "ref_types": {
     "common_definitions.json#/definitions/guid": "String",
@@ -137,12 +218,20 @@
     "waapi_definitions.json#/definitions/logCentralItem": "LogCentralItem",
     "waapi_definitions.json#/definitions/logCentralChannel": "LogChannel",
     "common_definitions.json#/definitions/arrayOfString": "Vec<String>",
-    "common_definitions.json#/definitions/stringOrArrayOfString": "serde_json::Value",
-    "waapi_definitions.json#/definitions/cursorTime": "serde_json::Value",
+    "common_definitions.json#/definitions/stringOrArrayOfString": "StringOrVec",
+    "waapi_definitions.json#/definitions/cursorTime": "CursorTime",
+    "waapi_definitions.json#/definitions/profilerCursor": "ProfilerCursor",
     "waapi_definitions.json#/definitions/arrayOfLogCentralItem": "Vec<LogCentralItem>",
     "waapi_definitions.json#/definitions/pluginReferenceGroup": "serde_json::Value",
     "waapi_definitions.json#/definitions/projectOptionCliArg": "String",
-    "waapi_definitions.json#/definitions/pipelineID": "f64",
+    "waapi_definitions.json#/definitions/pipelineID": "u32",
+    "waapi_definitions.json#/definitions/busReturn": "ProfilerBus",
+    "waapi_definitions.json#/definitions/voiceReturn": "ProfilerVoice",
+    "waapi_definitions.json#/definitions/audioObjectReturn": "ProfilerAudioObject",
+    "waapi_definitions.json#/definitions/voiceContributionsObject": "VoiceContributionObject",
+    "waapi_definitions.json#/definitions/arrayOfSourceControlStatus": "Vec<SourceControlStatus>",
+    "waapi_definitions.json#/definitions/platformsToCreateArg": "PlatformsToCreate",
+    "waapi_definitions.json#/definitions/addOnsCommands": "Vec<AddOnCommand>",
     "waapi_definitions.json#/definitions/mediaReference": "serde_json::Value",
     "waapi_definitions.json#/definitions/mediaPoolField": "String",
     "waapi_definitions.json#/definitions/mediaPoolReturnOption": "String",
@@ -150,6 +239,8 @@
     "waapi_definitions.json#/definitions/externalSourceReference": "serde_json::Value",
     "waapi_definitions.json#/definitions/curveObjectDefinition": "serde_json::Value",
     "waapi_definitions.json#/definitions/auxBusReference": "serde_json::Value",
-    "waapi_ui_definitions.json#/definitions/widgetAttributeEntry": "serde_json::Value"
+    "waapi_ui_definitions.json#/definitions/viewInstance": "ViewInstance",
+    "waapi_ui_definitions.json#/definitions/viewTypeToName": "ViewTypeInfo",
+    "waapi_ui_definitions.json#/definitions/widgetAttributeEntry": "WidgetAttributeEntry"
   }
 }

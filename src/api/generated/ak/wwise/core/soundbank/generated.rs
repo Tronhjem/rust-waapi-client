@@ -21,11 +21,15 @@ pub struct CoreSoundbankGeneratedPayload {
     #[serde(default)]
     pub error: Option<String>,
     /// SoundBank data object containing the actual data encoded in base64 and the size.
-    #[serde(rename = "bankData", default)]
-    pub bank_data: Option<serde_json::Value>,
+    #[serde(rename = "bankData", default, skip_serializing_if = "Option::is_none")]
+    pub bank_data: Option<SoundBankGeneratedBankData>,
     /// PluginInfo file info.
-    #[serde(rename = "pluginInfo", default)]
-    pub plugin_info: Option<serde_json::Value>,
+    #[serde(
+        rename = "pluginInfo",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub plugin_info: Option<SoundBankPluginInfo>,
     /// All the information for SoundBank.
     #[serde(rename = "bankInfo", default)]
     pub bank_info: Vec<serde_json::Value>,
