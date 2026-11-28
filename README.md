@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Async, compile-time checked, and strongly typed Rust client for the Wwise Authoring API (WAAPI).
-- **API Documentation (Rustdoc):** https://tronhjem.github.io/rust-waapi-client/wwise_waapi/
+- **API Documentation (Rustdoc):** https://spektakelaudio.github.io/rust-waapi-client/wwise_waapi/
 - **Wwise WAAPI Reference:** https://www.audiokinetic.com/en/public-library/2025.1.4_9062/?source=SDK&id=waapi.html
 
 ## Why `wwise-waapi`?
@@ -16,6 +16,23 @@ Previously I personally mostly wrote WAAPI Wwise automation and tooling in Pytho
 - **Compile-Time Checked & Type-Safe:** All 180 WAAPI functions, 35 subscription topics, 77 Wwise `ObjectType` variants, and 493 `Property` accessors are generated directly from Wwise's schemas and `WObjects.xml`. Invalid arguments, missing required fields, or mistyped property and object names are caught by the Rust compiler before your tool ever runs.
 - **Multi-Version Wwise 2024 & 2025+ Support:** Generated from the union of Wwise 2024 and 2025+ schemas so a single typed API works seamlessly across Wwise versions (including 2025 hierarchy and `ActorMixer` -> `PropertyContainer` renames).
 - **Significantly Faster than Python (`waapi-client`):** Built on a lightweight, low-latency WAMP v2 transport with single-pass `serde` serialization and async request pipelining - delivering **~3x faster per-call roundtrips** (`1.99 ms` vs `5.88 ms` on a 186-object `object.get` query) and **~8.5x faster end-to-end CLI execution** (`9.2 ms` vs `77.4 ms` from process start to exit).
+
+## Installation
+
+Add `wwise-waapi` and `tokio` (for the `#[tokio::main]` async runtime) to your project:
+
+```bash
+cargo add wwise-waapi
+cargo add tokio --features rt-multi-thread,macros
+```
+
+Or in `Cargo.toml`:
+
+```toml
+[dependencies]
+wwise-waapi = "0.1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] } # or features = ["full"]
+```
 
 ## Basic Usage
 
@@ -252,7 +269,7 @@ All **180 WAAPI functions** and **35 subscription topics** have generated typed 
 
 For the complete 180-function and 35-topic tables, JSON Schema mapping rules, and the full field-by-field breakdown of dynamic payloads, see:
 - **[Typed API Design & Endpoint Reference (`docs/API_REFERENCE.md`)](docs/API_REFERENCE.md)**
-- **[Interactive Rustdoc Documentation](https://tronhjem.github.io/rust-waapi-client/wwise_waapi/)**
+- **[Interactive Rustdoc Documentation](https://spektakelaudio.github.io/rust-waapi-client/wwise_waapi/)**
 
 ## Examples
 

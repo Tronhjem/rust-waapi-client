@@ -2,7 +2,7 @@
 
 All generated bindings in `src/waapi_function_api.rs`, `src/waapi_topics_api.rs`, and `src/api/generated/` are derived offline from the Wwise JSON schemas stored in `tools/waapi_schemas/<version>/` (fetched from a running Wwise instance via `tools/get_waapi_definitions.py`).
 
-For interactive API documentation of every generated module, struct, enum, and method, see the **[Rustdoc API Documentation](https://tronhjem.github.io/rust-waapi-client/wwise_waapi/)**.
+For interactive API documentation of every generated module, struct, enum, and method, see the **[Rustdoc API Documentation](https://spektakelaudio.github.io/rust-waapi-client/wwise_waapi/)**.
 
 ---
 

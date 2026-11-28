@@ -5,7 +5,6 @@ pub mod generated;
 /// Hand-written shared primitives for object references, 3D vectors/positions, and child object creation.
 pub mod primitives;
 
-pub use generated::ak;
 pub use generated::primitives::{
     ActionOnEventType, AddOnCommand, AkCurveInterpolation, AttenuationCurveType,
     AttenuationCurveUse, AudioConvertError, AudioImportLogItem, AudioImportedOperation,
@@ -38,6 +37,8 @@ pub use generated::primitives::{
     WwiseObject, WwiseObjectRef, WwiseObjectTypeInfo,
 };
 pub use generated::{ObjectType, Property};
+#[doc(inline)]
+pub use generated::{ak, clients};
 pub use primitives::{
     ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
 };

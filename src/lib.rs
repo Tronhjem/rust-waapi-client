@@ -4,6 +4,16 @@
 //! Audiokinetic Wwise's Authoring API (supporting Wwise 2024 and Wwise 2025+
 //! via multi-version union generation), along with a raw JSON escape hatch.
 //!
+//! # Installation
+//!
+//! Add `wwise-waapi` and `tokio` (for the `#[tokio::main]` async runtime) to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! wwise-waapi = "0.1"
+//! tokio = { version = "1", features = ["rt-multi-thread", "macros"] } # or features = ["full"]
+//! ```
+//!
 //! # Quick Start (Chained Typed API)
 //!
 //! The chained API on [`WaapiClient`] mirrors WAAPI URI dot-notation
@@ -119,9 +129,67 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! # WAAPI API Namespaces
+//!
+//! All 180 WAAPI functions and 35 subscription topics are organized by their WAAPI URI hierarchy
+//! under [`ak`] (request/response/payload types) and [`api::clients`] (callable client methods on [`WaapiClient`]).
+//! Click any namespace below to view its full URI table, client methods, and types:
+//!
+//! ## `ak.soundengine`
+//!
+//! | WAAPI Namespace | Client Handle (`WaapiClient`) | Client Struct (Methods) | Types Module |
+//! |---|---|---|---|
+//! | `ak.soundengine.*` | `client.soundengine()` | [`SoundengineClient`](api::clients::SoundengineClient) | [`ak::soundengine`] |
+//!
+//! ## `ak.wwise.core` (Objects, Audio & Authoring)
+//!
+//! | WAAPI Namespace | Client Handle (`WaapiClient`) | Client Struct (Methods) | Types Module |
+//! |---|---|---|---|
+//! | `ak.wwise.core.*` | `client.core()` | [`WwiseCoreClient`](api::clients::WwiseCoreClient) | [`ak::wwise::core`] |
+//! | `ak.wwise.core.object.*` | `client.object()` | [`WwiseCoreObjectClient`](api::clients::WwiseCoreObjectClient) | [`ak::wwise::core::object`] |
+//! | `ak.wwise.core.audio.*` | `client.core().audio()` | [`WwiseCoreAudioClient`](api::clients::WwiseCoreAudioClient) | [`ak::wwise::core::audio`] |
+//! | `ak.wwise.core.audioSourcePeaks.*` | `client.core().audio_source_peaks()` | [`WwiseCoreAudioSourcePeaksClient`](api::clients::WwiseCoreAudioSourcePeaksClient) | [`ak::wwise::core::audioSourcePeaks`] |
+//! | `ak.wwise.core.blendContainer.*` | `client.core().blend_container()` | [`WwiseCoreBlendContainerClient`](api::clients::WwiseCoreBlendContainerClient) | [`ak::wwise::core::blendContainer`] |
+//! | `ak.wwise.core.gameParameter.*` | `client.core().game_parameter()` | [`WwiseCoreGameParameterClient`](api::clients::WwiseCoreGameParameterClient) | [`ak::wwise::core::gameParameter`] |
+//! | `ak.wwise.core.mediaPool.*` | `client.core().media_pool()` | [`WwiseCoreMediaPoolClient`](api::clients::WwiseCoreMediaPoolClient) | [`ak::wwise::core::mediaPool`] |
+//! | `ak.wwise.core.project.*` | `client.core().project()` | [`WwiseCoreProjectClient`](api::clients::WwiseCoreProjectClient) | [`ak::wwise::core::project`] |
+//! | `ak.wwise.core.sound.*` | `client.core().sound()` | [`WwiseCoreSoundClient`](api::clients::WwiseCoreSoundClient) | [`ak::wwise::core::sound`] |
+//! | `ak.wwise.core.soundbank.*` | `client.core().soundbank()` | [`WwiseCoreSoundbankClient`](api::clients::WwiseCoreSoundbankClient) | [`ak::wwise::core::soundbank`] |
+//! | `ak.wwise.core.sourceControl.*` | `client.core().source_control()` | [`WwiseCoreSourceControlClient`](api::clients::WwiseCoreSourceControlClient) | [`ak::wwise::core::sourceControl`] |
+//! | `ak.wwise.core.switchContainer.*` | `client.core().switch_container()` | [`WwiseCoreSwitchContainerClient`](api::clients::WwiseCoreSwitchContainerClient) | [`ak::wwise::core::switchContainer`] |
+//! | `ak.wwise.core.transport.*` | `client.core().transport()` | [`WwiseCoreTransportClient`](api::clients::WwiseCoreTransportClient) | [`ak::wwise::core::transport`] |
+//! | `ak.wwise.core.undo.*` | `client.core().undo()` | [`WwiseCoreUndoClient`](api::clients::WwiseCoreUndoClient) | [`ak::wwise::core::undo`] |
+//! | `ak.wwise.core.workUnit.*` | `client.core().work_unit()` | [`WwiseCoreWorkUnitClient`](api::clients::WwiseCoreWorkUnitClient) | [`ak::wwise::core::workUnit`] |
+//!
+//! ## `ak.wwise.core.profiler` & Diagnostics
+//!
+//! | WAAPI Namespace | Client Handle (`WaapiClient`) | Client Struct (Methods) | Types Module |
+//! |---|---|---|---|
+//! | `ak.wwise.core.profiler.*` | `client.core().profiler()` | [`WwiseCoreProfilerClient`](api::clients::WwiseCoreProfilerClient) | [`ak::wwise::core::profiler`] |
+//! | `ak.wwise.core.profiler.captureLog.*` | `client.core().profiler().capture_log()` | [`WwiseCoreProfilerCaptureLogClient`](api::clients::WwiseCoreProfilerCaptureLogClient) | [`ak::wwise::core::profiler::captureLog`] |
+//! | `ak.wwise.core.log.*` | `client.core().log()` | [`WwiseCoreLogClient`](api::clients::WwiseCoreLogClient) | [`ak::wwise::core::log`] |
+//! | `ak.wwise.core.remote.*` | `client.core().remote()` | [`WwiseCoreRemoteClient`](api::clients::WwiseCoreRemoteClient) | [`ak::wwise::core::remote`] |
+//!
+//! ## `ak.wwise.ui`, `debug` & `waapi`
+//!
+//! | WAAPI Namespace | Client Handle (`WaapiClient`) | Client Struct (Methods) | Types Module |
+//! |---|---|---|---|
+//! | `ak.wwise.ui.*` | `client.ui()` | [`WwiseUiClient`](api::clients::WwiseUiClient) | [`ak::wwise::ui`] |
+//! | `ak.wwise.ui.cli.*` | `client.ui().cli()` | [`WwiseUiCliClient`](api::clients::WwiseUiCliClient) | [`ak::wwise::ui::cli`] |
+//! | `ak.wwise.ui.commands.*` | `client.ui().commands()` | [`WwiseUiCommandsClient`](api::clients::WwiseUiCommandsClient) | [`ak::wwise::ui::commands`] |
+//! | `ak.wwise.ui.layout.*` | `client.ui().layout()` | [`WwiseUiLayoutClient`](api::clients::WwiseUiLayoutClient) | [`ak::wwise::ui::layout`] |
+//! | `ak.wwise.ui.model.*` | `client.ui().model()` | [`WwiseUiModelClient`](api::clients::WwiseUiModelClient) | [`ak::wwise::ui::model`] |
+//! | `ak.wwise.ui.project.*` | `client.ui().project()` | [`WwiseUiProjectClient`](api::clients::WwiseUiProjectClient) | [`ak::wwise::ui::project`] |
+//! | `ak.wwise.ui.signal.*` | `client.ui().signal()` | [`WwiseUiSignalClient`](api::clients::WwiseUiSignalClient) | [`ak::wwise::ui::signal`] |
+//! | `ak.wwise.ui.window.*` | `client.ui().window()` | [`WwiseUiWindowClient`](api::clients::WwiseUiWindowClient) | [`ak::wwise::ui::window`] |
+//! | `ak.wwise.debug.*` | `client.wwise().debug()` | [`WwiseDebugClient`](api::clients::WwiseDebugClient) | [`ak::wwise::debug`] |
+//! | `ak.wwise.waapi.*` | `client.wwise().waapi()` | [`WwiseWaapiClient`](api::clients::WwiseWaapiClient) | [`ak::wwise::waapi`] |
 
 #![warn(missing_docs)]
 
+#[doc(inline)]
+pub use api::ak;
 pub mod api;
 /// Re-exports of `serde_json::Map` and `serde_json::Value`.
 pub mod types;
