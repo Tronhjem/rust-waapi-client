@@ -5,7 +5,7 @@ edition = "2024"
 license = "MIT"
 authors = ["Christian Tronhjem <ctronhjem@gmail.com>"]
 description = "Async, typed Rust client for the Wwise Authoring API (WAAPI)"
-repository = "https://github.com/Tronhjem/rust-waapi-client"
+repository = "https://github.com/SpektakelAudio/rust-waapi-client"
 readme = "README.md"
 documentation = "https://docs.rs/wwise-waapi"
 

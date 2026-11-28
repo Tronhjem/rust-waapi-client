@@ -10,7 +10,8 @@ Async, compile-time checked, and strongly typed Rust client for the Wwise Author
 
 ## Why `wwise-waapi`?
 
-Previously I mostly wrote Wwise automation and tooling in Python using raw JSON dictionaries. This creates problems where a misspelled URI, wrong argument shape, invalid property name, or Wwise version rename only fails at runtime. `wwise-waapi` brings **compile-time verification** and **native performance** to Wwise tooling and companion apps:
+Previously I personally mostly wrote WAAPI Wwise automation and tooling in Python using raw JSON dictionaries. This creates problems where a misspelled URI, wrong arguments, invalid property names, or Wwise version rename only fails at runtime. Further more one has to refer to the schema constantly and run it to make sure things work. 
+`wwise-waapi` brings **compile-time verification** and **native performance** to Wwise tooling and companion apps:
 
 - **Compile-Time Checked & Type-Safe:** All 180 WAAPI functions, 35 subscription topics, 77 Wwise `ObjectType` variants, and 493 `Property` accessors are generated directly from Wwise's schemas and `WObjects.xml`. Invalid arguments, missing required fields, or mistyped property and object names are caught by the Rust compiler before your tool ever runs.
 - **Multi-Version Wwise 2024 & 2025+ Support:** Generated from the union of Wwise 2024 and 2025+ schemas so a single typed API works seamlessly across Wwise versions (including 2025 hierarchy and `ActorMixer` -> `PropertyContainer` renames).
