@@ -1,7 +1,7 @@
 # wwise-waapi
 
+[![Crates.io](https://img.shields.io/crates/v/wwise-waapi.svg)](https://crates.io/crates/wwise-waapi)
 [![Docs (GitHub Pages)](https://img.shields.io/badge/docs-github%20pages-blue)](https://spektakelaudio.github.io/rust-waapi-client/wwise_waapi/)
-[![docs.rs](https://docs.rs/wwise-waapi/badge.svg)](https://docs.rs/wwise-waapi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Async, compile-time checked, and strongly typed Rust client for the Wwise Authoring API (WAAPI).

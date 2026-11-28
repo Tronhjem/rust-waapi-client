@@ -37,7 +37,6 @@ pub use generated::primitives::{
     WwiseObject, WwiseObjectRef, WwiseObjectTypeInfo,
 };
 pub use generated::{ObjectType, Property};
-#[doc(inline)]
 pub use generated::{ak, clients};
 pub use primitives::{
     ChildObject, ListMode, ObjectRef, OnNameConflict, PlatformRef, Position, PropertyValue, Vector3,
